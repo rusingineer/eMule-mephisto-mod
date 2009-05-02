@@ -122,6 +122,14 @@
 #include "UPnPImplWrapper.h"
 */
 //Xman end
+
+//zz_fly
+#include "SR13-ImportParts.h" //MORPH - Added by SiRoB, Import Parts
+// MORPH START - Added by Commander, Friendlinks [emulEspaa]
+#include "Friend.h"
+// MORPH END - Added by Commander, Friendlinks [emulEspaa]
+//zz_fly end
+
 #include "Dbt.h" // Automatic shared files updater [MoNKi] - Stulle
 #include "HttpDownloadDlg.h" // Advanced Updates [MorphXT/Stulle] - Stulle
 
@@ -254,6 +262,7 @@ BEGIN_MESSAGE_MAP(CemuleDlg, CTrayDialog)
 	ON_MESSAGE(TM_READBLOCKFROMFILEDONE, OnReadBlockFromFileDone) // SiRoB: ReadBlockFromFileThread
 	ON_MESSAGE(TM_FLUSHDONE, OnFlushDone) // SiRoB: Flush Thread
 	ON_MESSAGE(TM_DOTIMER, DoTimer) //Xman process timer code via messages (Xanatos)
+	ON_MESSAGE(TM_IMPORTPART, OnImportPart) //MORPH - Added by SiRoB, Import Parts - added by zz_fly
 	//Xman end
 	ON_MESSAGE(TM_SAVEDONE, OnSaveDone) // File Settings [sivka/Stulle] - Stulle
 	ON_MESSAGE(TM_SAVEKNOWNDONE, OnSaveKnownDone) // Threaded Known Files Saving [Stulle] - Stulle
@@ -1981,6 +1990,34 @@ void CemuleDlg::ProcessED2KLink(LPCTSTR pszData)
 					AddLogLine(true,GetResString(IDS_SERVERADDED), pSrv->GetListName());
 			}
 			break;
+			// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+			case CED2KLink::kFriend:
+			{
+				// Better with dynamic_cast, but no RTTI enabled in the project
+				CED2KFriendLink* pFriendLink = static_cast<CED2KFriendLink*>(pLink);
+				uchar userHash[16];
+				pFriendLink->GetUserHash(userHash);
+
+				if ( ! theApp.friendlist->IsAlreadyFriend(userHash) )
+					theApp.friendlist->AddFriend(userHash, 0U, 0U, 0U, 0U, pFriendLink->GetUserName(), 1U);
+				else
+				{
+					CString msg;
+					msg.Format(GetResString(IDS_USER_ALREADY_FRIEND), pFriendLink->GetUserName());
+					AddLogLine(true, msg);
+				}
+			}
+			break;
+			case CED2KLink::kFriendList:
+			{
+				// Better with dynamic_cast, but no RTTI enabled in the project
+				CED2KFriendListLink* pFrndLstLink = static_cast<CED2KFriendListLink*>(pLink);
+				CString sAddress = pFrndLstLink->GetAddress(); 
+				if ( !sAddress.IsEmpty() )
+					this->chatwnd->UpdateEmfriendsMetFromURL(sAddress);
+			}
+			break;
+			// MORPH END - Added by Commander, Friendlinks [emulEspaa]
 		default:
 			break;
 		}
@@ -2264,6 +2301,21 @@ LRESULT CemuleDlg::OnFlushDone(WPARAM /*wParam*/,LPARAM lParam)
 }
 // END SiRoB: Flush Thread
 //Xman end
+
+//MORPH START - Added by SiRoB, Import Parts - added by zz_fly
+LRESULT CemuleDlg::OnImportPart(WPARAM wParam,LPARAM lParam)
+{
+	CPartFile* partfile = (CPartFile*) lParam;
+	if (theApp.m_app_state != APP_STATE_SHUTTINGDOWN && AfxIsValidAddress(partfile,sizeof(CPartFile)) &&  theApp.downloadqueue->IsPartFile(partfile)) {	// could have been canceled 
+		ImportPart_Struct* importpart = (ImportPart_Struct*)wParam;
+		partfile->WriteToBuffer(importpart->end-importpart->start+1, importpart->data,importpart->start, importpart->end, NULL, NULL);
+	}
+	delete[] ((ImportPart_Struct*)wParam)->data;
+	delete	(ImportPart_Struct*)wParam;
+
+	return 0;
+}
+//MORPH END   - Added by SiRoB, Import Parts
 
 LRESULT CemuleDlg::OnFileAllocExc(WPARAM wParam,LPARAM lParam)
 {
@@ -5057,7 +5109,7 @@ void CemuleDlg::SaveSettings (bool _shutdown) {
 	}
 	else // we might have missed something
 	// <== Threaded Known Files Saving [Stulle] - Stulle
-	theApp.knownfiles->Save();
+		theApp.knownfiles->Save();
 	//transferwnd->downloadlistctrl.SaveSettings();
 	//transferwnd->downloadclientsctrl.SaveSettings();
 	//transferwnd->uploadlistctrl.SaveSettings();

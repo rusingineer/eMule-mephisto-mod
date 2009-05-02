@@ -322,7 +322,7 @@ void CCollectionCreateDialog::OnBnClickedOk()
 				byte abyMyPublicKey[1000];
 				ArraySink asink(abyMyPublicKey, 1000);
 				pubkey.DEREncode(asink);
-				int nLen = asink.TotalPutLength();
+				int nLen = (int)asink.TotalPutLength();
 				asink.MessageEnd();
 				m_pCollection->SetCollectionAuthorKey(abyMyPublicKey, nLen);
 			}

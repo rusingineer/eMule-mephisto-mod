@@ -48,6 +48,7 @@
 #include "ListenSocket.h" //Xman changed: display the obfuscation icon for all clients which enabled it
 #include "MassRename.h" //Xman Mass Rename (Morph)
 #include "Log.h" //Xman Mass Rename (Morph)
+#include "SR13-ImportParts.h"//MORPH - Added by SiRoB, Import Parts [SR13] - added by zz_fly
 #include "SivkaFileSettings.h" // File Settings [sivka/Stulle] - Stulle
 
 
@@ -1945,10 +1946,12 @@ void CDownloadListCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 			int iFilesToPreview = 0;
 			int iFilesToCancel = 0;
 			int iFilesA4AFAuto = 0; //Xman Xtreme Downloadmanager: Auto-A4AF-check
+			int	iFilesToImport = 0; //MORPH - Added by SiRoB, Import Parts - added by zz_fly
 			// ==> Follow The Majority [AndCycle/Stulle] - Stulle
 			UINT uFollowTheMajorityMenuItem = 0;
 			CString buffer = NULL;
 			// <== Follow The Majority [AndCycle/Stulle] - Stulle
+
 			UINT uPrioMenuItem = 0;
 			const CPartFile* file1 = NULL;
 			POSITION pos = GetFirstSelectedItemPosition();
@@ -1964,6 +1967,9 @@ void CDownloadListCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 
 				bool bFileDone = (pFile->GetStatus()==PS_COMPLETE || pFile->GetStatus()==PS_COMPLETING);
 				iFilesToCancel += pFile->GetStatus() != PS_COMPLETING ? 1 : 0;
+				 //MORPH START - Added by SiRoB, Import Parts - added by zz_fly
+				iFilesToImport += pFile->GetFileOp() == PFOP_SR13_IMPORTPARTS ? 1 : 0;
+				 //MORPH END   - Added by SiRoB, Import Parts
 				iFilesNotDone += !bFileDone ? 1 : 0;
 				iFilesToStop += pFile->CanStopFile() ? 1 : 0;
 				iFilesToPause += pFile->CanPauseFile() ? 1 : 0;
@@ -2048,6 +2054,20 @@ void CDownloadListCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 			else
 				m_FileMenu.SetDefaultItem((UINT)-1);
 			m_FileMenu.EnableMenuItem(MP_VIEWFILECOMMENTS, (iSelectedItems >= 1 /*&& iFilesNotDone == 1*/) ? MF_ENABLED : MF_GRAYED);
+
+			//MORPH START - Added by SiRoB, Import Parts [SR13] - added by zz_fly
+			if(thePrefs.IsExtControlsEnabled()){
+				// ==> XP Style Menu [Xanatos] - Stulle
+				/*
+				m_FileMenu.ModifyMenuAndIcon(MP_SR13_ImportParts, MF_STRING, MP_SR13_ImportParts,(iFilesToImport > 0) ? GetResString(IDS_IMPORTPARTS_STOP) :GetResString(IDS_IMPORTPARTS), _T("FILEIMPORTPARTS"));
+				*/
+				m_FileMenu.RemoveMenu(MP_SR13_ImportParts,MF_BYCOMMAND);
+				m_FileMenu.InsertMenu(MP_SR13_ImportParts,MF_STRING|MF_BYPOSITION,MP_SR13_ImportParts,(iFilesToImport > 0) ? GetResString(IDS_IMPORTPARTS_STOP) :GetResString(IDS_IMPORTPARTS),_T("FILEIMPORTPARTS"));
+				// <== XP Style Menu [Xanatos] - Stulle
+				m_FileMenu.EnableMenuItem(MP_SR13_ImportParts, (iSelectedItems == 1 && iFilesNotDone == 1) ? MF_ENABLED : MF_GRAYED);			
+			}
+			//m_FileMenu.EnableMenuItem(MP_SR13_InitiateRehash, (iSelectedItems == 1 && iFilesNotDone == 1) ? MF_ENABLED : MF_GRAYED);
+			//MORPH END   - Added by SiRoB, Import Parts [SR13]
 
 			int total;
 			m_FileMenu.EnableMenuItem(MP_CLEARCOMPLETED, GetCompleteDownloads(curTab, total) > 0 ? MF_ENABLED : MF_GRAYED);
@@ -2275,6 +2295,11 @@ void CDownloadListCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
         }
 		m_FileMenu.EnableMenuItem(MP_MASSRENAME,MF_GRAYED);//Xman Mass Rename (Morph)
 		m_FileMenu.EnableMenuItem(MP_PREVIEW, MF_GRAYED);
+		//MORPH START - Added by SiRoB, Import Parts [SR13] - added by zz_fly
+		if (thePrefs.IsExtControlsEnabled())
+			m_FileMenu.EnableMenuItem(MP_SR13_ImportParts,MF_GRAYED);
+		//m_FileMenu.EnableMenuItem(MP_SR13_InitiateRehash,MF_GRAYED);
+		//MORPH END   - Added by SiRoB, Import Parts [SR13]
 		m_FileMenu.EnableMenuItem(MP_METINFO, MF_GRAYED);
 		m_FileMenu.EnableMenuItem(MP_VIEWFILECOMMENTS, MF_GRAYED);
 		m_FileMenu.EnableMenuItem(MP_CLEARCOMPLETED, GetCompleteDownloads(curTab,total) > 0 ? MF_ENABLED : MF_GRAYED);
@@ -2910,6 +2935,16 @@ BOOL CDownloadListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				case MP_VIEWFILECOMMENTS:
 					ShowFileDialog(IDD_COMMENTLST);
 					break;
+				//MORPH START - Added by SiRoB, Import Parts [SR13] - added by zz_fly
+				case MP_SR13_ImportParts:
+					file->SR13_ImportParts();
+					break;
+				/*
+				case MP_SR13_InitiateRehash:
+					SR13_InitiateRehash(file);
+					break;
+				*/
+				//MORPH END   - Added by SiRoB, Import Parts [SR13]
 				case MP_SHOWED2KLINK:
 					ShowFileDialog(IDD_ED2KLINK);
 					break;
@@ -3740,6 +3775,12 @@ void CDownloadListCtrl::CreateMenues()
 	m_FileMenu.AppendMenu(MF_STRING, MP_PREVIEW, GetResString(IDS_DL_PREVIEW), _T("PREVIEW"));
 	m_FileMenu.AppendMenu(MF_STRING, MP_METINFO, GetResString(IDS_DL_INFO), _T("FILEINFO"));
 	m_FileMenu.AppendMenu(MF_STRING, MP_VIEWFILECOMMENTS, GetResString(IDS_CMT_SHOWALL), _T("FILECOMMENTS"));
+	//MORPH START - Added by SiRoB, Import Parts [SR13] - added by zz_fly
+	if(thePrefs.IsExtControlsEnabled())
+		m_FileMenu.AppendMenu(MF_STRING,MP_SR13_ImportParts, GetResString(IDS_IMPORTPARTS), _T("FILEIMPORTPARTS"));
+ 	//m_FileMenu.AppendMenu(MF_STRING,MP_SR13_InitiateRehash, GetResString(IDS_INITIATEREHASH), _T("FILEINITIATEREHASH"));
+	//MORPH END   - Added by SiRoB, Import Parts [SR13]
+	//Xman Mass Rename (Morph)
 	if (thePrefs.IsExtControlsEnabled()) m_FileMenu.AppendMenu(MF_STRING,MP_MASSRENAME, GetResString(IDS_MR), _T("FILEMASSRENAME")); //Xman Mass Rename (Morph)
 	m_FileMenu.AppendMenu(MF_SEPARATOR);
 	m_FileMenu.AppendMenu(MF_STRING, MP_CLEARCOMPLETED, GetResString(IDS_DL_CLEAR), _T("CLEARCOMPLETE"));

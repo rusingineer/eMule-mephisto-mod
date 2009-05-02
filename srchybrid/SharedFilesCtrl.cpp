@@ -2023,7 +2023,7 @@ BOOL CSharedFilesCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				{
 					CKnownFile* file = selectedList.GetNext(pos);
 					feed.Append(file->GetFeedback(wParam == MP_COPYFEEDBACK_US));
-					feed.Append(_T(" \r\n"));
+					feed.Append(_T("\r\n"));
 
 					uTransferredSum += file->statistic.GetTransferred();
 					uTransferredAllSum += file->statistic.GetAllTimeTransferred();

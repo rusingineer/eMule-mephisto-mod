@@ -279,6 +279,22 @@ CString GetVideoFormatName(DWORD biCompression)
 		strFormat = _T("MP42 (MS MPEG-4 v2)");
 	else if (IsEqualFOURCC(biCompression, MAKEFOURCC('D', 'X', 'S', 'B')))
 		strFormat = _T("DXSB (Subtitle)");
+	// X-Ray :: MoreFourCCCodes :: Start - added by zz_fly
+	else if (IsEqualFOURCC(biCompression, MAKEFOURCC('A', 'V', 'C', '1'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('D', 'A', 'V', 'C'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('H', '2', '6', '4'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('X', '2', '6', '4'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('V', 'S', 'S', 'H'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('V', 'S', 'S', 'W')))
+		strFormat = _T("H.264/MPEG-4 AVC");
+	else if (IsEqualFOURCC(biCompression, MAKEFOURCC('3', 'I', 'V', '0'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('3', 'I', 'V', '1'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('3', 'I', 'V', '2'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('3', 'I', 'V', 'D'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('3', 'I', 'V', 'X'))
+		||	 IsEqualFOURCC(biCompression, MAKEFOURCC('3', 'V', 'I', 'D')))
+		strFormat = _T("3ivX");
+	// X-Ray :: MoreFourCCCodes :: End
 	else
 	{
 		char szFourcc[5];

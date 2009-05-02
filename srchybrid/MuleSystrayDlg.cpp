@@ -231,6 +231,11 @@ BOOL CMuleSystrayDlg::OnInitDialog()
 	*/
 	//Xman end
 
+	//zz_fly :: make font not bold for chinese :: start
+	if(bValidFont && (thePrefs.m_wLanguageID != 2052) && (thePrefs.m_wLanguageID != 1028))
+		lfStaticFont.lfWeight += 200;			// make it bold
+	//zz_fly :: make font not bold for chinese :: end
+
 	p = GetDlgItem(IDC_RESTORE);
 	if(p)
 	{
@@ -249,9 +254,14 @@ BOOL CMuleSystrayDlg::OnInitDialog()
 		m_ctrlRestore.m_bParentCapture = true;
 		if(bValidFont)
 		{	
+			//zz_fly :: make font not bold for chinese :: start 
+			/*
 			LOGFONT lfFont = lfStaticFont;
 			lfFont.lfWeight += 200;			// make it bold
 			m_ctrlRestore.m_cfFont.CreateFontIndirect(&lfFont);
+			*/
+			m_ctrlRestore.m_cfFont.CreateFontIndirect(&lfStaticFont);
+			//zz_fly :: make font not bold for chinese :: end 
 		}	
 	}
 	

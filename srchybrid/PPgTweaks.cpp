@@ -200,7 +200,6 @@ CPPgTweaks::CPPgTweaks()
 	m_htiShareeMulePublicUser = NULL;
 	m_htiShareeMuleOldStyle = NULL;
 	m_htiCryptTCPPaddingLength=NULL; //Xman Added PaddingLength to Extended preferences
-
 }
 
 CPPgTweaks::~CPPgTweaks()
@@ -804,7 +803,10 @@ BOOL CPPgTweaks::OnApply()
 	thePrefs.ChangeUserDirMode(m_iShareeMule);
 
 	//Xman Added PaddingLength to Extended preferences
+	/*
 	thePrefs.m_byCryptTCPPaddingLength=(uint8)m_iCryptTCPPaddingLength;
+	*/
+	thePrefs.SetCryptTCPPaddingLength(m_iCryptTCPPaddingLength);
 	//Xman end
 
 	//Xman
@@ -952,7 +954,6 @@ void CPPgTweaks::Localize(void)
 		if (m_htiShareeMuleMultiUser) m_ctrlTreeOptions.SetItemText(m_htiShareeMuleMultiUser, GetResString(IDS_SHAREEMULEMULTI));
 		if (m_htiShareeMulePublicUser) m_ctrlTreeOptions.SetItemText(m_htiShareeMulePublicUser, GetResString(IDS_SHAREEMULEPUBLIC));
 		if (m_htiShareeMuleOldStyle) m_ctrlTreeOptions.SetItemText(m_htiShareeMuleOldStyle, GetResString(IDS_SHAREEMULEOLD));
-
 
 		CString temp;
 		temp.Format(_T("%s: %s"), GetResString(IDS_FILEBUFFERSIZE), CastItoXBytes(m_iFileBufferSize, false, false));

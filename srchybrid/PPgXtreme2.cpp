@@ -151,7 +151,12 @@ void CPPgXtreme2::LoadSettings(void)
 			GetDlgItem(IDC_ANTILEECHERSPAMMER_CHECK)->EnableWindow(false);
 			GetDlgItem(IDC_ANTILEECHERXSEXPLOITER_CHECK)->EnableWindow(false);
 			GetDlgItem(IDC_ANTILEECHEREMCRYPT_CHECK)->EnableWindow(false);
+			//zz_fly :: right IDC :: thanks dolphin87 :: start
+			/*
 			GetDlgItem(IDC_ANTILEECHERFILENAME_CHECK)->EnableWindow(false);
+			*/
+			GetDlgItem(IDC_ANTILEECHERUSERHASH_CHECK)->EnableWindow(false); 
+			//zz_fly :: right IDC :: end
 			GetDlgItem(IDC_STATIC_LEECHERCOMMUNITY)->EnableWindow(false);
 			GetDlgItem(IDC_STATIC_LEECHERGHOST)->EnableWindow(false);
 			GetDlgItem(IDC_STATIC_LEECHERTHIEF)->EnableWindow(false);

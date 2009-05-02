@@ -64,6 +64,8 @@ BEGIN
                     57,36,10
     CONTROL         "12000",IDC_SENDBUFFER3,"Button",BS_AUTORADIOBUTTON,155,
                     57,36,10
+	CONTROL         "24000",IDC_SENDBUFFER4,"Button",BS_AUTORADIOBUTTON,155,
+                    57,36,10
     LTEXT           "Sendbuffer:",IDC_SENDBUFFER_STATIC,14,57,59,10
     CONTROL         "show socket blocking ratio",IDC_SHOWBLOCKINGRATIO,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,198,179,11
@@ -372,9 +374,10 @@ BEGIN
     CONTROL         "Messages",IDC_MESSAGES_LBL,"Static",SS_LEFTNOWORDWRAP | 
                     WS_GROUP,153,6,236,8
     ICON            "",IDC_MESSAGEICON,140,4,20,20
+	PUSHBUTTON      "v",IDC_BTN_MENU,5,3,14,13,BS_NOTIFY | BS_FLAT
     CONTROL         "Friends",IDC_FRIENDS_LBL,"Static",SS_LEFTNOWORDWRAP | 
-                    WS_GROUP,18,6,93,8
-    ICON            "",IDC_FRIENDSICON,5,5,20,20,SS_NOTIFY
+                    WS_GROUP,34,6,93,8
+    ICON            "",IDC_FRIENDSICON,21,5,20,20,SS_NOTIFY
     GROUPBOX        "Info",IDC_FRIENDS_MSG,5,197,132,89
     LTEXT           "Hash:",IDC_FRIENDS_USERHASH,10,222,61,8
     LTEXT           "Software:",IDC_FRIENDS_CLIENT,10,234,61,8
@@ -3245,6 +3248,7 @@ FRIENDWITHCLIENTSLOT    ICON                    "res\\friends2slot.ICO"
 FRIENDCONNECTEDSLOT     ICON                    "res\\friends3slot.ICO"
 CLIENTFRIENDSLOTOVL     ICON                    "res\\FriendSlotOvl.ico"
 FILEMASSRENAME          ICON                    "res\\FileMassRename.ico"
+FILEIMPORTPARTS         ICON                    "res\\fileimportparts.ico"
 XTREME                  ICON                    "res\\Mule.ico"
 DROPDEFAULTS            ICON                    "res\\DropDefaults.ico"
 CLIENTCREDITOVL         ICON                    "res\\CreditOvl.ico"
@@ -5589,6 +5593,37 @@ BEGIN
     IDS_UPNPSTATUS_PORTINUSE "External NAT port in use"
     IDS_UPNPSTATUS_PORTINUSE2 "External NAT port in use: Too many retries"
     IDS_UPNP_REBINDTEXT     "Rebind UPnP On IP-Change"
+    IDS_IMPORTPARTS         "Import parts to file..."
+    IDS_IMPORTPARTS_STOP    "Stop Import parts to file"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SR13_IMPORTPARTS_ERR_ALREADYCOMPLETE 	"Import aborted: Can't import to a complete file."
+    IDS_SR13_IMPORTPARTS_ERR_HASHSETINCOMPLETE	"Import aborted: hashset incomplete for %s (%i hashes for %i parts)."
+    IDS_SR13_IMPORTPARTS_ERR_CANTOPENFILE 		"Import aborted: Couldn't open %s."
+    IDS_SR13_IMPORTPARTS_IMPORTSTART			"Importing %i parts to %s."
+    IDS_SR13_IMPORTPARTS_PARTIMPORTEDGOOD		"Part %i: imported."
+    IDS_SR13_IMPORTPARTS_PARTIMPORTEDBAD		"Part %i: imported for ICH handling."
+    IDS_SR13_IMPORTPARTS_PARTSKIPPEDDONTMATCH 	"Part %i: skipped, doesn't match partially completed block."
+    IDS_SR13_IMPORTPARTS_BADPARTSREHASH 		"%i bad parts were imported for A/ICH. Initiating rehash."
+    IDS_SR13_IMPORTPARTS_ERR_FILETOOSMALL 		"File is smaller than minimal recovery block for AICH - there's no use in importing data to it."
+    IDS_SR13_IMPORTPARTS_IMPORTFINISH 			"Import finished. %i parts were imported to %s."
+END
+
+STRINGTABLE 
+BEGIN
+	//Friendlinks
+	IDS_GETFRIENDED2KLINK   "Copy friend link to clipboard"
+    IDS_GETHTMLFRIENDED2KLINK "Copy friend link to clipboard (HTML)"
+    IDS_ERR_FAILEDDOWNLOADEMFRIENDS "Failed to download the friendlist from %s"
+    IDS_GETMYFRIENDED2KLINK "Copy my friend link to clipboard"
+    IDS_GETMYHTMLFRIENDED2KLINK "Copy my friend link to clipboard (HTML)"
+    IDS_FRIENDLINKMENUTITLE "FriendLinks"
+	IDS_DOWNLOADEMFRIENDSMET "Download emfriends.met"
+    IDS_EMFRIENDSMETURL     "Please enter the URL of emfriends.met:"
+	IDS_USER_ALREADY_FRIEND "User ""%s"" is already in your friend list"
+	IDS_PROGRESSHASHDONE	"Hashing done: %s"
 END
 
 STRINGTABLE 

@@ -72,6 +72,7 @@ enum EPartFileOp{
 	PFOP_HASHING,
 	PFOP_COPYING,
 	PFOP_UNCOMPRESSING
+	,PFOP_SR13_IMPORTPARTS //MORPH - Added by SiRoB, Import Parts - added by zz_fly
 };
 
 class CSearchFile;
@@ -216,8 +217,12 @@ public:
 	bool	IsCorruptedPart(UINT partnumber) const;
 	
 	//Xman Dynamic block request (netfinity/morph/Xman)
+	//zz_fly :: remove unused code :: start
+	/*
 	uint64	GetRemainingAvailableData(const uint8* srcstatus) const;
 	uint64	GetRemainingAvailableData(const CUpDownClient* sender) const;
+	*/
+	//zz_fly :: remove unused code :: end
 	uint32  GetDownloadSpeedInPart(uint16 forpart, CUpDownClient* current_source) const;
 	//Xman end
 
@@ -446,8 +451,18 @@ public:
 
 	//Xman manual file allocation (Xanatos)
 	void	AllocateNeededSpace();
+	//zz_fly :: disable preallocate while eMule allocating, otherwise gui will freeze :: dolphin87 :: start
+	/*
 	const bool	IncompleteAllocateSpace() const	{ return ((m_hpartfile.m_hFile != INVALID_HANDLE_VALUE) && m_hpartfile.GetLength() < GetFileSize()); } 
+	*/
+	const bool  IncompleteAllocateSpace() const { return ((!IsAllocating()) && (m_hpartfile.m_hFile != INVALID_HANDLE_VALUE) && m_hpartfile.GetLength() < GetFileSize()); }
+	//zz_fly :: disable preallocate while eMule allocating :: end
 	//Xman end
+
+	//zz_fly :: Drop stalled downloads :: netfinity :: start
+	bool	FindAndDropStalledDownload(CUpDownClient* ignore_client) const;
+	uint64	GetUnrequestedSize() const;
+	//zz_fly :: Drop stalled downloads :: netfinity :: end
 
 #ifdef PRINT_STATISTIC
 	uint32	GetSavedSources()	{return m_sourcesaver.GetSavedSources();}

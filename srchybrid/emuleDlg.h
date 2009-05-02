@@ -326,6 +326,9 @@ protected:
 	// END SiRoB: Flush Thread
 	afx_msg LRESULT OnFlushDone(WPARAM wParam,LPARAM lParam);
 	// END SiRoB: Flush Thread
+	//MORPH START - Added by SiRoB, Import Parts - added by zz_fly
+	afx_msg LRESULT OnImportPart(WPARAM wParam,LPARAM lParam);
+	//MORPH END   - Added by SiRoB, Import Parts
 	afx_msg LRESULT OnSaveDone(WPARAM wParam,LPARAM lParam); // File Settings [sivka/Stulle] - Stulle
 	afx_msg LRESULT OnSaveKnownDone(WPARAM wParam,LPARAM lParam); // Threaded Known Files Saving [Stulle] - Stulle
 
@@ -458,6 +461,7 @@ enum EEMuleAppMsgs
 	// END SLUGFILLER: SafeHash
 	TM_READBLOCKFROMFILEDONE, // SiRoB: ReadBlockFromFileThread
 	TM_FLUSHDONE, // SiRoB: Flush Thread
+	TM_IMPORTPART, //MORPH - Added by SiRoB, Import Parts - added by zz_fly
 	TM_DOTIMER, //Xman process timer code via messages (Xanatos)
 	TM_SAVEDONE, // File Settings [sivka/Stulle] - Stulle
 	TM_SAVEKNOWNDONE, // Threaded Known Files Saving [Stulle] - Stulle

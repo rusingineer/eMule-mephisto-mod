@@ -1367,7 +1367,7 @@ public:
 	//Xman always one release-slot
 	static bool m_onerealeseslot;
 	static bool UseReleasseSlot() {return m_onerealeseslot;}
-	static SetUseReleaseSlot(bool in) {m_onerealeseslot=in;}
+	static void SetUseReleaseSlot(bool in) {m_onerealeseslot=in;}
 	//Xman end
 	*/
 	// <== Superior Client Handling [Stulle] - Stulle
@@ -2208,6 +2208,7 @@ public:
 	static bool		IsServerCryptLayerTCPRequested()	{return IsClientCryptLayerRequested();}
 	static uint32	GetKadUDPKey()						{return m_dwKadUDPKey;}
 	static uint8	GetCryptTCPPaddingLength()			{return m_byCryptTCPPaddingLength;}
+	static void		SetCryptTCPPaddingLength(int in)	{m_byCryptTCPPaddingLength = (uint8)((in>=10 && in<=254) ? in : 128);} //zz_fly :: hardlimit on CryptTCPPaddingLength
 
 	// ==> UPnP support [MoNKi] - leuk_he
 	/*

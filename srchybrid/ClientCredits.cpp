@@ -988,8 +988,13 @@ void CClientCreditsList::LoadList()
 			m_mapClients.InitHashTable(count+5000); // TODO: should be prime number... and 20% larger
 			*/
 			UINT calc=UINT(count*1.2f);
+			//zz_fly :: prime table :: start
+			/*
 			calc = calc + calc%2 + 1;
 			m_mapClients.InitHashTable(calc + 20000); //optimized for 20 000 new contacts
+			*/
+			m_mapClients.InitHashTable(GetPrime(calc + 19000)); //GetPrime will increase the number about 1k in average
+			//zz_fly :: prime table :: end
 			//Xman end
 
 			// ==> Make code VS 2005 and VS 2008 ready [MorphXT] - Stulle
@@ -1671,6 +1676,42 @@ void	CClientCreditsList::PrintStatistic()
 }
 #endif
 //Xman end
+
+//zz_fly :: prime table :: start
+UINT CClientCreditsList::GetPrime(UINT calc) const
+{
+	//prime table from primes.utm.edu
+	//Table1 300k+, 20k per prime
+	static const UINT primeTable1[] = {
+			320009, 340007, 360007, 380041, 400009,	420001, 440009, 460013, 480013, 500009, 
+			520019, 540041, 560017, 580001,	600011, 620003, 640007, 660001, 680003, 700001, 
+			720007, 740011, 760007,	780029, 800011, 820037, 840023, 860009, 880001, 900001, 
+			920011, 940001,	960017, 980027, 1000003};
+	//Table2 120k~300k, 5k per prime
+	static const UINT primeTable2[] = {
+			125003,	130003, 135007, 140009, 145007, 150001, 155003, 160001,	165001, 170003,	
+			175003, 180001, 185021, 190027, 195023, 200003, 205019, 210011, 215051,	220009,
+			225023, 230003, 235003, 240007, 245023, 250007, 255007, 260003,	265003, 270001,
+			275003, 280001, 285007, 290011, 295007, 300007};
+	//Table3 20k~120k, 2k per prime
+	static const UINT primeTable3[] = {
+			 22003,  24001,  26003,  28001,  30011,  32003,  34019,  36007,  38011,  40009,
+			 42013,  44017,  46021,  48017,  50021,  52009,  54001,  56003,  58013,  60013,
+			 62003,  64007,  66029,  68023,  70001,  72019,  74017,  76001,  78007,  80021,
+			 82003,  84011,  86011,  88001,  90001,  92003,  94007,  96001,  98009, 100003,
+			102001, 104003, 106013, 108007, 110017, 112019, 114001, 116009, 118033, 120011};
+	if(calc>1000000)//1M contacts? let them eat cake...
+		return (calc + calc%2 + 1);
+	else if(calc>300000)
+		return primeTable1[(calc-300000)/20000];
+	else if(calc>120000)
+		return primeTable2[(calc-120000)/5000];
+	else if(calc>20000)
+		return primeTable3[(calc-20000)/2000];
+	else 
+		return 20011;
+}
+//zz_fly :: prime table :: end
 
 // ==> CreditSystems [EastShare/ MorphXT] - Stulle
 void CClientCreditsList::ResetCheckScoreRatio(){

@@ -58,7 +58,12 @@ private:
 	HICON icon_files;
 	CSplitterControl m_wndSplitter;
 	CEditDelayed	m_ctlFilter;
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	CHeaderCtrl		m_ctlSharedListHeader;
+	*/
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	uint32			m_nFilterColumn;
 
 protected:

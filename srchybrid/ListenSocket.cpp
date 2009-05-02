@@ -266,6 +266,8 @@ void CClientReqSocket::OnClose(int nErrorCode){
 	delete pstrReason;
 }
 
+// Stulle - We gonna test this again...
+/*
 //Xman improved socket closing
 void CClientReqSocket::CloseSocket()
 {
@@ -274,6 +276,8 @@ void CClientReqSocket::CloseSocket()
 	deltimer = ::GetTickCount();
 }
 //Xman end
+*/
+// Stulle - We gonna test this again...
 
 // Maella -Upload Stop Reason-
 /*

@@ -98,7 +98,13 @@ public:
 	// this method is threadsave at uploadbandwidththrottler!
 
 	//Xman include ACK
+	//zz_fly
+	//netfinity: Special case when socket is closing but data still in buffer, need to empty buffer or deadlock forever
+	/*
 	void ProcessReceiveData();
+	*/
+	void ProcessReceiveData(int nErrorCode = 0);
+	//zz_fly end
 
 	//Xman count block/success send
 	typedef CList<float> BlockHistory;

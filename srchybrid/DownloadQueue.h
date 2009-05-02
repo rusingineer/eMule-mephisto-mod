@@ -307,6 +307,8 @@ private:
 
 	CSourceHostnameResolveWnd m_srcwnd;
 
+	CCriticalSection srcLock;	//zz_fly :: make source add action thread safe :: Enig123
+
     //Xman
     /*
     DWORD       m_dwLastA4AFtime; // ZZ:DownloadManager

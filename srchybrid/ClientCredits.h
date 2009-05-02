@@ -287,4 +287,5 @@ private:
 	CryptoPP::RSASSA_PKCS1v15_SHA_Signer*		m_pSignkey;
 	byte			m_abyMyPublicKey[80];
 	uint8			m_nMyPublicKeyLen;
+	UINT GetPrime(UINT calc) const; //zz_fly :: prime table
 };

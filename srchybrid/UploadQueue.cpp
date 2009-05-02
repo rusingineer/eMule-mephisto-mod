@@ -266,7 +266,12 @@ CUpDownClient* CUploadQueue::FindBestClientInQueue(bool bCheckOnly)
 			/*
 			//Xman always one release-slot
 			CKnownFile* totest=theApp.sharedfiles->GetFileByID(cur_client->GetUploadFileID());
+			//zz_fly :: no reserved release-slot for partfile
+			/*
 			if(totest->GetUpPriority()==PR_POWER || totest->GetUpPriority()==PR_VERYHIGH)
+			*//*
+			if(totest->GetUpPriority()==PR_POWER || (totest->GetUpPriority()==PR_VERYHIGH && !totest->IsPartFile())) 
+			//zz_fly end
 			{
 				if(cur_score > bestpowerscore)
 				{
@@ -2527,13 +2532,7 @@ void CUploadQueue::UploadTimer()
 		//Xman 5.1
 		//Xman skip High-CPU-Load
 		static uint32 lastprocesstime;
-		//zz_fly
-		//Enig123 :: CodeFix :: unsigned int can not <0
-		/*
-		if(::GetTickCount() - lastprocesstime <=0)
-		*/
-		if((int)(::GetTickCount() - lastprocesstime) <=0)
-		//zz_fly
+		if((::GetTickCount() - lastprocesstime) <=0)
 			return;
 		else
 			lastprocesstime=::GetTickCount();

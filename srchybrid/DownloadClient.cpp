@@ -1435,38 +1435,54 @@ void CUpDownClient::SendBlockRequests()
 	//Xman end Dynamic block request
 	CreateBlockRequests(blockCount);
 	
-	if (m_PendingBlocks_list.IsEmpty()){
-		//Xman 0.46b
-		//Xman Xtreme Downloadmanager
-		/*
-		SendCancelTransfer();
-		SetDownloadState(DS_NONEEDEDPARTS);
-        SwapToAnotherFile(_T("A4AF for NNP file. CUpDownClient::SendBlockRequests()"), true, false, false, NULL, true, true);
-		*/
-		//Xman end
+	//zz_fly :: Drop stalled downloads :: netfinity :: start
+	try
+	{
+		if (m_PendingBlocks_list.IsEmpty())
+		{
+			if (reqfile->GetUnrequestedSize() == 0 && reqfile->FindAndDropStalledDownload(this))
+				CreateBlockRequests(blockCount);
+	//zz_fly :: Drop stalled downloads :: netfinity :: end
+			if (m_PendingBlocks_list.IsEmpty()){
+				//Xman 0.46b
+				//Xman Xtreme Downloadmanager
+				/*
+				SendCancelTransfer();
+				SetDownloadState(DS_NONEEDEDPARTS);
+		        SwapToAnotherFile(_T("A4AF for NNP file. CUpDownClient::SendBlockRequests()"), true, false, false, NULL, true, true);
+				*/
+				//Xman end
 
-		//Xman 4.2 just in time swapping
-		//try do swap just in time
-		CPartFile* oldreqfile=reqfile;
-		if(GetDownloadState()==DS_DOWNLOADING && socket!=NULL && socket->IsConnected() && SwapToAnotherFile(false,false,false, NULL, false, true)  )
-		{
-			protocolstepflag1=true;
-			SendFileRequest(); //ask for the file we swapped to
-			if(thePrefs.GetLogA4AF())
-				AddDebugLogLine(false, _T("-o- SendBlockRequests just in time swapping NNS: client %s, %s swapped from %s to %s"), DbgGetFullClientSoftVer(),GetUserName(), oldreqfile->GetFileName(), reqfile->GetFileName());
-		}
-		else
-		{
-			SendCancelTransfer();
-			SetDownloadState(DS_NONEEDEDPARTS, _T("No Needed Parts") , CUpDownClient::DSR_NONEEDEDPARTS); // - Maella -Download Stop Reason-
-		}
-		//to be sure not to fall in an endless loop (which theoretically can't happen):
-		DontSwapTo(oldreqfile);
+				//Xman 4.2 just in time swapping
+				//try do swap just in time
+				CPartFile* oldreqfile=reqfile;
+				if(GetDownloadState()==DS_DOWNLOADING && socket!=NULL && socket->IsConnected() && SwapToAnotherFile(false,false,false, NULL, false, true)  )
+				{
+					protocolstepflag1=true;
+					SendFileRequest(); //ask for the file we swapped to
+					if(thePrefs.GetLogA4AF())
+						AddDebugLogLine(false, _T("-o- SendBlockRequests just in time swapping NNS: client %s, %s swapped from %s to %s"), DbgGetFullClientSoftVer(),GetUserName(), oldreqfile->GetFileName(), reqfile->GetFileName());
+				}
+				else
+				{
+					SendCancelTransfer();
+					SetDownloadState(DS_NONEEDEDPARTS, _T("No Needed Parts") , CUpDownClient::DSR_NONEEDEDPARTS); // - Maella -Download Stop Reason-
+				}
+				//to be sure not to fall in an endless loop (which theoretically can't happen):
+				DontSwapTo(oldreqfile);
 		
 
-		//Xman end
-		return;
+				//Xman end
+				return;
+			}
+	//zz_fly :: Drop stalled downloads :: netfinity :: start
+		} 
+	} 
+	catch(...)
+	{
+		LogError(_T(__FUNCTION__) _T("; Error in drop stalled downloads algo."));
 	}
+	//zz_fly :: Drop stalled downloads :: netfinity :: end
 
 	bool bI64Offsets = false;
 	POSITION pos = m_PendingBlocks_list.GetHeadPosition();
@@ -3532,3 +3548,15 @@ void CUpDownClient::TrigNextSafeAskForDownload(CPartFile* pFile){
 	}
 }
 // Maella end
+
+//zz_fly :: Drop stalled downloads :: netfinity :: start
+uint64 CUpDownClient::GetBytesRemaining() const{
+	uint64	bytesRemaining = 0;
+	for (POSITION pos = m_PendingBlocks_list.GetHeadPosition(); pos !=0;)
+	{
+		Pending_Block_Struct* pendBlock = m_PendingBlocks_list.GetNext(pos);
+		bytesRemaining += (pendBlock->block->EndOffset + 1 - pendBlock->block->StartOffset) - pendBlock->block->transferred;
+	}
+	return bytesRemaining;
+}
+//zz_fly :: Drop stalled downloads :: netfinity :: end

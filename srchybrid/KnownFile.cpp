@@ -758,7 +758,7 @@ bool CKnownFile::CreateFromFile(LPCTSTR in_directory, LPCTSTR in_filename, LPVOI
 
 
 	//Xman Progress Hash (O2)
-	AddLogLine(true,_T("Hashing done: %s"), GetFilePath()  );
+	AddLogLine(true, GetResString(IDS_PROGRESSHASHDONE), GetFilePath()  );
 	//Xman end
 
 	UpdatePartsInfo();

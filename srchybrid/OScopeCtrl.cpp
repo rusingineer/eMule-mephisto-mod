@@ -979,7 +979,13 @@ void COScopeCtrl::OnMouseMove(UINT nFlags, CPoint point)
 		float apixel = (float)shownsecs / (float)plotRect.Width();
 
 		CString strInfo;
+		//Xman Maella Statistik-Zoom
+		//zz_fly :: moved from CStatisticsDlg::OnOscopePositionMsg()
+		/*
 		DWORD dwTime = (DWORD)(mypos * apixel);
+		*/
+		DWORD dwTime = (DWORD)(mypos * apixel) / thePrefs.GetZoomFactor(); 
+		//Xman end
 		time_t tNow = time(NULL) - dwTime;
 		TCHAR szDate[128];
 		_tcsftime(szDate, _countof(szDate), thePrefs.GetDateTimeFormat4Log(), localtime(&tNow));

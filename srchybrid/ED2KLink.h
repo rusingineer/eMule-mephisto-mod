@@ -35,7 +35,12 @@ public:
 	static CED2KLink* CreateLinkFromUrl(const TCHAR* url);
 	virtual ~CED2KLink();
 
+	// MORPH START - Modified by Commander, Friendlinks [emulEspaa] - added by zz_fly
+	/*
 	typedef enum { kServerList, kServer , kFile , kNodesList, kInvalid } LinkType;
+	*/
+	typedef enum { kServerList, kServer , kFile , kNodesList, kFriend, kFriendList, kInvalid } LinkType;
+	// MORPH END - Modified by Commander, Friendlinks [emulEspaa]
 
 	virtual LinkType GetKind() const = 0;
 	virtual void GetLink(CString& lnk) const = 0;
@@ -158,3 +163,46 @@ private:
 
 	CString m_address;
 };
+
+// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+class CED2KFriendLink : public CED2KLink
+{
+public:
+	CED2KFriendLink(LPCTSTR userName, LPCTSTR userHash);
+	CED2KFriendLink(LPCTSTR userName, uchar userHash[]);
+	virtual ~CED2KFriendLink()	{ }
+
+	virtual LinkType	GetKind() const;
+	virtual void	GetLink(CString& lnk) const;
+	virtual CED2KServerListLink*	GetServerListLink();
+	virtual CED2KServerLink*		GetServerLink();
+	virtual CED2KFileLink*			GetFileLink();
+	virtual CED2KNodesListLink*		GetNodesListLink();
+
+	CString	GetUserName() const						{ return m_sUserName; }
+	void	GetUserHash(uchar userHash[]) const		{ memcpy(userHash, m_hash, 16*sizeof(uchar)); }
+
+private:
+	CString	m_sUserName;
+	uchar	m_hash[16];
+};
+
+class CED2KFriendListLink : public CED2KLink
+{
+public:
+	CED2KFriendListLink(LPCTSTR address);
+	virtual ~CED2KFriendListLink()	{ }
+
+	virtual LinkType GetKind() const;
+	virtual void	GetLink(CString& lnk) const;
+	virtual CED2KServerListLink*	GetServerListLink();
+	virtual CED2KServerLink*		GetServerLink();
+	virtual CED2KFileLink*			GetFileLink();
+	virtual CED2KNodesListLink*		GetNodesListLink();
+
+	CString	GetAddress() const		{ return m_address; }
+
+private:
+	CString	m_address;
+};
+// MORPH END - Added by Commander, Friendlinks [emulEspaa]

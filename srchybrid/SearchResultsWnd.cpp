@@ -130,7 +130,12 @@ CSearchResultsWnd::CSearchResultsWnd(CWnd* /*pParent*/)
 CSearchResultsWnd::~CSearchResultsWnd()
 {
 	delete m_cattabs;
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	m_ctlSearchListHeader.Detach();
+	*/
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	delete m_btnSearchListMenu;
 	if (globsearch)
 		delete searchpacket;
@@ -143,7 +148,12 @@ void CSearchResultsWnd::OnInitialUpdate()
 	CResizableFormView::OnInitialUpdate();
 	InitWindowStyles(this);
 	theApp.searchlist->SetOutputWnd(&searchlistctrl);
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	m_ctlSearchListHeader.Attach(searchlistctrl.GetHeaderCtrl()->Detach());
+	*/
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	searchlistctrl.Init(theApp.searchlist);
 	searchlistctrl.SetName(_T("SearchListCtrl"));
 
@@ -159,7 +169,13 @@ void CSearchResultsWnd::OnInitialUpdate()
 	m_btnSearchListMenu->SetExtendedStyle(m_btnSearchListMenu->GetExtendedStyle() & ~TBSTYLE_EX_MIXEDBUTTONS);
 	m_btnSearchListMenu->RecalcLayout(true);
 
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	m_ctlFilter.OnInit(&m_ctlSearchListHeader);
+	*/
+	m_ctlFilter.OnInit(searchlistctrl.GetHeaderCtrl());
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	OnBackcolor(); // Design Settings [eWombat/Stulle] - Max
 
 	SetAllIcons();

@@ -288,7 +288,10 @@ CemuleApp::CemuleApp(LPCTSTR lpszAppName)
 	/*
 	m_strCurVersionLong += _T(" BETA3");
 	*/
-	m_strCurVersionLong += _T(" Testversion");
+	m_strCurVersionLong.AppendFormat(_T(" a%u "),CemuleApp::m_nMVersionBld);
+	m_strCurVersionLong += _T(__TIME__);
+	m_strCurVersionLong += _T(" ");
+	m_strCurVersionLong += _T(__DATE__);
 	//Xman end
 #endif
 
@@ -2494,12 +2497,12 @@ void CemuleApp::ResetStandByIdleTimer()
 	if (IsConnected() || (uploadqueue != NULL && uploadqueue->GetUploadQueueLength() > 0)
 		|| (downloadqueue != NULL && downloadqueue->GetDatarate() > 0))
 	*/
-		uint32 eMuleIn;
-		uint32 notUsed;
-		theApp.pBandWidthControl->GetDatarates(thePrefs.GetDatarateSamples(),
-			eMuleIn, notUsed,
-			notUsed, notUsed,
-			notUsed, notUsed);
+	uint32 eMuleIn;
+	uint32 notUsed;
+	theApp.pBandWidthControl->GetDatarates(thePrefs.GetDatarateSamples(),
+		eMuleIn, notUsed,
+		notUsed, notUsed,
+		notUsed, notUsed);
 	if (IsConnected() || (uploadqueue != NULL && uploadqueue->GetUploadQueueLength() > 0)
 		|| eMuleIn>0)
 	//Xman end
@@ -2651,6 +2654,14 @@ void CemuleApp::ForeAllDiscAccessThreadsToFinish()
 
 	threadqueuelock.Unlock();
 }
+
+// Commander - Added: FriendLinks [emulEspaa] - Start - added by zz_fly
+bool CemuleApp::IsEd2kFriendLinkInClipboard()
+{
+	static const CHAR _szEd2kFriendLink[] = "ed2k://|friend|";
+	return IsEd2kLinkInClipboard(_szEd2kFriendLink, ARRSIZE(_szEd2kFriendLink)-1);
+}
+// Commander - Added: FriendLinks [emulEspaa] - End
 
 // ==> Design Settings [eWombat/Stulle] - Stulle
 void CemuleApp::CreateExtraFonts(CFont *font)

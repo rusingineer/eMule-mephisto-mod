@@ -76,6 +76,12 @@ BOOL CClientDetailPage::OnInitDialog()
 	AddAnchor(IDC_STATIC30, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(IDC_STATIC40, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(IDC_STATIC50, TOP_LEFT, TOP_RIGHT);
+	//zz_fly :: let it resize together with the dialog
+	AddAnchor(IDC_DNAME, TOP_LEFT, TOP_RIGHT); 
+	CSize tAnchor(40,0);
+	AddAnchor(IDC_DSOFT, TOP_LEFT, tAnchor);
+	AddAnchor(IDC_DLOC, tAnchor, TOP_RIGHT);
+	//zz_fly :: end
 	AddAnchor(IDC_DDOWNLOADING, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(IDC_UPLOADING, TOP_LEFT, TOP_RIGHT);
 

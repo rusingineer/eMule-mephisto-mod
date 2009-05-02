@@ -737,7 +737,15 @@ UINT UploadBandwidthThrottler::RunInternal() {
 		{
 			//Xman 5.01 new High-Res-Timer oftenly sleep to short... it's probably too accurate (normal timer sleep always too long)
 			//to not do unnecessary loops sleep until we have 500 Bytes to spend.
+			//zz_fly :: Optimized :: start
+			//note: use integer+if is faster than float+marco.
+			/*
 			sleeptime=min((uint32)ceil((float)((-uSlope+500)*1000)/allowedDataRate),TIME_BETWEEN_UPLOAD_LOOPS_MAX); //was 1 byte to spend
+			*/
+			sleeptime = (uint32)(((-uSlope+500)*1000 + allowedDataRate-1) / allowedDataRate);
+			if(sleeptime > TIME_BETWEEN_UPLOAD_LOOPS_MAX)
+				sleeptime = TIME_BETWEEN_UPLOAD_LOOPS_MAX;
+			//zz_fly :: Optimized :: end
 		}
 		if(sleeptime<TIME_BETWEEN_UPLOAD_LOOPS_MIN)
 			sleeptime=TIME_BETWEEN_UPLOAD_LOOPS_MIN;

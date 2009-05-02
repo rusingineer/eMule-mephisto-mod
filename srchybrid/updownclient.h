@@ -739,6 +739,12 @@ public:
 	uint32 GetOtherRequestListCount() {return m_OtherRequests_list.GetSize();}
 #endif
 
+	//zz_fly :: Drop stalled downloads :: netfinity :: start
+	uint32	GetLastBlockReceived()	const	{return m_dwLastBlockReceived;} 
+	bool	IsPendingBlocksListEmpty() const	{return m_PendingBlocks_list.IsEmpty() ? true : false;} //avoid a warning
+	uint64	GetBytesRemaining() const;
+	//zz_fly :: Drop stalled downloads :: netfinity :: end
+
 	// BEGIN SiRoB: ReadBlockFromFileThread
 	void	SetReadBlockFromFileBuffer(byte* pdata) {filedata = pdata;};
 	// END SiRoB: ReadBlockFromFileThread

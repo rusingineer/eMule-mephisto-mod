@@ -2062,6 +2062,8 @@ bool CPartFile::SavePartFile()
 void CPartFile::PartFileHashFinished(CKnownFile* result){
 	newdate = true;
 	bool errorfound = false;
+	//zz_fly :: redundant code :: start
+	/*
 	//Xman
 	// BEGIN SLUGFILLER: SafeHash - one check for all
 	for (UINT i = 0; i < (UINT)hashlist.GetSize(); i++){
@@ -2075,6 +2077,9 @@ void CPartFile::PartFileHashFinished(CKnownFile* result){
 		}
 	}
 	// END SLUGFILLER: SafeHash
+	*/
+	//zz_fly :: redundant code :: end
+
 	// SLUGFILLER: SafeHash - use GetED2KPartCount
 	/*
 	if (GetED2KPartHashCount()==0 || GetHashCount()==0){
@@ -5129,6 +5134,10 @@ void CPartFile::ResumeFileInsufficient()
 
 CString CPartFile::getPartfileStatus() const
 {
+	//MORPH START - Added by SiRoB, Import Parts - added by zz_fly
+	if (GetFileOp() == PFOP_SR13_IMPORTPARTS)
+		return _T("Importing part");
+	//MORPH END  - Added by SiRoB, Import Parts
 	switch(GetStatus()){
 		case PS_HASHING:
 		case PS_WAITINGFORHASH:
@@ -5901,7 +5910,9 @@ uint32 CPartFile::WriteToBuffer(uint64 transize, const BYTE *data, uint64 start,
 	ASSERT( start <= end );
 
 	// Increment transferred bytes counter for this file
-	m_uTransferred += transize;
+
+	if (client) //MORPH - Added by SiRoB, Import Parts don't count as transfered - added by zz_fly
+		m_uTransferred += transize;
 
 	// This is needed a few times
 	uint32 lenData = (uint32)(end - start + 1);
@@ -6044,6 +6055,10 @@ uint32 CPartFile::WriteToBuffer(uint64 transize, const BYTE *data, uint64 start,
 
 	if (gaplist.IsEmpty())
 		FlushBuffer(true);
+	//MORPH START - Added by SiRoB, Import Parts - added by zz_fly
+	else if (GetStatus()!=PS_READY && GetStatus()!=PS_EMPTY)
+		FlushBuffer();
+	//MORPH END   - Added by SiRoB, Import Parts
 
 	// Return the length of data written to the buffer
 	return lenData;
@@ -6747,7 +6762,7 @@ void CPartFile::FlushBuffersExceptionHandler()
 
 		// ==> Make code VS 2005 and VS 2008 ready [MorphXT] - Stulle
 		/*
-	m_iLastPausePurge = time(NULL);
+		m_iLastPausePurge = time(NULL);
 		*/
 		m_iLastPausePurge = (uint32)time(NULL);
 		// <== Make code VS 2005 and VS 2008 ready [MorphXT] - Stulle
@@ -7984,6 +7999,8 @@ bool CPartFile::GetNextRequestedBlock_Maella(CUpDownClient* sender,
 }
 // Maella end
 
+//zz_fly :: remove unused code :: start
+/*
 //Xman Dynamic block request (netfinity/morph)
 uint64 CPartFile::GetRemainingAvailableData(const CUpDownClient* sender) const
 {
@@ -8019,6 +8036,8 @@ uint64 CPartFile::GetRemainingAvailableData(const uint8* srcstatus) const
 	return uTotalGapSizeInCommun;
 }
 //Xman end
+*/
+//zz_fly :: remove unused code :: end
 
 CString CPartFile::GetInfoSummary() const
 {
@@ -9358,6 +9377,94 @@ int CPartHashThread::Run()
 	return 0;
 }
 // END SiRoB, SLUGFILLER: SafeHash
+
+//zz_fly :: Drop stalled downloads :: netfinity :: start
+//note: all friend class is removed, i use some getters instead of it.
+bool CPartFile::FindAndDropStalledDownload(CUpDownClient* ignore_client) const
+{
+	bool			dropped = false;
+	CUpDownClient*	candidate = NULL;
+	CUpDownClient*	slowest = NULL;
+
+	try {
+	//DebugLog(_T(__FUNCTION__) _T("; Drop requested!"));
+	for(POSITION pos = m_downloadingSourceList.GetHeadPosition();pos!=0;)
+	{
+		CUpDownClient* cur_src = m_downloadingSourceList.GetNext(pos);
+		if (thePrefs.m_iDbgHeap >= 2)
+			ASSERT_VALID( cur_src );
+		if (cur_src && cur_src != ignore_client && cur_src->socket && cur_src->GetDownloadState() == DS_DOWNLOADING /*&& cur_src->m_dwNoNeededPartsPending == 0*/)
+		{
+			// No activity for more than 5 seconds
+			if ((::GetTickCount() - cur_src->GetLastBlockReceived()) > SEC2MS(10) && (::GetTickCount() - cur_src->socket->GetTimeOutTimer()) > SEC2MS(5))
+			{
+				//DebugLog(_T(__FUNCTION__) _T("; Found possible candidate!"));
+				// Blocks requested but nothing received
+				if (!cur_src->IsPendingBlocksListEmpty() /*&& cur_src->socket->pendingPacket == NULL*/)
+				{
+				//	DebugLog(_T(__FUNCTION__) _T("; Definitly a candidate!"));
+					// Remember client that has been stalled longest 
+					if (candidate == NULL || (cur_src->socket->GetTimeOutTimer() - candidate->socket->GetTimeOutTimer()) > 0)
+						candidate = cur_src;
+				}
+			}
+			// Slowest source that did not just begun a block
+			if (!cur_src->IsPendingBlocksListEmpty() && (::GetTickCount() - cur_src->GetLastBlockReceived()) > SEC2MS(5))
+			{
+				/* //moved to CUpDownClient::GetBytesRemaining()
+				uint64	bytesRemaining = 0;
+				for (POSITION pos = cur_src->m_PendingBlocks_list.GetHeadPosition(); pos !=0;)
+				{
+					Pending_Block_Struct* pendBlock = cur_src->m_PendingBlocks_list.GetNext(pos);
+					bytesRemaining += (pendBlock->block->EndOffset + 1 - pendBlock->block->StartOffset) - pendBlock->block->transferred;
+				}
+				*/
+				uint32	timeRemaining = (uint32) (cur_src->GetBytesRemaining() / (uint64) max(100, cur_src->GetDownloadDatarate10()));
+				if (timeRemaining > 15)
+				{
+					if (slowest == NULL || slowest->GetDownloadDatarate10() > cur_src->GetDownloadDatarate10())
+						slowest = cur_src;
+				}
+			}
+		}
+	}
+
+	// Drop stalled client if any
+	if (candidate == NULL)
+		candidate = slowest;
+	if (candidate != NULL)
+	{
+		//if (candidate->socket)
+		//	candidate->socket->RecoverPackets(); // Recover data in yet uncomplete part packets
+		candidate->SendCancelTransfer();
+		candidate->SetDownloadState(DS_ONQUEUE, _T("Stalled download dropped"), CUpDownClient::DSR_PAUSED); // Maella -Download Stop Reason-;
+		DebugLog(_T(__FUNCTION__) _T("; Drop done!"));
+		dropped = true;
+	}
+	} catch(...) {
+		LogError(_T(__FUNCTION__) _T("; Error while determining source to drop."));
+	}
+	return dropped;
+}
+
+uint64 CPartFile::GetUnrequestedSize() const
+{
+	uint64	requestedSize = 0;
+	try {
+	for (POSITION pos = requestedblocks_list.GetHeadPosition(); pos != 0;)
+	{
+		Requested_Block_Struct* item = requestedblocks_list.GetNext(pos);
+		requestedSize += (item->EndOffset - item->StartOffset + 1) - item->transferred;
+	}
+	requestedSize += (uint64) GetFileSize() - GetTotalGapSizeInRange(0, GetFileSize() - 1ULL);
+	if (GetFileSize() < requestedSize)
+		return 0;
+	} catch(...) {
+		LogError(_T(__FUNCTION__) _T("; Error in calculating requested size."));
+	}
+	return GetFileSize() - requestedSize;
+}
+//zz_fly :: Drop stalled downloads :: netfinity :: end
 
 // ==> Global Source Limit [Max/Stulle] - Stulle
 void CPartFile::IncrHL(UINT m_uSourcesDif)

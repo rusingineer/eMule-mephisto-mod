@@ -28,6 +28,10 @@
 #include "ListenSocket.h"
 #include "MenuCmds.h"
 #include "ChatWnd.h"
+// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+#include "ED2KLink.h"
+#include "Log.h"
+// MORPH END - Added by Commander, Friendlinks [emulEspaa]
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -203,6 +207,12 @@ void CFriendListCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 
     ClientMenu.EnableMenuItem(MP_FRIENDSLOT, (cur_friend)?MF_ENABLED : MF_GRAYED);
 	ClientMenu.CheckMenuItem(MP_FRIENDSLOT, (cur_friend && cur_friend->GetFriendSlot()) ? MF_CHECKED : MF_UNCHECKED);
+	// MORPH START - Modified by Commander, Friendlinks [emulEspaa] - added by zz_fly
+	ClientMenu.AppendMenu(MF_SEPARATOR);
+    ClientMenu.AppendMenu(MF_STRING | (theApp.IsEd2kFriendLinkInClipboard() ? MF_ENABLED : MF_GRAYED), MP_PASTE, GetResString(IDS_PASTE), _T("PASTELINK"));
+	ClientMenu.AppendMenu(MF_STRING | (cur_friend ? MF_ENABLED : MF_GRAYED), MP_GETFRIENDED2KLINK, GetResString(IDS_GETFRIENDED2KLINK), _T("ED2KLINK"));
+	ClientMenu.AppendMenu(MF_STRING | (cur_friend ? MF_ENABLED : MF_GRAYED), MP_GETHTMLFRIENDED2KLINK, GetResString(IDS_GETHTMLFRIENDED2KLINK), _T("ED2KLINK"));
+	// MORPH END - Modified by Commander, Friendlinks [emulEspaa]
 	// ==> Multiple friendslots [ZZ] - Mephisto
 	ClientMenu.AppendMenu(MF_STRING | (theApp.friendlist->IsFriendSlot() ? MF_ENABLED : MF_GRAYED),MP_REMOVEALLFRIENDSLOT, GetResString(IDS_REMOVEALLFRIENDSLOT), _T("FRIENDSLOTREMOVE"));
 	// <== Multiple friendslots [ZZ] - Mephisto
@@ -319,6 +329,76 @@ BOOL CFriendListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				break;
 			}
 			//Xman end
+		// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+		case MP_PASTE:
+		{
+			CString link = theApp.CopyTextFromClipboard();
+			link.Trim();
+			if ( link.IsEmpty() )
+				break;
+			try{
+				CED2KLink* pLink = CED2KLink::CreateLinkFromUrl(link);
+		
+				if (pLink && pLink->GetKind() == CED2KLink::kFriend )
+				{
+					// Better with dynamic_cast, but no RTTI enabled in the project
+					CED2KFriendLink* pFriendLink = static_cast<CED2KFriendLink*>(pLink);
+					uchar userHash[16];
+					pFriendLink->GetUserHash(userHash);
+
+					if ( ! theApp.friendlist->IsAlreadyFriend(userHash) )
+						theApp.friendlist->AddFriend(userHash, 0U, 0U, 0U, 0U, pFriendLink->GetUserName(), 1U);
+					else
+					{
+						CString msg;
+						msg.Format(GetResString(IDS_USER_ALREADY_FRIEND), pFriendLink->GetUserName());
+						AddLogLine(true, msg);
+					}
+				}
+				if(pLink) delete pLink; //zz_fly :: memleak :: thanks dolphin87
+			}
+			catch(CString strError){
+				AfxMessageBox(strError);
+			}
+		}
+			break;
+        case MP_GETFRIENDED2KLINK:
+		{
+			CString sCompleteLink;
+			if ( cur_friend && cur_friend->HasUserhash() )
+			{
+				CString sLink;
+				CED2KFriendLink friendLink(cur_friend->m_strName, cur_friend->m_abyUserhash);
+				friendLink.GetLink(sLink);
+				if ( !sCompleteLink.IsEmpty() )
+					sCompleteLink.Append(_T("\r\n"));
+				sCompleteLink.Append(sLink);
+			}
+
+			if ( !sCompleteLink.IsEmpty() )
+				theApp.CopyTextToClipboard(sCompleteLink);
+		}
+			break;
+		case MP_GETHTMLFRIENDED2KLINK:
+		{
+			CString sCompleteLink;
+			
+			if ( cur_friend && cur_friend->HasUserhash() )
+			{
+				CString sLink;
+				CED2KFriendLink friendLink(cur_friend->m_strName, cur_friend->m_abyUserhash);
+				friendLink.GetLink(sLink);
+				sLink = _T("<a href=\"") + sLink + _T("\">") + StripInvalidFilenameChars(cur_friend->m_strName, true) + _T("</a>");
+				if ( !sCompleteLink.IsEmpty() )
+					sCompleteLink.Append(_T("\r\n"));
+				sCompleteLink.Append(sLink);
+			}
+			
+			if ( !sCompleteLink.IsEmpty() )
+				theApp.CopyTextToClipboard(sCompleteLink);
+		}
+			break;
+		// MORPH END - Added by Commander, Friendlinks [emulEspaa]
 
 		case MP_FIND:
 			OnFindStart();
@@ -417,3 +497,15 @@ void CFriendListCtrl::UpdateList()
 	theApp.emuledlg->chatwnd->UpdateFriendlistCount(theApp.friendlist->GetCount());
 	SortItems(SortProc, MAKELONG(GetSortItem(), (GetSortAscending() ? 0 : 0x0001)));
 }
+
+// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+bool CFriendListCtrl::AddEmfriendsMetToList(const CString& strFile)
+{
+	ShowWindow(SW_HIDE);
+	bool ret = theApp.friendlist->AddEmfriendsMetToList(strFile);
+	theApp.friendlist->ShowFriends();
+	UpdateList();
+	ShowWindow(SW_SHOW);
+	return ret;
+}
+// MORPH END - Added by Commander, Friendlinks [emulEspaa]

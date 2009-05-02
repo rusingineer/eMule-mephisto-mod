@@ -203,6 +203,11 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
+	//MORPH START - Added by SiRoB, Import Parts [SR13]
+	bool	SR13_ImportParts();
+	bool	CreateHash(const uchar* pucData, uint32 uSize, uchar* pucHash, CAICHHashTree* pShaHashOut = NULL, bool slowdown=false) const; //Xman Nice Hash //moved from protected area
+	//MORPH END   - Added by SiRoB, Import Parts [SR13]
+
 protected:
 	//preview
 	bool	GrabImage(CString strFileName, uint8 nFramesToGrab, double dStartTime, bool bReduceColor, uint16 nMaxWidth, void* pSender);
@@ -216,7 +221,11 @@ protected:
 	*/
 	void	CreateHash(CFile* pFile, uint64 uSize, uchar* pucHash, CAICHHashTree* pShaHashOut = NULL, bool slowdown=false) const;
 	bool	CreateHash(FILE* fp, uint64 uSize, uchar* pucHash, CAICHHashTree* pShaHashOut = NULL, bool slowdown=false) const;
+	//MORPH - Removed by SiRoB, moved up in public area, Import Parts [SR13]
+	/*
 	bool	CreateHash(const uchar* pucData, uint32 uSize, uchar* pucHash, CAICHHashTree* pShaHashOut = NULL, bool slowdown=false) const;
+	*/
+	//MOPRH END
 	//Xman end
 	virtual void	UpdateFileRatingCommentAvail(bool bForceUpdate = false);
 

@@ -51,6 +51,7 @@ BEGIN_MESSAGE_MAP(CPPgXtreme, CPropertyPage)
 	ON_BN_CLICKED(IDC_SENDBUFFER1, OnSettingsChange)
 	ON_BN_CLICKED(IDC_SENDBUFFER2, OnSettingsChange)
 	ON_BN_CLICKED(IDC_SENDBUFFER3, OnSettingsChange)
+	ON_BN_CLICKED(IDC_SENDBUFFER4, OnSettingsChange) //zz_fly :: support 24k send buffer
 	//Xman chunk chooser
 	ON_BN_CLICKED(IDC_CC_MAELLA, OnSettingsChange)
 	ON_BN_CLICKED(IDC_CC_ZZ, OnSettingsChange)
@@ -138,6 +139,10 @@ void CPPgXtreme::LoadSettings(void)
 
 		CheckDlgButton(IDC_RETRYCONNECTIONATTEMPTS, thePrefs.retryconnectionattempts); //Xman 
 
+		//zz_fly :: support 24k send buffer :: start
+		GetDlgItem(IDC_SENDBUFFER3)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_SENDBUFFER4)->ShowWindow(SW_HIDE);
+		//zz_fly :: support 24k send buffer :: end
 		switch(thePrefs.GetSendbuffersize())
 		{
 		case 6000:
@@ -146,6 +151,13 @@ void CPPgXtreme::LoadSettings(void)
 		case 12000:
 			CheckDlgButton(IDC_SENDBUFFER3, TRUE);
 			break;
+		//zz_fly :: support 24k send buffer :: start
+		case 24000:
+			GetDlgItem(IDC_SENDBUFFER4)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_SENDBUFFER3)->ShowWindow(SW_HIDE);
+			CheckDlgButton(IDC_SENDBUFFER4, TRUE);				
+			break;
+		//zz_fly :: support 24k send buffer :: end
 		default:
 			CheckDlgButton(IDC_SENDBUFFER2, TRUE);
 		}
@@ -201,12 +213,24 @@ BOOL CPPgXtreme::OnApply()
 	SetPriorityClass(GetCurrentProcess(), thePrefs.GetMainProcessPriority());
 	//Xman end
 
+	//zz_fly :: support 24k send buffer :: start
+	if(GetDlgItem(IDC_SENDBUFFER4)->IsWindowVisible() && !(IsDlgButtonChecked(IDC_SENDBUFFER4)))
+	{
+		GetDlgItem(IDC_SENDBUFFER3)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_SENDBUFFER4)->ShowWindow(SW_HIDE);
+	}
+	//zz_fly :: support 24k send buffer :: end
+
 	if(IsDlgButtonChecked(IDC_SENDBUFFER1))
 		thePrefs.SetSendbuffersize(6000);
 	else if(IsDlgButtonChecked(IDC_SENDBUFFER2))
 		thePrefs.SetSendbuffersize(8192);
 	else if(IsDlgButtonChecked(IDC_SENDBUFFER3))
 		thePrefs.SetSendbuffersize(12000);
+	//zz_fly :: support 24k send buffer :: start
+	else if(IsDlgButtonChecked(IDC_SENDBUFFER4))
+		thePrefs.SetSendbuffersize(24000); 
+	//zz_fly :: support 24k send buffer :: end
 	theApp.uploadqueue->ChangeSendBufferSize(thePrefs.GetSendbuffersize());
 
 

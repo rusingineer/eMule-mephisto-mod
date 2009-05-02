@@ -567,7 +567,121 @@ CED2KLink* CED2KLink::CreateLinkFromUrl(const TCHAR* uri)
 			if (!strURL.IsEmpty() && GetNextString(strURI, _T("|"), iPos) == _T("/"))
 				return new CED2KNodesListLink(strURL);
 		}
+		// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+		else if ( strTok == _T("friend") )
+		{
+			CString sNick = GetNextString(strURI, _T("|"), iPos);
+			if ( !sNick.IsEmpty() )
+			{
+				CString sHash = GetNextString(strURI, _T("|"), iPos);
+				if ( !sHash.IsEmpty() && GetNextString(strURI, _T("|"), iPos) == _T("/"))
+					return new CED2KFriendLink(sNick, sHash);
+			}
+		}
+		else if ( strTok == _T("friendlist") )
+		{
+			CString sURL = GetNextString(strURI, _T("|"), iPos);
+			if ( !sURL.IsEmpty() && GetNextString(strURI, _T("|"), iPos) == _T("/") )
+				return new CED2KFriendListLink(sURL);
+		}
+		// MORPH END - Added by Commander, Friendlinks [emulEspaa]
 	}
 
 	throw GetResString(IDS_ERR_NOSLLINK);
 }
+
+// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+CED2KFriendLink::CED2KFriendLink(LPCTSTR userName, LPCTSTR userHash)
+{
+	if ( _tcslen(userHash) != 32 )
+		throw GetResString(IDS_ERR_ILLFORMEDHASH);
+
+	m_sUserName = userName;
+
+	for (int idx = 0; idx < 16; ++idx)
+	{
+		m_hash[idx] = (uchar)FromHexDigit(*userHash++) * 16;
+		m_hash[idx] += (uchar)FromHexDigit(*userHash++);
+	}
+}
+
+CED2KFriendLink::CED2KFriendLink(LPCTSTR userName, uchar userHash[])
+{
+	m_sUserName = userName;
+	memcpy(m_hash, userHash, 16*sizeof(uchar));
+}
+
+void CED2KFriendLink::GetLink(CString& lnk) const
+{
+	lnk = _T("ed2k://|friend|");
+	lnk += m_sUserName + _T("|");
+	for (int idx = 0; idx < 16; ++idx)
+	{
+		unsigned int ui1 = m_hash[idx] / 16;
+		unsigned int ui2 = m_hash[idx] % 16;
+		lnk += static_cast<TCHAR>( ui1 < 10 ? (_T('0')+ui1) : (_T('A')+(ui1-10)) );
+		lnk += static_cast<TCHAR>( ui2 < 10 ? (_T('0')+ui2) : (_T('A')+(ui2-10)) );
+	}
+	lnk += _T("|/");
+}
+
+CED2KServerListLink* CED2KFriendLink::GetServerListLink() 
+{ 
+	return NULL;
+}
+
+CED2KServerLink* CED2KFriendLink::GetServerLink() 
+{ 
+	return NULL; 
+}
+
+CED2KFileLink* CED2KFriendLink::GetFileLink() 
+{ 
+	return NULL;
+}
+
+CED2KNodesListLink* CED2KFriendLink::GetNodesListLink()
+{
+	return NULL;
+}
+
+CED2KLink::LinkType CED2KFriendLink::GetKind() const
+{
+	return kFriend;
+}
+
+CED2KFriendListLink::CED2KFriendListLink(LPCTSTR address)
+{
+	m_address = address;
+}
+
+void CED2KFriendListLink::GetLink(CString& lnk) const
+{
+	lnk.Format(_T("ed2k://|friendlist|%s|/"), m_address);
+}
+
+CED2KServerListLink* CED2KFriendListLink::GetServerListLink() 
+{ 
+	return NULL;
+}
+
+CED2KServerLink* CED2KFriendListLink::GetServerLink() 
+{ 
+	return NULL; 
+}
+
+CED2KFileLink* CED2KFriendListLink::GetFileLink() 
+{ 
+	return NULL;
+}
+
+CED2KNodesListLink* CED2KFriendListLink::GetNodesListLink()
+{
+	return NULL;
+}
+
+CED2KLink::LinkType CED2KFriendListLink::GetKind() const
+{
+	return kFriendList;
+}
+// MORPH END - Added by Commander, Friendlinks [emulEspaa]

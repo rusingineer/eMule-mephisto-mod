@@ -945,6 +945,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SR13-ImportParts.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StatisticFile.cpp"
 				>
 			</File>
@@ -1451,6 +1455,10 @@
 			</File>
 			<File
 				RelativePath="Sockets.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SR13-ImportParts.h"
 				>
 			</File>
 			<File

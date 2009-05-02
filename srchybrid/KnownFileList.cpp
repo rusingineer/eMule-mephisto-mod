@@ -785,7 +785,10 @@ void CKnownFileList::SaveKnown(bool bStart)
 	else
 	{
 		if(m_bSaveAgain)
+		{
 			m_bSaveAgain = false;
+			m_SaveKnownThread->Pause(false);
+		}
 		else if (m_SaveKnownThread) // just in case, should always be true at this point
 		{
 			m_SaveKnownThread->EndThread();
@@ -841,13 +844,11 @@ UINT CSaveKnownThread::RunInternal()
 {
 	while(bDoRun) 
 	{
-        pauseEvent->Lock();
-
-		if(!bDoRun)
-			break;
 		theApp.knownfiles->Save();
 
 		PostMessage(theApp.emuledlg->m_hWnd,TM_SAVEKNOWNDONE,0,0);
+		Pause(true);
+        pauseEvent->Lock();
 	}
 
 	threadEndedEvent->SetEvent();

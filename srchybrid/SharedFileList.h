@@ -120,9 +120,19 @@ public:
 	virtual int	Run();
 	void	SetValues(CSharedFileList* pOwner, LPCTSTR directory, LPCTSTR filename, CPartFile* partfile = NULL);
 
+	//MORPH START - Added by SiRoB, Import Parts [SR13] - added by zz_fly
+	bool	SR13_ImportParts();
+	uint16	SetPartToImport(LPCTSTR import);
+	//MORPH END   - Added by SiRoB, Import Parts [SR13]
+
 private:
 	CSharedFileList* m_pOwner;
 	CString			 m_strDirectory;
 	CString			 m_strFilename;
 	CPartFile*		 m_partfile;
+
+	//MORPH START - Added by SiRoB, Import Parts [SR13] - added by zz_fly
+	CString          m_strImport;
+	CArray<uint16,uint16>	m_PartsToImport;
+	//MORPH END   - Added by SiRoB, Import Parts [SR13]
 };

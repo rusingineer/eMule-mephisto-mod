@@ -20,13 +20,13 @@
 /*
 //Xman
 //ModID
-#define MOD_VERSION		_T("Xtreme 7.0") 
+#define MOD_VERSION		_T("Xtreme 7.1") 
 */
 // <== ModID [itsonlyme/SiRoB] - Stulle
 
 //Xman versions check
 #define MOD_MAIN_VER	7
-#define MOD_MIN_VER		0
+#define MOD_MIN_VER		1
 #define	MOD_BUILD_VER	1 //1=Xtreme x.x 2=Xtreme x.x.1
 
 // ==> ModID [itsonlyme/SiRoB] - Stulle

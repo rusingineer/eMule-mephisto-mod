@@ -69,7 +69,12 @@ CSharedFilesWnd::CSharedFilesWnd(CWnd* pParent /*=NULL*/)
 
 CSharedFilesWnd::~CSharedFilesWnd()
 {
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	m_ctlSharedListHeader.Detach();
+	*/
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	if (icon_files)
 		VERIFY( DestroyIcon(icon_files) );
 }
@@ -100,11 +105,22 @@ BOOL CSharedFilesWnd::OnInitDialog()
 	if (thePrefs.GetUseSystemFontForMainControls())
 		m_ctlSharedDirTree.SendMessage(WM_SETFONT, NULL, FALSE);
 
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	m_ctlSharedListHeader.Attach(sharedfilesctrl.GetHeaderCtrl()->Detach());
+	*/
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	CArray<int, int> aIgnore; // ignored no-text columns for filter edit
 	aIgnore.Add(8); // shared parts
 	aIgnore.Add(11); // shared ed2k/kad
+	//zz_fly, fix minor official draw bug around SharedFiles Filter on Language change
+	// X-Ray :: FiXeS :: Bugfix :: Start :: WiZaRd
+	/*
 	m_ctlFilter.OnInit(&m_ctlSharedListHeader, &aIgnore);
+	*/
+	m_ctlFilter.OnInit(sharedfilesctrl.GetHeaderCtrl(), &aIgnore);
+	// X-Ray :: FiXeS :: Bugfix :: End :: WiZaRd
 	
 	pop_bar.SetGradientColors(RGB(255,255,240),RGB(255,255,0));
 	pop_bar.SetTextColor(RGB(20,70,255));
@@ -194,7 +210,7 @@ void CSharedFilesWnd::DoResize(int iDelta)
 	CSplitterControl::ChangePos(&sharedfilesctrl, -iDelta, 0);
 	CSplitterControl::ChangeWidth(&m_ctrlStatisticsFrm, -iDelta);
 	CSplitterControl::ChangeWidth(&sharedfilesctrl, -iDelta);
-	
+
 	//Xman [MoNKi: -Downloaded History-]
 	CSplitterControl::ChangePos(GetDlgItem(IDC_DOWNHISTORYLIST), -iDelta, 0);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_DOWNHISTORYLIST), -iDelta);
@@ -530,32 +546,32 @@ LRESULT CSharedFilesWnd::DefWindowProc(UINT message, WPARAM wParam, LPARAM lPara
 	case WM_PAINT:
 		if (m_wndSplitter)
 		{
-			CRect rcWnd;
-			GetWindowRect(rcWnd);
-			if (rcWnd.Width() > 0)
+				CRect rcWnd;
+				GetWindowRect(rcWnd);
+				if (rcWnd.Width() > 0)
 			{
 				CRect rcSpl;
-				m_ctlSharedDirTree.GetWindowRect(rcSpl);
-				ScreenToClient(rcSpl);
-				rcSpl.left = rcSpl.right + SPLITTER_MARGIN;
+					m_ctlSharedDirTree.GetWindowRect(rcSpl);
+					ScreenToClient(rcSpl);
+					rcSpl.left = rcSpl.right + SPLITTER_MARGIN;
 				rcSpl.right = rcSpl.left + SPLITTER_WIDTH;
 
-				CRect rcFilter;
-				m_ctlFilter.GetWindowRect(rcFilter);
-				ScreenToClient(rcFilter);
-				rcSpl.top = rcFilter.top;
+					CRect rcFilter;
+					m_ctlFilter.GetWindowRect(rcFilter);
+					ScreenToClient(rcFilter);
+					rcSpl.top = rcFilter.top;
 				m_wndSplitter.MoveWindow(rcSpl, TRUE);
 			}
 		}
 		break;
 
-	case WM_NOTIFY:
-		if (wParam == IDC_SPLITTER_SHAREDFILES)
-		{ 
-			SPC_NMHDR* pHdr = (SPC_NMHDR*)lParam;
-			DoResize(pHdr->delta);
-		}
-		break;
+		case WM_NOTIFY:
+			if (wParam == IDC_SPLITTER_SHAREDFILES)
+			{ 
+				SPC_NMHDR* pHdr = (SPC_NMHDR*)lParam;
+				DoResize(pHdr->delta);
+			}
+			break;
 
 		case WM_WINDOWPOSCHANGED: {
 			CRect rcWnd;
@@ -564,15 +580,15 @@ LRESULT CSharedFilesWnd::DefWindowProc(UINT message, WPARAM wParam, LPARAM lPara
 				Invalidate();
 			break;
 		}
-	case WM_SIZE:
-		if (m_wndSplitter)
-		{
+		case WM_SIZE:
+			if (m_wndSplitter)
+			{
 				CRect rcWnd;
 				GetWindowRect(rcWnd);
 				ScreenToClient(rcWnd);
 				m_wndSplitter.SetRange(rcWnd.left + SPLITTER_RANGE_MIN, rcWnd.left + SPLITTER_RANGE_MAX);
-		}
-		break;
+			}
+			break;
 	}
 	return CResizableDialog::DefWindowProc(message, wParam, lParam);
 }

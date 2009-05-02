@@ -4345,7 +4345,11 @@ void CStatisticsDlg::OnStnDblclickStatsscope()
 
 LRESULT CStatisticsDlg::OnOscopePositionMsg(WPARAM /*wParam*/, LPARAM lParam)
 {
+	//zz_fly, moved to COScopeCtrl::OnMouseMove(), thanks dolphin87 
+	/*
 	lParam/=thePrefs.GetZoomFactor(); //Xman Maella Statistik-Zoom
+	*/
+	//zz_fly end
 	LPCTSTR pszInfo = (LPCTSTR)lParam;
 	m_TimeToolTips->UpdateTipText(pszInfo, GetDlgItem(IDC_SCOPE_D));
 	m_TimeToolTips->UpdateTipText(pszInfo, GetDlgItem(IDC_SCOPE_U));

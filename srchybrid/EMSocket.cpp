@@ -351,7 +351,13 @@ void CEMSocket::OnReceive(int nErrorCode){
 	//Xman end
 
 	// Check for an error code
+	//zz_fly
+	//netfinity: Special case when socket is closing but data still in buffer, need to empty buffer or deadlock forever
+	/*
 	if(nErrorCode != 0){
+	*/
+	if(nErrorCode != 0 && nErrorCode != WSAESHUTDOWN){ 
+	//zz_fly end
 		OnError(nErrorCode);
 		return;
 	}
@@ -375,18 +381,37 @@ void CEMSocket::OnReceive(int nErrorCode){
 	//Xman include ACK
 	theApp.pBandWidthControl->AddeMuleOutTCPOverall(0); //ACK
 	
+	//zz_fly
+	//netfinity: Special case when socket is closing but data still in buffer, need to empty buffer or deadlock forever
+	/*
 	ProcessReceiveData(); //Xman include ACK
+	*/
+	ProcessReceiveData(nErrorCode); //Xman include ACK
+	//zz_fly end
 }
 
 //Xman include ACK
+//zz_fly
+//netfinity: Special case when socket is closing but data still in buffer, need to empty buffer or deadlock forever
+/*
 void CEMSocket::ProcessReceiveData()
+*/
+void CEMSocket::ProcessReceiveData(int nErrorCode)
+//zz_fly end
+//Xman include ACK end
 {
 	// the 2 meg size was taken from another place
 	static char GlobalReadBuffer[256*1024];
 
 //Xman end include ACK
     // CPU load improvement
+	//zz_fly
+	//netfinity: Special case when socket is closing but data still in buffer, need to empty buffer or deadlock forever
+    /*
     if(downloadLimitEnable == true && downloadLimit == 0){
+	*/
+	if(downloadLimitEnable == true && downloadLimit == 0 && nErrorCode != WSAESHUTDOWN){ 
+	//zz_fly end
         EMTrace("CEMSocket::OnReceive blocked by limit");
         pendingOnReceive = true;
 

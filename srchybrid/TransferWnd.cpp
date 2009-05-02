@@ -531,7 +531,7 @@ void CTransferWnd::UpdateSplitterRange()
 			break;
 		default:
 		case IDC_DOWNLOADLIST:
-	downloadlistctrl.GetWindowRect(rcDown);
+			downloadlistctrl.GetWindowRect(rcDown);
 			break;
 	}
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
@@ -543,7 +543,7 @@ void CTransferWnd::UpdateSplitterRange()
 		clientlistctrl.GetWindowRect(rcUp);
 	else
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
-	downloadclientsctrl.GetWindowRect(rcUp);
+		downloadclientsctrl.GetWindowRect(rcUp);
 	ScreenToClient(rcUp);
 
 	thePrefs.SetSplitterbarPosition((rcDown.bottom * 100) / rcWnd.Height());
@@ -597,10 +597,10 @@ void CTransferWnd::UpdateSplitterRange()
 			break;
 		default:
 		case IDC_DOWNLOADLIST:
-	AddAnchor(IDC_UPLOADLIST, CSize(0, thePrefs.GetSplitterbarPosition()), BOTTOM_RIGHT);
-	AddAnchor(IDC_QUEUELIST, CSize(0, thePrefs.GetSplitterbarPosition()), BOTTOM_RIGHT);
-	AddAnchor(IDC_CLIENTLIST, CSize(0, thePrefs.GetSplitterbarPosition()), BOTTOM_RIGHT);
-	AddAnchor(IDC_DOWNLOADCLIENTS, CSize(0, thePrefs.GetSplitterbarPosition()), BOTTOM_RIGHT);
+			AddAnchor(IDC_UPLOADLIST,CSize(0,thePrefs.GetSplitterbarPosition()),BOTTOM_RIGHT);
+			AddAnchor(IDC_QUEUELIST,CSize(0,thePrefs.GetSplitterbarPosition()),BOTTOM_RIGHT);
+			AddAnchor(IDC_CLIENTLIST,CSize(0,thePrefs.GetSplitterbarPosition()),BOTTOM_RIGHT);
+			AddAnchor(IDC_DOWNLOADCLIENTS, CSize(0, thePrefs.GetSplitterbarPosition()), BOTTOM_RIGHT);
 			break;
 	}
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
@@ -814,7 +814,7 @@ void CTransferWnd::UpdateFilesCount(int iCount)
 		m_btnWnd1->SetWindowText(strBuffer);
 	}
 }
-5t*/
+*/
 void CTransferWnd::UpdateFilesCount(UINT iCount, UINT countsources, UINT countreadyfiles) 
 {
 	// ==> Advanced Transfer Window Layout [Stulle] - Stulle
@@ -1998,7 +1998,7 @@ BOOL CTransferWnd::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				ShowSplitWindow(false,IDC_DOWNLOADLIST);
 			else
 			// <== Advanced Transfer Window Layout [Stulle] - Stulle
-			ShowList(IDC_DOWNLOADLIST);
+				ShowList(IDC_DOWNLOADLIST);
 			break;
 		case MP_VIEW1_UPLOADING:
 			// ==> Advanced Transfer Window Layout [Stulle] - Stulle
@@ -2006,7 +2006,7 @@ BOOL CTransferWnd::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				ShowSplitWindow(false,IDC_UPLOADLIST);
 			else
 			// <== Advanced Transfer Window Layout [Stulle] - Stulle
-			ShowList(IDC_UPLOADLIST);
+				ShowList(IDC_UPLOADLIST);
 			break;
 		case MP_VIEW1_DOWNLOADING:
 			// ==> Advanced Transfer Window Layout [Stulle] - Stulle
@@ -2014,7 +2014,7 @@ BOOL CTransferWnd::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				ShowSplitWindow(false,IDC_DOWNLOADCLIENTS);
 			else
 			// <== Advanced Transfer Window Layout [Stulle] - Stulle
-			ShowList(IDC_DOWNLOADCLIENTS);
+				ShowList(IDC_DOWNLOADCLIENTS);
 			break;
 		case MP_VIEW1_ONQUEUE:
 			// ==> Advanced Transfer Window Layout [Stulle] - Stulle
@@ -2022,7 +2022,7 @@ BOOL CTransferWnd::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				ShowSplitWindow(false,IDC_QUEUELIST);
 			else
 			// <== Advanced Transfer Window Layout [Stulle] - Stulle
-			ShowList(IDC_QUEUELIST);
+				ShowList(IDC_QUEUELIST);
 			break;
 		case MP_VIEW1_CLIENTS:
 			// ==> Advanced Transfer Window Layout [Stulle] - Stulle
@@ -2030,7 +2030,7 @@ BOOL CTransferWnd::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				ShowSplitWindow(false,IDC_CLIENTLIST);
 			else
 			// <== Advanced Transfer Window Layout [Stulle] - Stulle
-			ShowList(IDC_CLIENTLIST);
+				ShowList(IDC_CLIENTLIST);
 			break;
 
 		// Handle the new view filter menu.

@@ -359,6 +359,11 @@ private:
 	uint16								 m_uRunningNonBlockedDiscAccessThreads;
 	//Xman end
 
+// MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
+public:
+	bool	IsEd2kFriendLinkInClipboard();
+// MORPH END - Added by Commander, Friendlinks [emulEspaa]
+
 	// ==> ModID [itsonlyme/SiRoB] - Stulle
 public:
 	static const UINT	m_nMVersionMjr;

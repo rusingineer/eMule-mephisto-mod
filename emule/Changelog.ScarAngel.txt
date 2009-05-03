@@ -1,12 +1,25 @@
 CHANGELOG FOR EMULE ScarAngel MOD
 
 
+eMule v0.49b ScarAngel v3.2:
+------------------------
+- xx.xx.2009 -
+-------------------------------------------------------------------------------
+based on eMule 0.49b Xtreme 7.1 compiled with vs2005 SP1
+Merged to eMule v0.49c [Stulle]
+Updated with code from zz_fly's Xtreme
+
+Added: Static Tray Icon [MorphXT] - MyTh88
+
+Fixed: Save known or FileSettings threads were not terminated properly [Stulle] - Stulle
+
+
 eMule v0.49b ScarAngel v3.1:
 ------------------------
 - 13.10.2008 -
 -------------------------------------------------------------------------------
 based on eMule 0.49b Xtreme 7.0 compiled with vs2005 SP1
-Merged to eMule v0.49b [Stulle]Fz
+Merged to eMule v0.49b [Stulle]
 
 Added: IP Filter White list [Stulle] - Stulle
 Added: TK4 CreditSystem [BlueSonicBoy] - Stulle

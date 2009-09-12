@@ -15,6 +15,7 @@ public:
 
 protected:
 	CListBox m_uncfolders;
+	HICON m_icoBrowse;
 
 	void LoadSettings(void);
 	void OnSettingsChangeCat(uint8 index);
@@ -32,6 +33,7 @@ protected:
 	afx_msg void OnSettingsChangeCat2()	{OnSettingsChangeCat(2);}
 	afx_msg void OnHelp();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnDestroy();
 public:
 	afx_msg void OnBnClickedRememberdownloaded(); //Xman remove unused AICH-hashes
 };

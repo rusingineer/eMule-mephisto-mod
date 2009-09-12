@@ -56,7 +56,7 @@ struct Pending_Block_Struct{
 	}
 	Requested_Block_Struct*	block;
 	struct z_stream_s*      zStream;       // Barry - Used to unzip packets
-	UINT                  totalUnzipped; // Barry - This holds the total unzipped bytes for all packets so far
+	UINT					totalUnzipped; // Barry - This holds the total unzipped bytes for all packets so far
 	UINT					fZStreamError : 1,
 							fRecovered    : 1,
 							fQueued		  : 3;
@@ -95,7 +95,7 @@ class CUpDownClient : public CObject
 
 	friend class CUploadQueue;
 public:
-	void PrintUploadStatus();
+    void PrintUploadStatus();
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base
@@ -152,7 +152,7 @@ public:
 	uint32			GetConnectIP() const							{ return m_nConnectIP; }
 	uint16			GetUserPort() const								{ return m_nUserPort; }
 	void			SetUserPort(uint16 val)							{ m_nUserPort = val; }
-	UINT			GetTransferredUp() const							{ return m_nTransferredUp; }
+	UINT			GetTransferredUp() const						{ return m_nTransferredUp; }
 	UINT			GetTransferredDown() const						{ return m_nTransferredDown; }
 	uint32			GetServerIP() const								{ return m_dwServerIP; }
 	void			SetServerIP(uint32 nIP)							{ m_dwServerIP = nIP; }
@@ -244,6 +244,8 @@ public:
 	bool			AllowIncomeingBuddyPingPong()					{ return m_dwLastBuddyPingPongTime < (::GetTickCount()-(3*60*1000)); }
 	void			SetLastBuddyPingPongTime()						{ m_dwLastBuddyPingPongTime = (::GetTickCount()+(10*60*1000)); }
 	void			ProcessFirewallCheckUDPRequest(CSafeMemFile* data);
+	void			SendSharedDirectories();
+
 	// secure ident
 	void			SendPublicKeyPacket();
 	void			SendSignaturePacket();
@@ -262,7 +264,8 @@ public:
 	void			ProcessPreviewAnswer(const uchar* pachPacket, UINT nSize);
 	bool			GetPreviewSupport() const						{ return m_fSupportsPreview && GetViewSharedFilesSupport(); }
 	bool			GetViewSharedFilesSupport() const				{ return m_fNoViewSharedFiles==0; }
-	bool			SafeSendPacket(Packet* packet);
+	bool			SafeConnectAndSendPacket(Packet* packet);
+	bool			SendPacket(Packet* packet, bool bDeletePacket, bool bVerifyConnection = false);
 	void			CheckForGPLEvilDoer();
 	// Encryption / Obfuscation / Connectoptions
 	bool			SupportsCryptLayer() const						{ return m_fSupportsCryptLayer; }

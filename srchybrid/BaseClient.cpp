@@ -450,11 +450,15 @@ CUpDownClient::~CUpDownClient(){
 
 	free(m_pszUsername);
 
-	delete[] m_abyPartStatus;
-	m_abyPartStatus = NULL;
+	if (m_abyPartStatus){ //from MorphXT
+		delete[] m_abyPartStatus;
+		m_abyPartStatus = NULL;
+	}
 
-	delete[] m_abyUpPartStatus;
-	m_abyUpPartStatus = NULL;
+	if (m_abyUpPartStatus){ //from MorphXT
+		delete[] m_abyUpPartStatus;
+		m_abyUpPartStatus = NULL;
+	}
 
 	ClearUploadBlockRequests();
 
@@ -502,14 +506,13 @@ CUpDownClient::~CUpDownClient(){
 	if(Credits())
 	{
 		Credits()->SetLastSeen(); //ensure we keep the credits at least 6 hours in memory, without this line our LastSeen can be outdated if we did only UDP
-		// ==> SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
+		//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
 		/*
 		if(Credits()->GetDownloadedTotal()==0 && Credits()->GetUploadedTotal()==0) //just to save some CPU-cycles, a second test is done at credits
-		*/
-		if(theApp.clientcredits->IsSaveUploadQueueWaitTime() == false &&
-			Credits()->GetDownloadedTotal()==0 && Credits()->GetUploadedTotal()==0)
-		// <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 			Credits()->MarkToDelete();
+		*/
+			Credits()->DecReferredTimes();
+		//zz_fly :: End
 	}
 	//Xman end
 
@@ -967,9 +970,18 @@ bool CUpDownClient::ProcessHelloTypePacket(CSafeMemFile* data, bool isHelloPacke
 	if(!HasLowID() || m_nUserIDHybrid == 0 || m_nUserIDHybrid == m_dwUserIP ) 
 		m_nUserIDHybrid = ntohl(m_dwUserIP);
 
+	//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+	//note: do not create credit in memory when we going to ban the client
+	/*
 	CClientCredits* pFoundCredits = theApp.clientcredits->GetCredit(m_achUserHash);
+	*/
+	//zz_fly :: End
 	if (credits == NULL){
+		//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+		/*
 		credits = pFoundCredits;
+		*/
+		//zz_fly :: End
 		//Xman Extened credit- table-arragement
 		/*
 		if (!theApp.clientlist->ComparePriorUserhash(m_dwUserIP, m_nUserPort, pFoundCredits)){
@@ -980,22 +992,36 @@ bool CUpDownClient::ProcessHelloTypePacket(CSafeMemFile* data, bool isHelloPacke
 			AddLeecherLogLine(false, _T("Clients: %s (%s), Banreason: Userhash changed (Found in TrackedClientsList)"), GetUserName(), ipstr(GetConnectIP()));
 		//Xman end
 			Ban();
-		}	
+		}
+		//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+		else if (GetUploadState()!=US_BANNED){
+			credits = theApp.clientcredits->GetCredit(m_achUserHash);
+		}
+		//zz_fly :: End
 	}
+	//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+	/*
 	else if (credits != pFoundCredits){
+	*/
+	else if (md4cmp(credits->GetKey(), m_achUserHash)){
+	//zz_fly :: End
 		//Xman Extened credit- table-arragement
 		credits->SetLastSeen(); //ensure to keep it at least 5 hours
-		// ==> SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
+		//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
 		/*
 		if(credits->GetUploadedTotal()==0 && credits->GetDownloadedTotal()==0)
-		*/
-		if(theApp.clientcredits->IsSaveUploadQueueWaitTime() == false &&
-			Credits()->GetUploadedTotal()==0 && Credits()->GetDownloadedTotal()==0)
-		// <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 			credits->MarkToDelete(); //check also if the old hash is used by an other client
+		*/		
+			credits->DecReferredTimes(); //check also if the old hash is used by an other client
+		//zz_fly :: End
 		//Xman end
 		// userhash change ok, however two hours "waittime" before it can be used
+		//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+		/*
 		credits = pFoundCredits;
+		*/
+		credits = NULL;
+		//zz_fly :: End
 		//Xman Extened credit- table-arragement
 		/*
 		if (thePrefs.GetLogBannedClients())
@@ -1005,7 +1031,11 @@ bool CUpDownClient::ProcessHelloTypePacket(CSafeMemFile* data, bool isHelloPacke
 		//Xman end
 		Ban();
 	}
-
+	//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+	else {
+		credits->SetLastSeen(); //Enig123::refresh is neccessary here to avoid wrong judgement
+	}
+	//zz_fly :: End
 
 	if (GetFriend() != NULL && GetFriend()->HasUserhash() && md4cmp(GetFriend()->m_abyUserhash, m_achUserHash) != 0)
 	{
@@ -1020,7 +1050,12 @@ bool CUpDownClient::ProcessHelloTypePacket(CSafeMemFile* data, bool isHelloPacke
 	if (GetFriend() == NULL || GetFriend()->HasUserhash() || GetFriend()->m_dwLastUsedIP != GetConnectIP()
 		|| GetFriend()->m_nLastUsedPort != GetUserPort())
 	{
+		//zz_fly :: minor issue with friends handling :: WiZaRd :: start
+		/*
 		if ((m_Friend = theApp.friendlist->SearchFriend(m_achUserHash, m_dwUserIP, m_nUserPort)) != NULL){
+		*/
+		if ((m_Friend = theApp.friendlist->SearchFriend(m_achUserHash, GetConnectIP(), m_nUserPort)) != NULL){
+		//zz_fly :: end
 			// Link the friend to that client
 			m_Friend->SetLinkedClient(this);
 		}
@@ -1223,7 +1258,7 @@ void CUpDownClient::SendHelloPacket(){
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__Hello", this);
 	theStats.AddUpDataOverheadOther(packet->size);
-	socket->SendPacket(packet,true);
+	SendPacket(packet, true);
 
 	m_bHelloAnswerPending = true;
 	return;
@@ -1291,7 +1326,7 @@ void CUpDownClient::SendMuleInfoPacket(bool bAnswer){
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend(!bAnswer ? "OP__EmuleInfo" : "OP__EmuleInfoAnswer", this);
 	theStats.AddUpDataOverheadOther(packet->size);
-	socket->SendPacket(packet,true,true);
+	SendPacket(packet, true);
 }
 
 void CUpDownClient::ProcessMuleInfoPacket(const uchar* pachPacket, uint32 nSize)
@@ -1907,9 +1942,13 @@ void CUpDownClient::ProcessMuleCommentPacket(const uchar* pachPacket, uint32 nSi
 		if (uLength > 0)
 		{
 			// we have to increase the raw max. allowed file comment len because of possible UTF8 encoding.
-			if (uLength > MAXFILECOMMENTLEN*3)
-				uLength = MAXFILECOMMENTLEN*3;
+			if (uLength > MAXFILECOMMENTLEN*4)
+				uLength = MAXFILECOMMENTLEN*4;
 			strComment = data.ReadString(GetUnicodeSupport()!=utf8strNone, uLength);
+
+			if (strComment.GetLength() > MAXFILECOMMENTLEN) // enforce the max len on the comment
+				strComment = strComment.Left(MAXFILECOMMENTLEN);
+
 			if (thePrefs.GetLogRatingDescReceived() && !strComment.IsEmpty())
 				AddDebugLogLine(false, GetResString(IDS_DESCRIPTIONRECV), m_strClientFilename, strComment);
 
@@ -1966,7 +2005,12 @@ bool CUpDownClient::Disconnected(LPCTSTR pszReason, bool bFromSocket, UpStopReas
 	//If this is a KAD client object, just delete it!
 	SetKadState(KS_NONE);
 
+	//Xman Xtreme Mod
+	/*
     if (GetUploadState() == US_UPLOADING || GetUploadState() == US_CONNECTING)
+	*/
+	if (GetUploadState() == US_UPLOADING) //uploading problem client
+	//Xman end
 	{
 		// sets US_NONE
 		// Maella -Upload Stop Reason-
@@ -1998,6 +2042,7 @@ bool CUpDownClient::Disconnected(LPCTSTR pszReason, bool bFromSocket, UpStopReas
 		ASSERT( m_nConnectingState == CCS_NONE );
 		if (m_ePeerCacheDownState == PCDS_WAIT_CACHE_REPLY || m_ePeerCacheDownState == PCDS_DOWNLOADING)
 			theApp.m_pPeerCache->DownloadAttemptFailed();
+		//Xman remark: the only reason can be a socket-error/timeout
 		// Maella -Download Stop Reason-
 		/*
 		SetDownloadState(DS_ONQUEUE, CString(_T("Disconnected: ")) + pszReason);
@@ -2681,7 +2726,7 @@ void CUpDownClient::ConnectionEstablished()
 					DebugSend("OP__AcceptUploadReq", this);
 				Packet* packet = new Packet(OP_ACCEPTUPLOADREQ,0);
 				theStats.AddUpDataOverheadFileRequest(packet->size);
-				socket->SendPacket(packet,true);
+				SendPacket(packet,true);
 				//Xman find best sources
 				//Xman: in every case, we add this client to our downloadqueue
 				CKnownFile* partfile = theApp.downloadqueue->GetFileByID(this->GetUploadFileID());
@@ -2697,14 +2742,14 @@ void CUpDownClient::ConnectionEstablished()
 			DebugSend(m_fSharedDirectories ? "OP__AskSharedDirs" : "OP__AskSharedFiles", this);
         Packet* packet = new Packet(m_fSharedDirectories ? OP_ASKSHAREDDIRS : OP_ASKSHAREDFILES,0);
 		theStats.AddUpDataOverheadOther(packet->size);
-		socket->SendPacket(packet,true,true);
+		SendPacket(packet,true);
 	}
 
 	while (!m_WaitingPackets_list.IsEmpty())
 	{
 		if (thePrefs.GetDebugClientTCPLevel() > 0)
 			DebugSend("Buffered Packet", this);
-		socket->SendPacket(m_WaitingPackets_list.RemoveHead());
+		SendPacket(m_WaitingPackets_list.RemoveHead(), true);
 	}
 
 }
@@ -3057,7 +3102,11 @@ void CUpDownClient::SendPublicKeyPacket()
 {
 	// send our public key to the client who requested it
 	if (socket == NULL || credits == NULL || m_SecureIdentState != IS_KEYANDSIGNEEDED){
+		//zz_fly :: see the changes in clientcreditlist
+		/*
 		ASSERT ( false );
+		*/
+		//zz_fly :: see the changes in clientcreditlist
 		return;
 	}
 	if (!theApp.clientcredits->CryptoAvailable())
@@ -3069,7 +3118,7 @@ void CUpDownClient::SendPublicKeyPacket()
 	packet->pBuffer[0] = theApp.clientcredits->GetPubKeyLen();
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__PublicKey", this);
-	socket->SendPacket(packet,true,true);
+	SendPacket(packet, true);
 	m_SecureIdentState = IS_SIGNATURENEEDED;
 }
 
@@ -3077,7 +3126,11 @@ void CUpDownClient::SendSignaturePacket()
 {
 	// signate the public key of this client and send it
 	if (socket == NULL || credits == NULL || m_SecureIdentState == 0){
+		//zz_fly :: see the changes in clientcreditlist
+		/*
 		ASSERT ( false );
+		*/
+		//zz_fly :: see the changes in clientcreditlist
 		return;
 	}
 
@@ -3127,7 +3180,7 @@ void CUpDownClient::SendSignaturePacket()
 		packet->pBuffer[1+siglen] = byChaIPKind;
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__Signature", this);
-	socket->SendPacket(packet,true,true);
+	SendPacket(packet, true);
 	m_SecureIdentState = IS_ALLREQUESTSSEND;
 }
 
@@ -3136,8 +3189,12 @@ void CUpDownClient::ProcessPublicKeyPacket(const uchar* pachPacket, uint32 nSize
 	theApp.clientlist->AddTrackClient(this);
 
 	if (socket == NULL || credits == NULL || pachPacket[0] != nSize-1
-		|| nSize == 0 || nSize > 250){
+		|| nSize < 10 || nSize > 250){
+		//zz_fly :: see the changes in clientcreditlist
+		/*
 		ASSERT ( false );
+		*/
+		//zz_fly :: see the changes in clientcreditlist
 		return;
 	}
 	if (!theApp.clientcredits->CryptoAvailable())
@@ -3166,8 +3223,12 @@ void CUpDownClient::ProcessSignaturePacket(const uchar* pachPacket, uint32 nSize
 {
 	// here we spread the good guys from the bad ones ;)
 
-	if (socket == NULL || credits == NULL || nSize == 0 || nSize > 250){
+	if (socket == NULL || credits == NULL || nSize > 250 || nSize < 10){
+		//zz_fly :: see the changes in clientcreditlist
+		/*
 		ASSERT ( false );
+		*/
+		//zz_fly :: see the changes in clientcreditlist
 		return;
 	}
 
@@ -3252,7 +3313,7 @@ void CUpDownClient::SendSecIdentStatePacket()
 		PokeUInt32(packet->pBuffer+1, dwRandom);
 		if (thePrefs.GetDebugClientTCPLevel() > 0)
 			DebugSend("OP__SecIdentState", this);
-		socket->SendPacket(packet,true,true);
+		SendPacket(packet, true);
 	}
 	else
 		ASSERT ( false );
@@ -3346,7 +3407,7 @@ void CUpDownClient::SendPreviewRequest(const CAbstractFile* pForFile)
 		Packet* packet = new Packet(OP_REQUESTPREVIEW,16,OP_EMULEPROT);
 		md4cpy(packet->pBuffer,pForFile->GetFileHash());
 		theStats.AddUpDataOverheadOther(packet->size);
-		SafeSendPacket(packet);
+		SafeConnectAndSendPacket(packet);
 	}
 	else{
 		LogWarning(LOG_STATUSBAR, GetResString(IDS_ERR_PREVIEWALREADY));
@@ -3390,7 +3451,7 @@ void CUpDownClient::SendPreviewAnswer(const CKnownFile* pForFile, CxImage** imgF
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__PreviewAnswer", this, (uchar*)packet->pBuffer);
 	theStats.AddUpDataOverheadOther(packet->size);
-	SafeSendPacket(packet);
+	SafeConnectAndSendPacket(packet);
 }
 
 void CUpDownClient::ProcessPreviewReq(const uchar* pachPacket, uint32 nSize)
@@ -3441,13 +3502,15 @@ void CUpDownClient::ProcessPreviewAnswer(const uchar* pachPacket, uint32 nSize)
 			CxImage* image = new CxImage(pBuffer, nImgSize, CXIMAGE_FORMAT_PNG);
 			delete[] pBuffer;
 			pBuffer = NULL;
-			if (image->IsValid()){
+			if (image->IsValid())
 				sfile->AddPreviewImg(image);
-			}
+			else
+				delete image;
 		}
 	}
 	catch(...){
-		delete[] pBuffer;
+		if(pBuffer) //zz_fly :: from ACAT
+			delete[] pBuffer;
 		throw;
 	}
 	(new PreviewDlg())->SetFile(sfile);
@@ -3456,14 +3519,33 @@ void CUpDownClient::ProcessPreviewAnswer(const uchar* pachPacket, uint32 nSize)
 // sends a packet, if needed it will establish a connection before
 // options used: ignore max connections, control packet, delete packet
 // !if the functions returns false that client object was deleted because the connection try failed and the object wasn't needed anymore.
-bool CUpDownClient::SafeSendPacket(Packet* packet){
-	if (socket && socket->IsConnected()){
-		socket->SendPacket(packet, true);
+bool CUpDownClient::SafeConnectAndSendPacket(Packet* packet)
+{
+	if (socket != NULL && socket->IsConnected())
+	{
+		socket->SendPacket(packet, true, true);
 		return true;
 	}
-	else{
+	else
+	{
 		m_WaitingPackets_list.AddTail(packet);
 		return TryToConnect(true);
+	}
+}
+
+bool CUpDownClient::SendPacket(Packet* packet, bool bDeletePacket, bool bVerifyConnection)
+{
+	if (socket != NULL && (!bVerifyConnection || socket->IsConnected()))
+	{
+		socket->SendPacket(packet, bDeletePacket, true);
+		return true;
+	}
+	else
+	{
+		DebugLogError(_T("Outgoing packet (0x%X) discarded because expected socket or connection does not exists %s"), packet->opcode, DbgGetClientInfo());
+		if (bDeletePacket)
+			delete packet;
+		return false;
 	}
 }
 
@@ -3707,7 +3789,7 @@ CString CUpDownClient::DbgGetClientInfo(bool bFormatIP) const
 			}
 		}
 		catch(...){
-			str.Format(_T("%08x - Invalid client instance"), this);
+			str.Format(_T("%p - Invalid client instance"), this);
 		}
 	}
 	return str;
@@ -3937,7 +4019,7 @@ void CUpDownClient::SendPublicIPRequest(){
 			DebugSend("OP__PublicIPReq", this);
 		Packet* packet = new Packet(OP_PUBLICIP_REQ,0,OP_EMULEPROT);
 		theStats.AddUpDataOverheadOther(packet->size);
-		socket->SendPacket(packet,true);
+		SendPacket(packet, true);
 		m_fNeedOurPublicIP = 1;
 	}
 }
@@ -4009,19 +4091,15 @@ void CUpDownClient::ProcessPublicIPAnswer(const BYTE* pbyData, UINT uSize){
 						AddLogLine(false, _T("Kad Connection detected IP-change, changed IP from %s to %s, all sources will be reasked within the next 10 minutes"), ipstr(theApp.last_valid_ip), ipstr(dwIP));
 					}
 					SetNextTCPAskedTime(::GetTickCount() + FILEREASKTIME); //not for this source
+					// ==> UPnP support [MoNKi] - leuk_he
+					/*
+					// official UPNP
+					// we don't want to trigger it twice, do we?!
+					theApp.emuledlg->RefreshUPnP(false); // refresh the UPnP mappings once
+					// official UPNP
+					*/
+					// <== UPnP support [MoNKi] - leuk_he
 				}
-				// ==> UPnP support [MoNKi] - leuk_he
-				/*
-				//zz_fly :: Rebind UPnP on IP-change :: upnp_start
-				if(thePrefs.GetUPnPNat() && thePrefs.GetUPnPNatRebind())
-				{
-					AddLogLine(false, _T("Detected IP-change, changed IP from %s to %s, rebinding UPnP..."), ipstr(theApp.last_valid_ip), ipstr(dwIP));
-					theApp.clientudp->RebindUPnP();
-					theApp.listensocket->RebindUPnP();
-				}
-				//zz_fly :: Rebind UPnP on IP-change end :: upnp_end
-				*/
-				// <== UPnP support [MoNKi] - leuk_he
 				// Xman reconnect Kad on IP-change
 				if (Kademlia::CKademlia::IsConnected() && Kademlia::CKademlia::GetPrefs()->GetIPAddress())
 					if(ntohl(Kademlia::CKademlia::GetIPAddress()) != dwIP)
@@ -4140,7 +4218,6 @@ void CUpDownClient::ProcessChatMessage(CSafeMemFile* data, uint32 nLength)
 	CString strMessage(data->ReadString(GetUnicodeSupport()!=utf8strNone, nLength));
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		Debug(_T("  %s\n"), strMessage);
-	
 	// default filtering
 	CString strMessageCheck(strMessage);
 
@@ -4209,7 +4286,8 @@ void CUpDownClient::ProcessChatMessage(CSafeMemFile* data, uint32 nLength)
 							m_cCaptchasSent++;
 							Packet* packet = new Packet(&fileAnswer, OP_EMULEPROT, OP_CHATCAPTCHAREQ);
 							theStats.AddUpDataOverheadOther(packet->size);
-							SafeSendPacket(packet);
+							if (!SafeConnectAndSendPacket(packet))
+								return; // deleted client while connecting
 						}
 						else{
 							ASSERT( false );
@@ -4225,9 +4303,9 @@ void CUpDownClient::ProcessChatMessage(CSafeMemFile* data, uint32 nLength)
 					{
 						m_cCaptchasSent++;
 						// always sent in english
-						CString rstrMessage = _T("In order to avoid spam messages, this user requires you to solve a captcha before you can send a message to him. However your client does not supports captchas, so you will not be able to chat with this user.");
-						SendChatMessage(rstrMessage);
+						CString rstrMessage = _T("In order to avoid spam messages, this user requires you to solve a captcha before you can send a message to him. However your client does not support captchas, so you will not be able to chat with this user.");
 						DebugLog(_T("Received message from client not supporting captchs, filtered and sent notifier (%s)"), DbgGetClientInfo());
+						SendChatMessage(rstrMessage); // could delete client
 					}
 					else
 						DebugLog(_T("Received message from client not supporting captchs, filtered, didn't sent notifier (%s)"), DbgGetClientInfo());
@@ -4249,7 +4327,10 @@ void CUpDownClient::ProcessChatMessage(CSafeMemFile* data, uint32 nLength)
 					Packet* packet = new Packet(OP_CHATCAPTCHARES, 1, OP_EMULEPROT, false);
 					packet->pBuffer[0] = 0; // status response
 					theStats.AddUpDataOverheadOther(packet->size);
-					SafeSendPacket(packet);
+					if (!SafeConnectAndSendPacket(packet)) {
+						ASSERT( false ); // deleted client while connecting
+						return;
+					}
 				}
 				else{ // wrong, cleanup and ignore
 					DebugLogWarning(_T("Captcha answer failed (%s)"), DbgGetClientInfo());
@@ -4259,7 +4340,7 @@ void CUpDownClient::ProcessChatMessage(CSafeMemFile* data, uint32 nLength)
 					Packet* packet = new Packet(OP_CHATCAPTCHARES, 1, OP_EMULEPROT, false);
 					packet->pBuffer[0] = (m_cCaptchasSent < 3)? 1 : 2; // status response
 					theStats.AddUpDataOverheadOther(packet->size);
-					SafeSendPacket(packet);
+					SafeConnectAndSendPacket(packet);
 					return; // nothing more todo
 				}
 			}	
@@ -4381,7 +4462,7 @@ void CUpDownClient::SendChatMessage(CString strMessage)
 	data.WriteString(strMessage, GetUnicodeSupport());
 	Packet* packet = new Packet(&data, OP_EDONKEYPROT, OP_MESSAGE);
 	theStats.AddUpDataOverheadOther(packet->size);
-	SafeSendPacket(packet);
+	SafeConnectAndSendPacket(packet);
 }
 
 bool CUpDownClient::HasPassedSecureIdent(bool bPassIfUnavailable) const
@@ -4411,14 +4492,13 @@ void CUpDownClient::SendFirewallCheckUDPRequest()
 		SetKadState(KS_NONE);
 		return;
 	}
-	ASSERT( Kademlia::CKademlia::GetPrefs()->GetExternalKadPort() != 0 );
 	CSafeMemFile data;
 	data.WriteUInt16(Kademlia::CKademlia::GetPrefs()->GetInternKadPort());
 	data.WriteUInt16(Kademlia::CKademlia::GetPrefs()->GetExternalKadPort());
 	data.WriteUInt32(Kademlia::CKademlia::GetPrefs()->GetUDPVerifyKey(GetConnectIP()));
 	Packet* packet = new Packet(&data, OP_EMULEPROT, OP_FWCHECKUDPREQ);
 	theStats.AddUpDataOverheadKad(packet->size);
-	SafeSendPacket(packet);
+	SafeConnectAndSendPacket(packet);
 }
 
 void CUpDownClient::ProcessFirewallCheckUDPRequest(CSafeMemFile* data){
@@ -4470,6 +4550,49 @@ void CUpDownClient::SetConnectOptions(uint8 byOptions, bool bEncryption, bool bC
 	SetCryptLayerRequest((byOptions & 0x02) != 0 && bEncryption);
 	SetCryptLayerRequires((byOptions & 0x04) != 0 && bEncryption);
 	SetDirectUDPCallbackSupport((byOptions & 0x08) != 0 && bCallback);
+}
+
+void CUpDownClient::SendSharedDirectories()
+{
+	//TODO: Don't send shared directories which do not contain any files
+	// add shared directories
+	CString strDir;
+	CStringArray arFolders;
+	POSITION pos = thePrefs.shareddir_list.GetHeadPosition();
+	while (pos)
+	{
+		strDir = theApp.sharedfiles->GetPseudoDirName(thePrefs.shareddir_list.GetNext(pos));
+		if (!strDir.IsEmpty())
+			arFolders.Add(strDir);
+	}
+
+	// add incoming folders
+	for (int iCat = 0; iCat < thePrefs.GetCatCount(); iCat++)
+	{
+		strDir = theApp.sharedfiles->GetPseudoDirName(thePrefs.GetCategory(iCat)->strIncomingPath);
+		if (!strDir.IsEmpty())
+			arFolders.Add(strDir);
+	}
+
+	// add temporary folder if there are any temp files
+	if (theApp.downloadqueue->GetFileCount() > 0)
+		arFolders.Add(CString(OP_INCOMPLETE_SHARED_FILES));
+	// add "Other" folder (for single shared files) if there are any single shared files
+	if (theApp.sharedfiles->ProbablyHaveSingleSharedFiles())
+		arFolders.Add(CString(OP_OTHER_SHARED_FILES));
+
+	// build packet
+	CSafeMemFile tempfile(80);
+	tempfile.WriteUInt32(arFolders.GetCount());
+	for (int i = 0; i < arFolders.GetCount(); i++)
+		tempfile.WriteString(arFolders.GetAt(i), GetUnicodeSupport());
+
+	if (thePrefs.GetDebugClientTCPLevel() > 0)
+		DebugSend("OP__AskSharedDirsAnswer", this);
+	Packet* replypacket = new Packet(&tempfile);
+	replypacket->opcode = OP_ASKSHAREDDIRSANS;
+	theStats.AddUpDataOverheadOther(replypacket->size);
+	VERIFY( SendPacket(replypacket, true, true) );
 }
 
 //EastShare Start - added by AndCycle, IP to Country
@@ -5240,7 +5363,6 @@ bool CUpDownClient::AntiUploaderBanActive()
 	return false;
 }
 // <== Anti Uploader Ban [Stulle] - Stulle
-
 // ==> Mephisto Upload - Mephisto
 void CUpDownClient::SetFriendSlot(bool bNV)
 {

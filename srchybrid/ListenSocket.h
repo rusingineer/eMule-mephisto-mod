@@ -36,7 +36,7 @@ class CClientReqSocket : public CEMSocket
 	DECLARE_DYNCREATE(CClientReqSocket)
 
 public:
-	CClientReqSocket(CUpDownClient* in_client = NULL);	
+	CClientReqSocket(CUpDownClient* in_client = NULL);
 
 	void	SetClient(CUpDownClient* pClient);
 	// Maella -Upload Stop Reason-
@@ -66,17 +66,13 @@ public:
 	CUpDownClient*	client;
 	*/
 	//Xman improved socket closing
-	// Stulle - We gonna test this again...
-	/*
 	void	CloseSocket();
-	*/
-	// Stulle - We gonna test this again...
 
 	uint32	GetTimeOutTimer()	const	{return timeout_timer;} //zz_fly :: Drop stalled downloads :: netfinity
 
 protected:
 	virtual ~CClientReqSocket();
-	virtual void Close()	{CAsyncSocketEx::Close();}
+	virtual void Close() { CAsyncSocketEx::Close(); }
 	void	Delete_Timed();
 
 	virtual void OnConnect(int nErrorCode);
@@ -89,7 +85,7 @@ protected:
 	int			 PacketReceivedSEH(Packet* packet);
 	bool		 PacketReceivedCppEH(Packet* packet);
 
-	bool	ProcessPacket(const BYTE* packet, uint32 size, UINT opcode);
+	bool	ProcessPacket(const BYTE* packet, uint32 size,UINT opcode);
 	bool	ProcessExtPacket(const BYTE* packet, uint32 size, UINT opcode, UINT uRawSize);
 	//Xman
 	// Maella -Dump information of unknown packet in debug tab-
@@ -133,11 +129,6 @@ public:
 	void	ReStartListening();
 	void	Debug_ClientDeleted(CUpDownClient* deleted);
 	bool	Rebind();
-	// ==> UPnP support [MoNKi] - leuk_he
-	/*
-	bool	RebindUPnP(); //zz_fly :: Rebind UPnP on IP-change
-	*/
-	// <== UPnP support [MoNKi] - leuk_he
 	bool	SendPortTestReply(char result,bool disconnect=false);
 
 	void	UpdateConnectionsStatus();

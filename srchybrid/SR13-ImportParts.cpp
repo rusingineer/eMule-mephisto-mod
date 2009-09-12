@@ -58,7 +58,7 @@ bool CKnownFile::SR13_ImportParts(){
 	CAddFileThread* addfilethread = (CAddFileThread*) AfxBeginThread(RUNTIME_CLASS(CAddFileThread), THREAD_PRIORITY_LOWEST, 0, CREATE_SUSPENDED);
 	if (addfilethread){
 		partfile->SetFileOpProgress(0);
-        addfilethread->SetValues(theApp.sharedfiles, partfile->GetPath(), partfile->m_hpartfile.GetFileName(), partfile);
+        addfilethread->SetValues(theApp.sharedfiles, partfile->GetPath(), partfile->m_hpartfile.GetFileName(), _T(""), partfile);
 		if (addfilethread->SetPartToImport(pathName))
 			partfile->SetFileOp(PFOP_SR13_IMPORTPARTS);
 		else
@@ -136,7 +136,11 @@ bool CAddFileThread::SR13_ImportParts(){
 			if (theApp.emuledlg->IsRunning()){
 				UINT uProgress = (UINT)(i * 100 / m_PartsToImport.GetSize());
 				VERIFY( PostMessage(theApp.emuledlg->GetSafeHwnd(), TM_FILEOPPROGRESS, uProgress, (LPARAM)m_partfile) );
+				//zz_fly :: increase sleep time to 150ms
+				/*
 				Sleep(100); // sleep very short to give write time to write (or else mem grows!)
+				*/
+				Sleep(150); // sleep very short to give write time to write (or else mem grows!)
 
 			}
 

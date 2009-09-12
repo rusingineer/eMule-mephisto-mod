@@ -230,30 +230,25 @@ void CDirectoryTreeCtrl::Init(void)
 
 
 	TCHAR drivebuffer[500];
-	::GetLogicalDriveStrings(ARRSIZE(drivebuffer), drivebuffer); // e.g. "a:\ c:\ d:\"
+	DWORD dwRet = GetLogicalDriveStrings(_countof(drivebuffer) - 1, drivebuffer);
+	if (dwRet > 0 && dwRet < _countof(drivebuffer))
+	{
+		drivebuffer[_countof(drivebuffer) - 1] = _T('\0');
 
-	const TCHAR* pos = drivebuffer;
-	while(*pos != _T('\0')){
+		const TCHAR* pos = drivebuffer;
+		while(*pos != _T('\0')){
 
-		// Copy drive name
-		TCHAR drive[4];
-		_tcsncpy(drive, pos, ARRSIZE(drive));
-		drive[ARRSIZE(drive) - 1] = _T('\0');
+			// Copy drive name
+			TCHAR drive[4];
+			_tcsncpy(drive, pos, _countof(drive));
+			drive[_countof(drive) - 1] = _T('\0');
 
-		switch(drive[0]){
-		case _T('a'):
-		case _T('A'):
-		case _T('b'):
-		case _T('B'):
-			// Skip floppy disk
-			break;
-		default:
 			drive[2] = _T('\0');
-			AddChildItem(NULL, drive); // e.g. ("c:")
-		}
+			AddChildItem(NULL, drive); // e.g. "C:"
 
-		// Point to the next drive (4 chars interval)
-		pos = &pos[4];
+			// Point to the next drive
+			pos += _tcslen(pos) + 1;
+		}
 	}
 	ShowWindow(SW_SHOW);
 }
@@ -264,7 +259,7 @@ HTREEITEM CDirectoryTreeCtrl::AddChildItem(HTREEITEM hRoot, CString strText)
 	if (hRoot != NULL && strPath.Right(1) != _T("\\"))
 		strPath += _T("\\");
 	CString strDir = strPath + strText;
-	TV_INSERTSTRUCT itInsert = {0};
+	TVINSERTSTRUCT itInsert = {0};
 	
 	// START: changed by FoRcHa /////
 	WORD wWinVer = thePrefs.GetWindowsVersion();
@@ -395,6 +390,16 @@ bool CDirectoryTreeCtrl::HasSubdirectories(CString strDir)
 {
 	if (strDir.Right(1) != _T('\\'))
 		strDir += _T('\\');
+	// Never try to enumerate the files of a drive and thus physically access the drive, just
+	// for the information whether the drive has sub directories in the root folder. Depending
+	// on the physical drive type (floppy disk, CD-ROM drive, etc.) this creates an annoying
+	// physical access to that drive - which is to be avoided in each case. Even Windows
+	// Explorer shows all drives by default with a '+' sign (which means that the user has
+	// to explicitly open the drive to really get the content) - and that approach will be fine
+	// for eMule as well.
+	// Since the restriction for drives 'A:' and 'B:' was removed, this gets more important now.
+	if (PathIsRoot(strDir))
+		return true;
 	CFileFind finder;
 	BOOL bWorking = finder.FindFile(strDir+_T("*.*"));
 	while (bWorking)
@@ -413,12 +418,12 @@ bool CDirectoryTreeCtrl::HasSubdirectories(CString strDir)
 	return false;
 }
 
-
 void CDirectoryTreeCtrl::GetSharedDirectories(CStringList* list)
 {
 	for (POSITION pos = m_lstShared.GetHeadPosition(); pos != NULL; )
 		list->AddTail(m_lstShared.GetNext(pos));
 }
+
 void CDirectoryTreeCtrl::SetSharedDirectories(CStringList* list)
 {
 	m_lstShared.RemoveAll();

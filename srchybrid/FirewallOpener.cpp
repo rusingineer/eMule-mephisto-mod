@@ -188,7 +188,7 @@ bool CFirewallOpener::AddRule(const CICSRuleInfo& riPortRule, const INetSharingC
                              riPortRule.m_nPortNumber,
                              riPortRule.m_nPortNumber,
                              0,
-                             L"127.0.0.1",
+                             CComBSTR(L"127.0.0.1"),
                              ICSTT_IPADDRESS,
                              &pNSPM);
 		CComBSTR bstrName;
@@ -444,5 +444,4 @@ bool CFirewallOpener::ReadFromICFdat(CFile &file, CICSRuleInfo &mapping){
 
 CString CFirewallOpener::GetICFdatFileName(){
 	return CString(thePrefs.GetMuleDirectory(EMULE_CONFIGDIR)+_T("ICF.dat"));
-}
-// <== Improved ICS-Firewall support [MoNKi] - Max
+}// <== Improved ICS-Firewall support [MoNKi] - Max

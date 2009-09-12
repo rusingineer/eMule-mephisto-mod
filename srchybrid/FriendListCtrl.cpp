@@ -43,15 +43,16 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNAMIC(CFriendListCtrl, CMuleListCtrl)
 
 BEGIN_MESSAGE_MAP(CFriendListCtrl, CMuleListCtrl)
+	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, OnLvnColumnClick)
+	ON_NOTIFY_REFLECT(NM_DBLCLK, OnNmDblClk)
 	ON_WM_CONTEXTMENU()
 	ON_WM_SYSCOLORCHANGE()
-	ON_NOTIFY_REFLECT(NM_DBLCLK, OnNMDblclk)
-	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, OnLvnColumnclick)
 END_MESSAGE_MAP()
 
 CFriendListCtrl::CFriendListCtrl()
 {
-	SetGeneralPurposeFind(true, false);
+	SetGeneralPurposeFind(true);
+	SetSkinKey(L"FriendsLv");
 }
 
 CFriendListCtrl::~CFriendListCtrl()
@@ -60,13 +61,13 @@ CFriendListCtrl::~CFriendListCtrl()
 
 void CFriendListCtrl::Init()
 {
-	SetName(_T("FriendListCtrl"));
+	SetPrefsKey(_T("FriendListCtrl"));
 
 	SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	RECT rcWindow;
 	GetWindowRect(&rcWindow);
-	InsertColumn(0, GetResString(IDS_QL_USERNAME), LVCFMT_LEFT, rcWindow.right - rcWindow.left - 4, 0);
+	InsertColumn(0, GetResString(IDS_QL_USERNAME), LVCFMT_LEFT, rcWindow.right - rcWindow.left - 4);
 
 	SetAllIcons();
 	theApp.friendlist->SetWindow(this);
@@ -84,7 +85,6 @@ void CFriendListCtrl::SetAllIcons()
 {
 	CImageList iml;
 	iml.Create(16, 16, theApp.m_iDfltImageListColorFlags | ILC_MASK, 0, 1);
-	iml.SetBkColor(CLR_NONE);
 	iml.Add(CTempIconLoader(_T("FriendNoClient")));
 	iml.Add(CTempIconLoader(_T("FriendWithClient")));
 	iml.Add(CTempIconLoader(_T("FriendConnected")));
@@ -407,7 +407,7 @@ BOOL CFriendListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 	return true;
 }
 
-void CFriendListCtrl::OnNMDblclk(NMHDR* /*pNMHDR*/, LRESULT* pResult)
+void CFriendListCtrl::OnNmDblClk(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 {
 	int iSel = GetNextItem(-1, LVIS_SELECTED | LVIS_FOCUSED);
 	if (iSel != -1) 
@@ -443,9 +443,9 @@ BOOL CFriendListCtrl::PreTranslateMessage(MSG* pMsg)
 	return CMuleListCtrl::PreTranslateMessage(pMsg);
 }
 
-void CFriendListCtrl::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
+void CFriendListCtrl::OnLvnColumnClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	NMLISTVIEW *pNMListView = (NMLISTVIEW *)pNMHDR;
 
 	// Determine ascending based on whether already sorted on this column
 	int iSortItem = GetSortItem();
@@ -464,8 +464,8 @@ void CFriendListCtrl::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
 
 int CFriendListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	CFriend* item1 = (CFriend*)lParam1;
-	CFriend* item2 = (CFriend*)lParam2; 
+	const CFriend *item1 = (CFriend *)lParam1;
+	const CFriend *item2 = (CFriend *)lParam2; 
 	if (item1 == NULL || item2 == NULL)
 		return 0;
 
@@ -484,6 +484,7 @@ int CFriendListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 		case 0:
 			iResult = CompareLocaleStringNoCase(item1->m_strName, item2->m_strName);
 			break;
+
 		default:
 			return 0;
 	}

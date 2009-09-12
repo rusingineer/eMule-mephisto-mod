@@ -1,17 +1,28 @@
 CHANGELOG FOR EMULE ScarAngel MOD
 
 
-eMule v0.49b ScarAngel v3.2:
+eMule v0.49c ScarAngel v3.2:
 ------------------------
 - xx.xx.2009 -
 -------------------------------------------------------------------------------
-based on eMule 0.49b Xtreme 7.1 compiled with vs2005 SP1
+based on eMule 0.49c Xtreme 7.2 compiled with vs2005 SP1
 Merged to eMule v0.49c [Stulle]
 Updated with code from zz_fly's Xtreme
 
 Added: Static Tray Icon [MorphXT] - MyTh88
+Added: (Design Settings) Shareable file style for SharedFilesCtrl [Stulle] - Stulle
+
+Changed: Updated ASFU to v3.4 to work with single shared files [Stulle] - Stulle
+Changed: Updated Design Settings for new code (also improves implementation) [Stulle] - Stulle
+Changed: Always wait 5 sec after sending save req before saving file settings [Stulle] - Stulle
+Changed: Write FileSettings.ini sequentially (faster) [Stulle] - Stulle
+Changed: Global SysInfo RAM stats will support usage of more than 4GB [Stulle] - Stulle
+Changed: Min small files push size to 1 kB [Stulle] - Stulle
+Changed: Small files push size slider kB based (makes keyboard input usable) [Stulle] - Stulle
 
 Fixed: Save known or FileSettings threads were not terminated properly [Stulle] - Stulle
+Fixed: Some glitches around Timer for ReAsk File Sources [Stulle] - Stulle
+Fixed: Changing the small files push size reset changes in the Tree options [Stulle] - Stulle
 
 
 eMule v0.49b ScarAngel v3.1:

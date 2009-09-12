@@ -1,4 +1,4 @@
-Xtreme 7.0
+Xtreme 7.2
 ----------------
 
 Main Features:
@@ -19,12 +19,71 @@ supported languages:
 german, english, spanish,  french, italian, chinese, turkish, czech
 
 
-based on emule 0.49b
+based on emule 0.49c
 compiled with:
 libpng 1.2.28
 zlib 1.2.3
 crypto 5.5.2
 CxImage version 6.00
+EditBinX
+ReplaceVistaIcon
+Windows Media SDK
+DirectX SDK
+MiniUPnP Lib (as of official)
+
+
+Xtreme 7.2
+* this version is modded by Stulle
+- updated to 0.49c codebase
+- improved: simply unsharing single shared files instead of excluding them
+- improved: greatly simplified remove unused AICH-hashes code while keeping original idea
+- fixed: official problem with downloading from webserver
+partially updated to 7.2 by zz_fly:
+- change: switch to official UPnP lib
+- add: support Ctrl+C and Delete handling in downloaded history list (Stulle)
+       Copy ed2k links into clipboard using Ctrl+C and Delete files on hitting the del key.
+- add: support dynamic ip servers in server list (DolphinX)
+- improved: reduce the memory usage of Client Credits (DolphinX, Enig123)
+- improved: optimized Xman's extened credit-table-arragement (Enig123)
+- improved: better .part.met file backup and recovery (Enig123)
+- improved: do not compress .mkv\.mp4 and .7z files
+- fixed: fix crash in downloading sources handling (Enig123)
+- fixed: fix possible overflow in processing of upload queue and download queue
+- fixed: fix crash at shutdown (MorphXT)
+- fixed: fix cat assign (Avi3k)
+- fixed: memleak when serverconnection fail (DolphinX)
+- fixed: memleak in statistics dialog (DolphinX)
+- fixed: minor issue in case of shutdown while still hashing (WiZaRd)
+- fixed: minor issue with friends handling (WiZaRd)
+- fixed: minor code fix and improvement by DolphinX
+- fixed: fix possible crash in uploading clients handling (thanks Enig123) 
+         this fix removed from FINAL build, test some more time.
+- restore: Xman's improved socket closing
+           Althought it use more memory(10~20MB), but it is necessary to some kind of user.
+
+
+
+Xtreme 7.1
+* this version is modded by Stulle
+partially updated to 7.1 by zz_fly:
+- add: faster end game: drop stalled downloads (netfinity)
+- add: Friend Links (MorphXT) and fixed a memleak (dolphin87)
+- add: H.264 and 3vid FourCC Codes to the MediaInfo Detection (X-Ray)
+- add: SR13-Import-Parts (roversr13/MorphXT)
+- fixed: disable preallocate while eMule allocating (dolphin87)
+- fixed: official bug around userhash initialization (Enig123)
+- fixed: avoid userhash collision (DreaMule)
+- fixed: Special case when socket is closing but data still in buffer (netfinity)
+- fixed: minor official draw bug around SharedFiles Filter on Language change (X-Ray)
+- improved: free unused memory when a download is completed/cancelled (Enig123)
+- improved: optimized Upload Bandwidth Throttler
+- improved: make source add action thread safe (Enig123)
+- improved: use a prime table to initiate ClientCreditsList
+- change: let nick name and location controls resize together with the source detail dialog
+- change: support 24k send buffer
+  You can enable this option via prefercence.ini by "sendbuffersize=24000".
+
+
 
 Xtreme 7.0
 * this version is modded by Stulle

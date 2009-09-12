@@ -114,7 +114,7 @@ void CStatisticsTree::OnLButtonUp( UINT nFlags, CPoint point )
 // are executing.  This is to prevent us from saving the string a bajillion
 // times whenever these functions are called.  CollapseAll and ExpandAll
 // call GetExpandedMask() upon completion.
-void CStatisticsTree::OnItemExpanded( NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
+void CStatisticsTree::OnItemExpanded(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
 {
 	if (!m_bExpandingAll)
 		thePrefs.SetExpandedTreeItems(GetExpandedMask());
@@ -141,7 +141,7 @@ void CStatisticsTree::DoMenu(CPoint doWhere, UINT nFlags)
 	CString		myBuffer;
 	int			myFlags;
 
-	myBuffer.Format(_T("%sstatbkup.ini"),thePrefs.GetMuleDirectory(EMULE_CONFIGDIR));
+	myBuffer.Format(_T("%sstatbkup.ini"), thePrefs.GetMuleDirectory(EMULE_CONFIGDIR));
 	if (!findBackUp.FindFile(myBuffer)) myFlags = MF_GRAYED;
 		else myFlags = MF_STRING;
 
@@ -305,10 +305,12 @@ CString CStatisticsTree::GetItemText(HTREEITEM theItem)
 	item.mask = TVIF_TEXT | TVIF_HANDLE;
 	item.hItem = theItem;
 	item.pszText = szText;
-	item.cchTextMax = 1024;
+	item.cchTextMax = _countof(szText);
 
-	if (GetItem(&item))
-		return CString(item.pszText);
+	if (GetItem(&item)) {
+		szText[_countof(szText) - 1] = _T('\0');
+		return szText;
+	}
 
 	return _T("");
 }

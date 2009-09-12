@@ -140,6 +140,7 @@
 #define	MP_SHOW_FILESIZE_KBYTE	10357
 #define	MP_SHOW_FILESIZE_MBYTE	10358
 #define MP_MARKASSPAM			10359
+#define MP_UNSHAREFILE			10360
 
 // quick-speed changer
 #define MP_QS_U10				10501

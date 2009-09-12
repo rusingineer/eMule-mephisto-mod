@@ -288,7 +288,7 @@ BOOL CStatisticsDlg::OnInitDialog()
 	rcSpl.left = rcDown.left;
 	rcSpl.right = rcDown.right;
 	rcSpl.top = rcDown.bottom;
-	rcSpl.bottom = rcSpl.top + 4; 
+	rcSpl.bottom = rcSpl.top + 4;
 	m_wndSplitterstat_HR.Create(WS_CHILD | WS_VISIBLE, rcSpl, this, IDC_SPLITTER_STAT_HR);
 	//Xman
 	/*
@@ -363,18 +363,17 @@ BOOL CStatisticsDlg::OnInitDialog()
 	//Xman end
 
 	Localize();
-
 	ShowStatistics(true);
 	
 	m_TimeToolTips = new CToolTipCtrl();
 	m_TimeToolTips->Create(this);
-	m_TimeToolTips->AddTool(GetDlgItem(IDC_SCOPE_D),	_T(""),NULL,0);
-	m_TimeToolTips->AddTool(GetDlgItem(IDC_SCOPE_U),	_T(""),NULL,0);
-	m_TimeToolTips->AddTool(GetDlgItem(IDC_STATSSCOPE),	_T(""),NULL, 0);
+	m_TimeToolTips->AddTool(GetDlgItem(IDC_SCOPE_D), _T(""), NULL, 0);
+	m_TimeToolTips->AddTool(GetDlgItem(IDC_SCOPE_U), _T(""), NULL, 0);
+	m_TimeToolTips->AddTool(GetDlgItem(IDC_STATSSCOPE),	_T(""), NULL, 0);
 	// Any Autopop-Time which is specified higher than ~30 sec. will get reset to 5 sec.
 	m_TimeToolTips->SetDelayTime(TTDT_AUTOPOP, 30000);
-	m_TimeToolTips->SetDelayTime(TTDT_INITIAL,	30000);
-	m_TimeToolTips->SetDelayTime(TTDT_RESHOW,	30000);
+	m_TimeToolTips->SetDelayTime(TTDT_INITIAL, 30000);
+	m_TimeToolTips->SetDelayTime(TTDT_RESHOW,  30000);
 	EnableToolTips(TRUE);
 
 	return true;
@@ -545,97 +544,97 @@ LRESULT CStatisticsDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam
 {
 	switch (message) 
 	{
-	case WM_PAINT:
-		if (m_wndSplitterstat) 
-		{
-			CRect rctree,rcSpl,rcW;
-			GetWindowRect(rcW);
-			ScreenToClient(rcW);
-
-			GetDlgItem(IDC_STATTREE)->GetWindowRect(rctree);
-			ScreenToClient(rctree);
-
-			if (rcW.Width()>0) 
+		case WM_PAINT:
+			if (m_wndSplitterstat) 
 			{
-				rcSpl.left = rctree.right;
-				rcSpl.right = rcSpl.left + 4;
-				rcSpl.top = rcW.top + 2;
-				rcSpl.bottom = rcW.bottom - 5;
-				m_wndSplitterstat.MoveWindow(rcSpl,true);
+				CRect rctree,rcSpl,rcW;
+				GetWindowRect(rcW);
+				ScreenToClient(rcW);
+
+				GetDlgItem(IDC_STATTREE)->GetWindowRect(rctree);
+				ScreenToClient(rctree);
+				
+				if (rcW.Width()>0) 
+				{
+					rcSpl.left = rctree.right;
+					rcSpl.right = rcSpl.left + 4;
+					rcSpl.top = rcW.top + 2;
+					rcSpl.bottom = rcW.bottom - 5;
+					m_wndSplitterstat.MoveWindow(rcSpl,true);
+				}
 			}
-		}
-		if (m_wndSplitterstat_HL) 
-		{
-			CRect rcUp,rcSpl,rcW;
-			CWnd* pWnd;
-
-			GetWindowRect(rcW);
-			ScreenToClient(rcW);
-
-			pWnd = &m_UploadOMeter;
-			pWnd->GetWindowRect(rcUp);
-
-			ScreenToClient(rcUp);
-
-			if (rcW.Height()>0) 
+			if (m_wndSplitterstat_HL) 
 			{
-				rcSpl.left = rcUp.left;
-				rcSpl.right = rcUp.right;
-				rcSpl.top = rcUp.bottom;
-				rcSpl.bottom = rcUp.bottom + 4;
-				m_wndSplitterstat_HL.MoveWindow(rcSpl,true);
+				CRect rcUp,rcSpl,rcW;
+				CWnd* pWnd;
+
+				GetWindowRect(rcW);
+				ScreenToClient(rcW);
+
+				pWnd = &m_UploadOMeter;
+				pWnd->GetWindowRect(rcUp);
+
+				ScreenToClient(rcUp);
+
+				if (rcW.Height()>0) 
+				{
+					rcSpl.left = rcUp.left;
+					rcSpl.right = rcUp.right;
+					rcSpl.top = rcUp.bottom;
+					rcSpl.bottom = rcUp.bottom + 4;
+					m_wndSplitterstat_HL.MoveWindow(rcSpl,true);
+				}
 			}
-		}
-		if (m_wndSplitterstat_HR) 
-		{
-			CRect rcDown,rcSpl,rcW;
-			CWnd* pWnd;
-
-			GetWindowRect(rcW);
-			ScreenToClient(rcW);
-
-			pWnd = &m_DownloadOMeter;
-			pWnd->GetWindowRect(rcDown);
-			ScreenToClient(rcDown);
-
-			if (rcW.Height()>0) 
+			if (m_wndSplitterstat_HR) 
 			{
-				rcSpl.left = rcDown.left;
-				rcSpl.right = rcDown.right;
-				rcSpl.top = rcDown.bottom;
-				rcSpl.bottom = rcDown.bottom + 4;
-				m_wndSplitterstat_HR.MoveWindow(rcSpl,true);
+				CRect rcDown,rcSpl,rcW;
+				CWnd* pWnd;
+
+				GetWindowRect(rcW);
+				ScreenToClient(rcW);
+
+				pWnd = &m_DownloadOMeter;
+				pWnd->GetWindowRect(rcDown);
+				ScreenToClient(rcDown);
+
+				if (rcW.Height()>0) 
+				{
+					rcSpl.left = rcDown.left;
+					rcSpl.right = rcDown.right;
+					rcSpl.top = rcDown.bottom;
+					rcSpl.bottom = rcDown.bottom + 4;
+					m_wndSplitterstat_HR.MoveWindow(rcSpl,true);
+				}
 			}
-		}
-		break;
-	case WM_NOTIFY:
-		if (wParam == IDC_SPLITTER_STAT)
-		{ 
-			SPC_NMHDR* pHdr = (SPC_NMHDR*) lParam;
-			DoResize_V(pHdr->delta);
-		}
-		else if (wParam == IDC_SPLITTER_STAT_HL)
-		{ 
-			SPC_NMHDR* pHdr = (SPC_NMHDR*) lParam;
-			DoResize_HL(pHdr->delta);
-		}
-		else if (wParam == IDC_SPLITTER_STAT_HR)
-		{ 
-			SPC_NMHDR* pHdr = (SPC_NMHDR*) lParam;
-			DoResize_HR(pHdr->delta);
-		}
-		break;
-	case WM_WINDOWPOSCHANGED: 
-		{
-			CRect rcW;
-			GetWindowRect(rcW);
-			ScreenToClient(rcW);
-			if (m_wndSplitterstat && rcW.Width()>0) Invalidate();
-			if (m_wndSplitterstat_HL && rcW.Height()>0) Invalidate();
-			if (m_wndSplitterstat_HR && rcW.Height()>0) Invalidate();
 			break;
-		}
-	case WM_SIZE:
+		case WM_NOTIFY:
+			if (wParam == IDC_SPLITTER_STAT)
+			{ 
+				SPC_NMHDR* pHdr = (SPC_NMHDR*) lParam;
+				DoResize_V(pHdr->delta);
+			}
+			else if (wParam == IDC_SPLITTER_STAT_HL)
+			{ 
+				SPC_NMHDR* pHdr = (SPC_NMHDR*) lParam;
+				DoResize_HL(pHdr->delta);
+			}
+			else if (wParam == IDC_SPLITTER_STAT_HR)
+			{ 
+				SPC_NMHDR* pHdr = (SPC_NMHDR*) lParam;
+				DoResize_HR(pHdr->delta);
+			}
+			break;
+
+		case WM_WINDOWPOSCHANGED:
+			if (m_wndSplitterstat)
+				m_wndSplitterstat.Invalidate();
+			if (m_wndSplitterstat_HL)
+				m_wndSplitterstat_HL.Invalidate();
+			if (m_wndSplitterstat_HR)
+				m_wndSplitterstat_HR.Invalidate();
+			break;
+
+		case WM_SIZE:
 		{
 			//set range
 			if (m_wndSplitterstat)
@@ -656,7 +655,7 @@ LRESULT CStatisticsDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam
 					rcSpl.right = rcSpl.left + 4; 
 					rcSpl.top = rcW.top + 2; 
 					rcSpl.bottom = rcW.bottom - 5;
-					m_wndSplitterstat.MoveWindow(rcSpl,true);
+	   				m_wndSplitterstat.MoveWindow(rcSpl,true);
 					m_wndSplitterstat.SetRange(rcW.left+11, rcW.right-11);
 				}
 			}
@@ -1940,6 +1939,7 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 						percentSessions = (double) 100*statGoodSessions/(statGoodSessions+statBadSessions);
 						//Xman
 						/*
+						cbuffer.Format(_T("%s: %s"), GetResString(IDS_STATS_AVGDATAULSES), CastItoXBytes( theStats.sessionSentBytes / statGoodSessions, false, false) ); 
 						*/
 						cbuffer.Format(_T("%s: %s"), GetResString(IDS_STATS_AVGDATAULSES), CastItoXBytes( bEmuleOut / statGoodSessions, false, false) ); 
 						//Xman end
@@ -2499,7 +2499,7 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 		time_t timeDiff;
 		if (thePrefs.GetStatsLastResetLng()) 
 		{
-			time_t	timeNow;
+			time_t timeNow;
 			time(&timeNow);
 			timeDiff = timeNow - thePrefs.GetStatsLastResetLng(); // In seconds
 			cbuffer.Format(GetResString(IDS_STATS_TIMESINCERESET), CastSecondsToLngHM(timeDiff));
@@ -2609,8 +2609,8 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 							if (forceUpdate || stattree.IsExpanded(time_aap_up_hd[mx][0])) 
 							{
 								int i = 0;
-								uint64 UpDataTotal =		(uint64)(thePrefs.GetUpTotalClientData() * avgModifier[mx]);
-								uint64 UpDataClient =		(uint64)(thePrefs.GetCumUpData_EMULE() * avgModifier[mx]);
+								uint64 UpDataTotal = (uint64)(thePrefs.GetUpTotalClientData() * avgModifier[mx]);
+								uint64 UpDataClient = (uint64)(thePrefs.GetCumUpData_EMULE() * avgModifier[mx]);
 								double percentClientTransferred = 0;
 								if ( UpDataTotal!=0 && UpDataClient!=0 )
 									percentClientTransferred = (double) 100 * UpDataClient / UpDataTotal;
@@ -2679,7 +2679,7 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 								uint64	PortDataDefault =	(uint64)(thePrefs.GetCumUpDataPort_4662() * avgModifier[mx]);
 								uint64	PortDataOther =		(uint64)(thePrefs.GetCumUpDataPort_OTHER() * avgModifier[mx]);
 								uint64	PortDataPeerCache =	(uint64)(thePrefs.GetCumUpDataPort_PeerCache() * avgModifier[mx]);
-								uint64	PortDataTotal =		(uint64)(thePrefs.GetUpTotalPortData() * avgModifier[mx]);
+								uint64	PortDataTotal =		(uint64)( thePrefs.GetUpTotalPortData() * avgModifier[mx]);
 								double	percentPortTransferred = 0;
 
 								if ( PortDataTotal!=0 && PortDataDefault!=0 )
@@ -2734,8 +2734,8 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 							}
 						}
 						// Upload Sessions
-						uint32 statGoodSessions = (uint32) ((theApp.uploadqueue->GetSuccessfullUpCount() + thePrefs.GetUpSuccessfulSessions() + theApp.uploadqueue->GetUploadQueueLength()) * avgModifier[mx]);
-						uint32 statBadSessions = (uint32) ((theApp.uploadqueue->GetFailedUpCount() + thePrefs.GetUpFailedSessions()) * avgModifier[mx]);
+						uint32 statGoodSessions = (uint32)((theApp.uploadqueue->GetSuccessfullUpCount() + thePrefs.GetUpSuccessfulSessions() + theApp.uploadqueue->GetUploadQueueLength()) * avgModifier[mx]);
+						uint32 statBadSessions = (uint32)((theApp.uploadqueue->GetFailedUpCount() + thePrefs.GetUpFailedSessions()) * avgModifier[mx]);
 						double percentSessions;
 						cbuffer.Format(_T("%s: %u"), GetResString(IDS_STATS_ULSES), statGoodSessions + statBadSessions);
 						stattree.SetItemText(time_aap_up[mx][1], cbuffer);
@@ -2761,17 +2761,17 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 
 						// Calculate Upline OH Totals
 						uint64 UpOHTotal = (uint64)((theStats.GetUpDataOverheadFileRequest() + 
-													theStats.GetUpDataOverheadSourceExchange() + 
-													theStats.GetUpDataOverheadServer() + 
-													theStats.GetUpDataOverheadKad() + 
-													theStats.GetUpDataOverheadOther()
-												   ) * avgModifier[mx]);
+													 theStats.GetUpDataOverheadSourceExchange() + 
+													 theStats.GetUpDataOverheadServer() + 
+													 theStats.GetUpDataOverheadKad() + 
+													 theStats.GetUpDataOverheadOther()
+												    ) * avgModifier[mx]);
 						uint64 UpOHTotalPackets = (uint64)((theStats.GetUpDataOverheadFileRequestPackets() + 
-														   theStats.GetUpDataOverheadSourceExchangePackets() + 
-														   theStats.GetUpDataOverheadServerPackets() + 
-														   theStats.GetUpDataOverheadKadPackets() + 
-														   theStats.GetUpDataOverheadOtherPackets()
-														  ) * avgModifier[mx]);
+														    theStats.GetUpDataOverheadSourceExchangePackets() + 
+														    theStats.GetUpDataOverheadServerPackets() + 
+														    theStats.GetUpDataOverheadKadPackets() + 
+														    theStats.GetUpDataOverheadOtherPackets()
+														   ) * avgModifier[mx]);
 
 						// Set Cumulative Total Overhead
 						//Xman
@@ -2851,8 +2851,8 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 							if (forceUpdate || stattree.IsExpanded(time_aap_down_hd[mx][0])) 
 							{
 								int i = 0;
-								uint64 DownDataTotal =		(uint64)(thePrefs.GetDownTotalClientData() * avgModifier[mx]);
-								uint64 DownDataClient =		(uint64)(thePrefs.GetCumDownData_EMULE() * avgModifier[mx]);
+								uint64 DownDataTotal = (uint64)(thePrefs.GetDownTotalClientData() * avgModifier[mx]);
+								uint64 DownDataClient = (uint64)(thePrefs.GetCumDownData_EMULE() * avgModifier[mx]);
 								double percentClientTransferred = 0;
 								if ( DownDataTotal!=0 && DownDataClient!=0 )
 									percentClientTransferred = (double) 100 * DownDataClient / DownDataTotal;
@@ -2965,8 +2965,8 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 						cbuffer.Format(_T("%s: %I64u"), GetResString(IDS_STATS_COMPDL), (uint64) (thePrefs.GetDownCompletedFiles() * avgModifier[mx]) );
 						stattree.SetItemText(time_aap_down[mx][1], cbuffer);
 						// Set Cum Download Sessions
-						uint32	statGoodSessions = (uint32) ((thePrefs.GetDownC_SuccessfulSessions() + myStats.a[1]) * avgModifier[mx]);
-						uint32	statBadSessions = (uint32) (thePrefs.GetDownC_FailedSessions() * avgModifier[mx]);
+						uint32	statGoodSessions = (uint32)((thePrefs.GetDownC_SuccessfulSessions() + myStats.a[1]) * avgModifier[mx]);
+						uint32	statBadSessions = (uint32)(thePrefs.GetDownC_FailedSessions() * avgModifier[mx]);
 						double	percentSessions;
 						cbuffer.Format(_T("%s: %u"), GetResString(IDS_STATS_DLSES), statGoodSessions+statBadSessions );
 						stattree.SetItemText(time_aap_down[mx][2], cbuffer);
@@ -3181,7 +3181,13 @@ void CStatisticsDlg::ShowStatistics(bool forceUpdate)
 							cbuffer.Format(_T("v%u.%u: %i (%1.1f%%)"), verMaj, verMin, topcnt, topper*100);
 					}
 					else 
+					//zz_fly :: Fix :: mem-leak :: DolphinX :: Start
+					{
+						if(i < cli_lastCount[0])// Slugfiller: modid
+							stattree.DeleteChildItems(cli_versions[i]);
+					//zz_fly :: Fix :: mem-leak :: DolphinX :: End
 						continue;
+					}//zz_fly :: Fix :: mem-leak
 					
 					if (i >= MAX_SUB_CLIENT_VERSIONS/2)
 						totalOther += topcnt;
@@ -3951,7 +3957,7 @@ void CStatisticsDlg::ShowInterval()
 		// CB Mod ---> Make Setters
 		m_Statistics.m_nXPartial = m_DownloadOMeter.m_nXPartial = m_UploadOMeter.m_nXPartial = shownSecs % 3600;
 		m_Statistics.m_nXGrids = m_DownloadOMeter.m_nXGrids = m_UploadOMeter.m_nXGrids = shownSecs / 3600;
-		
+
 		//Xman
 		/*
 		if(shownSecs <= 0)
@@ -3987,7 +3993,7 @@ void CStatisticsDlg::ShowInterval()
 //Xman
 // Maella -Accurate measure of bandwidth: eDonkey data + control, network adapter-
 /*
-void CStatisticsDlg::SetARange(bool SetDownload,int maxValue)
+void CStatisticsDlg::SetARange(bool SetDownload, int maxValue)
 {
 	if (SetDownload) 
 	{
@@ -4377,6 +4383,7 @@ BOOL CStatisticsDlg::OnHelpInfo(HELPINFO* /*pHelpInfo*/)
 	theApp.ShowHelp(eMule_FAQ_GUI_Statistics);
 	return TRUE;
 }
+
 HBRUSH CStatisticsDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 // ==> Design Settings [eWombat/Stulle] - Max

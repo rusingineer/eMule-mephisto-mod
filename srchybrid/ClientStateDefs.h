@@ -185,7 +185,6 @@ enum EChunkStatus{
 #define _EConnectingState	uint8
 #define _EModClient			uint8 // Mod Icons - Stulle
 #endif
-
 // ==> Mod Icons - Stulle
 enum EModClient{
 	MOD_NONE,

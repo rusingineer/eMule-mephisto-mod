@@ -242,6 +242,7 @@ void CFileDataIO::WriteLongString(const CString& rstr, EUtf8Str eEncode)
 		if (NeedUTF8String(rstr))
 		{
 		*/
+		//Borschtsch - we always use Unicode
 			CUnicodeToBOMUTF8 bomutf8(rstr);
 			WRITE_STR_LEN(bomutf8.GetLength());
 			Write((LPCSTR)bomutf8, bomutf8.GetLength());

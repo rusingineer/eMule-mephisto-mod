@@ -230,7 +230,7 @@ CPeerCacheUpSocket::~CPeerCacheUpSocket()
 	//Xman Xtreme Upload: Peercache-part
 	//Xman moved down, because of replace method
 	/*
-	theApp.uploadBandwidthThrottler->RemoveFromAllQueues(this);
+    theApp.uploadBandwidthThrottler->RemoveFromAllQueues(this);
 	DetachFromClient();
 	*/
 	DetachFromClient();
@@ -242,7 +242,7 @@ void CPeerCacheUpSocket::DetachFromClient()
 {
 	if (GetClient())
 	{
-		if (GetClient()->m_pPCUpSocket == this) {
+        if (GetClient()->m_pPCUpSocket == this) {
 			GetClient()->m_pPCUpSocket = NULL;
 			//Xman Xtreme Upload: Peercache-part
 			if(GetClient()->IsDownloading() && GetClient()->socket!=NULL)
@@ -603,7 +603,6 @@ void CUpDownClient::ProcessPeerCacheUpHttpResponse(const CStringAArray& astrHead
 
 bool CUpDownClient::SendHttpBlockRequests()
 {
-	USES_CONVERSION;
 	ASSERT( GetDownloadState() == DS_DOWNLOADING );
 	ASSERT( m_ePeerCacheDownState == PCDS_WAIT_CLIENT_REPLY || m_ePeerCacheDownState == PCDS_DOWNLOADING );
 
@@ -668,7 +667,7 @@ bool CUpDownClient::SendHttpBlockRequests()
 	strPCRequest.AppendFormat("GET http://%s/.ed2khash=%s HTTP/1.0\r\n", ipstrA(m_uPeerCacheRemoteIP), md4strA(reqfile->GetFileHash()));
 	strPCRequest.AppendFormat("X-ED2K-PushId: %u\r\n", m_uPeerCacheDownloadPushId);
 	strPCRequest.AppendFormat("Range: bytes=%I64u-%I64u\r\n", m_uReqStart, m_uReqEnd);
-	strPCRequest.AppendFormat("User-Agent: eMule/%s\r\n", T2CA(theApp.m_strCurVersionLong));
+	strPCRequest.AppendFormat("User-Agent: eMule/%ls\r\n", theApp.m_strCurVersionLong);
 	strPCRequest.AppendFormat("X-Network: eDonkey,Kademlia\r\n");
 	strPCRequest.AppendFormat("\r\n");
 

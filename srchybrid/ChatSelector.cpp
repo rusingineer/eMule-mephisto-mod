@@ -114,7 +114,7 @@ void CChatSelector::SetAllIcons()
 	SetImageList(&iml);
 	m_imlChat.DeleteImageList();
 	m_imlChat.Attach(iml.Detach());
-	SetPadding(CSize(12, 0));
+	SetPadding(CSize(12, 3));
 }
 
 void CChatSelector::UpdateFonts(CFont* pFont)

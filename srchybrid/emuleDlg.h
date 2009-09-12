@@ -126,11 +126,12 @@ public:
 	bool IsPreferencesDlgOpen() const;
 	bool IsTrayIconToFlash()	{ return m_iMsgIcon!=0; }
 	void SetToolTipsDelay(UINT uDelay);
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	void StartUPnP(bool bReset = true, uint16 nForceTCPPort = 0, uint16 nForceUDPPort = 0);
+	void RefreshUPnP(bool bRequestAnswer = false);
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	HBRUSH GetCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	void RunMiniMule(); // TBH: minimule (open on tray) - Stulle
@@ -188,11 +189,11 @@ protected:
 	CMenu			m_menuDownloadCtrl;
 	char			m_acVCDNSBuffer[MAXGETHOSTSTRUCT];
 	bool			m_iMsgBlinkState;
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	bool			m_bConnectRequestDelayedForUPnP;
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	bool			m_bKadSuspendDisconnect;
 	bool			m_bEd2kSuspendDisconnect;
 
@@ -231,13 +232,13 @@ protected:
 	UINT_PTR m_hTimer;
 	static void CALLBACK StartupTimer(HWND hwnd, UINT uiMsg, UINT idEvent, DWORD dwTime);
 
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	// UPnP TimeOutTimer
 	UINT_PTR m_hUPnPTimeOutTimer;
 	static void CALLBACK UPnPTimeOutTimer(HWND hwnd, UINT uiMsg, UINT idEvent, DWORD dwTime);
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 
 	void StartConnection();
 	void CloseConnection();
@@ -290,6 +291,7 @@ protected:
 	afx_msg void OnSysColorChange();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData);
 	afx_msg BOOL OnQueryEndSession();
 	afx_msg void OnEndSession(BOOL bEnding);
 	afx_msg LRESULT OnUserChanged(WPARAM wParam, LPARAM lParam);
@@ -301,7 +303,6 @@ protected:
 	// ==> XP Style Menu [Xanatos] - Stulle
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	// <== XP Style Menu [Xanatos] - Stulle
-	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData); // Automatic shared files updater [MoNKi] - Stulle
 
 	// quick-speed changer -- based on xrmb
 	afx_msg void QuickSpeedUpload(UINT nID);
@@ -375,11 +376,11 @@ protected:
 	afx_msg LRESULT OnConsoleThreadEvent(WPARAM wParam, LPARAM lParam);
 
 	// UPnP
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	afx_msg LRESULT OnUPnPResult(WPARAM wParam, LPARAM lParam);
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 
 // ==> Show in MSN7 [TPT] - Stulle
 protected:

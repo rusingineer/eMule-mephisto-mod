@@ -78,11 +78,11 @@ BEGIN_MESSAGE_MAP(CPPgConnection, CPropertyPage)
 	ON_BN_CLICKED(IDC_NETWORK_KADEMLIA, OnSettingsChange)
 	ON_WM_HELPINFO()
 	ON_BN_CLICKED(IDC_OPENPORTS, OnBnClickedOpenports)
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	ON_BN_CLICKED(IDC_PREF_UPNPONSTART, OnSettingsChange)
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 END_MESSAGE_MAP()
 
 CPPgConnection::CPPgConnection()
@@ -305,24 +305,35 @@ void CPPgConnection::LoadSettings(void)
 			CheckDlgButton(IDC_NETWORK_ED2K, 0);
 
 		// don't try on XP SP2 or higher, not needed there anymore
+		// ==> UPnP support [MoNKi] - leuk_he
+		/*
 		if (thePrefs.GetWindowsVersion() == _WINVER_XP_ && IsRunningXPSP2() == 0 && theApp.m_pFirewallOpener->DoesFWConnectionExist())
+		{//zz_fly
 			GetDlgItem(IDC_OPENPORTS)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_PREF_UPNPONSTART)->ShowWindow(SW_HIDE); //zz_fly :: show upnp option when there is enough place
+		}//zz_fly
 		else
+		{//zz_fly
 			GetDlgItem(IDC_OPENPORTS)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_PREF_UPNPONSTART)->ShowWindow(SW_SHOW); //zz_fly :: show upnp option when there is enough place
 		
 
-		//Xman official UPNP removed
-		/*
 		if (thePrefs.GetWindowsVersion() != _WINVER_95_ && thePrefs.GetWindowsVersion() != _WINVER_98_ && thePrefs.GetWindowsVersion() != _WINVER_NT4_)
 			GetDlgItem(IDC_PREF_UPNPONSTART)->EnableWindow(true);
 		else
 			GetDlgItem(IDC_PREF_UPNPONSTART)->EnableWindow(false);
+		}//zz_fly
 
 		if (thePrefs.IsUPnPEnabled())
 			CheckDlgButton(IDC_PREF_UPNPONSTART, 1);
 		else
 			CheckDlgButton(IDC_PREF_UPNPONSTART, 0);
 		*/
+		if (thePrefs.GetWindowsVersion() == _WINVER_XP_ && IsRunningXPSP2() == 0 && theApp.m_pFirewallOpener->DoesFWConnectionExist())
+			GetDlgItem(IDC_OPENPORTS)->ShowWindow(SW_SHOW);
+		else
+			GetDlgItem(IDC_OPENPORTS)->ShowWindow(SW_HIDE);
+		// <== UPnP support [MoNKi] - leuk_he
 
 		//Xman Xtreme Upload
 		CalculateMaxUpSlotSpeed();
@@ -623,7 +634,7 @@ BOOL CPPgConnection::OnApply()
 	}
 	thePrefs.maxconnections = tempcon;
 
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	if (IsDlgButtonChecked(IDC_PREF_UPNPONSTART) != 0){
 		if (!thePrefs.IsUPnPEnabled()){
@@ -634,6 +645,7 @@ BOOL CPPgConnection::OnApply()
 	else
 		thePrefs.m_bEnableUPnP = false;
 	*/
+	// <== UPnP support [MoNKi] - leuk_he
 
 	theApp.scheduler->SaveOriginals();
 
@@ -717,11 +729,11 @@ void CPPgConnection::Localize(void)
 		GetDlgItem(IDC_UDPDISABLE)->SetWindowText(GetResString(IDS_UDPDISABLED));
 		GetDlgItem(IDC_OPENPORTS)->SetWindowText(GetResString(IDS_FO_PREFBUTTON));
 		SetDlgItemText(IDC_STARTTEST, GetResString(IDS_STARTTEST) );
-		//Xman official UPNP removed
+		// ==> UPnP support [MoNKi] - leuk_he
 		/*
 		GetDlgItem(IDC_PREF_UPNPONSTART)->SetWindowText(GetResString(IDS_UPNPSTART));
 		*/
-		//Xman end
+		// <== UPnP support [MoNKi] - leuk_he
 		
 		//Xman GlobalMaxHarlimit for fairness
 		GetDlgItem(IDC_STATIC_MAXGLOBALSOURCES)->SetWindowText(GetResString(IDS_MAXGLOBALSOURCES));

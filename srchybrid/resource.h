@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by emule.rc
 //
-#define IDR_MANIFEST                    1
 #define IDC_STATUSBAR                   100
 #define IDD_ABOUTBOX                    101
 #define IDD_EMULE_DIALOG                102
@@ -760,7 +759,6 @@
 #define IDS_USECREDITSYSTEM             833
 #define IDS_FIRSTAUTODOWN               834
 #define IDS_FIRSTAUTOUP                 835
-#define IDS_FIRSTFULLCHUNK              836
 #define IDS_AUTOMATIC                   836
 #define IDS_FIRSTSAFECON                837
 #define IDS_FIRSTAUTOCON                838
@@ -1471,24 +1469,30 @@
 #define IDS_FILLGRAPHS                  1517
 #define IDS_PARAMETER                   1518
 #define IDS_TEST                        1519
+// ==> UPnP support [MoNKi] - leuk_he
+/*
 #define IDS_UPNPSTART                   1520
 #define IDS_UPNPSETUP                   1521
 #define IDS_UPNPFAILED                  1522
 #define IDS_UPNPSUCCESS                 1523
+*/
+// <== UPnP support [MoNKi] - leuk_he
 #define IDS_FO_PREFBUTTON_NEW           1524
+// ==> UPnP support [MoNKi] - leuk_he
+/*
 #define IDS_UPNP_NOSERVICE              1525
 #define IDS_DELAYEDBYUPNP               1526
 #define IDS_DELAYEDBYUPNP2              1527
-#define IDS_UPnP                        1528
 #define IDS_UPNP                        1528
 #define IDS_UPNPCLOSEONEXIT             1529
 #define IDS_UPNPSKIPWANIP               1530
 #define IDS_UPNPSKIPWANPPP              1531
+*/
+// <== UPnP support [MoNKi] - leuk_he
 #define IDS_SHAREEMULELABEL             1532
 #define IDS_SHAREEMULEMULTI             1533
 #define IDS_SHAREEMULEPUBLIC            1534
 #define IDS_SHAREEMULEOLD               1535
-#define IDS_SHAREMULEEWARNING           1536
 #define IDS_SHAREEMULEWARNING           1536
 #define IDS_SPAM                        1537
 #define IDS_MARKSPAM                    1538
@@ -1516,6 +1520,16 @@
 #define IDS_BETANAG                     1560
 #define IDS_CONFIRMNODESDOWNLOAD        1561
 #define IDS_NOTCONNECTEDANY             1562
+#define IDS_ERR_SHARED_DIR              1563
+#define IDS_FILE_WARNING_DRM            1564
+#define IDS_CHECK_FILE_OPEN             1565
+#define IDS_BOOTABLE                    1566
+#define IDS_UNSUPPORTEDIMAGE            1567
+#define IDS_UNSHARE                     1568
+#define IDS_WEBUPNPINCLUDE              1569
+#define IDS_ADDEDON                     1570
+#define IDS_FOLLOWLINKS                 1571
+#define IDS_RESOLVELINKS                1571
 #define IDC_ANIMATE1                    2000
 #define IDC_STATUS                      2001
 #define IDC_FILESTATUS                  2002
@@ -1587,7 +1601,6 @@
 #define IDC_SHOWCATINFO                 2110
 #define IDC_ADVSPAMFILTER               2112
 #define IDC_CB_TBN_ONNEWDOWNLOAD        2113
-#define IDC_ADVSPAMFILTER2              2113
 #define IDC_MSHOWSMILEYS                2113
 #define IDC_NETWORK_KADEMLIA            2114
 #define IDC_USECAPTCHAS                 2114
@@ -2007,6 +2020,7 @@
 #define IDC_REPAINT                     2669
 #define IDC_WSENABLED                   2671
 #define IDC_ENABLE                      2672
+#define IDC_WSUPNP                      2672
 #define IDC_WS_GZIP                     2673
 #define IDC_MSGONLYFRIENDS              2674
 #define IDC_WS_ALLOWHILEVFUNC           2674
@@ -2135,7 +2149,6 @@
 #define IDC_SAVE                        2811
 #define IDC_TOTAL_IPS_LABEL             2812
 #define IDC_TOTAL_IPS                   2813
-#define IDC_COPY                        2814
 #define IDC_APPEND                      2815
 #define IDC_FORMAT                      2816
 #define IDC_STATICIPLABEL               2818
@@ -2186,7 +2199,6 @@
 #define IDC_CLIENTDETAIL_KAD            2876
 #define IDC_LD_LINKEDI                  2877
 #define IDC_CLIENTDETAIL_KADCON         2878
-#define IDC_SEARCH_UNICODE              2879
 #define IDC_AUTOSTART                   2880
 #define IDC_STARTWIN                    2882
 #define IDC_RSRC                        2883
@@ -2277,15 +2289,23 @@
 #define IDC_GENERAL                     2984
 #define IDC_LBL_UPDATE_SERVERS          2985
 #define IDC_LBL_MISC                    2986
+// ==> UPnP support [MoNKi] - leuk_he
+/*
 #define IDC_UPNPSTART                   2987
 #define IDC_UPNPPROGRESS                2988
 #define IDC_UPNPSTATUS                  2989
 #define IDC_PREF_UPNPONSTART            2990
+*/
+// <== UPnP support [MoNKi] - leuk_he
 #define IDC_NODESDATLABEL               2991
 #define IDC_AFKADIDLABEL                2993
 #define IDC_SHAREDFILES_FILTER          2994
 #define IDC_EDITCOMMENTFILTER           2995
 #define IDC_WIZZARDOBFUSCATION          2996
+#define IDC_SPIN1                       2997
+#define IDC_TOOLTIPDELAY_SPIN           2997
+#define IDC_CHECK_FILE_OPEN             2998
+// ==========  Xtreme Mod  ==========
 #define IDS_DROPNONEEDEDSRCS            3000
 #define IDS_DROPQUEUEFULLSRCS           3001
 #define IDS_DROPQUEUETOOMANY            3002
@@ -2396,7 +2416,11 @@
 #define IDS_AUTOUPDATEIPFILTER          3177
 #define IDS_DROPBLOCKINGSOCKETS         3178
 #define IDS_LOGPARTMISMATCH             3179
+// ==> UPnP support [MoNKi] - leuk_he
+/*
 #define IDS_CN_UPNPTRYRANDOM            3180
+*/
+// <== UPnP support [MoNKi] - leuk_he
 #define IDS_CN_UPNPNAT                  3181
 #define IDS_CHUNKCHOOSER                3182
 #define IDS_UPLOADINSTABLE              3183
@@ -2420,15 +2444,19 @@
 #define IDI_ICONMR                      3201
 #define IDS_ANTILEECHERFILENAME_CHECK   3201
 #define IDS_ANTILEECHERUSERHASH_CHECK   3201
+// ==> UPnP support [MoNKi] - leuk_he
+/*
 //zz_fly :: Start
 //upnp status
-#define IDS_UPNPSTATUS					3350
-#define IDS_UPNPSTATUS_OK				3351
-#define IDS_UPNPSTATUS_NOTINLAN			3352
-#define IDS_UPNPSTATUS_ERROR			3353
-#define IDS_UPNPSTATUS_PORTINUSE		3354
-#define IDS_UPNPSTATUS_PORTINUSE2		3355
-#define IDS_UPNP_REBINDTEXT				3356
+#define IDS_UPNPSTATUS                  3350
+#define IDS_UPNPSTATUS_OK               3351
+#define IDS_UPNPSTATUS_NOTINLAN         3352
+#define IDS_UPNPSTATUS_ERROR            3353
+#define IDS_UPNPSTATUS_PORTINUSE        3354
+#define IDS_UPNPSTATUS_PORTINUSE2       3355
+#define IDS_UPNP_REBINDTEXT             3356
+*/
+// <== UPnP support [MoNKi] - leuk_he
 //import parts
 #define IDS_IMPORTPARTS                 3357
 #define IDS_IMPORTPARTS_STOP            3358
@@ -3067,6 +3095,7 @@
 #define IDS_COLOR_W10                   60986
 #define IDC_COLOR_WARNING               60987
 #define IDS_COLOR_WARNING               60988
+#define IDS_COLOR_S3                    60989
 // <== Design Settings [eWombat/Stulle] - Stulle
 // ==> Limit PS by amount of data uploaded [Stulle] - Stulle
 #define IDS_PS_AMOUNT_LIMIT             61000
@@ -3152,6 +3181,8 @@
 #define IDS_ASFU_DELAY                  61102
 #define IDS_ASFU_RELOAD                 61103
 #define IDS_ASFU_RELOADING              61104
+#define IDS_ASFU_SINGLE                 61105
+#define IDS_ASFU_TIMEBETWEEN            61106
 // <== Automatic shared files updater [MoNKi] - Stulle
 // ==> Anti Uploader Ban [Stulle] - Stulle
 #define IDS_UNBAN_UPLOADER              61110

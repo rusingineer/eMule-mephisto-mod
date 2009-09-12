@@ -62,9 +62,8 @@ CServer::CServer(const ServerMet_Struct* in_data)
 
 CServer::CServer(uint16 in_port, LPCTSTR i_addr)
 {
-	USES_CONVERSION;
 	port = in_port;
-	if ((ip = inet_addr(T2CA(i_addr))) == INADDR_NONE && _tcscmp(i_addr, _T("255.255.255.255")) != 0){
+	if ((ip = inet_addr(CT2CA(i_addr))) == INADDR_NONE && _tcscmp(i_addr, _T("255.255.255.255")) != 0){
 		m_strDynIP = i_addr;
 		ip = 0;
 	}

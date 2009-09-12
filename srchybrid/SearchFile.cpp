@@ -26,7 +26,6 @@
 #include "emule.h"
 #include "emuledlg.h"
 #include "Searchdlg.h"
-
 #ifdef _DEBUG
 #include "DebugHelpers.h"
 #endif

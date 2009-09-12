@@ -66,6 +66,10 @@ CKnownFileList::CKnownFileList()
 	m_dwCancelledFilesSeed = 0;
 	m_nLastSaved = ::GetTickCount();
 	Init();
+	//Xman [MoNKi: -Downloaded History-]
+	bReloadHistory = false; //Fafner: possible exception in history - 070626
+	//Xman end
+
 	// ==> Threaded Known Files Saving [Stulle] - Stulle
 	m_bSaveAgain = false;
 	m_SaveKnownThread = NULL;
@@ -165,7 +169,7 @@ bool CKnownFileList::LoadKnownFiles()
 }
 
 bool CKnownFileList::LoadCancelledFiles(){
-	// cancelled.met Format: <Header 1 = CANCELLED_HEADER><Version 1 = CANCELLED_VERSION><Seed 4><Count 4>[<HashHash 16><TagCount 1>[Tags TagCount] Count]
+// cancelled.met Format: <Header 1 = CANCELLED_HEADER><Version 1 = CANCELLED_VERSION><Seed 4><Count 4>[<HashHash 16><TagCount 1>[Tags TagCount] Count]
 	if (!thePrefs.IsRememberingCancelledFiles())
 	{ //Xman
 		//Xman Init-Hashtable optimization
@@ -337,7 +341,7 @@ void CKnownFileList::Save()
 
 	if (thePrefs.GetLogFileSaving())
 		AddDebugLogLine(false, _T("Saving known files list file \"%s\""), CANCELLED_MET_FILENAME);
-	fullpath = thePrefs.GetMuleDirectory(EMULE_CONFIGDIR);
+ 	fullpath = thePrefs.GetMuleDirectory(EMULE_CONFIGDIR);
 	fullpath += CANCELLED_MET_FILENAME;
 	if (!file.Open(fullpath, CFile::modeWrite|CFile::modeCreate|CFile::typeBinary|CFile::shareDenyWrite, &fexp)){
 		CString strError(_T("Failed to save ") CANCELLED_MET_FILENAME _T(" file"));
@@ -394,6 +398,7 @@ void CKnownFileList::Save()
 
 void CKnownFileList::Clear()
 {
+	m_mapKnownFilesByAICH.RemoveAll();
 	POSITION pos = m_Files_map.GetStartPosition();
 	while( pos != NULL )
 	{
@@ -414,6 +419,13 @@ void CKnownFileList::Process()
 		*/
 		SaveKnown();
 		// <== Threaded Known Files Saving [Stulle] - Stulle
+
+	//Xman [MoNKi: -Downloaded History-]
+	if (bReloadHistory) { //Fafner: possible exception in history - 070626
+		bReloadHistory = false;
+		theApp.emuledlg->sharedfileswnd->historylistctrl.Reload();
+	}
+	//Xman end
 }
 
 bool CKnownFileList::SafeAddKFile(CKnownFile* toadd)
@@ -423,14 +435,15 @@ bool CKnownFileList::SafeAddKFile(CKnownFile* toadd)
 	CKnownFile* pFileInMap;
 	if (m_Files_map.Lookup(key, pFileInMap))
 	{
-		TRACE(_T("%hs: Already in known list:   %s \"%s\"\n"), __FUNCTION__, md4str(pFileInMap->GetFileHash()), pFileInMap->GetFileName());
-		TRACE(_T("%hs: Old entry replaced with: %s \"%s\"\n"), __FUNCTION__, md4str(toadd->GetFileHash()), toadd->GetFileName());
+		TRACE(_T("%hs: Already in known list:   %s %I64u \"%s\"\n"), __FUNCTION__, md4str(pFileInMap->GetFileHash()), pFileInMap->GetFileSize(), pFileInMap->GetFileName());
+		TRACE(_T("%hs: Old entry replaced with: %s %I64u \"%s\"\n"), __FUNCTION__, md4str(toadd->GetFileHash()), toadd->GetFileSize(), toadd->GetFileName());
 
 		// if we hash files which are already in known file list and add them later (when the hashing thread is finished),
 		// we can not delete any already available entry from known files list. that entry can already be used by the
 		// shared file list -> crash.
 
 		m_Files_map.RemoveKey(CCKey(pFileInMap->GetFileHash()));
+		m_mapKnownFilesByAICH.RemoveKey(pFileInMap->GetAICHHashset()->GetMasterHash());
 		//This can happen in a couple situations..
 		//File was renamed outside of eMule.. 
 		//A user decided to redownload a file he has downloaded and unshared..
@@ -490,6 +503,8 @@ bool CKnownFileList::SafeAddKFile(CKnownFile* toadd)
 	if (bRemovedDuplicateSharedFile) {
 		theApp.sharedfiles->SafeAddKFile(toadd);
 	}
+	if (toadd->GetAICHHashset()->HasValidMasterHash())
+		m_mapKnownFilesByAICH.SetAt(toadd->GetAICHHashset()->GetMasterHash(), toadd);
 	return true;
 }
 
@@ -601,6 +616,34 @@ void CKnownFileList::CopyKnownFileMap(CMap<CCKey,const CCKey&,CKnownFile*,CKnown
 			Files_Map.SetAt(key, cur_file);
 		}
 	}
+}
+
+bool CKnownFileList::ShouldPurgeAICHHashset(const CAICHHash& rAICHHash) const
+{
+	const CKnownFile* pFile = NULL;
+	if (m_mapKnownFilesByAICH.Lookup(rAICHHash, pFile))
+	{
+		//Xman remove unused AICH-hashes
+		if (!thePrefs.GetRememberAICH())
+		{
+			if(!pFile->IsPartFile() && // this is neither a download
+				(theApp.sharedfiles && theApp.sharedfiles->GetFileByID(pFile->GetFileHash()) == NULL)) // and nor shared
+				return true; // so purge it immediatly
+		}
+		//Xman end
+		if (!pFile->ShouldPartiallyPurgeFile())
+			return false;
+	}
+	else
+		ASSERT( false );
+	return true;
+}
+
+void CKnownFileList::AICHHashChanged(const CAICHHash* pOldAICHHash, const CAICHHash& rNewAICHHash, CKnownFile* pFile)
+{
+	if (pOldAICHHash != NULL)
+		m_mapKnownFilesByAICH.RemoveKey(*pOldAICHHash);
+	m_mapKnownFilesByAICH.SetAt(rNewAICHHash, pFile);
 }
 
 //Xman [MoNKi: -Check already downloaded files-]
@@ -770,8 +813,6 @@ void CKnownFileList::ClearHistory(){
 
 //Xman end
 
-
-
 // ==> Threaded Known Files Saving [Stulle] - Stulle
 void CKnownFileList::SaveKnown(bool bStart)
 {
@@ -814,6 +855,9 @@ CSaveKnownThread::~CSaveKnownThread(void) {
 }
 
 void CSaveKnownThread::EndThread() {
+	if(!bDoRun) // we are trying to stop already
+		return;
+
 	// signal the thread to stop looping and exit.
 	bDoRun = false;
 
@@ -845,10 +889,9 @@ UINT CSaveKnownThread::RunInternal()
 	while(bDoRun) 
 	{
 		theApp.knownfiles->Save();
-
-		PostMessage(theApp.emuledlg->m_hWnd,TM_SAVEKNOWNDONE,0,0);
 		Pause(true);
-        pauseEvent->Lock();
+		PostMessage(theApp.emuledlg->m_hWnd,TM_SAVEKNOWNDONE,0,0);
+		pauseEvent->Lock();
 	}
 
 	threadEndedEvent->SetEvent();

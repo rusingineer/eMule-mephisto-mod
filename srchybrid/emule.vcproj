@@ -23,7 +23,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\site_config;.;..;..\id3lib\include;upnplib\ixml\src\inc;upnplib\upnp\src\inc;upnplib\upnp\inc;upnplib\build\inc;upnplib\threadutil\inc;upnplib\ixml\inc;pthreads\pthreads\inc"
+				AdditionalIncludeDirectories="..\site_config;.;..;..\id3lib\include;upnplib\ixml\src\inc;upnplib\upnp\src\inc;upnplib\upnp\inc;upnplib\build\inc;upnplib\threadutil\inc;upnplib\ixml\inc;pthreads\pthreads\inc;WMSDK\include9"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;ID3LIB_LINKOPTION=1;SUPPORT_LARGE_FILES;PRINT_STATISTIC;UPNP_STATIC_LIB;_WIN32;PTW32_STATIC_LIB;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
@@ -40,7 +40,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib winmm.lib ws2_32.lib gdiplus.lib ADSIId.lib crypt32.lib Iphlpapi.lib mpr.lib"
+				AdditionalDependencies="version.lib winmm.lib ws2_32.lib gdiplus.lib ADSIId.lib crypt32.lib Iphlpapi.lib mpr.lib WMSDK\lib9\WMVCORE.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				IgnoreDefaultLibraryNames=""
@@ -97,7 +97,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\site_config;.;..;..\id3lib\include;upnplib\ixml\src\inc;upnplib\upnp\src\inc;upnplib\upnp\inc;upnplib\build\inc;upnplib\threadutil\inc;upnplib\ixml\inc;pthreads\pthreads\inc"
+				AdditionalIncludeDirectories="..\site_config;.;..;..\id3lib\include;upnplib\ixml\src\inc;upnplib\upnp\src\inc;upnplib\upnp\inc;upnplib\build\inc;upnplib\threadutil\inc;upnplib\ixml\inc;pthreads\pthreads\inc;WMSDK\include9"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;ID3LIB_LINKOPTION=1;_RELEASE;SUPPORT_LARGE_FILES;UPNP_STATIC_LIB;_WIN32;PTW32_STATIC_LIB"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
@@ -114,21 +114,29 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="unicows.lib kernel32.lib advapi32.lib user32.lib gdi32.lib shell32.lib comdlg32.lib version.lib mpr.lib rasapi32.lib winmm.lib winspool.lib vfw32.lib secur32.lib oleacc.lib oledlg.lib sensapi.lib ws2_32.lib gdiplus.lib ADSIId.lib crypt32.lib"
-				SuppressStartupBanner="TRUE"
+				AdditionalOptions="/safeseh"
+				AdditionalDependencies="unicows.lib kernel32.lib advapi32.lib user32.lib gdi32.lib shell32.lib comdlg32.lib version.lib mpr.lib rasapi32.lib winmm.lib winspool.lib vfw32.lib secur32.lib oleacc.lib oledlg.lib sensapi.lib ws2_32.lib gdiplus.lib ADSIId.lib crypt32.lib WMSDK\lib9\WMVCORE.lib"
+				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="kernel32.lib;advapi32.lib;user32.lib;gdi32.lib;shell32.lib;comdlg32.lib;version.lib;mpr.lib;rasapi32.lib;winmm.lib;winspool.lib;vfw32.lib;secur32.lib;oleacc.lib;oledlg.lib;sensapi.lib"
 				DelayLoadDLLs="oleacc.dll;gdiplus.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				FixedBaseAddress="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
 				MkTypLibCompatible="FALSE"/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				Description="Performing Post-Build Steps..."
+				CommandLine="echo Inserting Vista application icon...
+..\ReplaceVistaIcon\release\ReplaceVistaIcon &quot;$(TargetPath)&quot; &quot;$(ProjectDir)res\mephisto_vista.ico&quot; AAAEMULEAPP
+echo Enabling Dynamic Base support...
+..\EditBinX\release\EditBinX /dynamicbase &quot;$(TargetPath)&quot;
+"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -170,7 +178,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\site_config;.;..;..\id3lib\include;upnplib\ixml\src\inc;upnplib\upnp\src\inc;upnplib\upnp\inc;upnplib\build\inc;upnplib\threadutil\inc;upnplib\ixml\inc;pthreads\pthreads\inc"
+				AdditionalIncludeDirectories="..\site_config;.;..;..\id3lib\include;upnplib\ixml\src\inc;upnplib\upnp\src\inc;upnplib\upnp\inc;upnplib\build\inc;upnplib\threadutil\inc;upnplib\ixml\inc;pthreads\pthreads\inc;WMSDK\include9"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;ID3LIB_LINKOPTION=1;_BETA;SUPPORT_LARGE_FILES;PRINT_STATISTIC;UPNP_STATIC_LIB;_WIN32;PTW32_STATIC_LIB"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
@@ -186,21 +194,30 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="unicows.lib kernel32.lib advapi32.lib user32.lib gdi32.lib shell32.lib comdlg32.lib version.lib mpr.lib rasapi32.lib winmm.lib winspool.lib vfw32.lib secur32.lib oleacc.lib oledlg.lib sensapi.lib ws2_32.lib gdiplus.lib ADSIId.lib Mpr.lib crypt32.lib"
-				SuppressStartupBanner="TRUE"
+				AdditionalOptions="/safeseh"
+				AdditionalDependencies="unicows.lib kernel32.lib advapi32.lib user32.lib gdi32.lib shell32.lib comdlg32.lib version.lib mpr.lib rasapi32.lib winmm.lib winspool.lib vfw32.lib secur32.lib oleacc.lib oledlg.lib sensapi.lib ws2_32.lib gdiplus.lib ADSIId.lib Mpr.lib crypt32.lib WMSDK\lib9\WMVCORE.lib"
+				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="kernel32.lib;advapi32.lib;user32.lib;gdi32.lib;shell32.lib;comdlg32.lib;version.lib;mpr.lib;rasapi32.lib;winmm.lib;winspool.lib;vfw32.lib;secur32.lib;oleacc.lib;oledlg.lib;sensapi.lib"
 				DelayLoadDLLs="oleacc.dll;gdiplus.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				FixedBaseAddress="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
 				MkTypLibCompatible="FALSE"/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				Description="Performing Post-Build Steps..."
+				CommandLine="echo Inserting Vista application icon...
+..\ReplaceVistaIcon\release\ReplaceVistaIcon &quot;$(TargetPath)&quot; &quot;$(ProjectDir)res\mephisto_vista.ico&quot; AAAEMULEAPP
+echo Enabling Dynamic Base support...
+..\EditBinX\release\EditBinX /dynamicbase &quot;$(TargetPath)&quot;
+del $(IntDir)\emule.obj
+"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -363,7 +380,8 @@
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;
+						Description="Assembling..."
+						CommandLine="ml.exe /nologo /c /Cx /coff /safeseh /Fo $(IntDir)\ &quot;$(InputPath)&quot;
 "
 						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
@@ -371,7 +389,8 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;
+						Description="Assembling..."
+						CommandLine="ml.exe /nologo /c /Cx /coff /safeseh /Fo $(IntDir)\ &quot;$(InputPath)&quot;
 "
 						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
@@ -379,7 +398,8 @@
 					Name="testversion|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;
+						Description="Assembling..."
+						CommandLine="ml.exe /nologo /c /Cx /coff /safeseh /Fo $(IntDir)\ &quot;$(InputPath)&quot;
 "
 						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
@@ -559,7 +579,8 @@
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;
+						Description="Assembling..."
+						CommandLine="ml.exe /nologo /c /Cx /coff /safeseh /Fo $(IntDir)\ &quot;$(InputPath)&quot;
 "
 						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
@@ -567,7 +588,8 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;
+						Description="Assembling..."
+						CommandLine="ml.exe /nologo /c /Cx /coff /safeseh /Fo $(IntDir)\ &quot;$(InputPath)&quot;
 "
 						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
@@ -575,13 +597,17 @@
 					Name="testversion|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;
+						Description="Assembling..."
+						CommandLine="ml.exe /nologo /c /Cx /coff /safeseh /Fo $(IntDir)\ &quot;$(InputPath)&quot;
 "
 						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="SHAHashSet.cpp">
+			</File>
+			<File
+				RelativePath=".\ShareableFile.cpp">
 			</File>
 			<File
 				RelativePath="SharedFileList.cpp">
@@ -812,9 +838,6 @@
 				RelativePath="Exceptions.h">
 			</File>
 			<File
-				RelativePath="fileformat.h">
-			</File>
-			<File
 				RelativePath="FirewallOpener.h">
 			</File>
 			<File
@@ -893,6 +916,9 @@
 				RelativePath="PartFileConvert.h">
 			</File>
 			<File
+				RelativePath="PeerCacheClient.h">
+			</File>
+			<File
 				RelativePath="PeerCacheFinder.h">
 			</File>
 			<File
@@ -960,6 +986,9 @@
 			</File>
 			<File
 				RelativePath="SHAHashSet.h">
+			</File>
+			<File
+				RelativePath=".\ShareableFile.h">
 			</File>
 			<File
 				RelativePath="SharedFileList.h">
@@ -1140,6 +1169,9 @@
 			</File>
 			<File
 				RelativePath="BtnST.cpp">
+			</File>
+			<File
+				RelativePath=".\BuddyButton.cpp">
 			</File>
 			<File
 				RelativePath=".\ButtonsTabCtrl.cpp">
@@ -2170,6 +2202,12 @@
 				RelativePath="res\Close.ico">
 			</File>
 			<File
+				RelativePath=".\res\CloseTab.ico">
+			</File>
+			<File
+				RelativePath=".\res\CloseTabSelected.ico">
+			</File>
+			<File
 				RelativePath="res\Collapse.ico">
 			</File>
 			<File
@@ -2533,6 +2571,9 @@
 				RelativePath="res\Import.ico">
 			</File>
 			<File
+				RelativePath=".\res\Incoming.gif">
+			</File>
+			<File
 				RelativePath="res\Incoming.ico">
 			</File>
 			<File
@@ -2576,6 +2617,9 @@
 			</File>
 			<File
 				RelativePath="res\KadNodeSearch.ico">
+			</File>
+			<File
+				RelativePath=".\res\KadServer.ico">
 			</File>
 			<File
 				RelativePath="res\KadStoreFile.ico">
@@ -2840,7 +2884,7 @@
 				RelativePath=".\res\SharedFilesManagement.ico">
 			</File>
 			<File
-				RelativePath=".\res\ShareDir.ico">
+				RelativePath=".\res\SharedFolderOvl.ico">
 			</File>
 			<File
 				RelativePath=".\res\sidebanner.jpg">

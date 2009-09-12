@@ -42,12 +42,6 @@ enum EPartFileStatus{
 
 
 //#define BUFFER_SIZE_LIMIT 500000 // Max bytes before forcing a flush
-//Xman increased to 8 sec
-/*
-#define BUFFER_TIME_LIMIT	60000	// Max milliseconds before forcing a flush
-*/
-#define BUFFER_TIME_LIMIT	80000
-//Xman end
 
 #define	PARTMET_BAK_EXT	_T(".bak")
 #define	PARTMET_TMP_EXT	_T(".backup")
@@ -61,6 +55,14 @@ enum EPartFileFormat{
 	PMT_NEWOLD,
 	PMT_SHAREAZA,
 	PMT_BADFORMAT	
+};
+
+enum EPartFileLoadResult{
+	PLR_LOADSUCCESS = 1,
+	PLR_CHECKSUCCESS = 2,
+	PLR_FAILED_METFILE_CORRUPT = -1,
+	PLR_FAILED_METFILE_NOACCESS = -2,
+	PLR_FAILED_OTHER   = 0
 };
 
 #define	FILE_COMPLETION_THREAD_FAILED	0x0000
@@ -191,10 +193,10 @@ public:
 	// Maella end
 	//Xman end	
 
-	uint8	LoadPartFile(LPCTSTR in_directory, LPCTSTR filename, bool getsizeonly = false); //filename = *.part.met
-	uint8	ImportShareazaTempfile(LPCTSTR in_directory,LPCTSTR in_filename , bool getsizeonly);
+	EPartFileLoadResult	LoadPartFile(LPCTSTR in_directory, LPCTSTR filename, EPartFileFormat* pOutCheckFileFormat = NULL); //filename = *.part.met
+	EPartFileLoadResult	ImportShareazaTempfile(LPCTSTR in_directory,LPCTSTR in_filename, EPartFileFormat* pOutCheckFileFormat = NULL);
 
-	bool	SavePartFile();
+	bool	SavePartFile(bool bDontOverrideBak = false);
 	void	PartFileHashFinished(CKnownFile* result);
 	bool	HashSinglePart(UINT partnumber); // true = ok , false = corrupted
 
@@ -369,9 +371,9 @@ public:
 
 
 	void	SetFileOp(EPartFileOp eFileOp);
-	EPartFileOp GetFileOp() const { return m_eFileOp; }
+	EPartFileOp GetFileOp() const							{ return m_eFileOp; }
 	void	SetFileOpProgress(UINT uProgress);
-	UINT	GetFileOpProgress() const { return m_uFileOpProgress; }
+	UINT	GetFileOpProgress() const						{ return m_uFileOpProgress; }
 
 	void	RequestAICHRecovery(UINT nPart);
 	void	AICHRecoveryDataAvailable(UINT nPart);
@@ -399,14 +401,14 @@ public:
 	*/
 	//Xman end
 	
-	UINT	SetPrivateMaxSources(uint32 in)	{ return m_uMaxSources = in; } 
-	UINT	GetPrivateMaxSources() const	{ return m_uMaxSources; } 
+	UINT	SetPrivateMaxSources(uint32 in)					{ return m_uMaxSources = in; } 
+	UINT	GetPrivateMaxSources() const					{ return m_uMaxSources; } 
 	UINT	GetMaxSources() const;
 	UINT	GetMaxSourcePerFileSoft() const;
 	UINT	GetMaxSourcePerFileUDP() const;
 
-    bool    GetPreviewPrio() const { return m_bpreviewprio; }
-	void    SetPreviewPrio(bool in) { m_bpreviewprio=in; }
+    bool    GetPreviewPrio() const							{ return m_bpreviewprio; }
+	void    SetPreviewPrio(bool in)							{ m_bpreviewprio=in; }
 
 	//Xman Xtreme Downloadmanager
 	/*
@@ -563,7 +565,11 @@ private:
 	CWinThread* m_AllocateThread;
 	DWORD	m_lastRefreshedDLDisplay;
 	CUpDownClientPtrList m_downloadingSourceList;
-	bool m_sourceListChange; //Xman // Maella -New bandwidth control-
+	//zz_fly :: delayed deletion of downloading source :: Enig123 :: Start
+	CUpDownClientPtrList m_downloadingDeleteList;
+	void	DoDelayedDeletion();
+	volatile bool	m_sourceListChange; //Xman // Maella -New bandwidth control-
+	//zz_fly :: delayed deletion of downloading source :: Enig123 :: End
 	bool	m_bDeleteAfterAlloc;
     bool	m_bpreviewprio;
 	// Barry - Buffered data to be written

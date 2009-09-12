@@ -33,17 +33,17 @@ protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnNMDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnBnClickedAdd();
 	afx_msg void OnBnClickedApply();
 	afx_msg void OnBnClickedRemove();
-	afx_msg void OnSettingsChange() {SetModified();}
-	afx_msg void OnEnableChange();
 	afx_msg void OnDisableTime2();
-	afx_msg void OnNMDblclkActionlist(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRclickActionlist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnEnableChange();
 	afx_msg void OnHelp();
-	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnNmClickList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNmDblClkActionlist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNmRClickActionlist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSettingsChange() {SetModified();}
 
 	// ==> XP Style Menu [Xanatos] - Stulle
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);

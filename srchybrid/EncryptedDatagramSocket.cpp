@@ -89,7 +89,7 @@
 		 x 1	-> Most likely an ED2k Packet, try Userhash as Key first
 		 0 0	-> Most likely an Kad Packet, try NodeID as Key first
 		 1 0	-> Most likely an Kad Packet, try SenderKey as Key first
-	
+
 	- Additional Comments:
 			- For obvious reasons the UDP handshake is actually no handshake. If a different Encryption method (or better a different Key) is to be used this has to be negotiated in a TCP connection
 		    - SemiRandomNotProtocolMarker is a Byte which has a value unequal any Protocol header byte. This is a compromiss, turning in complete randomness (and nice design) but gaining
@@ -129,6 +129,13 @@
 #pragma warning(default:4244) // conversion from 'type1' to 'type2', possible loss of data
 #pragma warning(default:4516) // access-declarations are deprecated; member using-declarations provide a better alternative
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+
 #define CRYPT_HEADER_WITHOUTPADDING		    8
 #define	MAGICVALUE_UDP						91
 #define MAGICVALUE_UDP_SYNC_CLIENT			0x395F2EC1
@@ -148,12 +155,12 @@ CEncryptedDatagramSocket::~CEncryptedDatagramSocket(){
 int CEncryptedDatagramSocket::DecryptReceivedClient(BYTE* pbyBufIn, int nBufLen, BYTE** ppbyBufOut, uint32 dwIP, uint32* nReceiverVerifyKey, uint32* nSenderVerifyKey) const{
 	int nResult = nBufLen;
 	*ppbyBufOut = pbyBufIn;
-
+	
 	if (nReceiverVerifyKey == NULL || nSenderVerifyKey == NULL){
 		ASSERT( false );
 		return nResult;
 	}
-
+	
 	*nReceiverVerifyKey = 0;
 	*nSenderVerifyKey = 0;
 
@@ -229,7 +236,7 @@ int CEncryptedDatagramSocket::DecryptReceivedClient(BYTE* pbyBufIn, int nBufLen,
 		RC4Crypt(pbyBufIn + 3, (uchar*)&dwValue, sizeof(dwValue), &keyReceiveKey);
 		byCurrentTry = (byCurrentTry + 1) % 3;
 	} while (dwValue != MAGICVALUE_UDP_SYNC_CLIENT && byTries > 0); // try to decrypt as ed2k as well as kad packet if needed (max 3 rounds)
-
+	
 	if (dwValue == MAGICVALUE_UDP_SYNC_CLIENT){
 		// yup this is an encrypted packet
 		// debugoutput notices
@@ -297,7 +304,7 @@ int CEncryptedDatagramSocket::EncryptSendClient(uchar** ppbyBuf, int nBufLen, co
 	uint32 nCryptedLen = nBufLen + nCryptHeaderLen;
 	uchar* pachCryptedBuffer = new uchar[nCryptedLen];
 	bool bKadRecKeyUsed = false;
-
+	
 	uint16 nRandomKeyPart = (uint16)cryptRandomGen.GenerateWord32(0x0000, 0xFFFF);
 	MD5Sum md5;
 	if (bKad){
@@ -318,6 +325,7 @@ int CEncryptedDatagramSocket::EncryptSendClient(uchar** ppbyBuf, int nBufLen, co
 		}
 		else {
 			ASSERT( false );
+			delete[] pachCryptedBuffer;
 			return nBufLen;
 		}
 	}
@@ -343,7 +351,7 @@ int CEncryptedDatagramSocket::EncryptSendClient(uchar** ppbyBuf, int nBufLen, co
 			bySemiRandomNotProtocolMarker = bKadRecKeyUsed ? ((bySemiRandomNotProtocolMarker & 0xFE) | 0x02) : (bySemiRandomNotProtocolMarker & 0xFC); // set the ed2k/kad and nodeid/reckey markerbit
 		else
 			bySemiRandomNotProtocolMarker = (bySemiRandomNotProtocolMarker | 0x01); // set the ed2k/kad marker bit
-
+		
 		bool bOk = false;
 		switch (bySemiRandomNotProtocolMarker){ // not allowed values
 			case OP_EMULEPROT:

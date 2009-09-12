@@ -13,6 +13,12 @@
 #include "kademlia/kademlia/indexed.h"
 #include "WebServer.h"
 #include "clientlist.h"
+// ==> UPnP support [MoNKi] - leuk_he
+/*
+#include "UPnPImpl.h" //zz_fly :: show UPnP status
+#include "UPnPImplWrapper.h" //zz_fly :: show UPnP status
+*/
+// <== UPnP support [MoNKi] - leuk_he
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -181,7 +187,7 @@ void CreateNetworkInfo(CRichEditCtrlX& rCtrl, CHARFORMAT& rcfDef, CHARFORMAT& rc
 			else
 				rCtrl << GetResString(IDS_PRIONORMAL);
 			rCtrl << _T("\r\n");
-
+			
 
 			if (bFullInfo)
 			{
@@ -316,7 +322,7 @@ void CreateNetworkInfo(CRichEditCtrlX& rCtrl, CHARFORMAT& rcfDef, CHARFORMAT& rc
 			buffer.Format(_T("%u"), Kademlia::CKademlia::GetPrefs()->GetExternalKadPort());
 			rCtrl << GetResString(IDS_EXTERNUDPPORT) << _T(":\t") << buffer << _T("\r\n");
 		}
-
+		
 		if (Kademlia::CUDPFirewallTester::IsFirewalledUDP(true)) {
 			rCtrl << GetResString(IDS_BUDDY) << _T(":\t");
 			switch ( theApp.clientlist->GetBuddyStatus() )
@@ -381,9 +387,22 @@ void CreateNetworkInfo(CRichEditCtrlX& rCtrl, CHARFORMAT& rcfDef, CHARFORMAT& rc
 		rCtrl << _T("URL:\t") << _T("http://") << strHostname << _T(":") << thePrefs.GetWSPort() << _T("/\r\n");
 	}
 
-
-
 	// ==> UPnP support [MoNKi] - leuk_he
+	/*
+	//zz_fly :: show UPnP status :: start
+	//if(thePrefs.GetUPnPNat())
+	if(thePrefs.IsUPnPEnabled() && theApp.m_pUPnPFinder)
+	{
+		rCtrl << _T("\r\n");
+		rCtrl.SetSelectionCharFormat(rcfBold);
+		rCtrl << GetResString(IDS_UPNPSTATUS) << _T("\r\n");
+		rCtrl.SetSelectionCharFormat(rcfDef);
+		//CString upnpinfo = theApp.m_UPnPNat.GetLastError(); //ACAT UPnP
+		CString upnpinfo = theApp.m_pUPnPFinder->GetImplementation() ? theApp.m_pUPnPFinder->GetImplementation()->GetStatusString() : _T(""); //Official UPNP
+		rCtrl << (upnpinfo.IsEmpty() ? _T("Unknown") : upnpinfo) << _T("\r\n");
+	}
+	//zz_fly :: show UPnP status :: end
+	*/
 	rCtrl << _T("\r\n");
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// upnp																								//

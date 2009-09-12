@@ -13,7 +13,7 @@ public:
 	int		GetCpuUsage();
 	uint32	GetMemoryUsage();
 	int		GetGlobalCpuUsage();
-	uint32	GetGlobalMemoryUsage();
+	uint64	GetGlobalMemoryUsage();
 
 private:
 	CPU cpu;

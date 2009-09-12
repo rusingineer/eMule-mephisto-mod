@@ -157,5 +157,3 @@ __inline int CmpED2KTagName(LPCSTR pszTagName1, LPCSTR pszTagName2){
 	return __ascii_stricmp(pszTagName1, pszTagName2);
 }
 void ConvertED2KTag(CTag*& pTag);
-
-bool WriteOptED2KUTF8Tag(CFileDataIO* data, LPCWSTR pwsz, uint8 uTagName);

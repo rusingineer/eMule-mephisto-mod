@@ -97,51 +97,77 @@ bool CSettingsSaver::SaveSettings()
 	CPartFile* cur_file ;
 	bool bAborted = false;
 
-	CString strCatIniFilePath;
-	strCatIniFilePath.Format(L"%sFileSettings.ini", thePrefs.GetMuleDirectory(EMULE_CONFIGDIR));
-	(void)_tremove(strCatIniFilePath);
+	CString strFileSettingsIniFilePath;
+	strFileSettingsIniFilePath.Format(L"%sFileSettings.ini", thePrefs.GetMuleDirectory(EMULE_CONFIGDIR));
+	(void)_tremove(strFileSettingsIniFilePath);
 	if(theApp.downloadqueue->filelist.GetCount()<=0) // nothing to save here
 		return true; // everything's fine
-	CIni ini(strCatIniFilePath);
-	ini.WriteInt(_T("FileSettingsVersion"), 1, _T("General")); // just in case...
+	CStdioFile ini;
+	CString buffer;
 
-	for (POSITION pos = theApp.downloadqueue->filelist.GetHeadPosition();pos != 0;){
-		cur_file = theApp.downloadqueue->filelist.GetNext(pos);
+	if(ini.Open(strFileSettingsIniFilePath,CFile::modeCreate | CFile::modeWrite | CFile::shareExclusive | CFile::typeText))
+	{
+		ini.WriteString(_T("[General]\r\n"));
+		buffer.Format(_T("FileSettingsVersion=%i\r\n"),1);
+		ini.WriteString(buffer);
 
-		if(!cur_file) // NULL-pointer? we deleted the file, break
-		{
-			bAborted = true;
-			break;
+		for (POSITION pos = theApp.downloadqueue->filelist.GetHeadPosition();pos != 0;){
+			cur_file = theApp.downloadqueue->filelist.GetNext(pos);
+
+			if(!cur_file) // NULL-pointer? we deleted the file, break
+			{
+				AddDebugLogLine(false,_T("CSettingsSaver cur_file == NULL? wtf?!"));
+				bAborted = true;
+				break;
+			}
+
+			try // i just hope we don't need this
+			{
+				buffer.Format(_T("[%s]\r\n"),cur_file->GetPartMetFileName());
+				ini.WriteString(buffer);
+
+				buffer.Format(_T("NNS=%i\r\n"),cur_file->GetEnableAutoDropNNS()?1:0);
+				ini.WriteString(buffer);
+				buffer.Format(_T("NNSTimer=%u\r\n"),cur_file->GetAutoNNS_Timer());
+				ini.WriteString(buffer);
+				buffer.Format(_T("NNSLimit=%u\r\n"),cur_file->GetMaxRemoveNNSLimit());
+				ini.WriteString(buffer);
+
+				buffer.Format(_T("FQS=%i\r\n"),cur_file->GetEnableAutoDropFQS()?1:0);
+				ini.WriteString(buffer);
+				buffer.Format(_T("FQSTimer=%u\r\n"),cur_file->GetAutoFQS_Timer());
+				ini.WriteString(buffer);
+				buffer.Format(_T("FQSLimit=%u\r\n"),cur_file->GetMaxRemoveFQSLimit());
+				ini.WriteString(buffer);
+
+				buffer.Format(_T("QRS=%i\r\n"),cur_file->GetEnableAutoDropQRS()?1:0);
+				ini.WriteString(buffer);
+				buffer.Format(_T("QRSTimer=%u\r\n"),cur_file->GetAutoHQRS_Timer());
+				ini.WriteString(buffer);
+				buffer.Format(_T("MaxQRS=%u\r\n"),cur_file->GetMaxRemoveQRS());
+				ini.WriteString(buffer);
+				buffer.Format(_T("QRSLimit=%u\n"),cur_file->GetMaxRemoveQRSLimit());
+				ini.WriteString(buffer);
+
+				buffer.Format(_T("GlobalHL=%i\r\n"),cur_file->GetGlobalHL()?1:0);
+				ini.WriteString(buffer);
+				buffer.Format(_T("XmanHQR=%i\r\n"),cur_file->GetHQRXman()?1:0);
+				ini.WriteString(buffer);
+				buffer.Format(_T("FTM=%i\r\n"),cur_file->GetFollowTheMajority());
+				ini.WriteString(buffer);
+			}
+			catch(...) // and if we do we break and log
+			{
+				bAborted = true;
+				AddDebugLogLine(true,_T("We had to catch an error in SettingsSaver::SaveSettings()! Report this please!"));
+				break;
+			}
 		}
-
-		try // i just hope we don't need this
-		{
-			ini.SetSection(cur_file->GetPartMetFileName());
-
-			ini.WriteBool(L"NNS",cur_file->GetEnableAutoDropNNS());
-			ini.WriteInt(L"NNSTimer",cur_file->GetAutoNNS_Timer());
-			ini.WriteInt(L"NNSLimit",cur_file->GetMaxRemoveNNSLimit());
-
-			ini.WriteBool(L"FQS",cur_file->GetEnableAutoDropFQS());
-			ini.WriteInt(L"FQSTimer",cur_file->GetAutoFQS_Timer());
-			ini.WriteInt(L"FQSLimit",cur_file->GetMaxRemoveFQSLimit());
-
-			ini.WriteBool(L"QRS",cur_file->GetEnableAutoDropQRS());
-			ini.WriteInt(L"QRSTimer",cur_file->GetAutoHQRS_Timer());
-			ini.WriteInt(L"MaxQRS",cur_file->GetMaxRemoveQRS());
-			ini.WriteInt(L"QRSLimit",cur_file->GetMaxRemoveQRSLimit());
-
-			ini.WriteBool(L"GlobalHL",cur_file->GetGlobalHL());
-			ini.WriteBool(L"XmanHQR",cur_file->GetHQRXman());
-			ini.WriteInt(L"FTM",cur_file->GetFollowTheMajority());
-		}
-		catch(...) // and if we do we break and log
-		{
-			bAborted = true;
-			AddDebugLogLine(true,_T("We had to catch an error in SettingsSaver::SaveSettings()! Report this please!"));
-			break;
-		}
+		ini.Close();
 	}
+	else
+		bAborted = true;
+
 	return !bAborted; // report if we had to abort, this is no good
 }
 
@@ -161,7 +187,7 @@ void CSettingsSaver::ImportOldSettings(CPartFile* file)
 	{
 		if (strLine.GetAt(0) == _T('#'))
 			continue;
-		int pos = strLine.Find(_T('\0'));
+		int pos = strLine.Find(_T('\n'));
 		if (pos == -1)
 			continue;
 		CString strData = strLine.Left(pos);

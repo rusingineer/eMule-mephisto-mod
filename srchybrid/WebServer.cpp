@@ -386,323 +386,322 @@ void CWebServer::ProcessURL(ThreadData Data)
 	try{
 #endif	
 
+		
+	bool isUseGzip = thePrefs.GetWebUseGzip();
+	bool justAddLink,login=false;
 
-		bool isUseGzip = thePrefs.GetWebUseGzip();
-		bool justAddLink,login=false;
+	CString Out;
+	CString OutE;	// List Entry Templates
+	CString OutS;	// ServerStatus Templates
+	TCHAR *gzipOut = NULL;
+	long gzipLen=0;
 
-		CString Out;
-		CString OutE;	// List Entry Templates
-		CString OutS;	// ServerStatus Templates
-		TCHAR *gzipOut = NULL;
-		long gzipLen=0;
-
-		CString HTTPProcessData;
-		srand ( time(NULL) );
+	CString HTTPProcessData;
+	srand ( time(NULL) );
 
 
-		USES_CONVERSION;
-		uint32 myip= inet_addr(T2CA(ipstr(Data.inadr)));
-		DWORD now=::GetTickCount();
+	uint32 myip= inet_addr(CT2CA(ipstr(Data.inadr)));
+	DWORD now=::GetTickCount();
 
-		// check for being banned
-		int myfaults=0;
-		int i=0;
-		while (i<pThis->m_Params.badlogins.GetSize() ) {
-			if ( pThis->m_Params.badlogins[i].timestamp < now-MIN2MS(15) ) {
-				pThis->m_Params.badlogins.RemoveAt(i);	// remove outdated entries
-				continue;
-			}
-
-			if ( pThis->m_Params.badlogins[i].datalen==myip) 
-				myfaults++;
-			i++;
-		}
-		if (myfaults>4) {
-			Data.pSocket->SendContent(T2CA(HTTPInit), _GetPlainResString(IDS_ACCESSDENIED));
-			CoUninitialize();
-			return;
+	// check for being banned
+	int myfaults=0;
+	int i=0;
+	while (i<pThis->m_Params.badlogins.GetSize() ) {
+		if ( pThis->m_Params.badlogins[i].timestamp < now-MIN2MS(15) ) {
+			pThis->m_Params.badlogins.RemoveAt(i);	// remove outdated entries
+			continue;
 		}
 
+		if ( pThis->m_Params.badlogins[i].datalen==myip) 
+			myfaults++;
+		i++;
+	}
+	if (myfaults>4) {
+		Data.pSocket->SendContent(CT2CA(HTTPInit), _GetPlainResString(IDS_ACCESSDENIED));
+		CoUninitialize();
+		return;
+	}
 
 
-		justAddLink=false;
-		long lSession = 0;
-		if(!_ParseURL(Data.sURL, _T("ses")).IsEmpty())
-			lSession = _tstol(_ParseURL(Data.sURL, _T("ses")));
 
-		if (_ParseURL(Data.sURL, _T("w")) == _T("password"))
+	justAddLink=false;
+	long lSession = 0;
+	if(!_ParseURL(Data.sURL, _T("ses")).IsEmpty())
+		lSession = _tstol(_ParseURL(Data.sURL, _T("ses")));
+
+	if (_ParseURL(Data.sURL, _T("w")) == _T("password"))
+	{
+		CString test=MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash();
+		CString ip=ipstr(Data.inadr);
+
+        if (_ParseURL(Data.sURL, _T("c")) != _T("")) {
+            // just sent password to add link remotely. Don't start a session.
+            justAddLink = true;
+        }
+
+		if(MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSPass())
 		{
-			CString test=MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash();
-			CString ip=ipstr(Data.inadr);
-
-			if (_ParseURL(Data.sURL, _T("c")) != _T("")) {
-				// just sent password to add link remotely. Don't start a session.
-				justAddLink = true;
-			}
-
-			if(MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSPass())
-			{
-				if (!justAddLink) 
-				{
-					// user wants to login
-					Session ses;
-					ses.admin=true;
-					ses.startTime = CTime::GetCurrentTime();
-					ses.lSession = lSession = GetRandomUInt32();
+	        if (!justAddLink) 
+	        {
+                // user wants to login
+				Session ses;
+				ses.admin=true;
+				ses.startTime = CTime::GetCurrentTime();
+				ses.lSession = lSession = GetRandomUInt32();
 				// ==> Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
 				/*
-					ses.lastcat= 0- thePrefs.GetCatFilter(0);
+				ses.lastcat= 0- thePrefs.GetCatFilter(0);
 				*/
 				ses.lastcat= 0;
 				// <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
-					pThis->m_Params.Sessions.Add(ses);
-				}
-
-				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION,WEBGUIIA_UPDATEMYINFO,0);
-
-				AddLogLine(true,GetResString(IDS_WEB_ADMINLOGIN)+_T(" (%s)"),ip);
-				login=true;
-			}
-			else if(thePrefs.GetWSIsLowUserEnabled() && thePrefs.GetWSLowPass()!=_T("") && MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSLowPass())
-			{
-				Session ses;
-				ses.admin=false;
-				ses.startTime = CTime::GetCurrentTime();
-				ses.lSession = lSession = GetRandomUInt32();
 				pThis->m_Params.Sessions.Add(ses);
+            }
+			
+			SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION,WEBGUIIA_UPDATEMYINFO,0);
 
-				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION,WEBGUIIA_UPDATEMYINFO,0);
+			AddLogLine(true,GetResString(IDS_WEB_ADMINLOGIN)+_T(" (%s)"),ip);
+			login=true;
+		}
+		else if(thePrefs.GetWSIsLowUserEnabled() && thePrefs.GetWSLowPass()!=_T("") && MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSLowPass())
+		{
+			Session ses;
+			ses.admin=false;
+			ses.startTime = CTime::GetCurrentTime();
+			ses.lSession = lSession = GetRandomUInt32();
+			pThis->m_Params.Sessions.Add(ses);
 
-				AddLogLine(true,GetResString(IDS_WEB_GUESTLOGIN)+_T(" (%s)"),ip);
-				login=true;
-			} else {
-				LogWarning(LOG_STATUSBAR,GetResString(IDS_WEB_BADLOGINATTEMPT)+_T(" (%s)"),ip);
+			SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION,WEBGUIIA_UPDATEMYINFO,0);
 
-				BadLogin newban={myip, now};	// save failed attempt (ip,time)
-				pThis->m_Params.badlogins.Add(newban);
-				login=false;
-				myfaults++;
-				if (myfaults>4) {
-					Data.pSocket->SendContent(T2CA(HTTPInit), _GetPlainResString(IDS_ACCESSDENIED));
-					CoUninitialize();
-					return;
-				}
-			}
-			isUseGzip = false; // [Julien]
-			if (login) {	// on login, forget previous failed attempts
-				i=0;
-				while (i<pThis->m_Params.badlogins.GetSize() ) {
-					if ( pThis->m_Params.badlogins[i].datalen==myip ) {
-						pThis->m_Params.badlogins.RemoveAt(i);
-						continue;
-					}
-					i++;
-				}
+			AddLogLine(true,GetResString(IDS_WEB_GUESTLOGIN)+_T(" (%s)"),ip);
+			login=true;
+		} else {
+			LogWarning(LOG_STATUSBAR,GetResString(IDS_WEB_BADLOGINATTEMPT)+_T(" (%s)"),ip);
+
+			BadLogin newban={myip, now};	// save failed attempt (ip,time)
+			pThis->m_Params.badlogins.Add(newban);
+			login=false;
+			myfaults++;
+			if (myfaults>4) {
+				Data.pSocket->SendContent(CT2CA(HTTPInit), _GetPlainResString(IDS_ACCESSDENIED));
+				CoUninitialize();
+				return;
 			}
 		}
+		isUseGzip = false; // [Julien]
+		if (login) {	// on login, forget previous failed attempts
+			i=0;
+			while (i<pThis->m_Params.badlogins.GetSize() ) {
+				if ( pThis->m_Params.badlogins[i].datalen==myip ) {
+					pThis->m_Params.badlogins.RemoveAt(i);
+					continue;
+				}
+				i++;
+			}
+		}
+	}
 
-		CString sSession; sSession.Format(_T("%ld"), lSession);
+	CString sSession; sSession.Format(_T("%ld"), lSession);
 
 	if (_ParseURL(Data.sURL, _T("w")) == _T("logout"))
+		_RemoveSession(Data, lSession);
+
+	if(_IsLoggedIn(Data, lSession))
+	{
+		if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession) && thePrefs.GetWebAdminAllowedHiLevFunc() )
+		{
+			theApp.m_app_state = APP_STATE_SHUTTINGDOWN;
 			_RemoveSession(Data, lSession);
 
-		if(_IsLoggedIn(Data, lSession))
+			// send answer ...
+			Out += _GetLoginScreen(Data);
+			Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
+
+			SendMessage(theApp.emuledlg->m_hWnd,WM_CLOSE,0,0);
+
+			CoUninitialize();
+			return;
+		}
+		else if (_ParseURL(Data.sURL, _T("w")) == _T("shutdown") && IsSessionAdmin(Data,sSession))
 		{
-		if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession) && thePrefs.GetWebAdminAllowedHiLevFunc() )
-			{
-				theApp.m_app_state = APP_STATE_SHUTTINGDOWN;
-				_RemoveSession(Data, lSession);
+			_RemoveSession(Data, lSession);
+			// send answer ...
+			Out += _GetLoginScreen(Data);
+			Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
 
-				// send answer ...
-				Out += _GetLoginScreen(Data);
-				Data.pSocket->SendContent(T2CA(HTTPInit), Out);
+			SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,1);
 
-				SendMessage(theApp.emuledlg->m_hWnd,WM_CLOSE,0,0);
+			CoUninitialize();
+			return;
 
-				CoUninitialize();
-				return;
-			}
-			else if (_ParseURL(Data.sURL, _T("w")) == _T("shutdown") && IsSessionAdmin(Data,sSession))
-			{
-				_RemoveSession(Data, lSession);
-				// send answer ...
-				Out += _GetLoginScreen(Data);
-				Data.pSocket->SendContent(T2CA(HTTPInit), Out);
+		}
+		else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession))
+		{
+			_RemoveSession(Data, lSession);
 
-				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,1);
+			// send answer ...
+			Out += _GetLoginScreen(Data);
+			Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
 
-				CoUninitialize();
-				return;
+			SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,2);
 
-			}
-			else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession))
-			{
-				_RemoveSession(Data, lSession);
-
-				// send answer ...
-				Out += _GetLoginScreen(Data);
-				Data.pSocket->SendContent(T2CA(HTTPInit), Out);
-
-				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,2);
+			CoUninitialize();
+			return;
+		}
+		else if (_ParseURL(Data.sURL, _T("w")) == _T("commentlist"))
+		{
+			CString Out=_GetCommentlist(Data);
+			
+			if (!Out.IsEmpty()) {
+				Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
 
 				CoUninitialize();
 				return;
 			}
-			else if (_ParseURL(Data.sURL, _T("w")) == _T("commentlist"))
-			{
-				CString Out=_GetCommentlist(Data);
-
-				if (!Out.IsEmpty()) {
-					Data.pSocket->SendContent(T2CA(HTTPInit), Out);
-
+		}
+		else if (_ParseURL(Data.sURL, _T("w")) == _T("getfile") && IsSessionAdmin(Data,sSession)) {
+			uchar FileHash[16];
+			CKnownFile* kf=theApp.sharedfiles->GetFileByID(_GetFileHash(_ParseURL(Data.sURL, _T("filehash")),FileHash) );
+			
+			if (kf) {
+				if (thePrefs.GetMaxWebUploadFileSizeMB() != 0 && kf->GetFileSize() > (uint64)thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024) {
+					Data.pSocket->SendReply( "HTTP/1.1 403 Forbidden\r\n" );
+				
 					CoUninitialize();
 					return;
 				}
-			}
-			else if (_ParseURL(Data.sURL, _T("w")) == _T("getfile") && IsSessionAdmin(Data,sSession)) {
-				uchar FileHash[16];
-				CKnownFile* kf=theApp.sharedfiles->GetFileByID(_GetFileHash(_ParseURL(Data.sURL, _T("filehash")),FileHash) );
+				else {
+					CFile file;
+					if(file.Open(kf->GetFilePath(), CFile::modeRead|CFile::shareDenyWrite|CFile::typeBinary))
+					{
+						EMFileSize filesize= kf->GetFileSize();
 
-				if (kf) {
-					if (thePrefs.GetMaxWebUploadFileSizeMB() != 0 && kf->GetFileSize() > (uint64)thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024) {
-						Data.pSocket->SendReply( "HTTP/1.1 403 Forbidden\r\n" );
+						#define SENDFILEBUFSIZE 2048
+						char* buffer=(char*)malloc(SENDFILEBUFSIZE);
+						if (!buffer) {
+							Data.pSocket->SendReply( "HTTP/1.1 500 Internal Server Error\r\n" );
+							CoUninitialize();
+							return;
+						}
+						
+						char szBuf[512];
+						int nLen = _snprintf(szBuf, _countof(szBuf), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Description: \"%s\"\r\nContent-Disposition: attachment; filename=\"%s\";\r\nContent-Transfer-Encoding: binary\r\nContent-Length: %I64u\r\n\r\n", 
+							(LPCSTR) CT2CA(kf->GetFileName()),
+							(LPCSTR) CT2CA(kf->GetFileName()),
+							(uint64)filesize);
+						Data.pSocket->SendData(szBuf, nLen);
 
+						DWORD r=1;
+						while (filesize > (uint64)0 && r) {
+							r=file.Read(buffer,SENDFILEBUFSIZE);
+							filesize -= (uint64)r;
+							Data.pSocket->SendData(buffer, r);
+						}
+						file.Close();
+
+						free(buffer);
 						CoUninitialize();
 						return;
 					}
 					else {
-						CFile file;
-						if(file.Open(kf->GetFilePath(), CFile::modeRead|CFile::shareDenyWrite|CFile::typeBinary))
-						{
-							EMFileSize filesize= kf->GetFileSize();
-
-#define SENDFILEBUFSIZE 2048
-							char* buffer=(char*)malloc(SENDFILEBUFSIZE);
-							if (!buffer) {
-								Data.pSocket->SendReply( "HTTP/1.1 500 Internal Server Error\r\n" );
-								CoUninitialize();
-								return;
-							}
-
-							char szBuf[512];
-							int nLen = _snprintf(szBuf, _countof(szBuf), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Description: \"%s\"\r\nContent-Disposition: attachment; filename=\"%s\";\r\nContent-Transfer-Encoding: binary\r\nContent-Length: %I64u\r\n\r\n", 
-								T2CA(kf->GetFileName()),
-								T2CA(kf->GetFileName()),
-								(uint64)filesize);
-							Data.pSocket->SendData(szBuf, nLen);
-
-							DWORD r=1;
-							while (filesize > (uint64)0 && r) {
-								r=file.Read(buffer,SENDFILEBUFSIZE);
-								filesize -= (uint64)r;
-								Data.pSocket->SendData(buffer, r);
-							}
-							file.Close();
-
-							free(buffer);
-							CoUninitialize();
-							return;
-						}
-						else {
-							Data.pSocket->SendReply( "HTTP/1.1 404 File not found\r\n" );
-							CoUninitialize();
-							return;
-						}
+						Data.pSocket->SendReply( "HTTP/1.1 404 File not found\r\n" );
+						CoUninitialize();
+						return;
 					}
 				}
-
 			}
 
-			Out += _GetHeader(Data, lSession);
-			CString sPage = _ParseURL(Data.sURL, _T("w"));
-			if (sPage == _T("server"))
-				Out += _GetServerList(Data);
-			else if (sPage == _T("shared"))
-				Out += _GetSharedFilesList(Data);
-			else if (sPage == _T("transfer"))
-				Out += _GetTransferList(Data);
-			else if (sPage == _T("search"))
-				Out += _GetSearch(Data);
-			else if (sPage == _T("graphs"))
-				Out += _GetGraphs(Data);
-			else if (sPage == _T("log"))
-				Out += _GetLog(Data);
-			if (sPage == _T("sinfo"))
-				Out += _GetServerInfo(Data);
-			if (sPage == _T("debuglog"))
-				Out += _GetDebugLog(Data);
-			if (sPage == _T("myinfo"))
-				Out += _GetMyInfo(Data);
-			if (sPage == _T("stats"))
-				Out += _GetStats(Data);
-			if (sPage == _T("kad"))
-				Out += _GetKadDlg(Data);
-			if (sPage == _T("options"))
-			{
-				isUseGzip = false;
-				Out += _GetPreferences(Data);
-			}
-			Out += _GetFooter(Data);
-
-			if (sPage.IsEmpty())
-				isUseGzip = false;
-
-			if(isUseGzip)
-			{
-				bool bOk = false;
-				try
-				{
-					const CStringA* pstrOutA;
-					CStringA strA(wc2utf8(Out));
-					pstrOutA = &strA;
-					uLongf destLen = pstrOutA->GetLength() + 1024;
-					gzipOut = new TCHAR[destLen];
-					if(_GzipCompress((Bytef*)gzipOut, &destLen, (const Bytef*)(LPCSTR)*pstrOutA, pstrOutA->GetLength(), Z_DEFAULT_COMPRESSION) == Z_OK)
-					{
-						bOk = true;
-						gzipLen = destLen;
-					}
-				}
-				catch(...)
-				{
-					ASSERT(0);
-				}
-				if(!bOk)
-				{
-					isUseGzip = false;
-					delete[] gzipOut;
-					gzipOut = NULL;
-				}
-			}
 		}
-		else if(justAddLink && login)
-		{
-			Out += _GetRemoteLinkAddedOk(Data);
-		}
-		else
+
+		Out += _GetHeader(Data, lSession);
+		CString sPage = _ParseURL(Data.sURL, _T("w"));
+		if (sPage == _T("server"))
+			Out += _GetServerList(Data);
+		else if (sPage == _T("shared"))
+			Out += _GetSharedFilesList(Data);
+		else if (sPage == _T("transfer"))
+			Out += _GetTransferList(Data);
+		else if (sPage == _T("search"))
+			Out += _GetSearch(Data);
+		else if (sPage == _T("graphs"))
+			Out += _GetGraphs(Data);
+		else if (sPage == _T("log"))
+			Out += _GetLog(Data);
+		if (sPage == _T("sinfo"))
+			Out += _GetServerInfo(Data);
+		if (sPage == _T("debuglog"))
+			Out += _GetDebugLog(Data);
+		if (sPage == _T("myinfo"))
+			Out += _GetMyInfo(Data);
+		if (sPage == _T("stats"))
+			Out += _GetStats(Data);
+		if (sPage == _T("kad"))
+			Out += _GetKadDlg(Data);
+		if (sPage == _T("options"))
 		{
 			isUseGzip = false;
-
-			if(justAddLink)
-				Out += _GetRemoteLinkAddedFailed(Data);
-			else
-				Out += _GetLoginScreen(Data);
+			Out += _GetPreferences(Data);
 		}
+		Out += _GetFooter(Data);
 
+		if (sPage.IsEmpty())
+			isUseGzip = false;
 
+		if(isUseGzip)
+		{
+			bool bOk = false;
+			try
+			{
+				const CStringA* pstrOutA;
+				CStringA strA(wc2utf8(Out));
+				pstrOutA = &strA;
+				uLongf destLen = pstrOutA->GetLength() + 1024;
+				gzipOut = new TCHAR[destLen];
+				if(_GzipCompress((Bytef*)gzipOut, &destLen, (const Bytef*)(LPCSTR)*pstrOutA, pstrOutA->GetLength(), Z_DEFAULT_COMPRESSION) == Z_OK)
+				{
+					bOk = true;
+					gzipLen = destLen;
+				}
+			}
+			catch(...)
+			{
+				ASSERT(0);
+			}
+			if(!bOk)
+			{
+				isUseGzip = false;
+				delete[] gzipOut;
+				gzipOut = NULL;
+			}
+		}
+	}
+	else if(justAddLink && login)
+	{
+            Out += _GetRemoteLinkAddedOk(Data);
+    }
+	else
+	{
+		isUseGzip = false;
 
-		// send answer ...
-		if(!isUseGzip)
-			Data.pSocket->SendContent(T2CA(HTTPInit), Out);
+		if(justAddLink)
+            Out += _GetRemoteLinkAddedFailed(Data);
 		else
-			Data.pSocket->SendContent(T2CA(HTTPInitGZ), gzipOut, gzipLen);
+			Out += _GetLoginScreen(Data);
+	}
 
-		delete[] gzipOut;
+
+
+	// send answer ...
+	if(!isUseGzip)
+		Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
+	else
+		Data.pSocket->SendContent(CT2CA(HTTPInitGZ), gzipOut, gzipLen);
+
+	delete[] gzipOut;
 
 #ifndef _DEBUG
 	}
 	catch(...){
-		AddDebugLogLine( DLP_VERYHIGH, false, _T("*** Unknown exception in CWebServer::ProcessURL\n") );
+		AddDebugLogLine( DLP_VERYHIGH, false, _T("*** Unknown exception in CWebServer::ProcessURL") );
 		ASSERT(0);
 	}	
 #endif
@@ -2445,7 +2444,7 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 		dUser.sFileInfo = _SpecialChars(GetClientSummary(cur_client),false);
 		dUser.sFileInfo.Replace(_T("\\"),_T("\\\\"));
 		dUser.sFileInfo.Replace(_T("\n"), _T("<br />"));
-		dUser.sFileInfo.Replace(_T("'"), _T("&#8217;"));
+		dUser.sFileInfo.Replace(_T("'"),_T("&#8217;"));
 
 		sTemp= GetClientversionImage(cur_client) ;
 		dUser.sClientSoft = sTemp;
@@ -2687,7 +2686,7 @@ CString CWebServer::_CreateTransferList(CString Out, CWebServer *pThis, ThreadDa
 
 		CString strFInfo = dwnlf.sFileInfo;
 		strFInfo.Replace(_T("'"),_T("&#8217;"));
-		strFInfo.Replace(_T("\n"),_T("\\n"));
+		strFInfo.Replace(_T("\n"), _T("\\n"));
 
 		dwnlf.sFileInfo.Replace(_T("\n"), _T("<br />"));
 		
@@ -3723,19 +3722,20 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 		fname = SharedArray[i].sFileName;
 		fname.Replace(_T("'"),_T("&#8217;"));
 
-		CKnownFile* cur_file;
-		uchar fileid[16];
+		bool downloadable = false;
+		uchar fileid[16] = {0};
 		if (hash.GetLength()==32 && DecodeBase16(hash, hash.GetLength(), fileid, ARRSIZE(fileid)))
-			HTTPProcessData.Replace(_T("[hash]"), hash);
-
-		cur_file=theApp.sharedfiles->GetFileByID(fileid);
-
-		if (cur_file != NULL)
 		{
-			if (cur_file->GetUpPriority() == PR_VERYHIGH)
-				HTTPProcessData.Replace(_T("[FileIsPriority]"), _T("release"));
-			else
-				HTTPProcessData.Replace(_T("[FileIsPriority]"), _T("none"));
+			HTTPProcessData.Replace(_T("[hash]"), hash);
+			CKnownFile* cur_file = theApp.sharedfiles->GetFileByID(fileid);
+			if (cur_file != NULL)
+			{
+				if (cur_file->GetUpPriority() == PR_VERYHIGH)
+					HTTPProcessData.Replace(_T("[FileIsPriority]"), _T("release"));
+				else
+					HTTPProcessData.Replace(_T("[FileIsPriority]"), _T("none"));
+				downloadable = !cur_file->IsPartFile() && (thePrefs.GetMaxWebUploadFileSizeMB() == 0 || SharedArray[i].m_qwFileSize < thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024);
+			}
 		}
 
 		HTTPProcessData.Replace(_T("[admin]"), (bAdmin) ? _T("admin") : _T(""));
@@ -3748,7 +3748,6 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 		HTTPProcessData.Replace(_T("[FileType]"), SharedArray[i].sFileType);
 		HTTPProcessData.Replace(_T("[FileState]"), SharedArray[i].sFileState);
 		
-		bool downloadable=!cur_file->IsPartFile() && (thePrefs.GetMaxWebUploadFileSizeMB() == 0 || SharedArray[i].m_qwFileSize < thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024);
 		
 		HTTPProcessData.Replace(_T("[Downloadable]"), downloadable?_T("yes"):_T("no") );
 		
@@ -3780,7 +3779,7 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 			_stprintf(HTTPTempC, _T("%i"), SharedArray[i].nFileRequests);
 			HTTPProcessData.Replace(_T("[FileRequests]"), HTTPTempC);
 			_stprintf(HTTPTempC, _T("%i"), SharedArray[i].nFileAllTimeRequests);
-			HTTPProcessData.Replace(_T("[FileAllTimeRequests]"), _T(" (") + CString(HTTPTempC)+ _T(")"));
+			HTTPProcessData.Replace(_T("[FileAllTimeRequests]"), _T(" (") + CString(HTTPTempC) + _T(")"));
 		}
 		else
 		{
@@ -3792,7 +3791,7 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 			_stprintf(HTTPTempC, _T("%i"), SharedArray[i].nFileAccepts);
 			HTTPProcessData.Replace(_T("[FileAccepts]"), HTTPTempC);
 			_stprintf(HTTPTempC, _T("%i"), SharedArray[i].nFileAllTimeAccepts);
-			HTTPProcessData.Replace(_T("[FileAllTimeAccepts]"), _T(" (")+CString(HTTPTempC)+ _T(")"));
+			HTTPProcessData.Replace(_T("[FileAllTimeAccepts]"), _T(" (") + CString(HTTPTempC) + _T(")"));
 		}
 		else
 		{
@@ -3922,7 +3921,7 @@ CString CWebServer::_GetAddServerBox(ThreadData Data)
 					nsrv->SetPreference(PR_NORMAL);
 				else if (_ParseURL(Data.sURL, _T("priority")) == _T("high"))
 					nsrv->SetPreference(PR_HIGH);
-
+	
 				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION,WEBGUIIA_UPDATESERVER,(LPARAM)nsrv);
 
 				if(_ParseURL(Data.sURL, _T("addtostatic")) == _T("true"))
@@ -3955,7 +3954,7 @@ CString CWebServer::_GetAddServerBox(ThreadData Data)
 	else
 		Out.Replace(_T("[Message]"), _T(""));
 
-	Out.Replace(_T("[AddServer]"), _GetPlainResString(IDS_SV_NEWSERVER));
+    Out.Replace(_T("[AddServer]"), _GetPlainResString(IDS_SV_NEWSERVER));
 	Out.Replace(_T("[IP]"), _GetPlainResString(IDS_SV_ADDRESS));
 	Out.Replace(_T("[Port]"), _GetPlainResString(IDS_PORT));
 	Out.Replace(_T("[Name]"), _GetPlainResString(IDS_SW_NAME));
@@ -3969,7 +3968,7 @@ CString CWebServer::_GetAddServerBox(ThreadData Data)
 	Out.Replace(_T("[UpdateServerMetFromURL]"), _GetPlainResString(IDS_SV_MET));
 	Out.Replace(_T("[URL]"), _GetPlainResString(IDS_SV_URL));
 	Out.Replace(_T("[Apply]"), _GetPlainResString(IDS_PW_APPLY));
-	Out.Replace(_T("[URL_Disconnect]"), IsSessionAdmin(Data,sSession)?CString(_T("?ses=") + sSession + _T("&w=server&c=disconnect") ):GetPermissionDenied());
+	Out.Replace(_T("[URL_Disconnect]"), IsSessionAdmin(Data,sSession)?CString(_T("?ses=") + sSession + _T("&w=server&c=disconnect")):GetPermissionDenied());
 	Out.Replace(_T("[URL_Connect]"), IsSessionAdmin(Data,sSession)?CString(_T("?ses=") + sSession + _T("&w=server&c=connect")):GetPermissionDenied());
 	Out.Replace(_T("[Disconnect]"), _GetPlainResString(IDS_IRC_DISCONNECT));
 	Out.Replace(_T("[Connect]"), _GetPlainResString(IDS_CONNECTTOANYSERVER));
@@ -4281,7 +4280,7 @@ CString CWebServer::_GetPreferences(ThreadData Data)
 
 	CString m_sTestURL;
 	m_sTestURL.Format(PORTTESTURL, thePrefs.GetPort(),thePrefs.GetUDPPort(), thePrefs.GetLanguageID() );
-	
+
 	// the portcheck will need to do an obfuscated callback too if obfuscation is requested, so we have to provide our userhash so it can create the key
 	if (thePrefs.IsClientCryptLayerRequested())
 		m_sTestURL += _T("&obfuscated_test=") + md4str(thePrefs.GetUserHash());
@@ -4595,7 +4594,8 @@ CString CWebServer::_GetDownloadGraph(ThreadData Data, CString filehash)
 			{
 				if (i>lastindex)
 				{
-					Out.AppendFormat(pThis->m_Templates.sProgressbarImgs, progresscolor[lastcolor], i-lastindex);
+					if (lastcolor < _countof(progresscolor))
+						Out.AppendFormat(pThis->m_Templates.sProgressbarImgs, progresscolor[lastcolor], i-lastindex);
 				}
 				lastcolor=(BYTE)_tstoi(s_ChunkBar.Mid(i,1));
 				lastindex=i;
@@ -4660,7 +4660,6 @@ CString	CWebServer::_GetSearch(ThreadData Data)
 		SSearchParams* pParams = new SSearchParams;
 		pParams->strExpression = _ParseURL(Data.sURL, _T("tosearch"));
 		pParams->strFileType = _ParseURL(Data.sURL, _T("type"));
-		pParams->bUnicode = (_ParseURL(Data.sURL, _T("unicode")).MakeLower() == _T("on"));
 		// for safety: this string is sent to servers and/or kad nodes, validate it!
 		if (!pParams->strFileType.IsEmpty()
 			&& pParams->strFileType != ED2KFTSTR_ARCHIVE
@@ -5192,11 +5191,10 @@ void CWebServer::ProcessFileReq(ThreadData Data) {
 		if (thePrefs.GetMaxWebUploadFileSizeMB()==0 || file.GetLength()<=thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024 ) {
 			DWORD filesize=(DWORD)file.GetLength();
 
-			USES_CONVERSION;
 			char* buffer=new char[filesize];
 			DWORD size=file.Read(buffer,filesize);
 			file.Close();
-			Data.pSocket->SendContent(T2CA(contenttype), buffer, size);
+			Data.pSocket->SendContent(CT2CA(contenttype), buffer, size);
 			delete[] buffer;
 		} else {
 			Data.pSocket->SendReply( "HTTP/1.1 403 Forbidden\r\n" );

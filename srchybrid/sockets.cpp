@@ -149,7 +149,7 @@ void CServerConnect::ConnectToServer(CServer* server, bool multiconnect, bool bN
 	singleconnecting = !multiconnect;
 	theApp.emuledlg->ShowConnectionState();
 
-	CServerSocket* newsocket = new CServerSocket(this);
+	CServerSocket* newsocket = new CServerSocket(this, !multiconnect);
 	//Xman
 	/*
 	m_lstOpenSockets.AddTail((void*&)newsocket);
@@ -459,6 +459,7 @@ VOID CALLBACK CServerConnect::RetryConnectTimer(HWND /*hWnd*/, UINT /*nMsg*/, UI
 		// Remark: The macro CATCH_DFLT_EXCEPTIONS will not catch all types of exception.
 		//         The exceptions thrown in callback function are not intercepted by the dbghelp.dll (e.g. eMule Dump, crashRpt, etc...)
 		catch(...) {
+			ASSERT( false ); //zz_fly :: uncover more bugs
 			if(theApp.emuledlg != NULL)
 				AddLogLine(true, _T("Unknown exception in %s"), __FUNCTION__);
 		}

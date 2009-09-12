@@ -24,12 +24,12 @@
 #include "Statistics.h"
 #include "ListenSocket.h"
 #include "ClientUDPSocket.h"
-//Xman official UPNP removed
+// ==> UPnP support [MoNKi] - leuk_he
 /*
 #include "UPnPImpl.h"
 #include "UPnPImplWrapper.h"
 */
-//Xman end
+// <== UPnP support [MoNKi] - leuk_he
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -267,24 +267,24 @@ public:
 	virtual ~CPPgWiz1Ports();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnStartConTest();
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	afx_msg void OnStartUPnP();
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	afx_msg void OnEnChangeUDPDisable();
 
 	afx_msg void OnEnChangeUDP();
 	afx_msg void OnEnChangeTCP();
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	afx_msg void OnTimer(UINT nIDEvent);
-
+	
 	BOOL	OnKillActive();
 	void	OnOK();
 	void	OnCancel();
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 
 	void OnPortChange();
 
@@ -301,21 +301,21 @@ public:
 	enum { IDD = IDD_WIZ1_PORTS };
 
 protected:
-	CString lastudp;
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//Xman official UPNP removed
+	CString			lastudp;
+	virtual void	DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	void			ResetUPnPProgress();
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 
 	DECLARE_MESSAGE_MAP()
 
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	int m_nUPnPTicks;
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 };
 
 IMPLEMENT_DYNAMIC(CPPgWiz1Ports, CDlgPageWizard)
@@ -323,18 +323,18 @@ IMPLEMENT_DYNAMIC(CPPgWiz1Ports, CDlgPageWizard)
 BEGIN_MESSAGE_MAP(CPPgWiz1Ports, CDlgPageWizard)
 	ON_BN_CLICKED(IDC_STARTTEST, OnStartConTest)
 	ON_BN_CLICKED(IDC_UDPDISABLE, OnEnChangeUDPDisable)
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	ON_BN_CLICKED(IDC_UPNPSTART, OnStartUPnP)
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	ON_EN_CHANGE(IDC_TCP, OnEnChangeTCP)
 	ON_EN_CHANGE(IDC_UDP, OnEnChangeUDP)
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	ON_WM_TIMER()
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 END_MESSAGE_MAP()
 
 CPPgWiz1Ports::CPPgWiz1Ports()
@@ -391,7 +391,7 @@ void CPPgWiz1Ports::OnPortChange() {
 	GetDlgItem(IDC_STARTTEST)->EnableWindow(flag);
 }
 
-//Xman official UPNP removed
+// ==> UPnP support [MoNKi] - leuk_he
 /*
 BOOL CPPgWiz1Ports::OnKillActive(){
 	ResetUPnPProgress();
@@ -451,7 +451,7 @@ void CPPgWiz1Ports::ResetUPnPProgress(){
 	GetDlgItem(IDC_UPNPSTART)->EnableWindow(TRUE);
 }
 */
-//Xman end
+// <== UPnP support [MoNKi] - leuk_he
 
 // **
 
@@ -489,11 +489,11 @@ BOOL CPPgWiz1Ports::OnInitDialog()
 	CDlgPageWizard::OnInitDialog();
 	CheckDlgButton(IDC_UDPDISABLE, m_sUDP.IsEmpty() || m_sUDP == _T("0"));
 	GetDlgItem(IDC_UDP)->EnableWindow(IsDlgButtonChecked(IDC_UDPDISABLE) == 0);
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	((CProgressCtrl*)GetDlgItem(IDC_UPNPPROGRESS))->SetRange(0, 40);
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	InitWindowStyles(this);
 	
 	lastudp = m_sUDP;
@@ -506,12 +506,9 @@ BOOL CPPgWiz1Ports::OnInitDialog()
 	// ==> UPnP support [MoNKi] - leuk_he
 	/*
 	SetDlgItemText(IDC_UDPDISABLE, GetResString(IDS_UDPDISABLED));
-	//Xman official UPNP removed
-	/*
 	SetDlgItemText(IDC_UPNPSTART, GetResString(IDS_UPNPSTART));
 	SetDlgItemText(IDC_UPNPSTATUS, _T(""));
 	*/
-	//Xman end
 	SetDlgItemText(IDC_ENABLE_PNP, GetResString(IDS_CN_UPNPNAT)); // enable upnpnat
 
 	switch(thePrefs.GetUpnpDetect()) {
@@ -547,7 +544,7 @@ void CPPgWiz1Ports::OnEnChangeUDPDisable()
 	
 	if (m_pbUDPDisabled != NULL)
 		*m_pbUDPDisabled = disabled;
-
+	
 	OnPortChange();
 }
 

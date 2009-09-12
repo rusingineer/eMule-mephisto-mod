@@ -61,7 +61,6 @@ void CUrlClient::SetRequestFile(CPartFile* pReqFile)
 
 bool CUrlClient::SetUrl(LPCTSTR pszUrl, uint32 nIP)
 {
-	USES_CONVERSION;
 	TCHAR szCanonUrl[INTERNET_MAX_URL_LENGTH];
 	DWORD dwCanonUrlSize = ARRSIZE(szCanonUrl);
 	if (!InternetCanonicalizeUrl(pszUrl, szCanonUrl, &dwCanonUrlSize, ICU_NO_ENCODE))
@@ -121,7 +120,7 @@ bool CUrlClient::SetUrl(LPCTSTR pszUrl, uint32 nIP)
 	if (nIP)
 		m_nConnectIP = nIP;
 	else
-		m_nConnectIP = inet_addr(T2A(szHostName));
+		m_nConnectIP = inet_addr(CT2A(szHostName));
 	ResetIP2Country(m_nConnectIP); //MORPH Added by SiRoB, IP to Country URLClient
 //	if (m_nConnectIP == INADDR_NONE)
 //		m_nConnectIP = 0;
@@ -142,7 +141,6 @@ void CUrlClient::SendBlockRequests()
 
 bool CUrlClient::SendHttpBlockRequests()
 {
-	USES_CONVERSION;
 	m_dwLastBlockReceived = ::GetTickCount();
 	if (reqfile == NULL)
 		throw CString(_T("Failed to send block requests - No 'reqfile' attached"));
@@ -243,7 +241,7 @@ bool CUrlClient::Disconnected(LPCTSTR pszReason, bool bFromSocket)
 	TRACE(_T("%hs: HttpState=%u, Reason=%s\n"), __FUNCTION__, s==NULL ? -1 : s->GetHttpState(), pszReason);
 	// TODO: This is a mess..
 	if (s && (s->GetHttpState() == HttpStateRecvExpected || s->GetHttpState() == HttpStateRecvBody))
-	    m_fileReaskTimes.RemoveKey(reqfile); // ZZ:DownloadManager (one resk timestamp for each file)
+        m_fileReaskTimes.RemoveKey(reqfile); // ZZ:DownloadManager (one resk timestamp for each file)
 	*/
 	//Xman end
 	return CUpDownClient::Disconnected(CString(_T("CUrlClient::Disconnected")) + pszReason, bFromSocket);
@@ -426,7 +424,7 @@ void CUpDownClient::ProcessHttpBlockPacket(const BYTE* pucData, UINT uSize)
 			if (lenWritten > 0)
 			{
 				m_nTransferredDown += uSize;
-				m_nCurSessionPayloadDown += lenWritten;
+                m_nCurSessionPayloadDown += lenWritten;
 				SetTransferredDownMini();
 
 				if (nEndPos >= cur_block->block->EndOffset)

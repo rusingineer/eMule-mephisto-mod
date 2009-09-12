@@ -68,6 +68,7 @@ public:
 
     void EndThread();
     void Pause(bool paused);
+	void KeepWaiting() {m_dwLastWait = ::GetTickCount();}
 
 private:
     static UINT RunProc(LPVOID pParam);
@@ -76,7 +77,10 @@ private:
 	CSettingsSaver m_SettingsSaver;
     CEvent* threadEndedEvent;
     CEvent* pauseEvent;
+	CEvent* waitEvent;
 	volatile bool bDoRun;
+	volatile bool bDoWait;
+	DWORD m_dwLastWait;
 };
 // <== File Settings [sivka/Stulle] - Stulle
 

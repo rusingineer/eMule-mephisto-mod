@@ -25,6 +25,7 @@
 #include "Preferences.h"
 #include "HelpIDs.h"
 #include "UserMsgs.h"
+#include "opcodes.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -44,11 +45,13 @@ BEGIN_MESSAGE_MAP(CPPgDirectories, CPropertyPage)
 	ON_BN_CLICKED(IDC_UNCREM,	OnBnClickedRemUNC)
 	ON_WM_HELPINFO()
 	ON_BN_CLICKED(IDC_SELTEMPDIRADD, OnBnClickedSeltempdiradd)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 CPPgDirectories::CPPgDirectories()
 	: CPropertyPage(CPPgDirectories::IDD)
 {
+	m_icoBrowse = NULL;
 }
 
 CPPgDirectories::~CPPgDirectories()
@@ -68,9 +71,15 @@ BOOL CPPgDirectories::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 	InitWindowStyles(this);
 
-	((CEdit*)GetDlgItem(IDC_INCFILES))->SetLimitText(509);
-	((CEdit*)GetDlgItem(IDC_TEMPFILES))->SetLimitText(509);
-	m_ctlUncPaths.InsertColumn(0, GetResString(IDS_UNCFOLDERS), LVCFMT_LEFT, 280, -1); 
+	((CEdit*)GetDlgItem(IDC_INCFILES))->SetLimitText(MAX_PATH);
+
+	AddBuddyButton(GetDlgItem(IDC_INCFILES)->m_hWnd, ::GetDlgItem(m_hWnd, IDC_SELINCDIR));
+	InitAttachedBrowseButton(::GetDlgItem(m_hWnd, IDC_SELINCDIR), m_icoBrowse);
+	
+	AddBuddyButton(GetDlgItem(IDC_TEMPFILES)->m_hWnd, ::GetDlgItem(m_hWnd, IDC_SELTEMPDIR));
+	InitAttachedBrowseButton(::GetDlgItem(m_hWnd, IDC_SELTEMPDIR), m_icoBrowse);
+
+	m_ctlUncPaths.InsertColumn(0, GetResString(IDS_UNCFOLDERS), LVCFMT_LEFT, 280);
 	m_ctlUncPaths.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	GetDlgItem(IDC_SELTEMPDIRADD)->ShowWindow(thePrefs.IsExtControlsEnabled()?SW_SHOW:SW_HIDE);
@@ -79,7 +88,7 @@ BOOL CPPgDirectories::OnInitDialog()
 	Localize();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+				  // EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CPPgDirectories::LoadSettings(void)
@@ -145,31 +154,24 @@ BOOL CPPgDirectories::OnApply()
 		while (!bEnd)
 		{
 			bEnd = !ff.FindNextFile();
-			if (ff.IsDirectory() || ff.IsDots() || ff.IsSystem() || ff.IsTemporary() || ff.GetLength()==0)
+			if (ff.IsDirectory() || ff.IsDots() || ff.IsSystem() || ff.IsTemporary() || ff.GetLength()==0 || ff.GetLength()>MAX_EMULE_FILE_SIZE)
 				continue;
 
-			// ignore real(!) LNK files
+			// ignore real LNK files
 			TCHAR szExt[_MAX_EXT];
 			_tsplitpath(ff.GetFileName(), NULL, NULL, NULL, szExt);
 			if (_tcsicmp(szExt, _T(".lnk")) == 0){
 				SHFILEINFO info;
 				if (SHGetFileInfo(ff.GetFilePath(), 0, &info, sizeof(info), SHGFI_ATTRIBUTES) && (info.dwAttributes & SFGAO_LINK)){
-					CComPtr<IShellLink> pShellLink;
-					if (SUCCEEDED(pShellLink.CoCreateInstance(CLSID_ShellLink))){
-						CComQIPtr<IPersistFile> pPersistFile = pShellLink;
-						if (pPersistFile){
-							USES_CONVERSION;
-							if (SUCCEEDED(pPersistFile->Load(T2COLE(ff.GetFilePath()), STGM_READ))){
-								TCHAR szResolvedPath[MAX_PATH];
-								if (pShellLink->GetPath(szResolvedPath, ARRSIZE(szResolvedPath), NULL, 0) == NOERROR){
-									TRACE(_T("%hs: Did not share file \"%s\" - not supported file type\n"), __FUNCTION__, ff.GetFilePath());
-									continue;
-								}
-							}
-						}
-					}
+					if (!thePrefs.GetResolveSharedShellLinks())
+						continue;
 				}
 			}
+
+			// ignore real THUMBS.DB files -- seems that lot of ppl have 'thumbs.db' files without the 'System' file attribute
+			if (ff.GetFileName().CompareNoCase(_T("thumbs.db")) == 0)
+				continue;
+
 			bExistingFile = true;
 			break;
 		}
@@ -317,8 +319,6 @@ void CPPgDirectories::Localize(void)
 
 		GetDlgItem(IDC_INCOMING_FRM)->SetWindowText(GetResString(IDS_PW_INCOMING));
 		GetDlgItem(IDC_TEMP_FRM)->SetWindowText(GetResString(IDS_PW_TEMP));
-		GetDlgItem(IDC_SELINCDIR)->SetWindowText(GetResString(IDS_PW_BROWSE));
-		GetDlgItem(IDC_SELTEMPDIR)->SetWindowText(GetResString(IDS_PW_BROWSE));
 		GetDlgItem(IDC_SHARED_FRM)->SetWindowText(GetResString(IDS_PW_SHARED));
 	}
 }
@@ -397,5 +397,15 @@ void CPPgDirectories::OnBnClickedSeltempdiradd()
 		paths.Append(_T("|"));
 		paths.Append(buffer);
 		SetDlgItemText(IDC_TEMPFILES, paths);
+	}
+}
+
+void CPPgDirectories::OnDestroy()
+{
+	CPropertyPage::OnDestroy();
+	if (m_icoBrowse)
+	{
+		VERIFY( DestroyIcon(m_icoBrowse) );
+		m_icoBrowse = NULL;
 	}
 }

@@ -193,7 +193,7 @@ BEGIN_MESSAGE_MAP(CTreeOptionsCtrl, CTreeCtrl)
 	ON_WM_MOUSEWHEEL()
 	ON_MESSAGE(WM_TOC_SETFOCUS_TO_CHILD, OnSetFocusToChild)
 	ON_MESSAGE(WM_TOC_REPOSITION_CHILD_CONTROL, OnRepositionChild)
-	ON_NOTIFY_REFLECT_EX(NM_CLICK, OnClick)
+	ON_NOTIFY_REFLECT_EX(NM_CLICK, OnNmClick)
 	ON_NOTIFY_REFLECT_EX(TVN_SELCHANGED, OnSelchanged)
 	ON_NOTIFY_REFLECT_EX(TVN_ITEMEXPANDING, OnItemExpanding)
 	ON_NOTIFY_REFLECT_EX(TVN_DELETEITEM, OnDeleteItem)
@@ -285,9 +285,9 @@ BOOL CTreeOptionsCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	return CTreeCtrl::OnMouseWheel(nFlags, zDelta, pt);
 }
 
-BOOL CTreeOptionsCtrl::OnDeleteItem(NMHDR* pNMHDR, LRESULT* pResult) 
+BOOL CTreeOptionsCtrl::OnDeleteItem(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NMTREEVIEW *pNMTreeView = (NMTREEVIEW *)pNMHDR;
 
 	*pResult = 0;
 
@@ -1718,9 +1718,9 @@ void CTreeOptionsCtrl::SetEditText(HTREEITEM hItem, const CString& sEditText)
 	SetComboText(hItem, sEditText);
 }
 
-BOOL CTreeOptionsCtrl::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult) 
+BOOL CTreeOptionsCtrl::OnSelchanged(NMHDR *pNMHDR, LRESULT *pResult) 
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NMTREEVIEW *pNMTreeView = (NMTREEVIEW *)pNMHDR;
 
 	if (!m_bBeingCleared)
 	{
@@ -1842,7 +1842,7 @@ void CTreeOptionsCtrl::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar
 	CTreeCtrl::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
-BOOL CTreeOptionsCtrl::OnClick(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
+BOOL CTreeOptionsCtrl::OnNmClick(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
 {
 	//If the mouse was over the label or icon and the item is a combo box
 	//or edit box and editing is currently not active then create the 
@@ -3117,7 +3117,7 @@ void DDX_TreeBoolean(CDataExchange* pDX, int nIDC, HTREEITEM hItem, BOOL& bValue
 HTREEITEM CTreeOptionsCtrl::CopyItem(HTREEITEM hItem, HTREEITEM htiNewParent, HTREEITEM htiAfter)
 {
 	//Get the details of the item to copy
-	TV_INSERTSTRUCT tvstruct;
+	TVINSERTSTRUCT tvstruct;
 	tvstruct.item.hItem = hItem;
 	tvstruct.item.mask = TVIF_CHILDREN | TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	GetItem(&tvstruct.item);

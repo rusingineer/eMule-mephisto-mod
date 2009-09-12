@@ -201,10 +201,14 @@ protected:
 	bool m_bEmuLphant;
 	bool m_bLogEmulator;
 	// <== Emulate others [WiZaRd/Spike/shadow2004] - Stulle
+	// ==> Automatic shared files updater [MoNKi] - Stulle
+	bool m_bAutoSharedUpdater;
+	bool m_bSingleSharedDirUpdater;
+	int m_iTimeBetweenReloads;
+	// <== Automatic shared files updater [MoNKi] - Stulle
 	bool m_bSUQWT; // SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 	bool m_bStartupSound; // Startupsound [Commander] - mav744
 	int m_iCompressLevel; // Adjust Compress Level [Stulle] - Stulle
-	bool m_bAutoSharedUpdater; // Automatic shared files updater [MoNKi] - Stulle
 
 	CTreeOptionsCtrlEx m_ctrlTreeOptions;
 	bool m_bInitializedTreeOpts;
@@ -453,10 +457,15 @@ protected:
 	HTREEITEM m_htiEmuLphant;
 	HTREEITEM m_htiLogEmulator;
 	// <== Emulate others [WiZaRd/Spike/shadow2004] - Stulle
+	// ==> Automatic shared files updater [MoNKi] - Stulle
+	HTREEITEM m_htiAutoSharedGroup;
+	HTREEITEM m_htiAutoSharedUpdater;
+	HTREEITEM m_htiSingleSharedDirUpdater;
+	HTREEITEM m_htiTimeBetweenReloads;
+	// <== Automatic shared files updater [MoNKi] - Stulle
 	HTREEITEM m_htiSUQWT; // SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 	HTREEITEM m_htiStartupSound; // Startupsound [Commander] - mav744
 	HTREEITEM m_htiCompressLevel; // Adjust Compress Level [Stulle] - Stulle
-	HTREEITEM m_htiAutoSharedUpdater; // Automatic shared files updater [MoNKi] - Stulle
 
 	// ==> push small files [sivka] - Stulle
 	uint32 m_iPushSmallFiles;
@@ -507,7 +516,7 @@ private:
 	// ScarAngel
 	CStatic		m_strWarning;
 	CStatic		m_strPushSmall, m_iPushSmallLabel;
-	CSliderCtrl m_iPushSmall;
+	CSliderCtrl m_ctlPushSmallSize;
 
 	// Backup
 	CButton		m_BackupBox;

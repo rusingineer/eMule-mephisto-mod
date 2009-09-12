@@ -138,9 +138,9 @@ bool CUPnP_IGDControlPoint::Init(bool bStopAtFirstConnFound){
 		&& IsLANIP((char *) thePrefs.GetBindAddrA()) )
 		HostIp=thePrefs.GetBindAddrA();
 	else if  ( thePrefs.GetUpnpBindAddr()!= 0 )
-		HostIp=strdup(ipstrA(htonl(thePrefs.GetUpnpBindAddr())));
-	 if ((HostIp!= NULL) && (inet_addr(HostIp)==INADDR_NONE))
-		 HostIp=NULL; // prevent failing if in prev version there was no valid interface. 
+		HostIp=_strdup(ipstrA(htonl(thePrefs.GetUpnpBindAddr()))); //Fafner: avoid C4996 (as in 0.49b vanilla) - 080731
+	if ((HostIp!= NULL) && (inet_addr(HostIp)==INADDR_NONE))
+		HostIp=NULL; // prevent failing if in prev version there was no valid interface. 
 	rc = UpnpInit( HostIp, thePrefs.GetUPnPPort() );
     /*
 	rc = UpnpInit( NULL, thePrefs.GetUPnPPort() );
@@ -239,8 +239,6 @@ unsigned int CUPnP_IGDControlPoint::GetPort(){
 
 // Handles all UPnP Events
 int CUPnP_IGDControlPoint::IGD_Callback( Upnp_EventType EventType, void* Event, void* /*Cookie */){
-	USES_CONVERSION;
-
 	switch (EventType){
 	//SSDP Stuff 
 		case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
@@ -575,8 +573,6 @@ CString CUPnP_IGDControlPoint::GetFirstNodeItem( IXML_Node * root_node, CString 
 	CString nodeVal;
 	CString node_name;
 
-	USES_CONVERSION;
-
 	node = root_node;
     while( node != NULL ) {
 		if (ixmlNode_getNodeType( node ) == eELEMENT_NODE){
@@ -640,8 +636,6 @@ IXML_NodeList *CUPnP_IGDControlPoint::GetElementsByName(IXML_Node *root_node, CS
 
 IXML_NodeList *CUPnP_IGDControlPoint::GetElementsByName(IXML_Node *root_node, CString name, IXML_NodeList **nodelist){
     IXML_Node *node;
-
-	USES_CONVERSION;
 
 	if(nodelist == NULL)
 		return NULL;
@@ -737,8 +731,6 @@ UINT CUPnP_IGDControlPoint::RemoveInstance(LPVOID /*pParam*/ ){
 void CUPnP_IGDControlPoint::AddDevice( IXML_Document * doc, CString location, int expires){
 	m_devListLock.Lock();
 	
-	USES_CONVERSION;
-
 	CString UDN;
 	UDN = GetFirstDocumentItem(doc, _T("UDN"));
 	
@@ -1024,8 +1016,6 @@ CUPnP_IGDControlPoint::UPNPNAT_RETURN CUPnP_IGDControlPoint::AddPortMappingToSer
 	if(!m_bInit)
 		return UNAT_ERROR;
 
-	USES_CONVERSION;
-
 	UPNPNAT_RETURN Status = UNAT_ERROR;
 
 	CString protocol;
@@ -1189,8 +1179,6 @@ CUPnP_IGDControlPoint::UPNPNAT_RETURN CUPnP_IGDControlPoint::DeletePortMappingFr
 	if(!m_bInit)
 		return UNAT_ERROR;
 
-	USES_CONVERSION;
-
 	UPNPNAT_RETURN Status = UNAT_ERROR;
 
 	CString protocol;
@@ -1263,8 +1251,6 @@ CUPnP_IGDControlPoint::UPNPNAT_RETURN CUPnP_IGDControlPoint::GetSpecificPortMapp
 		return UNAT_ERROR;
 
 	UPNPNAT_RETURN status = UNAT_ERROR;
-
-	USES_CONVERSION;
 
 	CString protocol;
 	CString desc;
@@ -1345,8 +1331,6 @@ CUPnP_IGDControlPoint::UPNPNAT_RETURN CUPnP_IGDControlPoint::GetExternalIPAddres
 		return UNAT_ERROR;
 
 	UPNPNAT_RETURN status = UNAT_ERROR;
-
-	USES_CONVERSION;
 
 	IXML_Document *actionNode = NULL;
 	char actionName[] = "GetExternalIPAddress";
@@ -1464,8 +1448,6 @@ bool CUPnP_IGDControlPoint::IsServiceEnabled(CUPnP_IGDControlPoint::UPNP_SERVICE
 
 	bool status = false;
 
-	USES_CONVERSION;
-
 	IXML_Document *actionNode = NULL;
 	char actionName[] = "GetStatusInfo";
 	actionNode = UpnpMakeAction(actionName, CT2CA(srv->ServiceType), 0, NULL);
@@ -1568,8 +1550,6 @@ void CUPnP_IGDControlPoint::OnEventReceived(Upnp_SID sid, int /* evntkey */, IXM
 
 CString CUPnP_IGDControlPoint::GetErrDescription(int err){
 	CString errDesc;
-
-	USES_CONVERSION;
 
 	if(err < 0){
 		errDesc = CA2CT(UpnpGetErrorMessage(err));

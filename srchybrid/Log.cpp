@@ -239,7 +239,7 @@ void AddLogTextV(UINT uFlags, EDebugLogPriority dlpPriority, LPCTSTR pszLine, va
 
 			if (thePrefs.GetVerbose() && ((uFlags & LOG_DEBUG) || thePrefs.GetFullVerbose()))
 		*/
-		if (iLen >= 0)
+		if (iLen > 0)
 		{
 			if (!((uFlags & LOG_DEBUG) || (uFlags & LOG_LEECHER)))
 			{

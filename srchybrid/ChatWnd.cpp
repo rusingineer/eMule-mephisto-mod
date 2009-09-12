@@ -63,7 +63,7 @@ BEGIN_MESSAGE_MAP(CChatWnd, CResizableDialog)
     ON_WM_CONTEXTMENU()
 	ON_WM_HELPINFO()
 	ON_NOTIFY(LVN_ITEMACTIVATE, IDC_FRIENDS_LIST, OnLvnItemActivateFriendList)
-	ON_NOTIFY(NM_CLICK, IDC_FRIENDS_LIST, OnNMClickFriendList)
+	ON_NOTIFY(NM_CLICK, IDC_FRIENDS_LIST, OnNmClickFriendList)
 	ON_STN_DBLCLK(IDC_FRIENDSICON, OnStnDblClickFriendIcon)
 	ON_BN_CLICKED(IDC_CSEND, OnBnClickedSend)
 	ON_BN_CLICKED(IDC_CCLOSE, OnBnClickedClose)
@@ -251,7 +251,8 @@ BOOL CChatWnd::OnInitDialog()
 	rcSpl.right = rcSpl.left + SPLITTER_HORZ_WIDTH;
 	m_wndSplitterHorz.Create(WS_CHILD | WS_VISIBLE, rcSpl, this, IDC_SPLITTER_FRIEND);
 
-	m_wndFormat.ModifyStyle(0, TBSTYLE_TOOLTIPS);
+	// Vista: Remove the TBSTYLE_TRANSPARENT to avoid flickering (can be done only after the toolbar was initially created with TBSTYLE_TRANSPARENT !?)
+	m_wndFormat.ModifyStyle((theApp.m_ullComCtrlVer >= MAKEDLLVERULL(6, 16, 0, 0)) ? TBSTYLE_TRANSPARENT : 0, TBSTYLE_TOOLTIPS);
 	m_wndFormat.SetExtendedStyle(m_wndFormat.GetExtendedStyle() | TBSTYLE_EX_MIXEDBUTTONS);
 	TBBUTTON atb[1] = {0};
 	atb[0].iBitmap = 0;
@@ -307,14 +308,14 @@ void CChatWnd::DoResize(int iDelta)
 {
 	CSplitterControl::ChangeWidth(&m_FriendListCtrl, iDelta);
 	m_FriendListCtrl.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
-	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_MSG), iDelta);
+	CSplitterControl::ChangeWidth(&m_cUserInfo, iDelta);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_NAME_EDIT), iDelta);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_USERHASH_EDIT), iDelta);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_CLIENTE_EDIT), iDelta);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_IDENTIFICACION_EDIT), iDelta);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_SUBIDO_EDIT), iDelta);
 	CSplitterControl::ChangeWidth(GetDlgItem(IDC_FRIENDS_DESCARGADO_EDIT), iDelta);
-	CSplitterControl::ChangeWidth(GetDlgItem(IDC_CHATSEL), -iDelta, CW_RIGHTALIGN);
+	CSplitterControl::ChangeWidth(&chatselector, -iDelta, CW_RIGHTALIGN);
 	CSplitterControl::ChangePos(GetDlgItem(IDC_MESSAGES_LBL), -iDelta, 0);
 	CSplitterControl::ChangePos(GetDlgItem(IDC_MESSAGEICON), -iDelta, 0);
 	CSplitterControl::ChangePos(&m_wndFormat, -iDelta, 0);
@@ -328,10 +329,10 @@ void CChatWnd::DoResize(int iDelta)
 
 	RemoveAnchor(m_FriendListCtrl);
 	AddAnchor(m_FriendListCtrl, TOP_LEFT, BOTTOM_LEFT);
-	RemoveAnchor(IDC_FRIENDS_MSG);
-	AddAnchor(IDC_FRIENDS_MSG, BOTTOM_LEFT, BOTTOM_LEFT);
-	RemoveAnchor(IDC_CHATSEL);
-	AddAnchor(IDC_CHATSEL, TOP_LEFT, BOTTOM_RIGHT);
+	RemoveAnchor(m_cUserInfo);
+	AddAnchor(m_cUserInfo, BOTTOM_LEFT, BOTTOM_LEFT);
+	RemoveAnchor(chatselector);
+	AddAnchor(chatselector, TOP_LEFT, BOTTOM_RIGHT);
 	RemoveAnchor(IDC_MESSAGES_LBL);
 	AddAnchor(IDC_MESSAGES_LBL, TOP_LEFT);
 	RemoveAnchor(IDC_MESSAGEICON);
@@ -400,13 +401,6 @@ LRESULT CChatWnd::DefWindowProc(UINT uMessage, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 
-		case WM_WINDOWPOSCHANGED: {
-			CRect rcWnd;
-			GetWindowRect(rcWnd);
-			if (m_wndSplitterHorz && rcWnd.Width() > 0)
-				Invalidate();
-			break;
-		}
 		case WM_SIZE:
 			if (m_wndSplitterHorz)
 			{
@@ -462,7 +456,7 @@ BOOL CChatWnd::PreTranslateMessage(MSG* pMsg)
 	return CResizableDialog::PreTranslateMessage(pMsg);
 }
 
-void CChatWnd::OnNMClickFriendList(NMHDR *pNMHDR, LRESULT *pResult)
+void CChatWnd::OnNmClickFriendList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	OnLvnItemActivateFriendList(pNMHDR, pResult);
 	*pResult = 0;

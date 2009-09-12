@@ -454,14 +454,56 @@ uint16 CPrefs::GetExternalKadPort() const
 	return m_nExternKadPort;
 }
 
-void CPrefs::SetExternKadPort(uint16 uVal){
-	m_nExternKadPort = uVal;
+#define EXTERNAL_PORT_ASKIPS	3
+void CPrefs::SetExternKadPort(uint16 uVal, uint32 uFromIP)
+{
+	if (FindExternKadPort(false))
+	{
+		for (int i = 0; i < m_anExternPortIPs.GetCount(); i++)
+		{
+			if (m_anExternPortIPs[i] == uFromIP)
+				return;
+		}
+		m_anExternPortIPs.Add(uFromIP);
+		DebugLog(_T("Received possible external Kad Port %u from %s"), uVal, ipstr(ntohl(uFromIP)));
+		// if 2 out of 3 tries result in the same external port its fine, otherwise consider it as unreliable
+		for (int i = 0; i < m_anExternPorts.GetCount(); i++)
+		{
+			if (m_anExternPorts[i] == uVal)
+			{
+				m_nExternKadPort = uVal;
+				DebugLog(_T("Set external Kad Port to %u"), uVal);
+				while (m_anExternPortIPs.GetCount() < EXTERNAL_PORT_ASKIPS)
+					m_anExternPortIPs.Add(0); // add empty entries so we know the check has finished even if we asked less than max IPs
+				return;
+			}
+		}
+		m_anExternPorts.Add(uVal);
+		if (!FindExternKadPort(false))
+		{
+			DebugLog(_T("Our external port seems unreliable, not using it for firewallchecks"), uVal);
+			m_nExternKadPort = 0;
+		}
+	}
 }
 
 uint16 CPrefs::GetInternKadPort() const
 {
 	return thePrefs.GetUDPPort();
 }
+
+bool CPrefs::FindExternKadPort(bool bReset)
+{
+	if (!bReset)
+		return m_anExternPortIPs.GetCount() < EXTERNAL_PORT_ASKIPS;
+	else
+	{
+		m_anExternPortIPs.RemoveAll();
+		m_anExternPorts.RemoveAll();
+		return true;
+	}
+}
+
 
 uint8 CPrefs::GetMyConnectOptions(bool bEncryption, bool bCallback){
 	return ::GetMyConnectOptions(bEncryption, bCallback);
@@ -506,8 +548,8 @@ float CPrefs::StatsGetKadV8Ratio(){
 		uint32 nV8Contacts = 0;
 		uint32 nNonV8Contacts = 0;
 		CKademlia::GetRoutingZone()->GetNumContacts(nV8Contacts, nNonV8Contacts, KADEMLIA_VERSION8_49b);
-		DEBUG_ONLY( AddDebugLogLine(DLP_LOW, false, _T("Counted Kad V8 Contacts: %u out of %u in routing table. FirewalledRatios: UDP - %.02f%% | TCP - %.02f%%")
-			, nV8Contacts, nNonV8Contacts, StatsGetFirewalledRatio(true) * 100, StatsGetFirewalledRatio(false) * 100) );
+		//DEBUG_ONLY( AddDebugLogLine(DLP_LOW, false, _T("Counted Kad V8 Contacts: %u out of %u in routing table. FirewalledRatios: UDP - %.02f%% | TCP - %.02f%%")
+		//	, nV8Contacts, nNonV8Contacts + nV8Contacts, StatsGetFirewalledRatio(true) * 100, StatsGetFirewalledRatio(false) * 100) );
 		if (nV8Contacts > 0)
 			m_fKadV8Ratio = ((float)nV8Contacts / (float)(nV8Contacts + nNonV8Contacts));
 		else

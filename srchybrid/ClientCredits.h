@@ -150,7 +150,12 @@ class CClientCredits
 	friend class CClientCreditsList;
 public:
 	CClientCredits(CreditStruct* in_credits);
+	//zz_fly :: Optimized :: Enig123, DolphinX :: Start
+	/*
 	CClientCredits(const uchar* key);
+	*/
+	CClientCredits(const uchar* key, CreditStruct* in_credits);
+	//zz_fly :: Optimized :: Enig123, DolphinX :: End
 	~CClientCredits();
 
 	const uchar* GetKey() const					{return m_pCredits->abyKey;}
@@ -193,9 +198,17 @@ public:
 	void	SetWaitStartTimeBonus(uint32 dwForIP, uint32 timestamp); //Xman Xtreme Full CHunk
 
 	//Xman Extened credit- table-arragement
+	//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+	//note: 2 objects. 1. do not allocate memory on banned clients. 2. delete a clientcredit when no one is referring to it.
+	/*
 	void	MarkToDelete() {m_bmarktodelete=true;} 
 	void	UnMarkToDelete() {m_bmarktodelete=false;}
 	bool	GetMarkToDelete() const {return m_bmarktodelete;} 
+	*/
+	void	DecReferredTimes() { if (m_nReferredTimes) m_nReferredTimes = m_nReferredTimes - 1; }
+	void	IncReferredTimes() { m_nReferredTimes = m_nReferredTimes + 1; }
+	bool	isDeletable() const { return (m_nReferredTimes == 0); }
+	//zz_fly :: End
 	uint32	GetLastSeen() const {return m_pCredits->nLastSeen;}
 	//Xman end
 
@@ -226,7 +239,12 @@ private:
 	sint64			m_dwUnSecureWaitTime;
 	// <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 	uint32			m_dwWaitTimeIP;			   // client IP assigned to the waittime
+	//zz_fly :: Optimized on table-arragement :: Enig123 :: Start
+	/*
 	bool			m_bmarktodelete;			//Xman Extened credit- table-arragement
+	*/
+	uint8			m_nReferredTimes;			//number of clients that are referring to this clientcredit
+	//zz_fly :: End
 
 	// ==> CreditSystems [EastShare/ MorphXT] - Stulle
 	bool			m_bCheckScoreRatio;
@@ -245,6 +263,14 @@ private:
 	bool	m_bPayBackFirst2;
 	// <== Pay Back First [AndCycle/SiRoB/Stulle] - Stulle
 };
+
+//zz_fly :: Optimized :: Enig123, DolphinX :: Start
+//note: do not allocale memory when we not use it
+struct ClientCreditContainer{
+	CreditStruct		theCredit;
+	CClientCredits*		clientCredit;
+};
+//zz_fly :: Optimized :: Enig123, DolphinX :: End
 
 class CClientCreditsList
 {
@@ -282,7 +308,12 @@ protected:
 	bool	Debug_CheckCrypting();
 #endif
 private:
+	//zz_fly :: Optimized :: Enig123, DolphinX :: Start
+	/*
 	CMap<CCKey, const CCKey&, CClientCredits*, CClientCredits*> m_mapClients;
+	*/
+	CMap<CCKey, const CCKey&, ClientCreditContainer*, ClientCreditContainer*> m_mapClients;
+	//zz_fly :: Optimized :: Enig123, DolphinX :: End
 	uint32			m_nLastSaved;
 	CryptoPP::RSASSA_PKCS1v15_SHA_Signer*		m_pSignkey;
 	byte			m_abyMyPublicKey[80];

@@ -16,10 +16,12 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #pragma once
 #include "MapKey.h"
+#include "SHAHashset.h"
 
 class CKnownFile;
 typedef CMap<CCKey,const CCKey&,CKnownFile*,CKnownFile*> CKnownFilesMap;
 typedef CMap<CSKey,const CSKey&,int,int> CancelledFilesMap;
+typedef CMap<CAICHHash, const CAICHHash&, const CKnownFile*, const CKnownFile*> KnonwFilesByAICHMap;
 
 // ==> Threaded Known Files Saving [Stulle] - Stulle
 class CSaveKnownThread : public CWinThread
@@ -67,6 +69,9 @@ public:
 	const CKnownFilesMap& GetKnownFiles() const { return m_Files_map; }
 	void	CopyKnownFileMap(CMap<CCKey,const CCKey&,CKnownFile*,CKnownFile*> &Files_Map);
 
+	bool	ShouldPurgeAICHHashset(const CAICHHash& rAICHHash) const;
+	void	AICHHashChanged(const CAICHHash* pOldAICHHash, const CAICHHash& rNewAICHHash, CKnownFile* pFile);
+
 	//Xman [MoNKi: -Check already downloaded files-]
 	int CheckAlreadyDownloadedFile(const uchar* hash, CString filename=_T(""), CArray<CKnownFile*,CKnownFile*> *files = NULL);
 	bool CheckAlreadyDownloadedFileQuestion(const uchar* hash, CString filename);
@@ -76,6 +81,7 @@ public:
 	CKnownFilesMap* GetDownloadedFiles();
 	bool RemoveKnownFile(CKnownFile *toRemove);
 	void ClearHistory();
+	bool	bReloadHistory; //Fafner: possible exception in history - 070626
 	//Xman end
 
 
@@ -89,6 +95,9 @@ private:
 	uint32 	m_nLastSaved;
 	CKnownFilesMap		m_Files_map;
 	CancelledFilesMap	m_mapCancelledFiles;
+	// for faster access, map of files indexed by AICH-hash, not garantueed to be complete at this point (!)
+	// (files which got AICH hashed later will not be added yet, because we don't need them, make sure to change this if needed)
+	KnonwFilesByAICHMap m_mapKnownFilesByAICH;
 	uint32	m_dwCancelledFilesSeed;
 
 public:

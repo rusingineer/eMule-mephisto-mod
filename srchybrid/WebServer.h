@@ -1,6 +1,6 @@
 #pragma once
 
-#include "zlib/zlib.h"
+#include <zlib/zlib.h>
 #include "WebSocket.h"
 #include "PartFile.h"
 //#include "Loggable.h"
@@ -223,8 +223,8 @@ typedef struct
 	bool			bShowSharedLine;//Purity: Action Buttons
 	CString			sShowSharedFile;//Purity: Action Buttons
 
-	CArray<UpDown>		PointsForWeb;
-	CArray<Session, Session>	Sessions;
+	CArray<UpDown>	PointsForWeb;
+	CArray<Session>	Sessions;
 
 	CString			sLastModified;
 	CString			sETag;

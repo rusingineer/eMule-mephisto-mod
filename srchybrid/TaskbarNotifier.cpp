@@ -404,7 +404,7 @@ BOOL CTaskbarNotifier::SetBitmap(UINT nBitmapID, int red, int green, int blue)
 		return FALSE;
 	}
 	else
-	return TRUE;
+		return TRUE;
 }
 
 BOOL CTaskbarNotifier::SetBitmap(CBitmap* pBitmap, int red, int green, int blue)

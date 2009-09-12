@@ -50,10 +50,12 @@ public:
 protected:
 	DECLARE_MESSAGE_MAP()
 
-	afx_msg	void OnColumnClick( NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnLvnColumnClick(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnGetDispInfo(NMHDR *pNMHDR, LRESULT *pResult);
 	void ShowFileDialog(CTypedPtrList<CPtrList, CKnownFile*>& aFiles, UINT uPshInvokePage = 0);
+	void GetItemDisplayText(CKnownFile* file, int iSubItem, LPTSTR pszText, int cchTextMax) const;
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	static int CALLBACK SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 	int FindFile(const CKnownFile* pFile);
@@ -63,5 +65,3 @@ private:
 	CTitleMenu	m_HistoryOpsMenu;
 	void		OpenFile(CKnownFile* file);
 };
-
-

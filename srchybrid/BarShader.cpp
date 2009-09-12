@@ -149,7 +149,7 @@ void CBarShader::FillRange(uint64 start, uint64 end, COLORREF color) {
 
 	// ==> Make code VS 2005 and VS 2008 ready [MorphXT] - Stulle
 	/*
-	for (POSITION pos = m_Spans.FindFirstKeyAfter(start+1); pos != endpos; ) {
+	for (POSITION pos = m_Spans.FindFirstKeyAfter(start+1); pos != NULL && pos != endpos; ) {
 	*/
 	//Fafner: fix vs2005 chunk detail - 080317
 	//Fafner: fix vs2005 freeze - 080317
@@ -277,7 +277,7 @@ void CBarShader::FillRect(CDC *dc, LPRECT rectSpan, float fRed, float fGreen,
 			*/
 			const COLORREF crNew = RGB((int)(fRed * m_Modifiers[i] + .5f), (int)(fGreen * m_Modifiers[i] + .5f), (int)(fBlue * m_Modifiers[i] + .5f));
 			//Xman end
-
+			
 			rect.top = iTop + i;
 			rect.bottom = iTop + i + 1;
 			//Xman Code Improvement: FillSolidRect

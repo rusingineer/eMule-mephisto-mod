@@ -277,7 +277,7 @@ bool CServerList::AddServer(const CServer* pServer, bool bAddTail)
 {
 	if (!IsGoodServerIP(pServer)){ // check for 0-IP, localhost and optionally for LAN addresses
 		if (thePrefs.GetLogFilteredIPs())
-			AddDebugLogLine(false, _T("Filtered server \"%s\" (IP=%s) - Invalid IP or LAN address."), pServer->GetListName(), ipstr(pServer->GetIP()));
+			AddDebugLogLine(false, _T("IPFilter(AddServer): Filtered server \"%s\" (IP=%s) - Invalid IP or LAN address."), pServer->GetListName(), ipstr(pServer->GetIP()));
 		return false;
 	}
 
@@ -290,7 +290,7 @@ bool CServerList::AddServer(const CServer* pServer, bool bAddTail)
 		//	return false;
 		if (theApp.ipfilter->IsFiltered(pServer->GetIP())){
 			if (thePrefs.GetLogFilteredIPs())
-				AddDebugLogLine(false, _T("Filtered server \"%s\" (IP=%s) - IP filter (%s)"), pServer->GetListName(), ipstr(pServer->GetIP()), theApp.ipfilter->GetLastHit());
+				AddDebugLogLine(false, _T("IPFilter(AddServer): Filtered server \"%s\" (IP=%s) - IP filter (%s)"), pServer->GetListName(), ipstr(pServer->GetIP()), theApp.ipfilter->GetLastHit());
 			return false;
 		}
 	}
@@ -307,7 +307,7 @@ bool CServerList::AddServer(const CServer* pServer, bool bAddTail)
 		return false;
 	}
 	if (bAddTail)
-	list.AddTail(const_cast<CServer*>(pServer));
+		list.AddTail(const_cast<CServer*>(pServer));
 	else
 		list.AddHead(const_cast<CServer*>(pServer));
 	return true;
@@ -748,26 +748,20 @@ bool CServerList::SaveServermetToFile()
 			servermet.WriteUInt32(uTagCount);
 
 			if (!nextserver->GetListName().IsEmpty()){
-				if (WriteOptED2KUTF8Tag(&servermet, nextserver->GetListName(), ST_SERVERNAME))
-					uTagCount++;
 				CTag servername(ST_SERVERNAME, nextserver->GetListName());
-				servername.WriteTagToFile(&servermet);
+				servername.WriteTagToFile(&servermet, utf8strOptBOM);
 				uTagCount++;
 			}
 			
 			if (!nextserver->GetDynIP().IsEmpty()){
-				if (WriteOptED2KUTF8Tag(&servermet, nextserver->GetDynIP(), ST_DYNIP))
-					uTagCount++;
 				CTag serverdynip(ST_DYNIP, nextserver->GetDynIP());
-				serverdynip.WriteTagToFile(&servermet);
+				serverdynip.WriteTagToFile(&servermet, utf8strOptBOM);
 				uTagCount++;
 			}
 			
 			if (!nextserver->GetDescription().IsEmpty()){
-				if (WriteOptED2KUTF8Tag(&servermet, nextserver->GetDescription(), ST_DESCRIPTION))
-					uTagCount++;
 				CTag serverdesc(ST_DESCRIPTION, nextserver->GetDescription());
-				serverdesc.WriteTagToFile(&servermet);
+				serverdesc.WriteTagToFile(&servermet, utf8strOptBOM);
 				uTagCount++;
 			}
 			
@@ -828,7 +822,7 @@ bool CServerList::SaveServermetToFile()
 			if (!nextserver->GetVersion().IsEmpty()){
 				// as long as we don't receive an integer version tag from the local server (TCP) we store it as string
 				CTag version(ST_VERSION, nextserver->GetVersion());
-				version.WriteTagToFile(&servermet);
+				version.WriteTagToFile(&servermet, utf8strOptBOM);
 				uTagCount++;
 			}
 			

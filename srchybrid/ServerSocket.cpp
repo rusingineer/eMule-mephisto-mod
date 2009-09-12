@@ -51,7 +51,7 @@ struct LoginAnswer_Struct {
 #pragma pack()
 
 
-CServerSocket::CServerSocket(CServerConnect* in_serverconnect)
+CServerSocket::CServerSocket(CServerConnect* in_serverconnect, bool bManualSingleConnect)
 {
 	serverconnect = in_serverconnect;
 	connectionstate = CS_NOTCONNECTED;
@@ -59,6 +59,7 @@ CServerSocket::CServerSocket(CServerConnect* in_serverconnect)
 	m_bIsDeleting = false;
 	m_dwLastTransmission = 0;
 	m_bStartNewMessageLog = true;
+	m_bManualSingleConnect = bManualSingleConnect;
 }
 
 CServerSocket::~CServerSocket()
@@ -90,7 +91,7 @@ BOOL CServerSocket::OnHostNameResolved(const SOCKADDR_IN *pSockAddr)
 		//
 		if (thePrefs.GetFilterServerByIP() && theApp.ipfilter->IsFiltered(cur_server->GetIP())) {
 			if (thePrefs.GetLogFilteredIPs())
-				AddDebugLogLine(false, _T("Filtered server \"%s\" (IP=%s) - IP filter (%s)"), pServer ? pServer->GetAddress() : cur_server->GetAddress(), ipstr(cur_server->GetIP()), theApp.ipfilter->GetLastHit());
+				AddDebugLogLine(false, _T("IPFilter(TCP/DNSResolve): Filtered server \"%s\" (IP=%s) - IP filter (%s)"), pServer ? pServer->GetAddress() : cur_server->GetAddress(), ipstr(cur_server->GetIP()), theApp.ipfilter->GetLastHit());
 			if (pServer)
 				theApp.emuledlg->serverwnd->serverlistctrl.RemoveServer(pServer);
 			m_bIsDeleting = true;
@@ -98,6 +99,10 @@ BOOL CServerSocket::OnHostNameResolved(const SOCKADDR_IN *pSockAddr)
 			serverconnect->DestroySocket(this);
 			return FALSE;	// Do *NOT* connect to this server
 		}
+		//zz_fly :: support dynamic ip servers :: DolphinX :: Start
+		if (pServer)
+			pServer->ResetIP2Country(); //EastShare - added by AndCycle, IP to Country
+		//zz_fly :: End
 	}
 	return TRUE; // Connect to this server
 }
@@ -159,6 +164,10 @@ void CServerSocket::OnReceive(int nErrorCode){
 	}
 	CEMSocket::OnReceive(nErrorCode);
 	m_dwLastTransmission = GetTickCount();
+	//zz_fly :: destory socket when serverconnection fail :: DolphinX :: Start
+	if(connectionstate == CS_ERROR)
+		serverconnect->DestroySocket(this);
+	//zz_fly :: destory socket when serverconnection fail :: DolphinX :: End
 }
 
 bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
@@ -250,12 +259,14 @@ bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
 						if (m_bStartNewMessageLog) {
 							m_bStartNewMessageLog = false;
 							theApp.emuledlg->AddServerMessageLine(LOG_INFO, _T(""));
-							CString strMsg;
-							if (IsObfusicating())
-								strMsg.Format(_T("%s: ") + GetResString(IDS_CONNECTEDTOOBFUSCATED) + _T(" (%s:%u)"), CTime::GetCurrentTime().Format(thePrefs.GetDateTimeFormat4Log()), cur_server->GetListName(), cur_server->GetAddress(), cur_server->GetObfuscationPortTCP());
-							else
-								strMsg.Format(_T("%s: ") + GetResString(IDS_CONNECTEDTO) + _T(" (%s:%u)"), CTime::GetCurrentTime().Format(thePrefs.GetDateTimeFormat4Log()), cur_server->GetListName(), cur_server->GetAddress(), cur_server->GetPort());
-							theApp.emuledlg->AddServerMessageLine(LOG_SUCCESS, strMsg);
+							if (cur_server) {
+								CString strMsg;
+								if (IsObfusicating())
+									strMsg.Format(_T("%s: ") + GetResString(IDS_CONNECTEDTOOBFUSCATED) + _T(" (%s:%u)"), CTime::GetCurrentTime().Format(thePrefs.GetDateTimeFormat4Log()), cur_server->GetListName(), cur_server->GetAddress(), cur_server->GetObfuscationPortTCP());
+								else
+									strMsg.Format(_T("%s: ") + GetResString(IDS_CONNECTEDTO) + _T(" (%s:%u)"), CTime::GetCurrentTime().Format(thePrefs.GetDateTimeFormat4Log()), cur_server->GetListName(), cur_server->GetAddress(), cur_server->GetPort());
+								theApp.emuledlg->AddServerMessageLine(LOG_SUCCESS, strMsg);
+							}
 						}
 						theApp.emuledlg->AddServerMessageLine(LOG_INFO, message);
 					}
@@ -331,11 +342,15 @@ bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
 				//Xman
 				// Maella -Activate Smart Low ID check-
 				/*
-				if (la->clientid == 0){
+				if (la->clientid == 0)
+				{
 					uint8 state = thePrefs.GetSmartIdState();
-					if ( state > 0 ){
+					if ( state > 0 )
+					{
+						if (state == 1)
+							theApp.emuledlg->RefreshUPnP(false); // refresh the UPnP mappings once
 						state++;
-						if( state > 3 )
+						if( state > 2 )
 							thePrefs.SetSmartIdState(0);
 						else
 							thePrefs.SetSmartIdState(state);
@@ -347,13 +362,18 @@ bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
 						thePrefs.SetSmartIdState(1);
 					else{
 						uint8 state = thePrefs.GetSmartIdState();
-						if ( state > 0 ){
+						if ( state > 0 )
+						{
+							if (state == 1)
+								theApp.emuledlg->RefreshUPnP(false); // refresh the UPnP mappings once
 							state++;
-							if( state > 3 )
+							if( state > 2 )
 								thePrefs.SetSmartIdState(0);
 							else
 								thePrefs.SetSmartIdState(state);
-							break;
+
+							if (!m_bManualSingleConnect)
+								break; // if this is a connect to any/multiple server connection try, disconnect and try another one
 						}
 					}
 				}
@@ -375,6 +395,8 @@ bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
 						AddLogLine(true, _T("LowID -- Trying Again (attempts %i)"), attempts);
 						break; // Retries
 					}
+					else if (!m_bManualSingleConnect)
+						break; // if this is a connect to any/multiple server connection try, disconnect and try another one
 				}
 				//Xman end
 				
@@ -432,6 +454,13 @@ bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
 								(serverconnect->GetClientID() < 16777216)  ? _T("low") : _T("high"),
 								_T(", all sources will be reasked within the next 10 minutes"));
 						}
+						// ==> UPnP support [MoNKi] - leuk_he
+						/*
+						// official UPNP
+						theApp.emuledlg->RefreshUPnP(false); // refresh the UPnP mappings once
+						// official UPNP
+						*/
+						// <== UPnP support [MoNKi] - leuk_he
 					}
 				}
 				if(serverconnect->GetClientID() != 0 && theApp.last_ip_change==0)

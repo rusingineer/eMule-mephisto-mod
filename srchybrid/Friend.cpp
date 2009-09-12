@@ -73,7 +73,12 @@ CFriend::CFriend(const uchar* abyUserhash, uint32 dwLastSeen, uint32 dwLastUsedI
 CFriend::CFriend(CUpDownClient* client){
 	ASSERT ( client );
 	m_dwLastSeen = time(NULL);
+	//zz_fly :: minor issue with friends handling :: WiZaRd :: start
+	/*
 	m_dwLastUsedIP = client->GetIP();
+	*/
+	m_dwLastUsedIP = client->GetConnectIP();
+	//zz_fly :: end
 	m_nLastUsedPort = client->GetUserPort();
 	m_dwLastChatted = 0;
     m_LinkedClient = NULL;
@@ -152,10 +157,8 @@ void CFriend::WriteToFile(CFileDataIO* file)
 	file->WriteUInt32(uTagCount);
 
 	if (!m_strName.IsEmpty()){
-		if (WriteOptED2KUTF8Tag(file, m_strName, FF_NAME))
-			uTagCount++;
 		CTag nametag(FF_NAME, m_strName);
-		nametag.WriteTagToFile(file);
+		nametag.WriteTagToFile(file, utf8strOptBOM);
 		uTagCount++;
 	}
 	if (HasKadID()){
@@ -247,6 +250,7 @@ CUpDownClient* CFriend::GetLinkedClient(bool bValidCheck) const
 	}
 	return m_LinkedClient; 
 };
+
 CUpDownClient* CFriend::GetClientForChatSession()
 {
 	CUpDownClient* pResult;
@@ -270,7 +274,12 @@ bool CFriend::TryToConnect(CFriendConnectionListener* pConnectionReport)
 		return true;
 	}
 	if (isnulmd4(m_abyKadID) && (m_dwLastUsedIP == 0 || m_nLastUsedPort == 0) 
+		//zz_fly :: minor issue with friends handling :: WiZaRd :: start
+		/*
 		&& (GetLinkedClient() == NULL || GetLinkedClient()->GetIP() == 0 || GetLinkedClient()->GetUserPort() == 0))
+		*/
+		&& (GetLinkedClient() == NULL || GetLinkedClient()->GetConnectIP() == 0 || GetLinkedClient()->GetUserPort() == 0))
+		//zz_fly :: end
 	{
 		pConnectionReport->ReportConnectionProgress(m_LinkedClient, _T("*** ") + GetResString(IDS_CONNECTING), false);
 		pConnectionReport->ConnectingResult(GetLinkedClient(), false);	

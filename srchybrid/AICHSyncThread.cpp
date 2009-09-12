@@ -65,7 +65,7 @@ int CAICHSyncThread::Run()
 	// we need to keep a lock on this file while the thread is running
 	CSingleLock lockKnown2Met(&CAICHHashSet::m_mutKnown2File);
 	lockKnown2Met.Lock();
-
+	
 	CSafeFile file;
 	bool bJustCreated = ConvertToKnown2ToKnown264(&file);
 	
@@ -172,18 +172,21 @@ int CAICHSyncThread::Run()
 			m_liToHash.AddTail(pCurFile);
 		}
 	}
-	//Xman remove unused AICH-hashes
-	theApp.m_AICH_Is_synchronizing=false;
-	//Xman end
 	sharelock.Unlock();
 
 	// removed all unused AICH hashsets from known2.met
 	//Xman remove unused AICH-hashes
 	/*
-	if (!thePrefs.IsRememberingDownloadedFiles() && liUsedHashs.GetCount() != liKnown2Hashs.GetCount()){
+	if (liUsedHashs.GetCount() != liKnown2Hashs.GetCount() && 
+		(!thePrefs.IsRememberingDownloadedFiles() || thePrefs.DoPartiallyPurgeOldKnownFiles()))
+	{
 	*/
-	if ((thePrefs.IsRememberingDownloadedFiles()==false || thePrefs.GetRememberAICH()==false)
-		&& liUsedHashs.GetCount() != liKnown2Hashs.GetCount()){
+	if (liUsedHashs.GetCount() != liKnown2Hashs.GetCount() && 
+			(!thePrefs.IsRememberingDownloadedFiles() ||
+			  thePrefs.DoPartiallyPurgeOldKnownFiles() || 
+			  !thePrefs.GetRememberAICH())
+			)
+	{
 	//Xman end
 		file.SeekToBegin();
 		try {
@@ -197,22 +200,36 @@ int CAICHSyncThread::Run()
 			ULONGLONG posWritePos = file.GetPosition();
 			ULONGLONG posReadPos = file.GetPosition();
 			uint32 nPurgeCount = 0;
+			uint32 nPurgeBecauseOld = 0;
 			while (file.GetPosition() < nExistingSize){
 				CAICHHash aichHash(&file);
 				nHashCount = file.ReadUInt32();
 				if (file.GetPosition() + nHashCount*CAICHHash::GetHashSize() > nExistingSize){
 					AfxThrowFileException(CFileException::endOfFile, 0, file.GetFileName());
 				}
-				if (liUsedHashs.Find(aichHash) == NULL){
+				//Xman remove unused AICH-hashes
+				/*
+				if (!thePrefs.IsRememberingDownloadedFiles() && liUsedHashs.Find(aichHash) == NULL)
+				*/
+				if ((!thePrefs.IsRememberingDownloadedFiles() || !thePrefs.GetRememberAICH()) && liUsedHashs.Find(aichHash) == NULL)
+				//Xman end
+				{
 					// unused hashset skip the rest of this hashset
 					file.Seek(nHashCount*CAICHHash::GetHashSize(), CFile::current);
 					nPurgeCount++;
+				}
+				else if (thePrefs.IsRememberingDownloadedFiles() && theApp.knownfiles->ShouldPurgeAICHHashset(aichHash))
+				{
 					//Xman remove unused AICH-hashes
-					POSITION posk2h=liKnown2Hashs.Find(aichHash);
-					if(posk2h)
-						liKnown2Hashs.RemoveAt(posk2h);
+					/*
+					ASSERT( thePrefs.DoPartiallyPurgeOldKnownFiles() );
+					*/
+					ASSERT( thePrefs.DoPartiallyPurgeOldKnownFiles() || !thePrefs.GetRememberAICH());
 					//Xman end
-
+					// also unused (purged) hashset skip the rest of this hashset
+					file.Seek(nHashCount*CAICHHash::GetHashSize(), CFile::current);
+					nPurgeCount++;
+					nPurgeBecauseOld++;
 				}
 				else if(nPurgeCount == 0){
 					// used Hashset, but it does not need to be moved as nothing changed yet
@@ -235,7 +252,8 @@ int CAICHSyncThread::Run()
 			}
 			posReadPos = file.GetPosition();
 			file.SetLength(posWritePos);
-			theApp.QueueDebugLogLine(false, _T("Cleaned up known2.met, removed %u hashsets (%s)"), nPurgeCount, CastItoXBytes(posReadPos-posWritePos)); 
+			theApp.QueueDebugLogLine(false, _T("Cleaned up known2.met, removed %u hashsets and purged %u hashsets of old known files (%s)")
+				, nPurgeCount - nPurgeBecauseOld, nPurgeBecauseOld, CastItoXBytes(posReadPos-posWritePos)); 
 
 			file.Flush();
 			file.Close();
@@ -254,37 +272,6 @@ int CAICHSyncThread::Run()
 			return false;
 		}
 	}
-
-	//Xman remove unused AICH-hashes
-	//Xman set all known files without an existing AICH hash to error 
-	CKnownFile* cur_file=NULL;
-	POSITION posk = theApp.knownfiles->GetKnownFiles().GetStartPosition();					
-	while(posk){
-		CCKey key;
-		theApp.knownfiles->GetKnownFiles().GetNextAssoc( posk, key, cur_file );
-
-		if (cur_file->GetAICHHashset()->GetStatus() == AICH_HASHSETCOMPLETE)
-		{
-			bool bFound = false;
-			for (POSITION pos = liKnown2Hashs.GetHeadPosition();pos != 0;)
-			{
-				CAICHHash current_hash = liKnown2Hashs.GetNext(pos);
-				if (current_hash == cur_file->GetAICHHashset()->GetMasterHash())
-				{
-					bFound=true;
-					break;
-				}
-			}
-			if(!bFound)
-			{
-				cur_file->GetAICHHashset()->SetStatus(AICH_EMPTY);
-			}
-		}
-	}
-	//Xman remark: it is important that this code is done while known2met is locked
-	//to not delete a just generated, new Hash
-	//Xman end
-
 
 	lockKnown2Met.Unlock();
 	// warn the user if he just upgraded

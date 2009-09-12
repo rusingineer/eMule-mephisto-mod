@@ -58,9 +58,9 @@ enum EUserWndMessages
 	// <== Advanced Updates [MorphXT/Stulle] - Stulle
 
 	// UPnP
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
-    UM_UPNP_RESULT
+	UM_UPNP_RESULT
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 };

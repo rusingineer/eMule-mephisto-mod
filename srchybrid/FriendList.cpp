@@ -208,7 +208,12 @@ bool CFriendList::AddFriend(CUpDownClient* toadd){
 	// client must have an IP (HighID) or a hash
 	if (toadd->HasLowID() && !toadd->HasValidHash())
 		return false;
+	//zz_fly :: minor issue with friends handling :: WiZaRd :: start
+	/*
 	if (SearchFriend(toadd->GetUserHash(), toadd->GetIP(), toadd->GetUserPort()) != NULL)
+	*/
+	if (SearchFriend(toadd->GetUserHash(), toadd->GetConnectIP(), toadd->GetUserPort()) != NULL)
+	//zz_fly :: end
 		return false;
 
 	CFriend* NewFriend = new CFriend(toadd);
@@ -259,6 +264,7 @@ void CFriendList::Process()
 	if (::GetTickCount() - m_nLastSaved > MIN2MS(19))
 		SaveList();
 }
+
 bool CFriendList::IsValid(CFriend* pToCheck) const
 {
 	// debug/sanity check function
@@ -268,7 +274,6 @@ bool CFriendList::IsValid(CFriend* pToCheck) const
 	}
 	return false;
 }
-
 // MORPH START - Added by Commander, Friendlinks [emulEspaa] - added by zz_fly
 bool CFriendList::IsAlreadyFriend(uchar userHash[]) const
 {
@@ -339,7 +344,6 @@ bool CFriendList::AddEmfriendsMetToList(const CString& strFile)
 	return true;
 }
 // MORPH END - Added by Commander, Friendlinks [emulEspaa]
-
 // ==> Multiple friendslots [ZZ] - Mephisto
 bool CFriendList::IsFriendSlot(){
 	for (POSITION pos = m_listFriends.GetHeadPosition();pos != 0; ){

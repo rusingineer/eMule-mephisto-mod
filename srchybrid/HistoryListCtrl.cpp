@@ -195,13 +195,12 @@ BOOL CHistoryFileDetailsSheet::OnCommand(WPARAM wParam, LPARAM lParam)
 //////////////////////////////
 // CHistoryListCtrl
 
-#define MLC_DT_TEXT (DT_SINGLELINE | DT_NOPREFIX | DT_VCENTER | DT_END_ELLIPSIS)
-
 IMPLEMENT_DYNAMIC(CHistoryListCtrl, CListCtrl)
 CHistoryListCtrl::CHistoryListCtrl()
 	: CListCtrlItemWalk(this)
 {
-	SetGeneralPurposeFind(true, false);
+	SetGeneralPurposeFind(true);
+	SetSkinKey(L"HistoryListCtrl");
 }
 
 CHistoryListCtrl::~CHistoryListCtrl()
@@ -212,20 +211,16 @@ CHistoryListCtrl::~CHistoryListCtrl()
 
 
 BEGIN_MESSAGE_MAP(CHistoryListCtrl, CMuleListCtrl)
-	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, OnColumnClick)
+	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, OnLvnColumnClick)
+	ON_NOTIFY_REFLECT(LVN_GETDISPINFO, OnLvnGetDispInfo)
+	ON_NOTIFY_REFLECT(NM_DBLCLK, OnNMDblclk)
 	ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
 
 void CHistoryListCtrl::Init(void)
 {
-	SetName(_T("HistoryListCtrl"));
-	CImageList ilDummyImageList; //dummy list for getting the proper height of listview entries
-	ilDummyImageList.Create(1, theApp.GetSmallSytemIconSize().cy,theApp.m_iDfltImageListColorFlags|ILC_MASK, 1, 1); 
-	SetImageList(&ilDummyImageList, LVSIL_SMALL);
-	ASSERT( (GetStyle() & LVS_SHAREIMAGELISTS) == 0 );
-	ilDummyImageList.Detach();
-
+	SetPrefsKey(_T("HistoryListCtrl"));
 	SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 	ModifyStyle(LVS_SINGLESEL,0);
 	
@@ -236,11 +231,15 @@ void CHistoryListCtrl::Init(void)
 	InsertColumn(4,GetResString(IDS_DATE),LVCFMT_LEFT, 120);
 	InsertColumn(5,GetResString(IDS_DOWNHISTORY_SHARED),LVCFMT_LEFT, 65);
 	InsertColumn(6,GetResString(IDS_COMMENT),LVCFMT_LEFT, 260);
+	//EastShare START - Added by Pretender
+	InsertColumn(7,GetResString(IDS_SF_TRANSFERRED),LVCFMT_RIGHT,120);
+	InsertColumn(8,GetResString(IDS_SF_REQUESTS),LVCFMT_RIGHT,100);
+	InsertColumn(9,GetResString(IDS_SF_ACCEPTS),LVCFMT_RIGHT,100);
+	//EastShare END
 
 	LoadSettings();
-	
+
 	Reload();
-	
 
 	SetSortArrow();
 	SortItems(SortProc, GetSortItem() + (GetSortAscending() ? 0:20));
@@ -300,7 +299,7 @@ void CHistoryListCtrl::Reload(void)
 		}
 	}
 	//Xman end
-
+      
 	SetRedraw(true);
 
 	if(IsWindowVisible())
@@ -311,196 +310,152 @@ void CHistoryListCtrl::Reload(void)
 	}
 }
 
-void CHistoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) {
+void CHistoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
 	if (!theApp.emuledlg->IsRunning())
 		return;
-	if( !lpDrawItemStruct->itemData)
+	if (!lpDrawItemStruct->itemData)
 		return;
 
-	//set up our ficker free drawing
-	CRect rcItem(lpDrawItemStruct->rcItem);
-	CDC *oDC = CDC::FromHandle(lpDrawItemStruct->hDC);
-	COLORREF crOldDCBkColor = oDC->SetBkColor(m_crWindow);
-	CMemDC pDC(oDC, &rcItem);	
-	CFont *pOldFont = pDC.SelectObject(GetFont());
-	COLORREF crOldTextColor;
-	CKnownFile* file = (CKnownFile*)lpDrawItemStruct->itemData;
-	
-	if(m_bCustomDraw)
-		crOldTextColor = pDC.SetTextColor(m_lvcd.clrText);
-	else
-		crOldTextColor = pDC.SetTextColor(m_crWindowText);
+	CMemDC dc(CDC::FromHandle(lpDrawItemStruct->hDC), &lpDrawItemStruct->rcItem);
+	BOOL bCtrlFocused;
+	InitItemMemDC(dc, lpDrawItemStruct, bCtrlFocused);
+	CRect cur_rec(lpDrawItemStruct->rcItem);
+	CRect rcClient;
+	GetClientRect(&rcClient);
 
-	int iOffset = pDC.GetTextExtent(_T(" "), 1 ).cx*2;
-	int iItem = lpDrawItemStruct->itemID;
-	CHeaderCtrl *pHeaderCtrl = GetHeaderCtrl();
+	//Fafner: possible exception in history - 070626
+	//Fafner: note: I got this when replacing known.met (e.g., with backup) and some of
+	//Fafner: note: the files are still shared. After return and reload it is fine.
+	CString sText;
+	try {
+		CKnownFile* file = (CKnownFile*)lpDrawItemStruct->itemData;
 
-	//gets the item image and state info
-	LV_ITEM lvi;
-	lvi.mask = LVIF_IMAGE | LVIF_STATE;
-	lvi.iItem = iItem;
-	lvi.iSubItem = 0;
-	lvi.stateMask = LVIS_DROPHILITED | LVIS_FOCUSED | LVIS_SELECTED;
-	GetItem(&lvi);
-
-	//see if the item be highlighted
-	BOOL bHighlight = ((lvi.state & LVIS_DROPHILITED) || (lvi.state & LVIS_SELECTED));
-	BOOL bCtrlFocused = ((GetFocus() == this) || (GetStyle() & LVS_SHOWSELALWAYS));
-
-	//get rectangles for drawing
-	CRect rcBounds, rcLabel, rcIcon;
-	GetItemRect(iItem, rcBounds, LVIR_BOUNDS);
-	GetItemRect(iItem, rcLabel, LVIR_LABEL);
-	GetItemRect(iItem, rcIcon, LVIR_ICON);
-	CRect rcCol(rcBounds);
-
-	//the label!
-	CString sLabel = GetItemText(iItem, 0);
-	//labels are offset by a certain amount
-	//this offset is related to the width of a space character
-	CRect rcHighlight;
-	CRect rcWnd;
-
-	//should I check (GetExtendedStyle() & LVS_EX_FULLROWSELECT) ?
-	rcHighlight.top    = rcBounds.top;
-	rcHighlight.bottom = rcBounds.bottom;
-	rcHighlight.left   = rcBounds.left  + 1;
-	rcHighlight.right  = rcBounds.right - 1;
-
-	COLORREF crOldBckColor;
-	//draw the background color
-	if(bHighlight) 
-	{
-		if(bCtrlFocused) 
+		CHeaderCtrl *pHeaderCtrl = GetHeaderCtrl();
+		int iCount = pHeaderCtrl->GetItemCount();
+		cur_rec.right = cur_rec.left - sm_iLabelOffset;
+		cur_rec.left += sm_iIconOffset;
+		int iIconDrawWidth = theApp.GetSmallSytemIconSize().cx;
+		for (int iCurrent = 0; iCurrent < iCount; iCurrent++)
 		{
-			pDC.FillRect(rcHighlight, &CBrush(m_crHighlight));
-			crOldBckColor = pDC.SetBkColor(m_crHighlight);
-		} 
-		else 
-		{
-			pDC.FillRect(rcHighlight, &CBrush(m_crNoHighlight));
-			crOldBckColor = pDC.SetBkColor(m_crNoHighlight);
-		}
-	} 
-	else 
-	{
-		pDC.FillRect(rcHighlight, &CBrush(m_crWindow));
-		crOldBckColor = pDC.SetBkColor(GetBkColor());
-	}
+			int iColumn = pHeaderCtrl->OrderToIndex(iCurrent);
+			if (!IsColumnHidden(iColumn))
+			{
+				UINT uDrawTextAlignment;
+				int iColumnWidth = GetColumnWidth(iColumn, uDrawTextAlignment);
+				cur_rec.right += iColumnWidth;
+				if (cur_rec.left < cur_rec.right && HaveIntersection(rcClient, cur_rec))
+				{
+					TCHAR szItem[1024];
+					GetItemDisplayText(file, iColumn, szItem, _countof(szItem));
+					switch (iColumn)
+					{
+						case 0:
+						{
+							int iIconPosY = (cur_rec.Height() > theApp.GetSmallSytemIconSize().cy) ? ((cur_rec.Height() - theApp.GetSmallSytemIconSize().cy) / 2) : 0;
+							int iImage = theApp.GetFileTypeSystemImageIdx(file->GetFileName());
+							if (theApp.GetSystemImageList() != NULL)
+								::ImageList_Draw(theApp.GetSystemImageList(), iImage, dc.GetSafeHdc(), cur_rec.left, cur_rec.top + iIconPosY, ILD_TRANSPARENT);
+							cur_rec.left += iIconDrawWidth;
 
-	//update column
-	rcCol.right = rcCol.left + GetColumnWidth(0);
+							cur_rec.left += sm_iLabelOffset;
+							dc.DrawText(szItem, -1, &cur_rec, MLC_DT_TEXT | uDrawTextAlignment);
+							cur_rec.left -= iIconDrawWidth;
+							cur_rec.right -= sm_iSubItemInset;
+							break;
+						}
 
-	//draw the item's icon
-	int iImage = theApp.GetFileTypeSystemImageIdx( file->GetFileName() );
-	if (theApp.GetSystemImageList() != NULL)
-		::ImageList_Draw(theApp.GetSystemImageList(), iImage, pDC, rcCol.left + 4, rcCol.top, ILD_NORMAL|ILD_TRANSPARENT);
-
-	//draw item label (column 0)
-	sLabel = file->GetFileName();
-	rcLabel.left += 16;
-	rcLabel.left += iOffset / 2;
-	rcLabel.right -= iOffset;
-	pDC.DrawText(sLabel, -1, rcLabel, MLC_DT_TEXT | DT_LEFT | DT_NOCLIP);
-
-	//draw labels for remaining columns
-	LV_COLUMN lvc;
-	lvc.mask = LVCF_FMT | LVCF_WIDTH;
-	rcBounds.right = rcHighlight.right > rcBounds.right ? rcHighlight.right : rcBounds.right;
-
-	int iCount = pHeaderCtrl->GetItemCount();
-	for(int iCurrent = 0; iCurrent < iCount; iCurrent++) 
-	{
-		int iColumn = pHeaderCtrl->OrderToIndex(iCurrent);
-
-		if(iColumn == 0)
-			continue;
-
-		GetColumn(iColumn, &lvc);
-		//don't draw anything with 0 width
-		if(lvc.cx == 0)
-			continue;
-
-		rcCol.left = rcCol.right;
-		rcCol.right += lvc.cx;
-
-		switch(iColumn){
-			case 1:
-				sLabel = CastItoXBytes(file->GetFileSize());
-				break;
-			case 2:
-				sLabel = file->GetFileTypeDisplayStr();
-				break;
-			case 3:
-				sLabel = EncodeBase16(file->GetFileHash(),16);
-				break;
-			case 4:
-				sLabel = file->GetUtcCFileDate().Format("%x %X");
-				break;
-			case 5:
-				if (theApp.sharedfiles->IsFilePtrInList(file))
-					sLabel=GetResString(IDS_YES);
-				else
-					sLabel=GetResString(IDS_NO);
-				break;
-			case 6:
-				sLabel = file->GetFileComment();
-				break;
-		}
-		if (sLabel.GetLength() == 0)
-			continue;
-
-		//get the text justification
-		UINT nJustify = DT_LEFT;
-		switch(lvc.fmt & LVCFMT_JUSTIFYMASK) 
-		{
-			case LVCFMT_RIGHT:
-				nJustify = DT_RIGHT;
-				break;
-			case LVCFMT_CENTER:
-				nJustify = DT_CENTER;
-				break;
-			default:
-				break;
+						default:
+							dc.DrawText(szItem, -1, &cur_rec, MLC_DT_TEXT | uDrawTextAlignment);
+							break;
+					}
+				}
+				cur_rec.left += iColumnWidth;
+			}
 		}
 
-		rcLabel = rcCol;
-		rcLabel.left += iOffset;
-		rcLabel.right -= iOffset;
-
-		pDC.DrawText(sLabel, -1, rcLabel, MLC_DT_TEXT | nJustify);
+		DrawFocusRect(dc, lpDrawItemStruct->rcItem, lpDrawItemStruct->itemState & ODS_FOCUS, bCtrlFocused, lpDrawItemStruct->itemState & ODS_SELECTED);
 	}
-
-	//draw focus rectangle if item has focus
-	if((lvi.state & LVIS_FOCUSED) && (bCtrlFocused || (lvi.state & LVIS_SELECTED))) 
-	{
-		if(!bCtrlFocused || !(lvi.state & LVIS_SELECTED))
-			pDC.FrameRect(rcHighlight, &CBrush(m_crNoFocusLine));
-		else
-			pDC.FrameRect(rcHighlight, &CBrush(m_crFocusLine));
+	catch (...) {
+		if (!theApp.knownfiles->bReloadHistory)
+			LogError(LOG_STATUSBAR, _T("CHistoryListCtrl::DrawItem: exception - %s."), sText); //just once
+		theApp.knownfiles->bReloadHistory = true;
 	}
-
-	//Xman Code Improvement
-	//not needed
-	//pDC.Flush();
-	//restore old font
-	pDC.SelectObject(pOldFont);
-	pDC.SetTextColor(crOldTextColor);
-	pDC.SetBkColor(crOldBckColor);
-	oDC->SetBkColor(crOldDCBkColor);
 }
 
-void CHistoryListCtrl::OnColumnClick( NMHDR* pNMHDR, LRESULT* pResult){
-	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+void CHistoryListCtrl::GetItemDisplayText(CKnownFile* file, int iSubItem, LPTSTR pszText, int cchTextMax) const
+{
+	if (pszText == NULL || cchTextMax <= 0) {
+		ASSERT(0);
+		return;
+	}
+	pszText[0] = _T('\0');
+	switch (iSubItem)
+	{
+	case 0:
+		_tcsncpy(pszText, file->GetFileName(), cchTextMax);
+		break;
+	case 1:
+		_tcsncpy(pszText, CastItoXBytes(file->GetFileSize()), cchTextMax);
+		break;
+	case 2:
+		_tcsncpy(pszText, file->GetFileTypeDisplayStr(), cchTextMax);
+		break;
+	case 3:
+		_tcsncpy(pszText, EncodeBase16(file->GetFileHash(),16), cchTextMax);
+		break;
+	case 4:
+		_tcsncpy(pszText, file->GetUtcCFileDate().Format("%x %X"), cchTextMax);
+		break;
+	case 5:
+		if (theApp.sharedfiles->IsFilePtrInList(file))
+			_tcsncpy(pszText, GetResString(IDS_YES), cchTextMax);
+		else
+			_tcsncpy(pszText, GetResString(IDS_NO), cchTextMax);
+		break;
+	case 6:
+		_tcsncpy(pszText, file->GetFileComment(), cchTextMax);
+		break;
+	//EastShare START - Added by Pretender
+	case 7:
+		_tcsncpy(pszText, CastItoXBytes(file->statistic.GetAllTimeTransferred()), cchTextMax);
+		break;
+	case 8:
+		_sntprintf(pszText, cchTextMax, _T("%u"), file->statistic.GetAllTimeRequests());
+		break;
+	case 9:
+		_sntprintf(pszText, cchTextMax, _T("%u"), file->statistic.GetAllTimeAccepts());
+		break;
+	//EastShare END
+	}
+	pszText[cchTextMax - 1] = _T('\0');
+}
 
-	// Barry - Store sort order in preferences
-	// Determine ascending based on whether already sorted on this column
-	bool sortAscending = (GetSortItem()!= pNMListView->iSubItem) ? true : !GetSortAscending();
+void CHistoryListCtrl::OnLvnColumnClick( NMHDR* pNMHDR, LRESULT* pResult)
+{
+	NMLISTVIEW *pNMListView = (NMLISTVIEW *)pNMHDR;
+	bool sortAscending;
+	if (GetSortItem() != pNMListView->iSubItem)
+	{
+		switch (pNMListView->iSubItem)
+		{
+			case 7:
+			case 8:
+			case 9:
+				sortAscending = false;
+				break;
+			default:
+				sortAscending = true;
+				break;
+		}
+	}
+	else
+		sortAscending = !GetSortAscending();
 
 	// Sort table
-	UpdateSortHistory(pNMListView->iSubItem + (sortAscending ? 0:20), 20);
+	UpdateSortHistory(pNMListView->iSubItem + (sortAscending ? 0 : 20),20);
 	SetSortArrow(pNMListView->iSubItem, sortAscending);
-	SortItems(SortProc, pNMListView->iSubItem + (sortAscending ? 0:20));
+	SortItems(SortProc, pNMListView->iSubItem + (sortAscending ? 0 : 20));
 
 	*pResult = 0;
 }
@@ -510,63 +465,79 @@ int CHistoryListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort
 	/*const*/ CKnownFile* item2 = (CKnownFile*)lParam2;	
 
 	int iResult=0;
+	bool bSortAscending = lParamSort < 20;
+	int iColumn = bSortAscending ? lParamSort : lParamSort - 20;
 
-	switch(lParamSort){
-		case 0: //filename asc
-			iResult= _tcsicmp(item1->GetFileName(),item2->GetFileName());
-			break;
-		case 20: //filename desc
-			iResult= _tcsicmp(item2->GetFileName(),item1->GetFileName());
-			break;
-		case 1: //filesize asc
-			iResult= item1->GetFileSize()==item2->GetFileSize()?0:(item1->GetFileSize()>item2->GetFileSize()?1:-1);
-			break;
-		case 21: //filesize desc
-			iResult= item1->GetFileSize()==item2->GetFileSize()?0:(item2->GetFileSize()>item1->GetFileSize()?1:-1);
-			break;
-		case 2: //filetype asc
+	try { //Fafner: possible exception in history - 070626
+		switch(iColumn){
+			case 0: //filename ascf
+				iResult = CompareLocaleStringNoCase(item1->GetFileName(), item2->GetFileName());
+				break;
+
+			case 1: //filesize asc
+				iResult = CompareUnsigned64(item1->GetFileSize(), item2->GetFileSize());
+				break;
+
+			case 2: //filetype asc
 			iResult= item1->GetFileType().CompareNoCase(item2->GetFileType());
-			break;
-		case 22: //filetype desc
-			iResult= item2->GetFileType().CompareNoCase(item1->GetFileType());
-			break;
-		case 3: //file ID
-			iResult= memcmp(item1->GetFileHash(),item2->GetFileHash(),16);
-			break;
-		case 23:
-			iResult= memcmp(item2->GetFileHash(),item1->GetFileHash(),16);
-			break;
-		case 4: //date
-			iResult= CompareUnsigned(item1->GetUtcFileDate(),item2->GetUtcFileDate());
-			break;
-		case 24:
-			iResult= CompareUnsigned(item2->GetUtcFileDate(),item1->GetUtcFileDate());
-			break;
-		case 5: //Shared?
+			// if the type is equal, subsort by extension
+			if (iResult == 0)
 			{
-				bool shared1, shared2;
-				shared1 = theApp.sharedfiles->IsFilePtrInList(item1);
-				shared2 = theApp.sharedfiles->IsFilePtrInList(item2);
-				iResult= shared1==shared2 ? 0 : (shared1 && !shared2 ? 1 : -1);
+				LPCTSTR pszExt1 = PathFindExtension(item1->GetFileName());
+				LPCTSTR pszExt2 = PathFindExtension(item2->GetFileName());
+				if ((pszExt1 == NULL) ^ (pszExt2 == NULL))
+					iResult = pszExt1 == NULL ? 1 : (-1);
+				else
+					iResult = pszExt1 != NULL ? _tcsicmp(pszExt1, pszExt2) : 0;
 			}
 			break;
-		case 25:
-			{
-				bool shared1, shared2;
-				shared1 = theApp.sharedfiles->IsFilePtrInList(item1);
-				shared2 = theApp.sharedfiles->IsFilePtrInList(item2);
-				iResult= shared1==shared2 ? 0 : (shared2 && !shared1 ? 1 : -1);
-			}
-			break;
-		case 6: //comment
-			iResult= _tcsicmp(item1->GetFileComment(),item2->GetFileComment());
-			break;
-		case 26:
-			iResult= _tcsicmp(item2->GetFileComment(),item1->GetFileComment());
-			break;
-		default: 
-			iResult= 0;
+
+			case 3: //file ID
+				iResult= memcmp(item1->GetFileHash(),item2->GetFileHash(),16);
+				break;
+
+			case 4: //date
+				iResult= CompareUnsigned(item1->GetUtcFileDate(),item2->GetUtcFileDate());
+				break;
+
+			case 5: //Shared?
+				{
+					bool shared1, shared2;
+					shared1 = theApp.sharedfiles->IsFilePtrInList(item1);
+					shared2 = theApp.sharedfiles->IsFilePtrInList(item2);
+					iResult= shared1==shared2 ? 0 : (shared1 && !shared2 ? 1 : -1);
+				}
+				break;
+
+			case 6: //comment
+				iResult= _tcsicmp(item1->GetFileComment(),item2->GetFileComment());
+				break;
+
+			//EastShare START - Added by Pretender
+			case 7: //all transferred asc
+				iResult=item1->statistic.GetAllTimeTransferred()==item2->statistic.GetAllTimeTransferred()?0:(item1->statistic.GetAllTimeTransferred()>item2->statistic.GetAllTimeTransferred()?1:-1);
+				break;
+
+			case 8: //acc requests asc
+				iResult=item1->statistic.GetAllTimeRequests() - item2->statistic.GetAllTimeRequests();
+				break;
+		
+			case 9: //acc accepts asc
+				iResult=item1->statistic.GetAllTimeAccepts() - item2->statistic.GetAllTimeAccepts();
+				break;
+			//EastShare END
+		}
 	}
+	catch (...) {
+		if (!theApp.knownfiles->bReloadHistory)
+			LogError(LOG_STATUSBAR, _T("CHistoryListCtrl::SortProc: exception.")); //just once
+		theApp.knownfiles->bReloadHistory = true;
+		iResult = 0;
+	}
+
+	if (!bSortAscending)
+		iResult = -iResult;
+
 	// SLUGFILLER: multiSort remove - handled in parent class
 	/*
 	int dwNextSort;
@@ -608,6 +579,18 @@ void CHistoryListCtrl::Localize() {
 			case 6:
 				strRes = GetResString(IDS_COMMENT);
 				break;
+
+			//EastShare
+			case 7:
+				strRes = GetResString(IDS_SF_TRANSFERRED);
+				break;
+			case 8:
+				strRes = GetResString(IDS_SF_REQUESTS);
+				break;
+			case 9:
+				strRes = GetResString(IDS_SF_ACCEPTS);
+				break;
+			//EastShare
 			default:
 				strRes = "No Text!!";
 		}
@@ -698,13 +681,13 @@ void CHistoryListCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 	m_HistoryMenu.AppendMenu(MF_SEPARATOR); 
 	m_HistoryMenu.AppendMenu(MF_STRING | (GetItemCount() > 0 ? MF_ENABLED : MF_GRAYED), MP_FIND, GetResString(IDS_FIND), _T("Search"));
 
+	GetPopupMenuPos(*this, point);
 	m_HistoryMenu.TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON,point.x,point.y,this);
 
 	m_HistoryMenu.RemoveMenu(m_HistoryMenu.GetMenuItemCount()-1,MF_BYPOSITION); //find menu
 	m_HistoryMenu.RemoveMenu(m_HistoryMenu.GetMenuItemCount()-1,MF_BYPOSITION); //separator
 	m_HistoryMenu.RemoveMenu(m_HistoryMenu.GetMenuItemCount()-1,MF_BYPOSITION); //web menu
 	VERIFY( WebMenu.DestroyMenu() );
-
 }
 
 void CHistoryListCtrl::OnNMDblclk(NMHDR* /*pNMHDR*/, LRESULT *pResult)
@@ -778,6 +761,18 @@ BOOL CHistoryListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				ShowFileDialog(selectedList);
 				break;
 			}
+			case MP_COPYSELECTED:{
+				CString str;
+				while (!selectedList.IsEmpty()){
+					if (!str.IsEmpty())
+						str += _T("\r\n");
+					str += CreateED2kLink(selectedList.GetHead());
+					selectedList.RemoveHead();
+				}
+				theApp.CopyTextToClipboard(str);
+				break;
+			}
+			case MPG_DELETE:
 			case MP_REMOVESELECTED:
 				{
 					UINT i, uSelectedCount = GetSelectedCount();
@@ -903,7 +898,6 @@ void CHistoryListCtrl::UpdateFile(const CKnownFile* file)
 			theApp.emuledlg->sharedfileswnd->ShowSelectedFilesSummary();
 	}
 }
-
 int CHistoryListCtrl::FindFile(const CKnownFile* pFile)
 {
 	LVFINDINFO find;
@@ -919,4 +913,27 @@ void CHistoryListCtrl::ShowFileDialog(CTypedPtrList<CPtrList, CKnownFile*>& aFil
 		CHistoryFileDetailsSheet dialog(aFiles, uPshInvokePage, this);
 		dialog.DoModal();
 	}
+}
+void CHistoryListCtrl::OnLvnGetDispInfo(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	if (theApp.emuledlg->IsRunning()) {
+		// Although we have an owner drawn listview control we store the text for the primary item in the listview, to be
+		// capable of quick searching those items via the keyboard. Because our listview items may change their contents,
+		// we do this via a text callback function. The listview control will send us the LVN_DISPINFO notification if
+		// it needs to know the contents of the primary item.
+		//
+		// But, the listview control sends this notification all the time, even if we do not search for an item. At least
+		// this notification is only sent for the visible items and not for all items in the list. Though, because this
+		// function is invoked *very* often, do *NOT* put any time consuming code in here.
+		//
+		// Vista: That callback is used to get the strings for the label tips for the sub(!) items.
+		//
+		NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+		if (pDispInfo->item.mask & LVIF_TEXT) {
+			CKnownFile* pFile = reinterpret_cast<CKnownFile*>(pDispInfo->item.lParam);
+			if (pFile != NULL)
+				GetItemDisplayText(pFile, pDispInfo->item.iSubItem, pDispInfo->item.pszText, pDispInfo->item.cchTextMax);
+		}
+	}
+	*pResult = 0;
 }

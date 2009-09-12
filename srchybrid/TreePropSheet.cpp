@@ -8,9 +8,9 @@
 * Redistribution is appreciated.
 *
 * $Workfile:$
-* $Revision: 1.5 $
+* $Revision:$
 * $Modtime:$
-* $Author: stulleamgym $
+* $Author:$
 *
 * Revision History:
 *	$History:$
@@ -353,6 +353,7 @@ void CTreePropSheet::RefillPageTree()
 			return;
 
 		pTabCtrl->GetItem(nPage, &ti);
+		ti.pszText[ti.cchTextMax - 1] = _T('\0');
 		strPagePath.ReleaseBuffer();
 
 		// Create an item in the tree for the page
@@ -735,10 +736,10 @@ BOOL CTreePropSheet::OnInitDialog()
 		{
 			IMAGEINFO	ii;
 			m_DefaultImages.GetImageInfo(0, &ii);
-			m_Images.Create(ii.rcImage.right-ii.rcImage.left, ii.rcImage.bottom-ii.rcImage.top, theApp.m_iDfltImageListColorFlags|ILC_MASK, 0, 1);
+			m_Images.Create(ii.rcImage.right - ii.rcImage.left, ii.rcImage.bottom - ii.rcImage.top, theApp.m_iDfltImageListColorFlags | ILC_MASK, 0, 1);
 		}
 		else
-			m_Images.Create(16, 16, theApp.m_iDfltImageListColorFlags|ILC_MASK, 0, 1);
+			m_Images.Create(16, 16, theApp.m_iDfltImageListColorFlags | ILC_MASK, 0, 1);
 	}
 
 	// perform default implementation
@@ -868,7 +869,7 @@ BOOL CTreePropSheet::OnInitDialog()
 			rectTree, this, s_unPageTreeId);
 	}
 	#endif
-	
+
 	// This treeview control was created dynamically, thus it does not derive the font
 	// settings from the parent dialog. Need to set the font explicitly so that it fits
 	// to the font which is used for the property pages.
@@ -1011,15 +1012,28 @@ void CTreePropSheet::OnPageTreeSelChanged(NMHDR* /*pNotifyStruct*/, LRESULT* plR
 LRESULT CTreePropSheet::OnIsDialogMessage(WPARAM wParam, LPARAM lParam)
 {
 	MSG	*pMsg = reinterpret_cast<MSG*>(lParam);
-	if (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB && GetKeyState(VK_CONTROL)&0x8000)
+	if (pMsg->message == WM_KEYDOWN && (GetKeyState(VK_CONTROL) & 0x8000))
 	{
-		if (GetKeyState(VK_SHIFT)&0x8000)
-			ActivatePreviousPage();
-		else
-			ActivateNextPage();
-		return TRUE;
+		// Handle default Windows Common Controls short cuts
+		if (pMsg->wParam == VK_TAB)
+		{
+			if (GetKeyState(VK_SHIFT) & 0x8000)
+				ActivatePreviousPage();			// Ctrl+Shift+Tab
+			else
+				ActivateNextPage();				// Ctrl+Tab
+			return TRUE;
+		}
+		else if (pMsg->wParam == VK_PRIOR)
+		{
+			ActivatePreviousPage();				// Ctrl+PageUp
+			return TRUE;
+		}
+		else if (pMsg->wParam == VK_NEXT)
+		{
+			ActivateNextPage();					// Ctrl+PageDown
+			return TRUE;
+		}
 	}
-
 
 	return CPropertySheet::DefWindowProc(PSM_ISDIALOGMESSAGE, wParam, lParam);
 }

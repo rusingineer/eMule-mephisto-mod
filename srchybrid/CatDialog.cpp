@@ -287,9 +287,13 @@ void CCatDialog::OnBnClickedOk()
 	}
 
 	if (m_myCat->strIncomingPath.CompareNoCase(oldpath)!=0)
+	{ // Automatic shared files updater [MoNKi] - Stulle
 		theApp.sharedfiles->Reload();
-
-	theApp.ResetDirectoryWatcher(); // Automatic shared files updater [MoNKi] - Stulle
+	// ==> Automatic shared files updater [MoNKi] - Stulle
+		if(thePrefs.GetDirectoryWatcher())
+			theApp.ResetDirectoryWatcher();
+	}
+	// <== Automatic shared files updater [MoNKi] - Stulle
 
 	m_myCat->color=newcolor;
     m_myCat->prio=m_prio.GetCurSel();

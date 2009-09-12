@@ -106,7 +106,7 @@ void CUpDownClient::DrawUpStatusBar(CDC* dc, RECT* rect, bool onlygreyrect, bool
 	CKnownFile* currequpfile = theApp.sharedfiles->GetFileByID(requpfileid);
 	EMFileSize filesize;
 	if (currequpfile)
-		filesize=currequpfile->GetFileSize();
+		filesize = currequpfile->GetFileSize();
 	else
 		filesize = (uint64)(PARTSIZE * (uint64)m_nUpPartCount);
 	// wistily: UpStatusFix
@@ -221,6 +221,8 @@ void CUpDownClient::SetUploadState(EUploadState eNewState)
 			m_nSumForAvgUpDataRate = 0;
 			m_AvarageUDR_list.RemoveAll();
 		}
+		if (eNewState == US_UPLOADING)
+			m_fSentOutOfPartReqs = 0;
 		*/
 		if(m_nUploadState == US_UPLOADING || eNewState == US_UPLOADING || m_nUploadState== US_CONNECTING){
 			m_nUpDatarate = 0;
@@ -273,7 +275,12 @@ void CUpDownClient::SetUploadState(EUploadState eNewState)
  */
 float CUpDownClient::GetCombinedFilePrioAndCredit() {
 	if (credits == 0){
+		//zz_fly :: in the Optimized on ClientCredits, banned client has no credits
+		/*
 		ASSERT ( IsKindOf(RUNTIME_CLASS(CUrlClient)) );
+		*/
+		ASSERT ( IsKindOf(RUNTIME_CLASS(CUrlClient)) || (GetUploadState()==US_BANNED) );
+		//zz_fly :: in the Optimized on ClientCredits, banned client has no credits
 		return 0.0F;
 	}
 
@@ -406,7 +413,12 @@ uint32 CUpDownClient::GetScore(bool sysvalue, bool isdownloading, bool onlybasev
 		return 0;
 
 	if (credits == 0){
+		//zz_fly :: in the Optimized on ClientCredits, banned client has no credits
+		/*
 		ASSERT ( IsKindOf(RUNTIME_CLASS(CUrlClient)) );
+		*/
+		ASSERT ( IsKindOf(RUNTIME_CLASS(CUrlClient)) || (GetUploadState()==US_BANNED) );
+		//zz_fly :: in the Optimized on ClientCredits, banned client has no credits
 		return 0;
 	}
 	//Xman Code Improvement
@@ -906,7 +918,8 @@ void CUpDownClient::CreateNextBlockPackage(){
 					return;
 				} else if (filedata == (byte*)-1) {
 					//An error occured
-					theApp.sharedfiles->Reload();
+					if(!theApp.sharedfiles->IsUnsharedFile(currentblock->FileID)) //zz_fly :: Fixes :: DolphinX :: don't reload sharedfiles when we need not
+						theApp.sharedfiles->Reload();
 					throw GetResString(IDS_ERR_OPEN);
 				}
 
@@ -992,7 +1005,8 @@ void CUpDownClient::CreateNextBlockPackage(){
 	{
 		//Xman Reload shared files on filenotfound exception
 		if( e->m_cause == CFileException::fileNotFound )
-			theApp.sharedfiles->Reload();
+			if(!theApp.sharedfiles->IsUnsharedFile(m_BlockRequests_queue.GetHead()->FileID)) //zz_fly :: Fixes :: DolphinX :: don't reload sharedfiles when we need not
+				theApp.sharedfiles->Reload();
 		//Xman end
 		TCHAR szError[MAX_CFEXP_ERRORMSG];
 		e->GetErrorMessage(szError, ARRSIZE(szError));
@@ -1024,7 +1038,7 @@ bool CUpDownClient::ProcessExtendedInfo(CSafeMemFile* data, CKnownFile* tempreqf
 	//Xman end
 
 	delete[] m_abyUpPartStatus;
-	m_abyUpPartStatus = NULL;	
+	m_abyUpPartStatus = NULL;
 	m_nUpPartCount = 0;
 	m_nUpCompleteSourcesCount= 0;
 	if (GetExtendedRequestsVersion() == 0)
@@ -1063,7 +1077,7 @@ bool CUpDownClient::ProcessExtendedInfo(CSafeMemFile* data, CKnownFile* tempreqf
 		while (done != m_nUpPartCount)
 		{
 			uint8 toread = data->ReadUInt8();
-			for (UINT i = 0;i != 8;i++)
+			for (UINT i = 0; i != 8; i++)
 			{
 				m_abyUpPartStatus[done] = ((toread >> i) & 1) ? 1 : 0;
 //				We may want to use this for another feature..
@@ -1260,7 +1274,7 @@ void CUpDownClient::CreateStandartPackets(byte* data,uint32 togo, Requested_Bloc
 				Debug(_T("  Start=%I64u  End=%I64u  Size=%u\n"), statpos, endpos, nPacketSize);
 			}
 			// put packet directly on socket
-
+			
 			socket->SendPacket(packet,true,false, nPacketSize);
 		}
 	}
@@ -1320,7 +1334,7 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
 	}
 	// <== Adjust Compress Level [Stulle] - Stulle
 	CMemFile memfile(output,newsize);
-	uint32 oldSize = togo;
+    uint32 oldSize = togo;
 	togo = newsize;
 	uint32 nPacketSize;
 
@@ -1340,12 +1354,12 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
 	if (togo > splittingsize) 
 		nPacketSize = togo/(uint32)(togo/splittingsize);
 	//Xman end
-	else
-		nPacketSize = togo;
+    else
+        nPacketSize = togo;
+    
+    uint32 totalPayloadSize = 0;
 
-	uint32 totalPayloadSize = 0;
-
-	while (togo){
+    while (togo){
 		if (togo < nPacketSize*2)
 			nPacketSize = togo;
 		ASSERT( nPacketSize );
@@ -1373,21 +1387,21 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
 			DebugSend("OP__CompressedPart", this, GetUploadFileID());
 			Debug(_T("  Start=%I64u  BlockSize=%u  Size=%u\n"), statpos, newsize, nPacketSize);
 		}
-		// approximate payload size
-		uint32 payloadSize = nPacketSize*oldSize/newsize;
+        // approximate payload size
+        uint32 payloadSize = nPacketSize*oldSize/newsize;
 
-		if(togo == 0 && totalPayloadSize+payloadSize < oldSize) {
-			payloadSize = oldSize-totalPayloadSize;
-		}
-		totalPayloadSize += payloadSize;
+        if(togo == 0 && totalPayloadSize+payloadSize < oldSize) {
+            payloadSize = oldSize-totalPayloadSize;
+        }
+        totalPayloadSize += payloadSize;
 
-		// put packet directly on socket
+        // put packet directly on socket
 		//Xman fix: we have different sizes , moved up
 		/*
 		theStats.AddUpDataOverheadFileRequest(24);
 		*/
 		//Xman end
-		socket->SendPacket(packet,true,false, payloadSize);
+        socket->SendPacket(packet,true,false, payloadSize);
 	}
 	delete[] output;
 }
@@ -1398,8 +1412,21 @@ void CUpDownClient::SetUploadFileID(CKnownFile* newreqfile)
 	//We use the knownfilelist because we may have unshared the file..
 	//But we always check the download list first because that person may have decided to redownload that file.
 	//Which will replace the object in the knownfilelist if completed.
-	if ((oldreqfile = theApp.downloadqueue->GetFileByID(requpfileid)) == NULL )
+	if ((oldreqfile = theApp.downloadqueue->GetFileByID(requpfileid)) == NULL)
 		oldreqfile = theApp.knownfiles->FindKnownFileByID(requpfileid);
+	else
+	{
+		// In some _very_ rare cases it is possible that we have different files with the same hash in the downloadlist
+		// as well as in the sharedlist (redownloading a unshared file, then resharing it before the first part has been downloaded)
+		// to make sure that in no case a deleted client object is left on the list, we need to doublecheck
+		// TODO: Fix the whole issue properly
+		CKnownFile* pCheck = theApp.knownfiles->FindKnownFileByID(requpfileid);
+		if (pCheck != NULL && pCheck != oldreqfile)
+		{
+			ASSERT( false );
+			pCheck->RemoveUploadingClient(this);
+		}
+	}
 
 	if (newreqfile == oldreqfile)
 		return;
@@ -1413,7 +1440,7 @@ void CUpDownClient::SetUploadFileID(CKnownFile* newreqfile)
 
 	if (newreqfile)
 	{
-		newreqfile->AddUploadingClient(this); 
+		newreqfile->AddUploadingClient(this);
 		md4cpy(requpfileid, newreqfile->GetFileHash());
 	}
 	else
@@ -1534,7 +1561,7 @@ uint32 CUpDownClient::SendBlockData(){
 		//Xman end
 
         sentBytesPayload = s->GetSentPayloadSinceLastCallAndReset();
-		m_nCurQueueSessionPayloadUp = (UINT)(m_nCurQueueSessionPayloadUp + sentBytesPayload);
+        m_nCurQueueSessionPayloadUp = (UINT)(m_nCurQueueSessionPayloadUp + sentBytesPayload);
 
 		//Xman Full Chunk
 		//in CreateNextBlockPackage we saw this upload end soon,
@@ -1558,8 +1585,8 @@ uint32 CUpDownClient::SendBlockData(){
         } 
 		else {
             if(upendsoon==false) //Xman Full Chunk
-				// read blocks from file and put on socket
-				CreateNextBlockPackage();
+            // read blocks from file and put on socket
+            CreateNextBlockPackage();
         }
     }
 
@@ -1599,7 +1626,7 @@ uint32 CUpDownClient::SendBlockData(){
 	*/
 	//Xman end
 
-	return (UINT)(sentBytesCompleteFile + sentBytesPartFile);
+    return (UINT)(sentBytesCompleteFile + sentBytesPartFile);
 }
 
 //Xtreme Full Chunk
@@ -1624,7 +1651,7 @@ void CUpDownClient::SendOutOfPartReqsAndAddToWaitingQueue(bool /*givebonus*/)
 		DebugSend("OP__OutOfPartReqs", this);
 	Packet* pPacket = new Packet(OP_OUTOFPARTREQS, 0);
 	theStats.AddUpDataOverheadFileRequest(pPacket->size);
-	socket->SendPacket(pPacket, true, true);
+	SendPacket(pPacket, true);
 	m_fSentOutOfPartReqs = 1;
     
 	//Xtreme Full Chunk
@@ -1645,7 +1672,7 @@ void CUpDownClient::SendOutOfPartReqsAndAddToWaitingQueue(bool /*givebonus*/)
 	// <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 	//Xman end
 
-	theApp.uploadqueue->AddClientToQueue(this, true);
+    theApp.uploadqueue->AddClientToQueue(this, true);
 
 	//Xtreme Full Chunk
 	// ==> SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
@@ -1667,7 +1694,7 @@ void CUpDownClient::SendOutOfPartReqsAndAddToWaitingQueue(bool /*givebonus*/)
  * See description for CEMSocket::TruncateQueues().
  */
 void CUpDownClient::FlushSendBlocks(){ // call this when you stop upload, or the socket might be not able to send
-	if (socket)      //socket may be NULL...
+    if (socket)      //socket may be NULL...
         socket->TruncateQueues();
 
 	//Xman Code Fix
@@ -1695,7 +1722,7 @@ void CUpDownClient::SendHashsetPacket(const uchar* forfileid)
 	Packet* packet = new Packet(&data);
 	packet->opcode = OP_HASHSETANSWER;
 	theStats.AddUpDataOverheadFileRequest(packet->size);
-	socket->SendPacket(packet,true,true);
+	SendPacket(packet, true);
 }
 
 //Xman - Fix Filtered Block Request
@@ -1740,7 +1767,7 @@ void CUpDownClient::SendRankingInfo(){
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__QueueRank", this);
 	theStats.AddUpDataOverheadFileRequest(packet->size);
-	socket->SendPacket(packet,true,true);
+	SendPacket(packet, true);
 }
 
 void CUpDownClient::SendCommentInfo(/*const*/ CKnownFile *file)
@@ -1762,7 +1789,7 @@ void CUpDownClient::SendCommentInfo(/*const*/ CKnownFile *file)
 	Packet *packet = new Packet(&data,OP_EMULEPROT);
 	packet->opcode = OP_FILEDESC;
 	theStats.AddUpDataOverheadFileRequest(packet->size);
-	socket->SendPacket(packet,true);
+	SendPacket(packet, true);
 }
 
 void CUpDownClient::AddRequestCount(const uchar* fileid)
@@ -1770,7 +1797,14 @@ void CUpDownClient::AddRequestCount(const uchar* fileid)
 	for (POSITION pos = m_RequestedFiles_list.GetHeadPosition(); pos != 0; ){
 		Requested_File_Struct* cur_struct = m_RequestedFiles_list.GetNext(pos);
 		if (!md4cmp(cur_struct->fileid,fileid)){
+			//zz_fly :: fix possible overflow :: start
+			//note: in some special case, ::GetTickCount() may lesser than cur_struct->lastasked
+			/*
 			if (::GetTickCount() - cur_struct->lastasked < MIN_REQUESTTIME && !GetFriendSlot()){ 
+			*/
+			uint32 DeltaTime = 30000 + ::GetTickCount() - cur_struct->lastasked;
+			if (DeltaTime < (MIN_REQUESTTIME + 30000) && !GetFriendSlot()){ 
+			//zz_fly :: end
 				if (GetDownloadState() != DS_DOWNLOADING)
 					cur_struct->badrequests++;
 				if (cur_struct->badrequests == BADCLIENTBAN){

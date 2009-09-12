@@ -63,7 +63,7 @@ BOOL CSearchDlg::Create(CWnd* pParent)
 	//	  exceed the minimum client area of the frame window.
 	// Otherwise we may get scrollbars in the search results window
 	CRect rc(0, 0, 50, 50);
-	return CFrameWnd::Create(NULL, _T("Search"), WS_CHILD, rc, pParent, NULL, 0, NULL);
+	return CFrameWnd::Create(NULL, _T("Search"), WS_CHILD | WS_CLIPCHILDREN, rc, pParent, NULL, 0, NULL);
 }
 
 int CSearchDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -84,6 +84,8 @@ int CSearchDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pwndParams->Create(this, IDD_SEARCH_PARAMS, 
 						 WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_SIZE_FIXED | CBRS_SIZE_DYNAMIC | CBRS_GRIPPER, 
 						 IDBAR_SEARCH_PARAMS);
+	ASSERT( m_pwndParams->GetStyle() & WS_CLIPSIBLINGS );
+	ASSERT( m_pwndParams->GetStyle() & WS_CLIPCHILDREN );
 	m_pwndParams->SetWindowText(GetResString(IDS_SEARCHPARAMS));
 	m_pwndParams->EnableDocking(CBRS_ALIGN_ANY);
 
@@ -314,9 +316,10 @@ BOOL CSearchDlg::PreTranslateMessage(MSG* pMsg)
 			theApp.emuledlg->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
 			return TRUE;
 		}
-		else if (pMsg->wParam == 87 && GetAsyncKeyState(VK_CONTROL) < 0)
+		else if (pMsg->wParam == 'W' && GetAsyncKeyState(VK_CONTROL) < 0)
 		{
 			m_pwndResults->DeleteSelectedSearch();
+			return TRUE;
 		}
 	}
 	return CFrameWnd::PreTranslateMessage(pMsg);
@@ -327,7 +330,6 @@ BOOL CSearchDlg::OnHelpInfo(HELPINFO* /*pHelpInfo*/)
 	theApp.ShowHelp(eMule_FAQ_GUI_Search);
 	return TRUE;
 }
-
 // ==> Design Settings [eWombat/Stulle] - Max
 void CSearchDlg::OnBackcolor() 
 {

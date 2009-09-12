@@ -100,6 +100,12 @@ Basic Obfuscated Handshake Protocol Client <-> Server:
 #pragma warning(default:4100) // unreferenced formal parameter
 #pragma warning(default:4516) // access-declarations are deprecated; member using-declarations provide a better alternative
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 
 #define	MAGICVALUE_REQUESTER	34							// modification of the requester-send and server-receive key
 #define	MAGICVALUE_SERVER		203							// modification of the server-send and requester-send key

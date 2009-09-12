@@ -119,7 +119,6 @@ protected:
 	CFont bold;
 	// <== Client queue progress bar [Commander] - Stulle
 
-
 	void	ShowWnd2(EWnd2 uList);
 	void	SetWnd2(EWnd2 uWnd2);
 	void	DoResize(int delta);
@@ -158,26 +157,25 @@ protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnHoverUploadList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnHoverDownloadList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnTcnSelchangeDltab(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRclickDltab(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnBegindrag(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnTabMovement(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnLvnKeydownDownloadlist(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnSysColorChange();
-	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
-	afx_msg void OnDblclickDltab();
-	afx_msg void OnBnClickedQueueRefreshButton();
-	afx_msg void OnBnClickedChangeView();
-	afx_msg void OnWnd1BtnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnWnd2BtnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnSplitterMoved(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnBnClickedChangeView();
+	afx_msg void OnBnClickedQueueRefreshButton();
+	afx_msg void OnDblClickDltab();
+	afx_msg void OnHoverDownloadList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnHoverUploadList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnLvnBeginDragDownloadList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnKeydownDownloadList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnNmRClickDltab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg void OnSplitterMoved(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSysColorChange();
+	afx_msg void OnTabMovement(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTcnSelchangeDltab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnWnd1BtnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnWnd2BtnDropDown(NMHDR *pNMHDR, LRESULT *pResult);
 
 	// ==> XP Style Menu [Xanatos] - Stulle
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);

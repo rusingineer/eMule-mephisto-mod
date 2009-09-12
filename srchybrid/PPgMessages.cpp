@@ -171,7 +171,7 @@ void CPPgMessages::Localize(void)
 
 		GetDlgItem(IDC_ADVSPAMFILTER)->SetWindowText(GetResString(IDS_ADVSPAMFILTER));
 
-		GetDlgItem(IDC_MSHOWSMILEYS)->SetWindowText(GetResString(IDS_SHOWSMILEYS));		
+		GetDlgItem(IDC_MSHOWSMILEYS)->SetWindowText(GetResString(IDS_SHOWSMILEYS));
 		
 	}
 }
@@ -208,6 +208,7 @@ BOOL CPPgMessages::OnHelpInfo(HELPINFO* /*pHelpInfo*/)
 	OnHelp();
 	return TRUE;
 }
+
 void CPPgMessages::OnSpamFilterChange()
 {
 	if (IsDlgButtonChecked(IDC_ADVSPAMFILTER) == 0){

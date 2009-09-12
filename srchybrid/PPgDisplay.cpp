@@ -35,6 +35,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#define MAX_TOOLTIP_DELAY_SEC	32
+
 
 IMPLEMENT_DYNAMIC(CPPgDisplay, CPropertyPage)
 
@@ -149,6 +151,9 @@ BOOL CPPgDisplay::OnInitDialog()
 	slider3D->SetTicFreq(1);
 	DrawPreview();
 
+	CSpinButtonCtrl *pSpinCtrl = (CSpinButtonCtrl *)GetDlgItem(IDC_TOOLTIPDELAY_SPIN);
+	if (pSpinCtrl)
+		pSpinCtrl->SetRange(0, MAX_TOOLTIP_DELAY_SEC);
 
 	LoadSettings();
 	Localize();
@@ -184,12 +189,12 @@ BOOL CPPgDisplay::OnApply()
 	else
 		thePrefs.showRatesInTitle = false;
 
-		// ==> show overhead on title - Stulle
-		if(IsDlgButtonChecked(IDC_SHOWOVERHEADONTITLE))
-			thePrefs.showOverheadInTitle= true;
-		else
-			thePrefs.showOverheadInTitle= false;
-		// <== show overhead on title - Stulle
+	// ==> show overhead on title - Stulle
+	if(IsDlgButtonChecked(IDC_SHOWOVERHEADONTITLE))
+		thePrefs.showOverheadInTitle= true;
+	else
+		thePrefs.showOverheadInTitle= false;
+	// <== show overhead on title - Stulle
 
 	thePrefs.ShowCatTabInfos(IsDlgButtonChecked(IDC_SHOWCATINFO) != 0);
 	if (!thePrefs.ShowCatTabInfos())
@@ -216,8 +221,8 @@ BOOL CPPgDisplay::OnApply()
 	}
 
 	GetDlgItem(IDC_TOOLTIPDELAY)->GetWindowText(buffer,20);
-	if (_tstoi(buffer) > 32)
-		thePrefs.m_iToolDelayTime = 32;
+	if (_tstoi(buffer) > MAX_TOOLTIP_DELAY_SEC)
+		thePrefs.m_iToolDelayTime = MAX_TOOLTIP_DELAY_SEC;
 	else
 		thePrefs.m_iToolDelayTime = _tstoi(buffer);
 	theApp.emuledlg->SetToolTipsDelay(thePrefs.GetToolTipDelay()*1000);
@@ -238,25 +243,25 @@ BOOL CPPgDisplay::OnApply()
 
 	if (mintotray_old != thePrefs.mintotray)
 		theApp.emuledlg->TrayMinimizeToTrayChange();
-		// ==> Show sources on title - Stulle
-		/*
+	// ==> Show sources on title - Stulle
+	/*
 	if (!thePrefs.ShowRatesOnTitle())
-		*/
-		if (!thePrefs.ShowRatesOnTitle() && !thePrefs.ShowSrcOnTitle()) 
-		// <== Show sources on title - Stulle
+	*/
+	if (!thePrefs.ShowRatesOnTitle() && !thePrefs.ShowSrcOnTitle()) 
+	// <== Show sources on title - Stulle
 		// Xman // Maella -Support for tag ET_MOD_VERSION 0x55
 		/*
 		theApp.emuledlg->SetWindowText(_T("eMule v") + theApp.m_strCurVersionLong);
 		*/
-			// ==> ModID [itsonlyme/SiRoB] - Stulle
-			/*
+		// ==> ModID [itsonlyme/SiRoB] - Stulle
+		/*
 		theApp.emuledlg->SetWindowText(_T("eMule v") + theApp.m_strCurVersionLong + _T(" ") + MOD_VERSION);
-			*/
-			{
-				_stprintf(buffer,_T("eMule v%s [%s]"),theApp.m_strCurVersionLong,theApp.m_strModLongVersion);
-				theApp.emuledlg->SetWindowText(buffer);
-			}
-			// <== ModID [itsonlyme/SiRoB] - Stulle
+		*/
+		{
+			_stprintf(buffer,_T("eMule v%s [%s]"),theApp.m_strCurVersionLong,theApp.m_strModLongVersion);
+			theApp.emuledlg->SetWindowText(buffer);
+		}
+		// <== ModID [itsonlyme/SiRoB] - Stulle
 		//Xman end
 
 	SetModified(FALSE);
@@ -310,18 +315,18 @@ void CPPgDisplay::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 }
 
 // NOTE: Can't use 'lCustData' for a structure which would hold that static members,
-// because '_pfnChooseFontHook' will be needed *before* WM_INITDIALOG (which would
+// because 's_pfnChooseFontHook' will be needed *before* WM_INITDIALOG (which would
 // give as the 'lCustData').
-LPCFHOOKPROC _pfnChooseFontHook = NULL;
-CPPgDisplay* _pThis = NULL;
+static LPCFHOOKPROC s_pfnChooseFontHook = NULL;
+static CPPgDisplay* s_pThis = NULL;
 
 UINT CALLBACK CPPgDisplay::ChooseFontHook(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	UINT uResult;
 
 	// Call MFC's common dialog Hook function
-	if (_pfnChooseFontHook != NULL)
-		uResult = (*_pfnChooseFontHook)(hdlg, uiMsg, wParam, lParam);
+	if (s_pfnChooseFontHook != NULL)
+		uResult = (*s_pfnChooseFontHook)(hdlg, uiMsg, wParam, lParam);
 	else
 		uResult = 0;
 
@@ -337,7 +342,7 @@ UINT CALLBACK CPPgDisplay::ChooseFontHook(HWND hdlg, UINT uiMsg, WPARAM wParam, 
 			if (pDlg != NULL)
 			{
 				pDlg->GetCurrentFont(&lf);
-				if (_pThis->m_eSelectFont == sfLog)
+				if (s_pThis->m_eSelectFont == sfLog)
 					theApp.emuledlg->ApplyLogFont(&lf);
 				else
 					theApp.emuledlg->ApplyHyperTextFont(&lf);
@@ -374,9 +379,9 @@ void CPPgDisplay::OnBnClickedSelectHypertextFont()
 	dlg.m_cf.Flags |= CF_APPLY | CF_ENABLEHOOK;
 
 	// Set 'lpfnHook' to our own Hook function. But save MFC's hook!
-	_pfnChooseFontHook = dlg.m_cf.lpfnHook;
+	s_pfnChooseFontHook = dlg.m_cf.lpfnHook;
 	dlg.m_cf.lpfnHook = ChooseFontHook;
-	_pThis = this;
+	s_pThis = this;
 
 	if (dlg.DoModal() == IDOK)
 	{
@@ -386,8 +391,8 @@ void CPPgDisplay::OnBnClickedSelectHypertextFont()
 			theApp.emuledlg->ApplyHyperTextFont(&lf);
 	}
 
-	_pfnChooseFontHook = NULL;
-	_pThis = NULL;
+	s_pfnChooseFontHook = NULL;
+	s_pThis = NULL;
 }
 
 void CPPgDisplay::OnBtnClickedResetHist()

@@ -26,14 +26,13 @@ class CClientListCtrl : public CMuleListCtrl, public CListCtrlItemWalk
 
 public:
 	CClientListCtrl();
-	virtual ~CClientListCtrl();
 
 	void	Init();
 	void	AddClient(const CUpDownClient* client);
 	void	RemoveClient(const CUpDownClient* client);
 	void	RefreshClient(const CUpDownClient* client);
 	void	Hide() {ShowWindow(SW_HIDE);}
-	void	Visable() {ShowWindow(SW_SHOW);}
+	void	Show() { ShowWindow(SW_SHOW); }
 	void	Localize();
 	void	ShowSelectedUserDetails();
 	void	ShowKnownClients();
@@ -42,20 +41,23 @@ public:
 	//Xman end
 
 protected:
-	void SetAllIcons();
+	CImageList m_ImageList;
 
+	void SetAllIcons();
+	void GetItemDisplayText(const CUpDownClient *pClient, int iSubItem, LPTSTR pszText, int cchTextMax);
 	static int CALLBACK SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 
 	DECLARE_MESSAGE_MAP()
-	afx_msg	void OnColumnClick( NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnLvnColumnClick(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnGetDispInfo(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnGetDispInfo(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNmDblClk(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnSysColorChange();
 
-private:
-	CImageList imagelist;
+	// ==> Mod Icons - Stulle
+	CImageList m_overlayimages;
+	// <== Mod Icons - Stulle
 };

@@ -232,6 +232,13 @@ BOOL CMuleSystrayDlg::OnInitDialog()
 	//Xman end
 
 	//zz_fly :: make font not bold for chinese :: start
+	p = GetDlgItem(IDC_RESTORE);
+	if(p)
+	{
+		p->GetFont()->GetLogFont(&lfStaticFont);
+		bValidFont = true;
+	}
+
 	if(bValidFont && (thePrefs.m_wLanguageID != 2052) && (thePrefs.m_wLanguageID != 1028))
 		lfStaticFont.lfWeight += 200;			// make it bold
 	//zz_fly :: make font not bold for chinese :: end

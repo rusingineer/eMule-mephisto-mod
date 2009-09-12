@@ -175,6 +175,16 @@ void CMMServer::ProcessStatusRequest(CMMSocket* sender, CMMPacket* packet){
 
 	//Xman
 	// Maella -Accurate measure of bandwidth: eDonkey data + control, network adapter-
+	/*
+	packet->WriteShort((uint16)theApp.uploadqueue->GetDatarate()/100);
+	packet->WriteShort((uint16)((thePrefs.GetMaxGraphUploadRate(true)*1024)/100));
+	packet->WriteShort((uint16)theApp.downloadqueue->GetDatarate()/100);
+	packet->WriteShort((uint16)((thePrefs.GetMaxGraphDownloadRate()*1024)/100));
+	packet->WriteByte((uint8)theApp.downloadqueue->GetDownloadingFileCount());
+	packet->WriteByte((uint8)theApp.downloadqueue->GetPausedFileCount());
+	packet->WriteInt((uint32)(theStats.sessionReceivedBytes/1048576));
+	packet->WriteShort((uint16)((theStats.GetAvgDownloadRate(0)*1024)/100));
+	*/
 	uint32 eMuleIn;
 	uint32 eMuleOut;
 	uint32 notUsed;
@@ -484,14 +494,17 @@ void  CMMServer::ProcessSearchRequest(CMMData* data, CMMSocket* sender){
 		sender->Send(buffer,iBuffLen);
 }
 
-
 void  CMMServer::ProcessChangeLimitRequest(CMMData* data, CMMSocket* sender){
 	//Xman
 	// Maella [FAF] -Allow Bandwidth Settings in <1KB Incremements-
+	/*
+	uint16 nNewUpload = data->ReadShort();
+	uint16 nNewDownload = data->ReadShort();
+	*/
 	float nNewUpload = data->ReadShort();
 	float nNewDownload = data->ReadShort();
-	thePrefs.SetMaxUpload(nNewUpload);
 	//Xman end
+	thePrefs.SetMaxUpload(nNewUpload);
 	thePrefs.SetMaxDownload(nNewDownload);
 
 	CMMPacket* packet = new CMMPacket(MMP_CHANGELIMITANS);
@@ -693,7 +706,7 @@ VOID CALLBACK CMMServer::CommandTimer(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*i
 					break;
 			}
 			case MMT_SDEMULE:
-				theApp.m_app_state	= APP_STATE_SHUTTINGDOWN;
+				theApp.m_app_state = APP_STATE_SHUTTINGDOWN;
 				SendMessage(theApp.emuledlg->m_hWnd,WM_CLOSE,0,0);
 				break;
 			case MMT_SEARCH:

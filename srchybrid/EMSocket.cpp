@@ -1662,14 +1662,12 @@ int CEMSocket::Receive(void* lpBuf, int nBufLen, int nFlags)
 		//ASSERT (false);
 		//Xman improved socket closing
 		//removed this old patch. At least the FD-WRITE is wrong here
-		// Stulle - We gonna test this again...
-//		/*
+		/*
 		if ( 0 == AsyncSelect(FD_CLOSE|FD_WRITE) ) { // no more READ notifications ...
 			//int waserr = GetLastError(); // oups, AsyncSelect failed !!!
 			ASSERT(false);
 		}
-//		*/
-		// Stulle end
+		*/
 		//Xman end
 		return 0;
 	case SOCKET_ERROR:

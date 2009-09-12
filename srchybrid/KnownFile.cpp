@@ -17,9 +17,8 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "stdafx.h"
 #include <io.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <share.h>
+#include <sys/stat.h>
 #ifdef _DEBUG
 #include "DebugHelpers.h"
 #endif
@@ -52,8 +51,6 @@
 #include "MuleStatusBarCtrl.h" //Xman Progress Hash (O2)
 #include "UploadQueue.h" // Mephisto Upload - Mephisto
 
-
-// id3lib
 #pragma warning(disable:4100) // unreferenced formal parameter
 #include <id3/tag.h>
 #include <id3/misc_support.h>
@@ -66,9 +63,14 @@ extern wchar_t *ID3_GetStringW(const ID3_Frame *frame, ID3_FieldID fldName);
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#define	META_DATA_VER	1
+// Meta data version
+// -----------------
+//	0	untrusted meta data which was received via search results
+//	1	trusted meta data, Unicode (strings where not stored correctly)
+//	2	0.49c: trusted meta data, Unicode
+#define	META_DATA_VER	2
 
-IMPLEMENT_DYNAMIC(CKnownFile, CAbstractFile)
+IMPLEMENT_DYNAMIC(CKnownFile, CShareableFile)
 
 CKnownFile::CKnownFile()
 {
@@ -99,7 +101,7 @@ CKnownFile::CKnownFile()
 	m_lastBuddyIP = 0;
 	m_pAICHHashSet = new CAICHHashSet(this);
 	m_pCollection = NULL;
-	m_verifiedFileType=FILETYPE_UNKNOWN;
+	m_timeLastSeen = 0;
 	onuploadqueue = 0; //Xman see OnUploadqueue
 	// ==> Removed Dynamic Hide OS [SlugFiller/Xman] - Stulle
 	/*
@@ -349,7 +351,7 @@ void CKnownFile::UpdatePartsInfo()
 	// Cache part count
 	UINT partcount = GetPartCount();
 	bool flag = (time(NULL) - m_nCompleteSourcesTime > 0); 
-
+	
 	// Reset part counters
 	if ((UINT)m_AvailPartFrequency.GetSize() < partcount)
 		m_AvailPartFrequency.SetSize(partcount);
@@ -407,9 +409,9 @@ void CKnownFile::UpdatePartsInfo()
 		//Xman show virtual sources
 		m_nVirtualCompleteSourcesCount=m_nCompleteSourcesCount;
 		//Xman end
-
+	
 		count.Add(m_nCompleteSourcesCount+1); // plus 1 since we have the file complete too
-
+	
 		int n = count.GetSize();
 		if (n > 0)
 		{
@@ -424,7 +426,7 @@ void CKnownFile::UpdatePartsInfo()
 				HeapSort(count, 0, r-1);
 			}
 			// SLUGFILLER: heapsortCompletesrc
-
+			
 			// calculate range
 			int i = n >> 1;			// (n / 2)
 			int j = (n * 3) >> 2;	// (n * 3) / 4
@@ -449,13 +451,13 @@ void CKnownFile::UpdatePartsInfo()
 					m_nCompleteSourcesCountHi = m_nCompleteSourcesCount;
 			}
 			else
-				//Many sources..
-				//For low guess
-				//	Use what we see.
-				//For normal guess
-				//	Adjust network accounts for 100%, we account for 0% with what we see and make sure we are still above the low.
-				//For high guess
-				//  Adjust network accounts for 100%, we account for 0% with what we see and make sure we are still above the normal.
+			//Many sources..
+			//For low guess
+			//	Use what we see.
+			//For normal guess
+			//	Adjust network accounts for 100%, we account for 0% with what we see and make sure we are still above the low.
+			//For high guess
+			//  Adjust network accounts for 100%, we account for 0% with what we see and make sure we are still above the normal.
 			{
 				/* Xman Code Improvement
 				m_nCompleteSourcesCountLo= m_nCompleteSourcesCount;
@@ -554,6 +556,7 @@ void CKnownFile::SetFileName(LPCTSTR pszFileName, bool bReplaceInvalidFileSystem
 		theApp.sharedfiles->RemoveKeywords(this);
 
 	CAbstractFile::SetFileName(pszFileName, bReplaceInvalidFileSystemChars, true, bRemoveControlChars);
+	m_verifiedFileType = FILETYPE_UNKNOWN;
 
 	wordlist.clear();
 	if(m_pCollection)
@@ -568,16 +571,6 @@ void CKnownFile::SetFileName(LPCTSTR pszFileName, bool bReplaceInvalidFileSystem
 	if (pFile && pFile == this)
 		theApp.sharedfiles->AddKeywords(this);
 } 
-
-void CKnownFile::SetPath(LPCTSTR path)
-{
-	m_strDirectory = path;
-}
-
-void CKnownFile::SetFilePath(LPCTSTR pszFilePath)
-{
-	m_strFilePath = pszFilePath;
-}
 
 bool CKnownFile::CreateFromFile(LPCTSTR in_directory, LPCTSTR in_filename, LPVOID pvProgressParam)
 {
@@ -599,11 +592,16 @@ bool CKnownFile::CreateFromFile(LPCTSTR in_directory, LPCTSTR in_filename, LPVOI
 	}
 
 	// set filesize
-	if (_filelengthi64(file->_file) > MAX_EMULE_FILE_SIZE){
+	__int64 llFileSize = _filelengthi64(_fileno(file));
+	if ((uint64)llFileSize > MAX_EMULE_FILE_SIZE){
+		if (llFileSize == -1i64)
+			LogError(_T("Failed to hash file \"%s\" - %s"), strFilePath, _tcserror(errno));
+		else
+			LogError(_T("Skipped hashing of file \"%s\" - File size exceeds limit."), strFilePath);
 		fclose(file);
 		return false; // not supported by network
 	}
-	SetFileSize((uint64)_filelengthi64(file->_file));
+	SetFileSize((uint64)llFileSize);
 
 	// we are reading the file data later in 8K blocks, adjust the internal file stream buffer accordingly
 	setvbuf(file, NULL, _IOFBF, 1024*8*2);
@@ -689,13 +687,6 @@ bool CKnownFile::CreateFromFile(LPCTSTR in_directory, LPCTSTR in_filename, LPVOI
 		m_pAICHHashSet->SetStatus(AICH_HASHSETCOMPLETE);
 		if (!m_pAICHHashSet->SaveHashSet())
 			LogError(LOG_STATUSBAR, GetResString(IDS_SAVEACFAILED));
-		//Xman remove unused AICH-hashes
-		//we must apply the status a second time, because aich-synthread could be running
-		//and change the Status,
-		//however the hashset is saved correctly because saving is using the mutex
-		//better solution would be to move the mutex here
-		m_pAICHHashSet->SetStatus(AICH_HASHSETCOMPLETE);
-		//Xman end
 	}
 	else{
 		// now something went pretty wrong
@@ -749,7 +740,7 @@ bool CKnownFile::CreateFromFile(LPCTSTR in_directory, LPCTSTR in_filename, LPVOI
 		// <== Make code VS 2005 and VS 2008 ready [MorphXT] - Stulle
 		AdjustNTFSDaylightFileTime(m_tUtcLastModified, strFilePath);
 	}
-	
+
 	fclose(file);
 	file = NULL;
 
@@ -769,6 +760,10 @@ bool CKnownFile::CreateFromFile(LPCTSTR in_directory, LPCTSTR in_filename, LPVOI
 bool CKnownFile::CreateAICHHashSetOnly()
 {
 	ASSERT( !IsPartFile() );
+
+	CAICHHash oldMasterHash = m_pAICHHashSet->GetMasterHash();
+	bool bOldMasterHashValid = m_pAICHHashSet->HasValidMasterHash();
+	
 	m_pAICHHashSet->FreeHashSet();
 	FILE* file = _tfsopen(GetFilePath(), _T("rbS"), _SH_DENYNO); // can not use _SH_DENYWR because we may access a completing part file
 	if (!file){
@@ -825,7 +820,8 @@ bool CKnownFile::CreateAICHHashSetOnly()
 
 	fclose(file);
 	file = NULL;
-
+	
+	theApp.knownfiles->AICHHashChanged(bOldMasterHashValid ? &oldMasterHash : NULL, m_pAICHHashSet->GetMasterHash(), this);
 	return true;	
 }
 
@@ -1119,8 +1115,9 @@ bool CKnownFile::LoadTagsFromFile(CFileDataIO* file)
 				// Misc. Flags
 				// ------------------------------------------------------------------------------
 				// Bits  3-0: Meta data version
-				//				0 = Unknown
-				//				1 = we have created that meta data by examining the file contents.
+				//				0	untrusted meta data which was received via search results
+				//				1	trusted meta data, Unicode (strings where not stored correctly)
+				//				2	0.49c: trusted meta data, Unicode
 				// Bits 31-4: Reserved
 				ASSERT( newtag->IsInt() );
 				if (newtag->IsInt())
@@ -1149,6 +1146,14 @@ bool CKnownFile::LoadTagsFromFile(CFileDataIO* file)
 				delete newtag;
 				break;
 			}
+			case FT_LASTSHARED:
+				if (newtag->IsInt())
+					m_timeLastSeen = newtag->GetInt();
+				else
+					ASSERT( false );
+				delete newtag;
+				break;
+
 			//Xman advanced upload-priority
 			case FT_NOTCOUNTEDTRANSFERREDLOW:
 			{
@@ -1243,6 +1248,13 @@ bool CKnownFile::LoadTagsFromFile(CFileDataIO* file)
 	// missing meta data.
 	if (m_uMetaDataVer == 0)
 		RemoveMetaDataTags();
+	else if (m_uMetaDataVer == 1)
+	{
+		// Meta data tags v1 did not store Unicode strings correctly.
+		// Remove broken Unicode string meta data tags from v1, but keep the integer tags.
+		RemoveBrokenUnicodeMetaDataTags();
+		m_uMetaDataVer = META_DATA_VER;
+	}
 
 	//Xman // SLUGFILLER: SafeHash - Must have a filesize tag
 	/*
@@ -1310,51 +1322,14 @@ bool CKnownFile::WriteToFile(CFileDataIO* file)
 	ULONG uTagCountFilePos = (ULONG)file->GetPosition();
 	file->WriteUInt32(uTagCount);
 
-	/* Borschtsch - we always save file name using UTF8
-	 * Helps to eliminate re-hashing of files with
-	 * the "wrong" symbols in their names
-	if (WriteOptED2KUTF8Tag(file, GetFileName(), FT_FILENAME))
-		uTagCount++;
-	CTag nametag(FT_FILENAME, GetFileName());
-	nametag.WriteTagToFile(file);
-	*/
 	CTag nametag(FT_FILENAME, GetFileName());
 	nametag.WriteTagToFile(file, utf8strOptBOM);
-	// Borschtsch - we always save file name using UTF8
 	uTagCount++;
 	
 	CTag sizetag(FT_FILESIZE, m_nFileSize, IsLargeFile());
 	sizetag.WriteTagToFile(file);
 	uTagCount++;
-	
-	// statistic
-	if (statistic.alltimetransferred){
-		CTag attag1(FT_ATTRANSFERRED, (uint32)statistic.alltimetransferred);
-		attag1.WriteTagToFile(file);
-		uTagCount++;
-		
-		CTag attag4(FT_ATTRANSFERREDHI, (uint32)(statistic.alltimetransferred >> 32));
-		attag4.WriteTagToFile(file);
-		uTagCount++;
-	}
 
-	if (statistic.GetAllTimeRequests()){
-		CTag attag2(FT_ATREQUESTED, statistic.GetAllTimeRequests());
-		attag2.WriteTagToFile(file);
-		uTagCount++;
-	}
-	
-	if (statistic.GetAllTimeAccepts()){
-		CTag attag3(FT_ATACCEPTED, statistic.GetAllTimeAccepts());
-		attag3.WriteTagToFile(file);
-		uTagCount++;
-	}
-
-	// priority N permission
-	CTag priotag(FT_ULPRIORITY, IsAutoUpPriority() ? PR_AUTO : m_iUpPriority);
-	priotag.WriteTagToFile(file);
-	uTagCount++;
-	
 	//AICH Filehash
 	if (m_pAICHHashSet->HasValidMasterHash() && (m_pAICHHashSet->GetStatus() == AICH_HASHSETCOMPLETE || m_pAICHHashSet->GetStatus() == AICH_VERIFIED)){
 		CTag aichtag(FT_AICH_HASH, m_pAICHHashSet->GetMasterHash().GetString());
@@ -1362,157 +1337,204 @@ bool CKnownFile::WriteToFile(CFileDataIO* file)
 		uTagCount++;
 	}
 
-
-	if (m_lastPublishTimeKadSrc){
-		CTag kadLastPubSrc(FT_KADLASTPUBLISHSRC, m_lastPublishTimeKadSrc);
-		kadLastPubSrc.WriteTagToFile(file);
-		uTagCount++;
-	}
-
-	if (m_lastPublishTimeKadNotes){
-		CTag kadLastPubNotes(FT_KADLASTPUBLISHNOTES, m_lastPublishTimeKadNotes);
-		kadLastPubNotes.WriteTagToFile(file);
-		uTagCount++;
-	}
-
-	if (m_uMetaDataVer > 0)
+	// last shared
+	static bool sDbgWarnedOnZero = false;
+	if (!sDbgWarnedOnZero && m_timeLastSeen == 0)
 	{
-		// Misc. Flags
-		// ------------------------------------------------------------------------------
-		// Bits  3-0: Meta data version
-		//				0 = Unknown
-		//				1 = we have created that meta data by examining the file contents.
-		// Bits 31-4: Reserved
-		ASSERT( m_uMetaDataVer <= 0x0F );
-		uint32 uFlags = m_uMetaDataVer & 0x0F;
-		CTag tagFlags(FT_FLAGS, uFlags);
-		tagFlags.WriteTagToFile(file);
-		uTagCount++;
+		DebugLog(_T("Unknown last seen date on stored file(s), upgrading from old version?"));
+		sDbgWarnedOnZero = true;
 	}
+	ASSERT( m_timeLastSeen <= time(NULL) );
+	time_t timeLastShared = (m_timeLastSeen > 0 && m_timeLastSeen <= time(NULL)) ? m_timeLastSeen : time(NULL);
+	CTag lastSharedTag(FT_LASTSHARED, (uint32)timeLastShared);
+	lastSharedTag.WriteTagToFile(file);
+	uTagCount++;
 
-	//Xman advanced upload-priority
-	if (statistic.m_unotcountedtransferred)
+	if (!ShouldPartiallyPurgeFile())
 	{
-		CTag stag1(FT_NOTCOUNTEDTRANSFERREDLOW, (uint32)statistic.m_unotcountedtransferred);
-		stag1.WriteTagToFile(file);
-		uTagCount++;
+		// those tags are no longer stored for long time not seen (shared) known files to tidy up known.met and known2.met
 
-		CTag stag2(FT_NOTCOUNTEDTRANSFERREDHIGH, (uint32)(statistic.m_unotcountedtransferred >> 32));
-		stag2.WriteTagToFile(file);
-		uTagCount++;
-	}
-	if (statistic.m_tlastdataupdate!=0)
-	{
-		CTag stag1(FT_LASTDATAUPDATE, statistic.m_tlastdataupdate);
-		stag1.WriteTagToFile(file);
-		uTagCount++;
-	}
-	//Xman end
-
-	// ==> HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
-	if (GetHideOS()>=0){
-		CTag hideostag(FT_HIDEOS, GetHideOS());
-		hideostag.WriteTagToFile(file);
-		uTagCount++;
-	}
-	if (GetSelectiveChunk()>=0){
-		CTag selectivechunktag(FT_SELECTIVE_CHUNK, GetSelectiveChunk());
-		selectivechunktag.WriteTagToFile(file);
-		uTagCount++;
-	}
-	if (GetShareOnlyTheNeed()>=0){
-		CTag shareonlytheneedtag(FT_SHAREONLYTHENEED, GetShareOnlyTheNeed());
-		shareonlytheneedtag.WriteTagToFile(file);
-		uTagCount++;
-	}
-	// <== HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
-	// ==> Limit PS by amount of data uploaded [Stulle] - Stulle
-	if (GetPsAmountLimit()>=0){
-		CTag psamountlimittag(FT_PS_AMOUNT_LIMIT, GetPsAmountLimit());
-		psamountlimittag.WriteTagToFile(file);
-		uTagCount++;
-	}
-	// <== Limit PS by amount of data uploaded [Stulle] - Stulle
-	// ==> PowerShare [ZZ/MorphXT] - Stulle
-	if (GetPowerSharedMode()>=0){
-		CTag powersharetag(FT_POWERSHARE, GetPowerSharedMode());
-		powersharetag.WriteTagToFile(file);
-		uTagCount++;
-	}
-	if (GetPowerShareLimit()>=0){
-		CTag powersharelimittag(FT_POWERSHARE_LIMIT, GetPowerShareLimit());
-		powersharelimittag.WriteTagToFile(file);
-		uTagCount++;
-	}
-	// <== PowerShare [ZZ/MorphXT] - Stulle
-	// ==> Spread bars [Slugfiller/MorphXT] - Stulle
-	if(thePrefs.GetSpreadbarSetStatus()){
-
-		char namebuffer[10];
-		char* number = &namebuffer[1];
-		UINT i_pos = 0;
-		if (IsLargeFile()) {
-			uint64 hideOS = GetHideOS()>=0?GetHideOS():thePrefs.GetHideOvershares();
-			for (POSITION pos = statistic.spreadlist.GetHeadPosition(); pos; ){
-				uint64 count = statistic.spreadlist.GetValueAt(pos);
-				if (!count) {
-					statistic.spreadlist.GetNext(pos);
-					continue;
-				}
-				uint64 start = statistic.spreadlist.GetKeyAt(pos);
-				statistic.spreadlist.GetNext(pos);
-				ASSERT(pos != NULL);	// Last value should always be 0
-				uint64 end = statistic.spreadlist.GetKeyAt(pos);
-				//MORPH - Smooth sample
-				if (end - start < EMBLOCKSIZE && count > hideOS)
-					continue;
-				//MORPH - Smooth sample
-				itoa(i_pos,number,10);
-				namebuffer[0] = FT_SPREADSTART;
-				CTag(namebuffer,start,true).WriteTagToFile(file);
-				namebuffer[0] = FT_SPREADEND;
-				CTag(namebuffer,end,true).WriteTagToFile(file);
-				namebuffer[0] = FT_SPREADCOUNT;
-				CTag(namebuffer,count,true).WriteTagToFile(file);
-				uTagCount+=3;
-				i_pos++;
-			}
-		} else {
-			uint32 hideOS = GetHideOS()>=0?GetHideOS():thePrefs.GetHideOvershares();
-			for (POSITION pos = statistic.spreadlist.GetHeadPosition(); pos; ){
-				uint32 count = (uint32)statistic.spreadlist.GetValueAt(pos);
-				if (!count) {
-					statistic.spreadlist.GetNext(pos);
-					continue;
-				}
-				uint32 start = (uint32)statistic.spreadlist.GetKeyAt(pos);
-				statistic.spreadlist.GetNext(pos);
-				ASSERT(pos != NULL);	// Last value should always be 0
-				uint32 end = (uint32)statistic.spreadlist.GetKeyAt(pos);
-				//MORPH - Smooth sample
-				if (end - start < EMBLOCKSIZE && count > hideOS)
-					continue;
-				//MORPH - Smooth sample
-				itoa(i_pos,number,10);
-				namebuffer[0] = FT_SPREADSTART;
-				CTag(namebuffer,start).WriteTagToFile(file);
-				namebuffer[0] = FT_SPREADEND;
-				CTag(namebuffer,end).WriteTagToFile(file);
-				namebuffer[0] = FT_SPREADCOUNT;
-				CTag(namebuffer,count).WriteTagToFile(file);
-				uTagCount+=3;
-				i_pos++;
-			}
+		// statistic
+		if (statistic.alltimetransferred){
+			CTag attag1(FT_ATTRANSFERRED, (uint32)statistic.alltimetransferred);
+			attag1.WriteTagToFile(file);
+			uTagCount++;
+			
+			CTag attag4(FT_ATTRANSFERREDHI, (uint32)(statistic.alltimetransferred >> 32));
+			attag4.WriteTagToFile(file);
+			uTagCount++;
 		}
 
-	}
-	// <== Spread bars [Slugfiller/MorphXT] - Stulle
-
-	//other tags
-	for (int j = 0; j < taglist.GetCount(); j++){
-		if (taglist[j]->IsStr() || taglist[j]->IsInt()){
-			taglist[j]->WriteTagToFile(file);
+		if (statistic.GetAllTimeRequests()){
+			CTag attag2(FT_ATREQUESTED, statistic.GetAllTimeRequests());
+			attag2.WriteTagToFile(file);
 			uTagCount++;
+		}
+		
+		if (statistic.GetAllTimeAccepts()){
+			CTag attag3(FT_ATACCEPTED, statistic.GetAllTimeAccepts());
+			attag3.WriteTagToFile(file);
+			uTagCount++;
+		}
+
+		// priority N permission
+		CTag priotag(FT_ULPRIORITY, IsAutoUpPriority() ? PR_AUTO : m_iUpPriority);
+		priotag.WriteTagToFile(file);
+		uTagCount++;
+		
+
+		if (m_lastPublishTimeKadSrc){
+			CTag kadLastPubSrc(FT_KADLASTPUBLISHSRC, m_lastPublishTimeKadSrc);
+			kadLastPubSrc.WriteTagToFile(file);
+			uTagCount++;
+		}
+
+		if (m_lastPublishTimeKadNotes){
+			CTag kadLastPubNotes(FT_KADLASTPUBLISHNOTES, m_lastPublishTimeKadNotes);
+			kadLastPubNotes.WriteTagToFile(file);
+			uTagCount++;
+		}
+
+		if (m_uMetaDataVer > 0)
+		{
+			// Misc. Flags
+			// ------------------------------------------------------------------------------
+			// Bits  3-0: Meta data version
+			//				0	untrusted meta data which was received via search results
+			//				1	trusted meta data, Unicode (strings where not stored correctly)
+			//				2	0.49c: trusted meta data, Unicode
+			// Bits 31-4: Reserved
+			ASSERT( m_uMetaDataVer <= 0x0F );
+			uint32 uFlags = m_uMetaDataVer & 0x0F;
+			CTag tagFlags(FT_FLAGS, uFlags);
+			tagFlags.WriteTagToFile(file);
+			uTagCount++;
+		}
+
+		//Xman advanced upload-priority
+		if (statistic.m_unotcountedtransferred)
+		{
+			CTag stag1(FT_NOTCOUNTEDTRANSFERREDLOW, (uint32)statistic.m_unotcountedtransferred);
+			stag1.WriteTagToFile(file);
+			uTagCount++;
+
+			CTag stag2(FT_NOTCOUNTEDTRANSFERREDHIGH, (uint32)(statistic.m_unotcountedtransferred >> 32));
+			stag2.WriteTagToFile(file);
+			uTagCount++;
+		}
+
+		if (statistic.m_tlastdataupdate!=0)
+		{
+			CTag stag1(FT_LASTDATAUPDATE, statistic.m_tlastdataupdate);
+			stag1.WriteTagToFile(file);
+			uTagCount++;
+		}
+		//Xman end
+
+		// ==> HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
+		if (GetHideOS()>=0){
+			CTag hideostag(FT_HIDEOS, GetHideOS());
+			hideostag.WriteTagToFile(file);
+			uTagCount++;
+		}
+		if (GetSelectiveChunk()>=0){
+			CTag selectivechunktag(FT_SELECTIVE_CHUNK, GetSelectiveChunk());
+			selectivechunktag.WriteTagToFile(file);
+			uTagCount++;
+		}
+		if (GetShareOnlyTheNeed()>=0){
+			CTag shareonlytheneedtag(FT_SHAREONLYTHENEED, GetShareOnlyTheNeed());
+			shareonlytheneedtag.WriteTagToFile(file);
+			uTagCount++;
+		}
+		// <== HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
+		// ==> Limit PS by amount of data uploaded [Stulle] - Stulle
+		if (GetPsAmountLimit()>=0){
+			CTag psamountlimittag(FT_PS_AMOUNT_LIMIT, GetPsAmountLimit());
+			psamountlimittag.WriteTagToFile(file);
+			uTagCount++;
+		}
+		// <== Limit PS by amount of data uploaded [Stulle] - Stulle
+		// ==> PowerShare [ZZ/MorphXT] - Stulle
+		if (GetPowerSharedMode()>=0){
+			CTag powersharetag(FT_POWERSHARE, GetPowerSharedMode());
+			powersharetag.WriteTagToFile(file);
+			uTagCount++;
+		}
+		if (GetPowerShareLimit()>=0){
+			CTag powersharelimittag(FT_POWERSHARE_LIMIT, GetPowerShareLimit());
+			powersharelimittag.WriteTagToFile(file);
+			uTagCount++;
+		}
+		// <== PowerShare [ZZ/MorphXT] - Stulle
+		// ==> Spread bars [Slugfiller/MorphXT] - Stulle
+		if(thePrefs.GetSpreadbarSetStatus())
+		{
+			char namebuffer[10];
+			char* number = &namebuffer[1];
+			UINT i_pos = 0;
+			if (IsLargeFile()) {
+				uint64 hideOS = GetHideOS()>=0?GetHideOS():thePrefs.GetHideOvershares();
+				for (POSITION pos = statistic.spreadlist.GetHeadPosition(); pos; ){
+					uint64 count = statistic.spreadlist.GetValueAt(pos);
+					if (!count) {
+						statistic.spreadlist.GetNext(pos);
+						continue;
+					}
+					uint64 start = statistic.spreadlist.GetKeyAt(pos);
+					statistic.spreadlist.GetNext(pos);
+					ASSERT(pos != NULL);	// Last value should always be 0
+					uint64 end = statistic.spreadlist.GetKeyAt(pos);
+					//MORPH - Smooth sample
+					if (end - start < EMBLOCKSIZE && count > hideOS)
+						continue;
+					//MORPH - Smooth sample
+					itoa(i_pos,number,10);
+					namebuffer[0] = FT_SPREADSTART;
+					CTag(namebuffer,start,true).WriteTagToFile(file);
+					namebuffer[0] = FT_SPREADEND;
+					CTag(namebuffer,end,true).WriteTagToFile(file);
+					namebuffer[0] = FT_SPREADCOUNT;
+					CTag(namebuffer,count,true).WriteTagToFile(file);
+					uTagCount+=3;
+					i_pos++;
+				}
+			} else {
+				uint32 hideOS = GetHideOS()>=0?GetHideOS():thePrefs.GetHideOvershares();
+				for (POSITION pos = statistic.spreadlist.GetHeadPosition(); pos; ){
+					uint32 count = (uint32)statistic.spreadlist.GetValueAt(pos);
+					if (!count) {
+						statistic.spreadlist.GetNext(pos);
+						continue;
+					}
+					uint32 start = (uint32)statistic.spreadlist.GetKeyAt(pos);
+					statistic.spreadlist.GetNext(pos);
+					ASSERT(pos != NULL);	// Last value should always be 0
+					uint32 end = (uint32)statistic.spreadlist.GetKeyAt(pos);
+					//MORPH - Smooth sample
+					if (end - start < EMBLOCKSIZE && count > hideOS)
+						continue;
+					//MORPH - Smooth sample
+					itoa(i_pos,number,10);
+					namebuffer[0] = FT_SPREADSTART;
+					CTag(namebuffer,start).WriteTagToFile(file);
+					namebuffer[0] = FT_SPREADEND;
+					CTag(namebuffer,end).WriteTagToFile(file);
+					namebuffer[0] = FT_SPREADCOUNT;
+					CTag(namebuffer,count).WriteTagToFile(file);
+					uTagCount+=3;
+					i_pos++;
+				}
+			}
+		}
+		// <== Spread bars [Slugfiller/MorphXT] - Stulle
+
+		// other tags
+		for (int j = 0; j < taglist.GetCount(); j++){
+			if (taglist[j]->IsStr() || taglist[j]->IsInt()){
+				taglist[j]->WriteTagToFile(file, utf8strOptBOM);
+				uTagCount++;
+			}
 		}
 	}
 
@@ -1547,8 +1569,8 @@ void CKnownFile::CreateHash(CFile* pFile, uint64 Length, uchar* pMd4HashOut, CAI
 	//Xman end
 
 	while (Required >= 64){
-		uint32 len; 
-		if ((Required / 64) > sizeof(X)/(64 * sizeof(X[0]))) 
+        uint32 len; 
+        if ((Required / 64) > sizeof(X)/(64 * sizeof(X[0]))) 
 			len = sizeof(X)/(64 * sizeof(X[0]));
 		else
 			len = (uint32)Required / 64;
@@ -1699,102 +1721,80 @@ Packet*	CKnownFile::CreateSrcInfoPacket(const CUpDownClient* forClient, uint8 by
 	// check whether client has either no download status at all or a download status which is valid for this file
 	if (   !(forClient->GetUpPartCount()==0 && forClient->GetUpPartStatus()==NULL)
 		&& !(forClient->GetUpPartCount()==GetPartCount() && forClient->GetUpPartStatus()!=NULL)) {
-			// should never happen
-			DEBUG_ONLY( DebugLogError(_T("*** %hs - part count (%u) of client (%s) does not match part count (%u) of file \"%s\""), __FUNCTION__, forClient->GetUpPartCount(), forClient->DbgGetClientInfo(), GetPartCount(), GetFileName()) );
-			ASSERT(0);
+		// should never happen
+		DEBUG_ONLY( DebugLogError(_T("*** %hs - part count (%u) of client (%s) does not match part count (%u) of file \"%s\""), __FUNCTION__, forClient->GetUpPartCount(), forClient->DbgGetClientInfo(), GetPartCount(), GetFileName()) );
+		ASSERT(0);
+		return NULL;
+	}
+
+	CSafeMemFile data(1024);
+	
+	uint8 byUsedVersion;
+	bool bIsSX2Packet;
+	if (forClient->SupportsSourceExchange2() && byRequestedVersion > 0){
+		// the client uses SourceExchange2 and requested the highest version he knows
+		// and we send the highest version we know, but of course not higher than his request
+		byUsedVersion = min(byRequestedVersion, (uint8)SOURCEEXCHANGE2_VERSION);
+		bIsSX2Packet = true;
+		data.WriteUInt8(byUsedVersion);
+
+		// we don't support any special SX2 options yet, reserved for later use
+		if (nRequestedOptions != 0)
+			DebugLogWarning(_T("Client requested unknown options for SourceExchange2: %u (%s)"), nRequestedOptions, forClient->DbgGetClientInfo());
+	}
+	else{
+		byUsedVersion = forClient->GetSourceExchange1Version();
+		bIsSX2Packet = false;
+		if (forClient->SupportsSourceExchange2())
+			DebugLogWarning(_T("Client which announced to support SX2 sent SX1 packet instead (%s)"), forClient->DbgGetClientInfo());
+	}
+
+	uint16 nCount = 0;
+	data.WriteHash16(forClient->GetUploadFileID());
+	data.WriteUInt16(nCount);
+	uint32 cDbgNoSrc = 0;
+	for (POSITION pos = m_ClientUploadList.GetHeadPosition(); pos != 0; )
+	{
+		/*const*/ CUpDownClient* cur_src = m_ClientUploadList.GetNext(pos);
+		
+		// some rare issue seen in a crashdumps, hopefully fixed already, but to be sure we double check here
+		// TODO: remove check next version, as it uses ressources and shouldn't be necessary
+		if (!theApp.clientlist->IsValidClient(cur_src))
+		{
+#ifdef _BETA
+			throw new CUserException();
+#endif
+			ASSERT( false );
+			DebugLogError(_T("Invalid client in uploading list for file %s"), GetFileName());
 			return NULL;
 		}
 
-		CSafeMemFile data(1024);
+		if (cur_src->HasLowID() || cur_src == forClient || !(cur_src->GetUploadState() == US_UPLOADING || cur_src->GetUploadState() == US_ONUPLOADQUEUE))
+			continue;
+		if (!cur_src->IsEd2kClient())
+			continue;
 
-		uint8 byUsedVersion;
-		bool bIsSX2Packet;
-		if (forClient->SupportsSourceExchange2() && byRequestedVersion > 0){
-			// the client uses SourceExchange2 and requested the highest version he knows
-			// and we send the highest version we know, but of course not higher than his request
-			byUsedVersion = min(byRequestedVersion, (uint8)SOURCEEXCHANGE2_VERSION);
-			bIsSX2Packet = true;
-			data.WriteUInt8(byUsedVersion);
-
-			// we don't support any special SX2 options yet, reserved for later use
-			if (nRequestedOptions != 0)
-				DebugLogWarning(_T("Client requested unknown options for SourceExchange2: %u (%s)"), nRequestedOptions, forClient->DbgGetClientInfo());
-		}
-		else{
-			byUsedVersion = forClient->GetSourceExchange1Version();
-			bIsSX2Packet = false;
-			if (forClient->SupportsSourceExchange2())
-				DebugLogWarning(_T("Client which announced to support SX2 sent SX1 packet instead (%s)"), forClient->DbgGetClientInfo());
-		}
-
-		uint16 nCount = 0;
-		data.WriteHash16(forClient->GetUploadFileID());
-		data.WriteUInt16(nCount);
-		uint32 cDbgNoSrc = 0;
-		for (POSITION pos = m_ClientUploadList.GetHeadPosition(); pos != 0; )
+		bool bNeeded = false;
+		const uint8* rcvstatus = forClient->GetUpPartStatus();
+		if (rcvstatus)
 		{
-			const CUpDownClient *cur_src = m_ClientUploadList.GetNext(pos);
-			if (cur_src->HasLowID() || cur_src == forClient || !(cur_src->GetUploadState() == US_UPLOADING || cur_src->GetUploadState() == US_ONUPLOADQUEUE))
-				continue;
-			if (!cur_src->IsEd2kClient())
-				continue;
-
-			bool bNeeded = false;
-			const uint8* rcvstatus = forClient->GetUpPartStatus();
-			if (rcvstatus)
+			ASSERT( forClient->GetUpPartCount() == GetPartCount() );
+			const uint8* srcstatus = cur_src->GetUpPartStatus();
+			if (srcstatus)
 			{
-				ASSERT( forClient->GetUpPartCount() == GetPartCount() );
-				const uint8* srcstatus = cur_src->GetUpPartStatus();
-				if (srcstatus)
+				ASSERT( cur_src->GetUpPartCount() == GetPartCount() );
+				if (cur_src->GetUpPartCount() == forClient->GetUpPartCount())
 				{
-					ASSERT( cur_src->GetUpPartCount() == GetPartCount() );
-					if (cur_src->GetUpPartCount() == forClient->GetUpPartCount())
+					for (UINT x = 0; x < GetPartCount(); x++)
 					{
-						for (UINT x = 0; x < GetPartCount(); x++)
+						// ==> See chunk that we hide [SiRoB] - Stulle
+						/*
+						if (srcstatus[x] && !rcvstatus[x])
+						*/
+						if (srcstatus[x]&SC_AVAILABLE && !(rcvstatus[x]&SC_AVAILABLE))
+						// <== See chunk that we hide [SiRoB] - Stulle
 						{
-							// ==> See chunk that we hide [SiRoB] - Stulle
-							/*
-							if (srcstatus[x] && !rcvstatus[x])
-							*/
-							if (srcstatus[x]&SC_AVAILABLE && !(rcvstatus[x]&SC_AVAILABLE))
-							// <== See chunk that we hide [SiRoB] - Stulle
-							{
-								// We know the recieving client needs a chunk from this client.
-								bNeeded = true;
-								break;
-							}
-						}
-					}
-					else
-					{
-						// should never happen
-						//if (thePrefs.GetVerbose())
-						DEBUG_ONLY( DebugLogError(_T("*** %hs - found source (%s) with wrong part count (%u) attached to file \"%s\" (partcount=%u)"), __FUNCTION__, cur_src->DbgGetClientInfo(), cur_src->GetUpPartCount(), GetFileName(), GetPartCount()));
-					}
-				}
-				else
-				{
-					cDbgNoSrc++;
-					// This client doesn't support upload chunk status. So just send it and hope for the best.
-					bNeeded = true;
-				}
-			}
-			else
-			{
-				ASSERT( forClient->GetUpPartCount() == 0 );
-				TRACE(_T("%hs, requesting client has no chunk status - %s"), __FUNCTION__, forClient->DbgGetClientInfo());
-				// remote client does not support upload chunk status, search sources which have at least one complete part
-				// we could even sort the list of sources by available chunks to return as much sources as possible which
-				// have the most available chunks. but this could be a noticeable performance problem.
-				const uint8* srcstatus = cur_src->GetUpPartStatus();
-				if (srcstatus)
-				{
-					ASSERT( cur_src->GetUpPartCount() == GetPartCount() );
-					for (UINT x = 0; x < GetPartCount(); x++ )
-					{
-						if (srcstatus[x])
-						{
-							// this client has at least one chunk
+							// We know the recieving client needs a chunk from this client.
 							bNeeded = true;
 							break;
 						}
@@ -1802,57 +1802,92 @@ Packet*	CKnownFile::CreateSrcInfoPacket(const CUpDownClient* forClient, uint8 by
 				}
 				else
 				{
-					// This client doesn't support upload chunk status. So just send it and hope for the best.
-					bNeeded = true;
+					// should never happen
+					//if (thePrefs.GetVerbose())
+						DEBUG_ONLY( DebugLogError(_T("*** %hs - found source (%s) with wrong part count (%u) attached to file \"%s\" (partcount=%u)"), __FUNCTION__, cur_src->DbgGetClientInfo(), cur_src->GetUpPartCount(), GetFileName(), GetPartCount()));
 				}
 			}
-
-			if (bNeeded)
+			else
 			{
-				nCount++;
-				uint32 dwID;
-				if (byUsedVersion >= 3)
-					dwID = cur_src->GetUserIDHybrid();
-				else
-					dwID = cur_src->GetIP();
-				data.WriteUInt32(dwID);
-				data.WriteUInt16(cur_src->GetUserPort());
-				data.WriteUInt32(cur_src->GetServerIP());
-				data.WriteUInt16(cur_src->GetServerPort());
-				if (byUsedVersion >= 2)
-					data.WriteHash16(cur_src->GetUserHash());
-				if (byUsedVersion >= 4){
+				cDbgNoSrc++;
+				// This client doesn't support upload chunk status. So just send it and hope for the best.
+				bNeeded = true;
+			}
+		}
+		else
+		{
+			ASSERT( forClient->GetUpPartCount() == 0 );
+			TRACE(_T("%hs, requesting client has no chunk status - %s"), __FUNCTION__, forClient->DbgGetClientInfo());
+			// remote client does not support upload chunk status, search sources which have at least one complete part
+			// we could even sort the list of sources by available chunks to return as much sources as possible which
+			// have the most available chunks. but this could be a noticeable performance problem.
+			const uint8* srcstatus = cur_src->GetUpPartStatus();
+			if (srcstatus)
+			{
+				ASSERT( cur_src->GetUpPartCount() == GetPartCount() );
+				for (UINT x = 0; x < GetPartCount(); x++ )
+				{
+					if (srcstatus[x])
+					{
+						// this client has at least one chunk
+						bNeeded = true;
+						break;
+					}
+				}
+			}
+			else
+			{
+				// This client doesn't support upload chunk status. So just send it and hope for the best.
+				bNeeded = true;
+			}
+		}
+
+		if (bNeeded)
+		{
+			nCount++;
+			uint32 dwID;
+			if (byUsedVersion >= 3)
+				dwID = cur_src->GetUserIDHybrid();
+			else
+				dwID = cur_src->GetIP();
+		    data.WriteUInt32(dwID);
+		    data.WriteUInt16(cur_src->GetUserPort());
+		    data.WriteUInt32(cur_src->GetServerIP());
+		    data.WriteUInt16(cur_src->GetServerPort());
+			if (byUsedVersion >= 2)
+			    data.WriteHash16(cur_src->GetUserHash());
+			if (byUsedVersion >= 4){
 				// ConnectSettings - SourceExchange V4
 				// 4 Reserved (!)
 				// 1 DirectCallback Supported/Available 
-					// 1 CryptLayer Required
-					// 1 CryptLayer Requested
-					// 1 CryptLayer Supported
-					const uint8 uSupportsCryptLayer	= cur_src->SupportsCryptLayer() ? 1 : 0;
-					const uint8 uRequestsCryptLayer	= cur_src->RequestsCryptLayer() ? 1 : 0;
-					const uint8 uRequiresCryptLayer	= cur_src->RequiresCryptLayer() ? 1 : 0;
+				// 1 CryptLayer Required
+				// 1 CryptLayer Requested
+				// 1 CryptLayer Supported
+				const uint8 uSupportsCryptLayer	= cur_src->SupportsCryptLayer() ? 1 : 0;
+				const uint8 uRequestsCryptLayer	= cur_src->RequestsCryptLayer() ? 1 : 0;
+				const uint8 uRequiresCryptLayer	= cur_src->RequiresCryptLayer() ? 1 : 0;
 				//const uint8 uDirectUDPCallback	= cur_src->SupportsDirectUDPCallback() ? 1 : 0;
 				const uint8 byCryptOptions = /*(uDirectUDPCallback << 3) |*/ (uRequiresCryptLayer << 2) | (uRequestsCryptLayer << 1) | (uSupportsCryptLayer << 0);
-					data.WriteUInt8(byCryptOptions);
-				}
-				if (nCount > 500)
-					break;
+				data.WriteUInt8(byCryptOptions);
 			}
+			if (nCount > 500)
+				break;
 		}
-		TRACE(_T("%hs: Out of %u clients, %u had no valid chunk status\n"), __FUNCTION__, m_ClientUploadList.GetCount(), cDbgNoSrc);
-		if (!nCount)
-			return 0;
-		data.Seek(bIsSX2Packet ? 17 : 16, SEEK_SET);
-		data.WriteUInt16((uint16)nCount);
+	}
+	TRACE(_T("%hs: Out of %u clients, %u had no valid chunk status\n"), __FUNCTION__, m_ClientUploadList.GetCount(), cDbgNoSrc);
+	if (!nCount)
+		return 0;
+	data.Seek(bIsSX2Packet ? 17 : 16, SEEK_SET);
+	data.WriteUInt16((uint16)nCount);
 
-		Packet* result = new Packet(&data, OP_EMULEPROT);
-		result->opcode = bIsSX2Packet ? OP_ANSWERSOURCES2 : OP_ANSWERSOURCES;
-		// (1+)16+2+501*(4+2+4+2+16+1) = 14547 (14548) bytes max.
-		if (result->size > 354)
-			result->PackPacket();
-		if (thePrefs.GetDebugSourceExchange())
-			AddDebugLogLine(false, _T("SXSend: Client source response SX2=%s, Version=%u; Count=%u, %s, File=\"%s\""), bIsSX2Packet ? _T("Yes") : _T("No"), byUsedVersion, nCount, forClient->DbgGetClientInfo(), GetFileName());
-		return result;
+	Packet* result = new Packet(&data, OP_EMULEPROT);
+	result->opcode = bIsSX2Packet ? OP_ANSWERSOURCES2 : OP_ANSWERSOURCES;
+	// (1+)16+2+501*(4+2+4+2+16+1) = 14547 (14548) bytes max.
+	if (result->size > 354)
+		result->PackPacket();
+	if (thePrefs.GetDebugSourceExchange())
+		AddDebugLogLine(false, _T("SXSend: Client source response SX2=%s, Version=%u; Count=%u, %s, File=\"%s\""), bIsSX2Packet ? _T("Yes") : _T("No"), byUsedVersion, nCount, forClient->DbgGetClientInfo(), GetFileName());
+	return result;
 }
 
 void CKnownFile::SetFileComment(LPCTSTR pszComment)
@@ -2007,7 +2042,7 @@ void SecToTimeLength(unsigned long ulSec, CStringW& rstrTimeLength)
 	}
 }
 
-void CKnownFile::RemoveMetaDataTags()
+void CKnownFile::RemoveMetaDataTags(UINT uTagType)
 {
 	static const struct
 	{
@@ -2015,24 +2050,72 @@ void CKnownFile::RemoveMetaDataTags()
 		uint8	nType;
 	} _aEmuleMetaTags[] = 
 	{
-		{ FT_MEDIA_ARTIST,  2 },
-		{ FT_MEDIA_ALBUM,   2 },
-		{ FT_MEDIA_TITLE,   2 },
-		{ FT_MEDIA_LENGTH,  3 },
-		{ FT_MEDIA_BITRATE, 3 },
-		{ FT_MEDIA_CODEC,   2 }
+		{ FT_MEDIA_ARTIST,  TAGTYPE_STRING },
+		{ FT_MEDIA_ALBUM,   TAGTYPE_STRING },
+		{ FT_MEDIA_TITLE,   TAGTYPE_STRING },
+		{ FT_MEDIA_LENGTH,  TAGTYPE_UINT32 },
+		{ FT_MEDIA_BITRATE, TAGTYPE_UINT32 },
+		{ FT_MEDIA_CODEC,   TAGTYPE_STRING }
 	};
 
 	// 05-Jän-2004 [bc]: ed2k and Kad are already full of totally wrong and/or not properly attached meta data. Take
 	// the chance to clean any available meta data tags and provide only tags which were determined by us.
 	// Remove all meta tags. Never ever trust the meta tags received from other clients or servers.
-	for (int j = 0; j < ARRSIZE(_aEmuleMetaTags); j++)
+	for (int j = 0; j < _countof(_aEmuleMetaTags); j++)
+	{
+		if (uTagType == 0 || (uTagType == _aEmuleMetaTags[j].nType))
+		{
+			int i = 0;
+			while (i < taglist.GetSize())
+			{
+				const CTag* pTag = taglist[i];
+				if (pTag->GetNameID() == _aEmuleMetaTags[j].nID)
+				{
+					delete pTag;
+					taglist.RemoveAt(i);
+				}
+				else
+					i++;
+			}
+		}
+	}
+
+	m_uMetaDataVer = 0;
+}
+
+void CKnownFile::RemoveBrokenUnicodeMetaDataTags()
+{
+	static const struct
+	{
+		uint8	nID;
+		uint8	nType;
+	} _aEmuleMetaTags[] = 
+	{
+		{ FT_MEDIA_ARTIST,  TAGTYPE_STRING },
+		{ FT_MEDIA_ALBUM,   TAGTYPE_STRING },
+		{ FT_MEDIA_TITLE,   TAGTYPE_STRING },
+		{ FT_MEDIA_CODEC,   TAGTYPE_STRING }	// This one actually contains only ASCII
+	};
+
+	for (int j = 0; j < _countof(_aEmuleMetaTags); j++)
 	{
 		int i = 0;
 		while (i < taglist.GetSize())
 		{
+			// Meta data strings of older eMule versions did store Unicode strings as MBCS strings,
+			// which means that - depending on the Unicode string content - particular characters
+			// got lost. Unicode characters which cannot get converted into the local codepage
+			// will get replaced by Windows with a '?' character. So, to estimate if we have a
+			// broken Unicode string (due to the conversion between Unicode/MBCS), we search the
+			// strings for '?' characters. This is not 100% perfect, as it would also give
+			// false results for strings which do contain the '?' character by intention. It also
+			// would give wrong results for particular characters which got mapped to ASCII chars
+			// due to the conversion from Unicode->MBCS. But at least it prevents us from deleting
+			// all the existing meta data strings.
 			const CTag* pTag = taglist[i];
-			if (pTag->GetNameID() == _aEmuleMetaTags[j].nID)
+			if (   pTag->GetNameID() == _aEmuleMetaTags[j].nID
+				&& pTag->IsStr()
+				&& _tcschr(pTag->GetStr(), _T('?')) != NULL)
 			{
 				delete pTag;
 				taglist.RemoveAt(i);
@@ -2041,21 +2124,14 @@ void CKnownFile::RemoveMetaDataTags()
 				i++;
 		}
 	}
-
-	m_uMetaDataVer = 0;
 }
 
 CStringA GetED2KAudioCodec(WORD wFormatTag)
 {
-	if (wFormatTag == 0x0055)
-		return "mp3";
-	else if (wFormatTag == 0x0130)
-		return "sipr";
-	else if (wFormatTag == 0x2000)
-		return "ac3";
-	else if (wFormatTag == 0x2004)
-		return "cook";
-	return "";
+	CStringA strCodec(GetAudioFormatCodecId(wFormatTag));
+	strCodec.Trim();
+	strCodec.MakeLower();
+	return strCodec;
 }
 
 CStringA GetED2KVideoCodec(DWORD biCompression)
@@ -2068,13 +2144,16 @@ CStringA GetED2KVideoCodec(DWORD biCompression)
 		return "rle4";
 	else if (biCompression == BI_BITFIELDS)
 		return "bitfields";
+	else if (biCompression == BI_JPEG)
+		return "jpeg";
+	else if (biCompression == BI_PNG)
+		return "png";
 
 	LPCSTR pszCompression = (LPCSTR)&biCompression;
 	for (int i = 0; i < 4; i++)
 	{
-		if (   !isalnum((unsigned char)pszCompression[i])
+		if (   !__iscsym((unsigned char)pszCompression[i])
 			&& pszCompression[i] != '.' 
-			&& pszCompression[i] != '_' 
 			&& pszCompression[i] != ' ')
 			return "";
 	}
@@ -2109,6 +2188,22 @@ SMediaInfo *GetRMMediaInfo(LPCTSTR pszFullPath)
 		return NULL;
 	}
 	return mi;
+}
+
+SMediaInfo *GetWMMediaInfo(LPCTSTR pszFullPath)
+{
+#ifdef HAVE_WMSDK_H
+	bool bIsWM;
+	SMediaInfo *mi = new SMediaInfo;
+	if (!GetWMHeaders(pszFullPath, mi, bIsWM)) {
+		delete mi;
+		return NULL;
+	}
+	return mi;
+#else//HAVE_WMSDK_H
+	UNREFERENCED_PARAMETER(pszFullPath);
+	return NULL;
+#endif//HAVE_WMSDK_H
 }
 
 // Max. string length which is used for string meta tags like TAG_MEDIA_TITLE, TAG_MEDIA_ARTIST, ...
@@ -2184,42 +2279,42 @@ void CKnownFile::UpdateMetaDataTags()
 					ID3_FrameID eFrameID = frame->GetID();
 					switch (eFrameID)
 					{
-					case ID3FID_LEADARTIST:{
-						wchar_t* pszText = ID3_GetStringW(frame, ID3FN_TEXT);
-						CString strText(pszText);
-						TruncateED2KMetaData(strText);
-						if (!strText.IsEmpty()){
-							CTag* pTag = new CTag(FT_MEDIA_ARTIST, strText);
-							AddTagUnique(pTag);
-							m_uMetaDataVer = META_DATA_VER;
+						case ID3FID_LEADARTIST:{
+							wchar_t* pszText = ID3_GetStringW(frame, ID3FN_TEXT);
+							CString strText(pszText);
+							TruncateED2KMetaData(strText);
+							if (!strText.IsEmpty()){
+								CTag* pTag = new CTag(FT_MEDIA_ARTIST, strText);
+								AddTagUnique(pTag);
+								m_uMetaDataVer = META_DATA_VER;
+							}
+							delete[] pszText;
+							break;
 						}
-						delete[] pszText;
-						break;
-										   }
-					case ID3FID_ALBUM:{
-						wchar_t* pszText = ID3_GetStringW(frame, ID3FN_TEXT);
-						CString strText(pszText);
-						TruncateED2KMetaData(strText);
-						if (!strText.IsEmpty()){
-							CTag* pTag = new CTag(FT_MEDIA_ALBUM, strText);
-							AddTagUnique(pTag);
-							m_uMetaDataVer = META_DATA_VER;
+						case ID3FID_ALBUM:{
+							wchar_t* pszText = ID3_GetStringW(frame, ID3FN_TEXT);
+							CString strText(pszText);
+							TruncateED2KMetaData(strText);
+							if (!strText.IsEmpty()){
+								CTag* pTag = new CTag(FT_MEDIA_ALBUM, strText);
+								AddTagUnique(pTag);
+								m_uMetaDataVer = META_DATA_VER;
+							}
+							delete[] pszText;
+							break;
 						}
-						delete[] pszText;
-						break;
-									  }
-					case ID3FID_TITLE:{
-						wchar_t* pszText = ID3_GetStringW(frame, ID3FN_TEXT);
-						CString strText(pszText);
-						TruncateED2KMetaData(strText);
-						if (!strText.IsEmpty()){
-							CTag* pTag = new CTag(FT_MEDIA_TITLE, strText);
-							AddTagUnique(pTag);
-							m_uMetaDataVer = META_DATA_VER;
+						case ID3FID_TITLE:{
+							wchar_t* pszText = ID3_GetStringW(frame, ID3FN_TEXT);
+							CString strText(pszText);
+							TruncateED2KMetaData(strText);
+							if (!strText.IsEmpty()){
+								CTag* pTag = new CTag(FT_MEDIA_TITLE, strText);
+								AddTagUnique(pTag);
+								m_uMetaDataVer = META_DATA_VER;
+							}
+							delete[] pszText;
+							break;
 						}
-						delete[] pszText;
-						break;
-									  }
 					}
 				}
 				delete iter;
@@ -2234,16 +2329,16 @@ void CKnownFile::UpdateMetaDataTags()
 	else
 	{
 		TCHAR szFullPath[MAX_PATH];
-
 		if (_tmakepathlimit(szFullPath, NULL, GetPath(), GetFileName(), NULL))
 		{
-
 			SMediaInfo* mi = NULL;
 			try
 			{
 				mi = GetRIFFMediaInfo(szFullPath);
 				if (mi == NULL)
 					mi = GetRMMediaInfo(szFullPath);
+				if (mi == NULL)
+					mi = GetWMMediaInfo(szFullPath);
 				if (mi)
 				{
 					mi->InitFileLength();
@@ -2292,6 +2387,13 @@ void CKnownFile::UpdateMetaDataTags()
 						m_uMetaDataVer = META_DATA_VER;
 					}
 
+					TruncateED2KMetaData(mi->strAlbum);
+					if (!mi->strAlbum.IsEmpty()){
+						CTag* pTag = new CTag(FT_MEDIA_ALBUM, mi->strAlbum);
+						AddTagUnique(pTag);
+						m_uMetaDataVer = META_DATA_VER;
+					}
+
 					delete mi;
 					return;
 				}
@@ -2303,157 +2405,6 @@ void CKnownFile::UpdateMetaDataTags()
 			}
 			delete mi;
 		}
-
-#ifdef HAVE_QEDIT_H
-		if (thePrefs.GetExtractMetaData() >= 2)
-		{
-			// starting the MediaDet object takes a noticeable amount of time.. avoid starting that object
-			// for files which are not expected to contain any Audio/Video data.
-			// note also: MediaDet does not work well for too short files (e.g. 16K)
-			EED2KFileType eFileType = GetED2KFileTypeID(GetFileName());
-			if ((eFileType == ED2KFT_AUDIO || eFileType == ED2KFT_VIDEO) && GetFileSize() >= (uint64)32768)
-			{
-				// Avoid processing of some file types which are known to crash due to bugged DirectShow filters.
-				TCHAR szExt[_MAX_EXT];
-				_tsplitpath(GetFileName(), NULL, NULL, NULL, szExt);
-				_tcslwr(szExt);
-				if (_tcscmp(szExt, _T(".ogm"))!=0 && _tcscmp(szExt, _T(".ogg"))!=0 && _tcscmp(szExt, _T(".mkv"))!=0)
-				{
-					TCHAR szFullPath[MAX_PATH];
-					if (_tmakepathlimit(szFullPath, NULL, GetPath(), GetFileName(), NULL))
-					{
-						try{
-							CComPtr<IMediaDet> pMediaDet;
-							HRESULT hr = pMediaDet.CoCreateInstance(__uuidof(MediaDet));
-							if (SUCCEEDED(hr))
-							{
-								USES_CONVERSION;
-								if (SUCCEEDED(hr = pMediaDet->put_Filename(CComBSTR(T2W(szFullPath)))))
-								{
-									// Get the first audio/video streams
-									long lAudioStream = -1;
-									long lVideoStream = -1;
-									double fVideoStreamLengthSec = 0.0;
-									DWORD dwVideoBitRate = 0;
-									DWORD dwVideoCodec = 0;
-									double fAudioStreamLengthSec = 0.0;
-									DWORD dwAudioBitRate = 0;
-									WORD wAudioCodec = 0;
-									long lStreams;
-									if (SUCCEEDED(hr = pMediaDet->get_OutputStreams(&lStreams)))
-									{
-										for (long i = 0; i < lStreams; i++)
-										{
-											if (SUCCEEDED(hr = pMediaDet->put_CurrentStream(i)))
-											{
-												GUID major_type;
-												if (SUCCEEDED(hr = pMediaDet->get_StreamType(&major_type)))
-												{
-													if (major_type == MEDIATYPE_Video)
-													{
-														if (lVideoStream == -1){
-															lVideoStream = i;
-															pMediaDet->get_StreamLength(&fVideoStreamLengthSec);
-
-															AM_MEDIA_TYPE mt = {0};
-															if (SUCCEEDED(hr = pMediaDet->get_StreamMediaType(&mt))){
-																if (mt.formattype == FORMAT_VideoInfo){
-																	VIDEOINFOHEADER* pVIH = (VIDEOINFOHEADER*)mt.pbFormat;
-																	// do not use that 'dwBitRate', whatever this number is, it's not
-																	// the bitrate of the encoded video stream. seems to be the bitrate
-																	// of the uncompressed stream divided by 2 !??
-																	//dwVideoBitRate = pVIH->dwBitRate / 1000;
-
-																	// for AVI files this gives that used codec
-																	// for MPEG(1) files this just gives "Y41P"
-																	dwVideoCodec = pVIH->bmiHeader.biCompression;
-																}
-															}
-
-															if (mt.pUnk != NULL)
-																mt.pUnk->Release();
-															if (mt.pbFormat != NULL)
-																CoTaskMemFree(mt.pbFormat);
-														}
-													}
-													else if (major_type == MEDIATYPE_Audio)
-													{
-														if (lAudioStream == -1){
-															lAudioStream = i;
-															pMediaDet->get_StreamLength(&fAudioStreamLengthSec);
-
-															AM_MEDIA_TYPE mt = {0};
-															if (SUCCEEDED(hr = pMediaDet->get_StreamMediaType(&mt))){
-																if (mt.formattype == FORMAT_WaveFormatEx){
-																	WAVEFORMATEX* wfx = (WAVEFORMATEX*)mt.pbFormat;
-																	dwAudioBitRate = (DWORD)(((wfx->nAvgBytesPerSec * 8.0) + 500.0) / 1000.0);
-																	wAudioCodec = wfx->wFormatTag;
-																}
-															}
-
-															if (mt.pUnk != NULL)
-																mt.pUnk->Release();
-															if (mt.pbFormat != NULL)
-																CoTaskMemFree(mt.pbFormat);
-														}
-													}
-													else{
-														TRACE("%s - Unknown stream type\n", GetFileName());
-													}
-
-													if (lVideoStream != -1 && lAudioStream != -1)
-														break;
-												}
-											}
-										}
-									}
-
-									UINT uLengthSec = 0;
-									CStringA strCodec;
-									uint32 uBitrate = 0;
-									if (fVideoStreamLengthSec > 0.0){
-										uLengthSec = (UINT)fVideoStreamLengthSec;
-										strCodec = GetED2KVideoCodec(dwVideoCodec);
-										uBitrate = dwVideoBitRate;
-									}
-									else if (fAudioStreamLengthSec > 0.0){
-										uLengthSec = (UINT)fAudioStreamLengthSec;
-										strCodec = GetED2KAudioCodec(wAudioCodec);
-										uBitrate = dwAudioBitRate;
-									}
-
-									if (uLengthSec){
-										CTag* pTag = new CTag(FT_MEDIA_LENGTH, (uint32)uLengthSec);
-										AddTagUnique(pTag);
-										m_uMetaDataVer = META_DATA_VER;
-									}
-
-									if (!strCodec.IsEmpty()){
-										CTag* pTag = new CTag(FT_MEDIA_CODEC, CString(strCodec));
-										AddTagUnique(pTag);
-										m_uMetaDataVer = META_DATA_VER;
-									}
-
-									if (uBitrate){
-										CTag* pTag = new CTag(FT_MEDIA_BITRATE, (uint32)uBitrate);
-										AddTagUnique(pTag);
-										m_uMetaDataVer = META_DATA_VER;
-									}
-								}
-							}
-						}
-						catch(...){
-							if (thePrefs.GetVerbose())
-								AddDebugLogLine(false, _T("Unhandled exception while extracting meta data (MediaDet) from \"%s\""), szFullPath);
-							ASSERT(0);
-						}
-					}
-				}
-			}
-		}
-#else//HAVE_QEDIT_H
-#pragma message("WARNING: Missing 'qedit.h' header file - some features will get disabled. See the file 'emule_site_config.h' for more information.")
-#endif//HAVE_QEDIT_H
 	}
 }
 
@@ -2558,7 +2509,7 @@ CString CKnownFile::GetInfoSummary() const
 	strFolder.ReleaseBuffer();
 
 	CString strAccepts, strRequests, strTransferred;
-	strRequests.Format(_T("%u (%u)"), statistic.GetRequests(), statistic.GetAllTimeRequests());
+    strRequests.Format(_T("%u (%u)"), statistic.GetRequests(), statistic.GetAllTimeRequests());
 	strAccepts.Format(_T("%u (%u)"), statistic.GetAccepts(), statistic.GetAllTimeAccepts());
 	strTransferred.Format(_T("%s (%s)"), CastItoXBytes(statistic.GetTransferred(), false, false), CastItoXBytes(statistic.GetAllTimeTransferred(), false, false));
 	CString strType = GetFileTypeDisplayStr();
@@ -2615,6 +2566,12 @@ CString CKnownFile::GetUpPriorityDisplayString() const {
 		default:
 			return _T("");
 	}
+}
+
+bool CKnownFile::ShouldPartiallyPurgeFile() const
+{
+	return thePrefs.DoPartiallyPurgeOldKnownFiles() && m_timeLastSeen > 0
+		&& time(NULL) > m_timeLastSeen && time(NULL) - m_timeLastSeen > OLDFILES_PARTIALLYPURGE;
 }
 
 // ==> Removed Dynamic Hide OS [SlugFiller/Xman] - Stulle

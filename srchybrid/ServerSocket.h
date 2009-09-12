@@ -23,7 +23,7 @@ class CServerSocket : public CEMSocket
 {
 	friend class CServerConnect;
 public:
-	CServerSocket(CServerConnect* in_serverconnect);
+	CServerSocket(CServerConnect* in_serverconnect, bool bManualSingleConnect);
 	~CServerSocket();
 
 	void ConnectTo(CServer* server, bool bNoCrypt = false);
@@ -50,4 +50,5 @@ private:
 	bool m_bIsDeleting;	// true: socket is already in deletion phase, don't destroy it in ::StopConnectionTry
 	DWORD m_dwLastTransmission;
 	bool m_bStartNewMessageLog;
+	bool m_bManualSingleConnect;
 };

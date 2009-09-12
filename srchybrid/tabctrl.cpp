@@ -301,6 +301,7 @@ BOOL TabControl::ReorderTab(unsigned int nSrcTab, unsigned int nDstTab)
 	item.pszText = sBuffer;
 	item.cchTextMax = _countof(sBuffer);
 	BOOL bOK = GetItem(nSrcTab, &item);
+	sBuffer[_countof(sBuffer) - 1] = _T('\0');
 	ASSERT( bOK );
 
 	bOK = DeleteItem(nSrcTab);
@@ -388,6 +389,7 @@ void TabControl::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	tci.cchTextMax = _countof(szLabel);
 	if (!GetItem(nTabIndex, &tci))
 		return;
+	szLabel[_countof(szLabel) - 1] = _T('\0');
 
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 	if (!pDC)

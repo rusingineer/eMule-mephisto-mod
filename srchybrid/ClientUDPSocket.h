@@ -45,11 +45,6 @@ public:
 
 	bool	Create();
 	bool	Rebind();
-	// ==> UPnP support [MoNKi] - leuk_he
-	/*
-	bool	RebindUPnP(); //zz_fly :: Rebind UPnP on IP-change
-	*/
-	// <== UPnP support [MoNKi] - leuk_he
 	uint16	GetConnectedPort()			{ return m_port; }
 	bool	SendPacket(Packet* packet, uint32 dwIP, uint16 nPort, bool bEncrypt, const uchar* pachTargetClientHashORKadID, bool bKad, uint32 nReceiverVerifyKey);
     SocketSentBytes  SendControlData(uint32 maxNumberOfBytesToSend, uint32 minFragSize); // ZZ:UploadBandWithThrottler (UDP)

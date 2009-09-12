@@ -41,7 +41,7 @@ BEGIN_MESSAGE_MAP(CConnectionWizardDlg, CDialog)
 	ON_BN_CLICKED(IDC_WIZ_LOWDOWN_RADIO, OnBnClickedWizLowdownloadRadio)
 	ON_BN_CLICKED(IDC_WIZ_MEDIUMDOWN_RADIO, OnBnClickedWizMediumdownloadRadio)
 	ON_BN_CLICKED(IDC_WIZ_HIGHDOWN_RADIO, OnBnClickedWizHighdownloadRadio)
-	ON_NOTIFY(NM_CLICK, IDC_PROVIDERS, OnNMClickProviders)
+	ON_NOTIFY(NM_CLICK, IDC_PROVIDERS, OnNmClickProviders)
 END_MESSAGE_MAP()
 
 CConnectionWizardDlg::CConnectionWizardDlg(CWnd* pParent /*=NULL*/)
@@ -79,7 +79,7 @@ void CConnectionWizardDlg::OnBnClickedApply()
 		thePrefs.maxGraphDownloadRate = 96;
 		thePrefs.maxupload = UNLIMITED;
 		thePrefs.maxdownload = UNLIMITED;
-		theApp.emuledlg->statisticswnd->SetARange(false, thePrefs.GetMaxGraphUploadRate());
+		theApp.emuledlg->statisticswnd->SetARange(false, thePrefs.GetMaxGraphUploadRate(true));
 		theApp.emuledlg->statisticswnd->SetARange(true, thePrefs.maxGraphDownloadRate);
 		theApp.emuledlg->preferenceswnd->m_wndConnection.LoadSettings();
 		CDialog::OnOK();
@@ -375,9 +375,9 @@ BOOL CConnectionWizardDlg::OnInitDialog()
 	//Xman end
 
 	m_provider.InsertColumn(0, GetResString(IDS_PW_CONNECTION), LVCFMT_LEFT, 150);
-	m_provider.InsertColumn(1, GetResString(IDS_WIZ_DOWN), LVCFMT_LEFT, 85);
-	m_provider.InsertColumn(2, GetResString(IDS_WIZ_UP), LVCFMT_LEFT, 85);
-	m_provider.SetExtendedStyle(LVS_EX_FULLROWSELECT  | LVS_EX_INFOTIP);
+	m_provider.InsertColumn(1, GetResString(IDS_WIZ_DOWN),		LVCFMT_LEFT,  85);
+	m_provider.InsertColumn(2, GetResString(IDS_WIZ_UP),		LVCFMT_LEFT,  85);
+	m_provider.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	//Xman no support for unlimited
 	/*
@@ -416,40 +416,40 @@ BOOL CConnectionWizardDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CConnectionWizardDlg::OnNMClickProviders(NMHDR* /*pNMHDR*/, LRESULT* pResult)
+void CConnectionWizardDlg::OnNmClickProviders(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 {
 	SetCustomItemsActivation();
 
 	UINT up, down;
 	switch (m_provider.GetSelectionMark())
 	{
-	//Xman changed
-	/*
+		//Xman changed
+		/*
 		case  0: down=   0;up=   0; break;
 		case  1: down= ((thePrefs.maxGraphDownloadRate * 1024) + 500) / 1000 * 8; up= ((thePrefs.GetMaxGraphUploadRate(true) * 1024) + 500) / 1000 * 8; break;
-	*/
-	case  0: down= (UINT)thePrefs.GetMaxGraphDownloadRate()*8 ; up= (UINT)thePrefs.GetMaxGraphUploadRate()*8; break;
-	case  1: down=  16000;	up=  1024; break; //Xman 
-	//Xman end
-	case  2: down=   56;	up=   33; break;
-	case  3: down=   64;	up=   64; break;
-	case  4: down=  128;	up=  128; break;
-	case  5: down= 1024;	up=  128; break;
-	case  6: down= 1536;	up=  192; break;
-	case  7: down= 2048;	up=  192; break;
-	case  8: down= 2048;	up=  384; break;
-	case  9: down= 3072;	up=  384; break;
-	case 10: down= 6016;	up=  576; break;
-	case 11: down= 6016;	up=  572; break;
-	case 12: down= 6016;	up=  512; break;
-	case 13: down= 6144;	up=  512; break;
-	case 14: down=  187;	up=   32; break;
-	case 15: down=  187;	up=   64; break;
-	case 16: down= 1500;	up= 1500; break;
-	case 17: down=44000;	up=44000; break;
-	default: return;
+		*/
+		case  0: down= (UINT)thePrefs.GetMaxGraphDownloadRate()*8 ; up= (UINT)thePrefs.GetMaxGraphUploadRate()*8; break;
+		case  1: down=  16000;	up=  1024; break; //Xman 
+		//Xman end
+		case  2: down=   56;	up=   33; break;
+		case  3: down=   64;	up=   64; break;
+		case  4: down=  128;	up=  128; break;
+		case  5: down= 1024;	up=  128; break;
+		case  6: down= 1536;	up=  192; break;
+		case  7: down= 2048;	up=  192; break;
+		case  8: down= 2048;	up=  384; break;
+		case  9: down= 3072;	up=  384; break;
+		case 10: down= 6016;	up=  576; break;
+		case 11: down= 6016;	up=  572; break;
+		case 12: down= 6016;	up=  512; break;
+		case 13: down= 6144;	up=  512; break;
+		case 14: down=  187;	up=   32; break;
+		case 15: down=  187;	up=   64; break;
+		case 16: down= 1500;	up= 1500; break;
+		case 17: down=44000;	up=44000; break;
+		default: return;
 	}
-
+	
 	SetDlgItemInt(IDC_WIZ_TRUEDOWNLOAD_BOX, down, FALSE);
 	SetDlgItemInt(IDC_WIZ_TRUEUPLOAD_BOX, up, FALSE);
 	CheckRadioButton(IDC_KBITS, IDC_KBYTES, IDC_KBITS);

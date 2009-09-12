@@ -92,11 +92,8 @@ void CStatisticFile::AddRequest(){
 	alltimerequested++;
 	theApp.knownfiles->requested++;
 	//Xman Code Improvement -> don't update to often
-	//if(m_uFileupdatetime + 1000 < ::GetTickCount()) //once per second
-	{
-		m_uFileupdatetime=::GetTickCount();
-		theApp.sharedfiles->UpdateFile(fileParent);
-	}
+	m_uFileupdatetime=::GetTickCount(); 
+	theApp.sharedfiles->UpdateFile(fileParent);
 	//Xman end
 }
 	
@@ -105,11 +102,8 @@ void CStatisticFile::AddAccepted(){
 	alltimeaccepted++;
 	theApp.knownfiles->accepted++;
 	//Xman Code Improvement -> don't update to often
-	//if(m_uFileupdatetime + 1000 < ::GetTickCount()) //once per second
-	{
-		m_uFileupdatetime=::GetTickCount();
-		theApp.sharedfiles->UpdateFile(fileParent);
-	}
+	m_uFileupdatetime=::GetTickCount(); 
+	theApp.sharedfiles->UpdateFile(fileParent);
 	//Xman end
 }
 	
@@ -327,7 +321,6 @@ void CStatisticFile::UpdateCountedTransferred()
 	}
 }
 //Xman end
-
 // ==> Spread bars [Slugfiller/MorphXT] - Stulle
 void CStatisticFile::AddBlockTransferred(uint64 start, uint64 end, uint64 count){
 	if (start >= end || !count)
@@ -542,7 +535,8 @@ void CStatisticFile::ResetSpreadBar()
 // <== Spread bars [Slugfiller/MorphXT] - Stulle
 
 // ==> Fair Play [AndCycle/Stulle] - Stulle
-bool	CStatisticFile::GetFairPlay() {
+bool	CStatisticFile::GetFairPlay() const
+{
 	//should only judge simple UL or is there any better replacement?
 	//Stulle: rewrote the code to ensure bug free compiling
 	double dShareFactor = ((double)GetAllTimeTransferred())/((double)fileParent->GetFileSize());

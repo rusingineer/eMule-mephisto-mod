@@ -31,9 +31,9 @@
 #include "Opcodes.h"
 #include "Log.h"
 #include "ToolTipCtrlX.h"
+#include "IPFilter.h"
 #include "IP2Country.h" //EastShare - added by AndCycle, IP to Country
 #include "MemDC.h" // Xman
-#include "IPFilter.h" 
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -45,16 +45,16 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNAMIC(CServerListCtrl, CMuleListCtrl)
 
 BEGIN_MESSAGE_MAP(CServerListCtrl, CMuleListCtrl)
-	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, OnColumnClick)
-	ON_NOTIFY_REFLECT(NM_DBLCLK, OnNMDblClk)
+	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, OnLvnColumnClick)
 	ON_NOTIFY_REFLECT(LVN_GETINFOTIP, OnLvnGetInfoTip)
-	ON_WM_CONTEXTMENU()
-	ON_WM_SYSCOLORCHANGE()
 	//Xman no need for this because //EastShare - added by AndCycle, IP to Country
 	/*
-	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNMCustomDraw)
+	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNmCustomDraw)
 	*/
 	//Xman end
+	ON_NOTIFY_REFLECT(NM_DBLCLK, OnNmDblClk)
+	ON_WM_CONTEXTMENU()
+	ON_WM_SYSCOLORCHANGE()
 END_MESSAGE_MAP()
 
 CServerListCtrl::CServerListCtrl()
@@ -66,12 +66,12 @@ CServerListCtrl::CServerListCtrl()
 	SetGeneralPurposeFind(true, false);
 	//Xman end
 	m_tooltip = new CToolTipCtrlX;
+	SetSkinKey(L"ServersLv");
 }
 
 bool CServerListCtrl::Init()
 {
-	SetName(_T("ServerListCtrl"));
-
+	SetPrefsKey(_T("ServerListCtrl"));
 	SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	CToolTipCtrl* tooltip = GetToolTips();
@@ -86,17 +86,17 @@ bool CServerListCtrl::Init()
 	InsertColumn(1, GetResString(IDS_IP),			LVCFMT_LEFT, 140);
 	InsertColumn(2, GetResString(IDS_DESCRIPTION),	LVCFMT_LEFT, 150);
 	InsertColumn(3, GetResString(IDS_PING),			LVCFMT_RIGHT, 50);
-	InsertColumn(4, GetResString(IDS_UUSERS),		LVCFMT_RIGHT, 50);
-	InsertColumn(5, GetResString(IDS_MAXCLIENT),	LVCFMT_RIGHT, 50);
-	InsertColumn(6, GetResString(IDS_PW_FILES) ,	LVCFMT_RIGHT, 50);
-	InsertColumn(7, GetResString(IDS_PREFERENCE),	LVCFMT_LEFT,  60);
+	InsertColumn(4, GetResString(IDS_UUSERS),		LVCFMT_RIGHT, 60);
+	InsertColumn(5, GetResString(IDS_MAXCLIENT),	LVCFMT_RIGHT, 60);
+	InsertColumn(6, GetResString(IDS_PW_FILES) ,	LVCFMT_RIGHT, 60);
+	InsertColumn(7, GetResString(IDS_PREFERENCE),	LVCFMT_LEFT,  50);
 	InsertColumn(8, GetResString(IDS_UFAILED),		LVCFMT_RIGHT, 50);
 	InsertColumn(9, GetResString(IDS_STATICSERVER),	LVCFMT_LEFT,  50);
-	InsertColumn(10,GetResString(IDS_SOFTFILES),	LVCFMT_RIGHT, 50);
-	InsertColumn(11,GetResString(IDS_HARDFILES),	LVCFMT_RIGHT, 50);
-	InsertColumn(12,GetResString(IDS_VERSION),		LVCFMT_LEFT,  50);
-	InsertColumn(13,GetResString(IDS_IDLOW),		LVCFMT_RIGHT, 50);
-	InsertColumn(14,GetResString(IDS_OBFUSCATION)  ,LVCFMT_RIGHT, 50);
+	InsertColumn(10,GetResString(IDS_SOFTFILES),	LVCFMT_RIGHT, 60);
+	InsertColumn(11,GetResString(IDS_HARDFILES),	LVCFMT_RIGHT, 60, -1, true);
+	InsertColumn(12,GetResString(IDS_VERSION),		LVCFMT_LEFT,  50, -1, true);
+	InsertColumn(13,GetResString(IDS_IDLOW),		LVCFMT_RIGHT, 60);
+	InsertColumn(14,GetResString(IDS_OBFUSCATION),  LVCFMT_RIGHT, 50);
 
 	SetAllIcons();
 	Localize();
@@ -104,7 +104,7 @@ bool CServerListCtrl::Init()
 
 	// Barry - Use preferred sort order from preferences
 	SetSortArrow();
-	SortItems(SortProc, MAKELONG(GetSortItem(), (GetSortAscending()? 0 : 0x0001)));
+	SortItems(SortProc, MAKELONG(GetSortItem(), (GetSortAscending() ? 0 : 0x0001)));
 
 	ShowServerCount();
 
@@ -125,8 +125,7 @@ void CServerListCtrl::OnSysColorChange()
 void CServerListCtrl::SetAllIcons()
 {
 	CImageList iml;
-	iml.Create(16,16,theApp.m_iDfltImageListColorFlags|ILC_MASK,0,1);
-	iml.SetBkColor(CLR_NONE);
+	iml.Create(16, 16, theApp.m_iDfltImageListColorFlags | ILC_MASK, 0, 1);
 	iml.Add(CTempIconLoader(_T("Server")));
 	HIMAGELIST himl = ApplyImageList(iml.Detach());
 	if (himl)
@@ -242,7 +241,7 @@ void CServerListCtrl::RemoveAllDeadServers()
 	for (POSITION pos = theApp.serverlist->list.GetHeadPosition(); pos != NULL; )
 	{
 		const CServer* cur_server = theApp.serverlist->list.GetNext(pos);
-		if (cur_server->GetFailedCount() >= thePrefs.GetDeadServerRetries()) 
+		if (cur_server->GetFailedCount() >= thePrefs.GetDeadServerRetries())
 		{
 				//Xman
 				// Mighty Knife: Static server handling
@@ -267,7 +266,7 @@ void CServerListCtrl::RemoveAllFilteredServers()
 		if (theApp.ipfilter->IsFiltered(cur_server->GetIP()))
 		{
 			if (thePrefs.GetLogFilteredIPs())
-				AddDebugLogLine(false, _T("Filtered server \"%s\" (IP=%s) - IP filter (%s)"), cur_server->GetListName(), ipstr(cur_server->GetIP()), theApp.ipfilter->GetLastHit());
+				AddDebugLogLine(false, _T("IPFilter(Updated): Filtered server \"%s\" (IP=%s) - IP filter (%s)"), cur_server->GetListName(), ipstr(cur_server->GetIP()), theApp.ipfilter->GetLastHit());
 			RemoveServer(cur_server);
 			pos = theApp.serverlist->list.GetHeadPosition();
 		}
@@ -282,7 +281,7 @@ bool CServerListCtrl::AddServer(const CServer* pServer, bool bAddToList, bool bR
 		return false;
 	if (bAddToList)
 	{
-		InsertItem(LVIF_TEXT | LVIF_PARAM, bAddTail ? GetItemCount() : 0, pServer->GetListName(), 0, 0, 1, (LPARAM)pServer);
+		InsertItem(LVIF_TEXT | LVIF_PARAM, bAddTail ? GetItemCount() : 0, pServer->GetListName(), 0, 0, 0, (LPARAM)pServer);
 		RefreshServer(pServer);
 	}
 	ShowServerCount();
@@ -294,6 +293,11 @@ void CServerListCtrl::RefreshServer(const CServer* server)
 	if (!server || !theApp.emuledlg->IsRunning())
 		return;
 
+	//MORPH START - SiRoB, Don't Refresh item if not needed
+	if( theApp.emuledlg->activewnd != theApp.emuledlg->serverwnd || IsWindowVisible() == FALSE )
+		return;
+	//MORPH END   - SiRoB, Don't Refresh item if not needed
+
 	LVFINDINFO find;
 	find.flags = LVFI_PARAM;
 	find.lParam = (LPARAM)server;
@@ -303,7 +307,6 @@ void CServerListCtrl::RefreshServer(const CServer* server)
 
 	//MORPH START - Added by SiRoB,  CountryFlag Addon, IP to Country
 	Update(itemnr);
-	return;
 	//MORPH START - Added by SiRoB,  CountryFlag Addon
 
 	//Xman not used because of morph code
@@ -401,9 +404,9 @@ void CServerListCtrl::RefreshServer(const CServer* server)
 
 	// Obfuscation
 	if (server->SupportsObfuscationTCP() && server->GetObfuscationPortTCP() != 0)
-	SetItemText(itemnr, 14, GetResString(IDS_YES));
+		SetItemText(itemnr, 14, GetResString(IDS_YES));
 	else
-	SetItemText(itemnr, 14, GetResString(IDS_NO));
+		SetItemText(itemnr, 14, GetResString(IDS_NO));
 	*/
 	//Xman end
 }
@@ -415,7 +418,6 @@ void CServerListCtrl::RefreshAllServer(){
 	{
 		RefreshServer(theApp.serverlist->list.GetAt(pos));
 	}
-
 }
 //EastShare End - added by AndCycle, IP to Country
 
@@ -537,8 +539,8 @@ BOOL CServerListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 			theApp.CopyTextToClipboard(strURLs);
 		DeleteSelectedServers();
 		return TRUE;
-				 }
-
+	}
+	
 	case MP_COPYSELECTED:
 	case MP_GETED2KLINK:
 	case Irc_SetSendLink: {
@@ -550,7 +552,7 @@ BOOL CServerListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 				theApp.CopyTextToClipboard(strURLs);
 		}
 		return TRUE;
-						  }
+	}
 
 	case MP_PASTE:
 		if (theApp.IsEd2kServerLinkInClipboard())
@@ -572,7 +574,7 @@ BOOL CServerListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 		SetFocus();
 		AutoSelectItem();
 		return TRUE;
-					 }
+	}
 
 	case MP_REMOVEALL:
 		if (AfxMessageBox(GetResString(IDS_REMOVEALLSERVERS), MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2) != IDYES)
@@ -603,7 +605,7 @@ BOOL CServerListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 			RefreshServer(pServer);
 		}
 		return TRUE;
-						 }
+	}
 
 	case MP_REMOVEFROMSTATIC: {
 		POSITION pos = GetFirstSelectedItemPosition();
@@ -614,16 +616,16 @@ BOOL CServerListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 			RefreshServer(pServer);
 		}
 		return TRUE;
-							  }
+	}
 
 	case MP_PRIOLOW:
 		SetSelectedServersPriority(SRV_PR_LOW);
 		return TRUE;
-
+	
 	case MP_PRIONORMAL:
 		SetSelectedServersPriority(SRV_PR_NORMAL);
 		return TRUE;
-
+	
 	case MP_PRIOHIGH:
 		SetSelectedServersPriority(SRV_PR_HIGH);
 		return TRUE;
@@ -680,7 +682,7 @@ void CServerListCtrl::SetSelectedServersPriority(UINT uPriority)
 		theApp.serverlist->SaveStaticServers();
 }
 
-void CServerListCtrl::OnNMDblClk(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
+void CServerListCtrl::OnNmDblClk(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
 {
 	int iSel = GetNextItem(-1, LVIS_SELECTED | LVIS_FOCUSED);
 	if (iSel != -1){
@@ -699,19 +701,38 @@ bool CServerListCtrl::AddServerMetToList(const CString& strFile)
 	return bResult;
 }
 
-void CServerListCtrl::OnColumnClick(NMHDR *pNMHDR, LRESULT *pResult) 
-{ 
-	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR; 
-
-	// Barry - Store sort order in preferences
-	// Determine ascending based on whether already sorted on this column
-	bool bSortAscending = (GetSortItem()!= pNMListView->iSubItem) ? true : !GetSortAscending();
+void CServerListCtrl::OnLvnColumnClick(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NMLISTVIEW *pNMListView = (NMLISTVIEW *)pNMHDR;
+	bool sortAscending;
+	if (GetSortItem() != pNMListView->iSubItem)
+	{
+		switch (pNMListView->iSubItem)
+		{
+			case 4: // Users
+			case 5: // Max Users
+			case 6: // Files
+			case 7: // Priority
+			case 9: // Static
+			case 10: // Soft Files
+			case 11: // Hard Files
+			case 12: // Version
+			case 13: // Low IDs
+			case 14: // Obfuscation
+				sortAscending = false;
+				break;
+			default:
+				sortAscending = true;
+				break;
+		}
+	}
+	else
+		sortAscending = !GetSortAscending();
 
 	// Sort table
-	UpdateSortHistory(MAKELONG(pNMListView->iSubItem, (bSortAscending ? 0 : 0x0001)));
-	SetSortArrow(pNMListView->iSubItem, bSortAscending);
-	SortItems(SortProc, MAKELONG(pNMListView->iSubItem, (bSortAscending ? 0 : 0x0001)));
-
+	UpdateSortHistory(MAKELONG(pNMListView->iSubItem, (sortAscending ? 0 : 0x0001)));
+	SetSortArrow(pNMListView->iSubItem, sortAscending);
+	SortItems(SortProc, MAKELONG(pNMListView->iSubItem, (sortAscending ? 0 : 0x0001)));
 	Invalidate();
 	*pResult = 0;
 }
@@ -740,7 +761,8 @@ int CServerListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 		return -1;						\
 
 	int iResult;
-	switch (LOWORD(lParamSort)){
+	switch (LOWORD(lParamSort))
+	{
 	  case 0:
 		  UNDEFINED_STR_AT_BOTTOM(item1->GetListName(), item2->GetListName());
 		  iResult = item1->GetListName().CompareNoCase(item2->GetListName());
@@ -833,8 +855,8 @@ int CServerListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 		  iResult = CompareUnsigned(item1->GetLowIDUsers(), item2->GetLowIDUsers());
 		  break;
 	  case 14: 
-		  iResult = (int)(item1->SupportsObfuscationTCP() && item1->GetObfuscationPortTCP() != 0) - (int)(item2->SupportsObfuscationTCP() && item2->GetObfuscationPortTCP() != 0);
-		  break;
+		 iResult = (int)(item1->SupportsObfuscationTCP() && item1->GetObfuscationPortTCP() != 0) - (int)(item2->SupportsObfuscationTCP() && item2->GetObfuscationPortTCP() != 0);
+		 break;
 
 	  default: 
 		  iResult = 0;
@@ -842,12 +864,11 @@ int CServerListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 
 	// SLUGFILLER: multiSort remove - handled in parent class
 	/*
-	int dwNextSort;
 	//call secondary sortorder, if this one results in equal
-	//(Note: yes I know this call is evil OO wise, but better than changing a lot more code, while we have only one instance anyway - might be fixed later)
-	if (iResult == 0 && (dwNextSort = theApp.emuledlg->serverwnd->serverlistctrl.GetNextSortOrder(lParamSort)) != (-1)){
-		iResult= SortProc(lParam1, lParam2, dwNextSort);
-	}
+	int dwNextSort;
+	if (iResult == 0 && (dwNextSort = theApp.emuledlg->serverwnd->serverlistctrl.GetNextSortOrder(lParamSort)) != -1)
+		iResult = SortProc(lParam1, lParam2, dwNextSort);
+
 	*/
 	//Xman end
 
@@ -877,15 +898,13 @@ bool CServerListCtrl::StaticServerFileRemove(CServer *server)
 void CServerListCtrl::ShowServerCount()
 {
 	CString counter;
-
 	counter.Format(_T(" (%i)"), GetItemCount());
-	theApp.emuledlg->serverwnd->GetDlgItem(IDC_SERVLIST_TEXT)->SetWindowText(GetResString(IDS_SV_SERVERLIST)+counter  );
+	theApp.emuledlg->serverwnd->GetDlgItem(IDC_SERVLIST_TEXT)->SetWindowText(GetResString(IDS_SV_SERVERLIST) + counter);
 }
 
 void CServerListCtrl::OnLvnGetInfoTip(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVGETINFOTIP pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIP>(pNMHDR);
-
 	if (pGetInfoTip->iSubItem == 0)
 	{
 		LVHITTESTINFO hti = {0};
@@ -894,11 +913,25 @@ void CServerListCtrl::OnLvnGetInfoTip(NMHDR *pNMHDR, LRESULT *pResult)
 		bool bOverMainItem = (SubItemHitTest(&hti) != -1 && hti.iItem == pGetInfoTip->iItem && hti.iSubItem == 0);
 
 		// those tooltips are very nice for debugging/testing but pretty annoying for general usage
-		// enable tooltips only if Shift+Ctrl is currently pressed
-		bool bShowInfoTip = GetSelectedCount() > 1 || ((GetKeyState(VK_SHIFT) & 0x8000) && (GetKeyState(VK_CONTROL) & 0x8000));
+		// enable tooltips only if Ctrl is currently pressed
+		bool bShowInfoTip = bOverMainItem && (GetSelectedCount() > 1 || (GetKeyState(VK_CONTROL) & 0x8000));
+		if (bShowInfoTip && GetSelectedCount() > 1)
+		{
+			// Don't show the tooltip if the mouse cursor is not over at least one of the selected items
+			bool bInfoTipItemIsPartOfMultiSelection = false;
+			POSITION pos = GetFirstSelectedItemPosition();
+			while (pos) {
+				if (GetNextSelectedItem(pos) == pGetInfoTip->iItem) {
+					bInfoTipItemIsPartOfMultiSelection = true;
+					break;
+				}
+			}
+			if (!bInfoTipItemIsPartOfMultiSelection)
+				bShowInfoTip = false;
+		}
 
 		if (!bShowInfoTip) {
-			if (!bOverMainItem){
+			if (!bOverMainItem) {
 				// don't show the default label tip for the main item, if the mouse is not over the main item
 				if ((pGetInfoTip->dwFlags & LVGIT_UNFOLDED) == 0 && pGetInfoTip->cchTextMax > 0 && pGetInfoTip->pszText[0] != _T('\0'))
 					pGetInfoTip->pszText[0] = _T('\0');
@@ -906,11 +939,7 @@ void CServerListCtrl::OnLvnGetInfoTip(NMHDR *pNMHDR, LRESULT *pResult)
 			return;
 		}
 
-		if (GetSelectedCount() == 1)
-		{
-			;
-		}
-		else
+		if (GetSelectedCount() > 1)
 		{
 			int iSelected = 0;
 			ULONGLONG ulTotalUsers = 0;
@@ -949,9 +978,9 @@ void CServerListCtrl::OnLvnGetInfoTip(NMHDR *pNMHDR, LRESULT *pResult)
 
 //Xman no need for this because //EastShare - added by AndCycle, IP to Country
 /*
-void CServerListCtrl::OnNMCustomDraw(NMHDR *pNMHDR, LRESULT *plResult)
+void CServerListCtrl::OnNmCustomDraw(NMHDR *pNMHDR, LRESULT *plResult)
 */
-void CServerListCtrl::OnNMCustomDraw(NMHDR* /*pNMHDR*/, LRESULT* /*plResult*/)
+void CServerListCtrl::OnNmCustomDraw(NMHDR* /*pNMHDR*/, LRESULT* /*plResult*/)
 {
 	
 	return; 
@@ -988,8 +1017,6 @@ void CServerListCtrl::OnNMCustomDraw(NMHDR* /*pNMHDR*/, LRESULT* /*plResult*/)
 }
 
 //Commander - Added: CountryFlag - Start IP to Country
-#define DLC_DT_TEXT (DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_NOPREFIX|DT_END_ELLIPSIS)
-
 void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	if( !theApp.emuledlg->IsRunning() )
@@ -1000,11 +1027,11 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	//MORPH START - Added by SiRoB, Don't draw hidden Rect
 	RECT clientRect;
 	GetClientRect(&clientRect);
-	RECT cur_rec = lpDrawItemStruct->rcItem;
+	CRect cur_rec(lpDrawItemStruct->rcItem);
 	if (cur_rec.top >= clientRect.bottom || cur_rec.bottom <= clientRect.top)
 		return;
 	//MORPH END   - Added by SiRoB, Don't draw hidden Rect
-
+	
 	CDC* odc = CDC::FromHandle(lpDrawItemStruct->hDC);
 	BOOL bCtrlFocused = ((GetFocus() == this ) || (GetStyle() & LVS_SHOWSELALWAYS));
 	const CServer* server = (CServer*)lpDrawItemStruct->itemData;
@@ -1141,13 +1168,13 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 					POINT point2= {cur_rec.left,cur_rec.top+1};
 					if(theApp.ip2country->ShowCountryFlag() ){
-						theApp.ip2country->GetFlagImageList()->Draw(dc, server->GetCountryFlagIndex(), point2, ILD_NORMAL);
+						theApp.ip2country->GetFlagImageList()->DrawIndirect(dc, server->GetCountryFlagIndex(), point2, CSize(18,16), CPoint(0,0), ILD_NORMAL);
 					}
 					else
 						imagelist.DrawIndirect(dc, 0, point2, CSize(16,16), CPoint(0,0), ILD_NORMAL);
 
 					cur_rec.left +=20;
-					dc->DrawText(Sbuffer,Sbuffer.GetLength(),&cur_rec,DLC_DT_TEXT);
+					dc->DrawText(Sbuffer,Sbuffer.GetLength(),&cur_rec,MLC_DT_TEXT);
 					cur_rec.left -=20;
 					cur_rec.top +=2;//Grafic Bug Fix By Aenarion[ITA] leuk_he
 
@@ -1174,7 +1201,7 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				case 4:
 				{
 					if(server->GetUsers())
-						Sbuffer.Format(_T("%i"), server->GetUsers());
+						Sbuffer.Format(_T("%s"), CastItoIShort(server->GetUsers()));
 					else
 						Sbuffer = "";
 					break;
@@ -1182,7 +1209,7 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				case 5:
 				{
 					if(server->GetMaxUsers())
-						Sbuffer.Format(_T("%i"), server->GetMaxUsers());
+						Sbuffer.Format(_T("%s"), CastItoIShort(server->GetMaxUsers()));
 					else
 						Sbuffer = "";
 					break;
@@ -1190,7 +1217,7 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				case 6:
 				{
 					if(server->GetFiles())
-						Sbuffer.Format(_T("%i"), server->GetFiles());
+						Sbuffer.Format(_T("%s"), CastItoIShort(server->GetFiles()));
 					else
 						Sbuffer = "";
 					break;
@@ -1228,7 +1255,7 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				case 10:
 				{
 					if(server->GetSoftFiles())
-						Sbuffer.Format(_T("%i"), server->GetSoftFiles());
+						Sbuffer.Format(_T("%s"), CastItoIShort(server->GetSoftFiles()));
 					else
 						Sbuffer = "";
 					break;
@@ -1236,7 +1263,7 @@ void CServerListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				case 11:
 				{
 					if(server->GetHardFiles())
-						Sbuffer.Format(_T("%i"), server->GetHardFiles());
+						Sbuffer.Format(_T("%s"), CastItoIShort(server->GetHardFiles()));
 					else
 						Sbuffer = "";
 					break;

@@ -57,7 +57,7 @@ protected:
 	bool m_bDisablePeerCache;
 	//Xman
 	/*
-	bool m_bDynUpEnabled;
+    bool m_bDynUpEnabled;
     int m_iDynUpMinUpload;
     int m_iDynUpPingTolerance;
     int m_iDynUpPingToleranceMilliseconds;
@@ -70,16 +70,18 @@ protected:
 	//Xman end
 	bool m_bAutoArchDisable;
 	int m_iExtractMetaData;
-	//Xman official UPNP removed
+	// ==> UPnP support [MoNKi] - leuk_he
 	/*
+	bool m_bIsUPnPEnabled; //zz_fly :: add UPnP option in Tweaks
 	bool m_bCloseUPnPOnExit;
 	bool m_bSkipWANIPSetup;
 	bool m_bSkipWANPPPSetup;
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	int m_iShareeMule;
 	int m_iCryptTCPPaddingLength; //Xman Added PaddingLength to Extended preferences
 	bool bShowedWarning;
+	bool m_bResolveShellLinks;
 
 
 	CSliderCtrl m_ctlFileBuffSize;
@@ -131,7 +133,7 @@ protected:
 	HTREEITEM m_htiDisablePeerCache;
 	//Xman
 	/*
-	HTREEITEM m_htiDynUp;
+    HTREEITEM m_htiDynUp;
 	HTREEITEM m_htiDynUpEnabled;
     HTREEITEM m_htiDynUpMinUpload;
     HTREEITEM m_htiDynUpPingTolerance;
@@ -142,46 +144,33 @@ protected:
     HTREEITEM m_htiDynUpGoingUpDivider;
     HTREEITEM m_htiDynUpGoingDownDivider;
     HTREEITEM m_htiDynUpNumberOfPings;
-	HTREEITEM m_htiA4AFSaveCpu;
+    HTREEITEM m_htiA4AFSaveCpu;
 	*/
 	//Xman end
-
-	// ==> UPnP support [MoNKi] - leuk_he
-	/*
-	//Xman
-	//upnp_start
-	HTREEITEM m_htiUPnPNat;
-	HTREEITEM m_htiUPnPTryRandom;
-	HTREEITEM m_htiUPnPRebindOnIPChange; //zz_fly :: Rebind UPnP on IP-change
-	bool m_iUPnPNat;
-	bool m_iUPnPTryRandom;
-	bool m_iUPnPRebindOnIPChange; //zz_fly :: Rebind UPnP on IP-change
-	//upnp_end
-	*/
-	// <== UPnP support [MoNKi] - leuk_he
 
 	// ==> UPnP support [MoNKi] - leuk_he verbose log
 	bool m_bLogUPnP;
 	HTREEITEM m_htiLogUPnP;
 	// <== UPnP support [MoNKi] - leuk_he 
-
 	HTREEITEM m_htiExtractMetaData;
 	HTREEITEM m_htiExtractMetaDataNever;
 	HTREEITEM m_htiExtractMetaDataID3Lib;
 	HTREEITEM m_htiAutoArch;
-	//Xman official UPNP removed
-	/*
 	HTREEITEM m_htiUPnP;
+	// ==> UPnP support [MoNKi] - leuk_he
+	/*
+	HTREEITEM m_htiIsUPnPEnabled; //zz_fly :: add UPnP option in Tweaks
 	HTREEITEM m_htiCloseUPnPPorts;
 	HTREEITEM m_htiSkipWANIPSetup;
 	HTREEITEM m_htiSkipWANPPPSetup;
 	*/
-	//Xman end
+	// <== UPnP support [MoNKi] - leuk_he
 	HTREEITEM m_htiShareeMule;
 	HTREEITEM m_htiShareeMuleMultiUser;
 	HTREEITEM m_htiShareeMulePublicUser;
 	HTREEITEM m_htiShareeMuleOldStyle;
 	//HTREEITEM m_htiExtractMetaDataMediaDet;
+	HTREEITEM m_htiResolveShellLinks;
 
 	HTREEITEM m_htiCryptTCPPaddingLength; //Xman Added PaddingLength to Extended preferences
 

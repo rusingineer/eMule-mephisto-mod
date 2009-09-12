@@ -23,6 +23,7 @@
 #include "emuledlg.h"
 #include "Preferences.h"
 #include "HelpIDs.h"
+#include ".\ppgfiles.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,11 +60,13 @@ BEGIN_MESSAGE_MAP(CPPgFiles, CPropertyPage)
 	ON_BN_CLICKED(IDC_REMEMBERCANCELLED, OnSettingsChange) 
 	ON_BN_CLICKED(IDC_BROWSEV, BrowseVideoplayer)
 	ON_WM_HELPINFO()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 CPPgFiles::CPPgFiles()
 	: CPropertyPage(CPPgFiles::IDD)
 {
+	m_icoBrowse = NULL;
 }
 
 CPPgFiles::~CPPgFiles()
@@ -79,6 +82,9 @@ BOOL CPPgFiles::OnInitDialog()
 {
 	CPropertyPage::OnInitDialog();
 	InitWindowStyles(this);
+
+	AddBuddyButton(GetDlgItem(IDC_VIDEOPLAYER)->m_hWnd, ::GetDlgItem(m_hWnd, IDC_BROWSEV));
+	InitAttachedBrowseButton(::GetDlgItem(m_hWnd, IDC_BROWSEV), m_icoBrowse);
 
 	LoadSettings();
 	Localize();
@@ -272,7 +278,6 @@ void CPPgFiles::Localize(void)
 		GetDlgItem(IDC_VIDEOPLAYER_CMD_LBL)->SetWindowText(GetResString(IDS_COMMAND));
 		GetDlgItem(IDC_VIDEOPLAYER_ARGS_LBL)->SetWindowText(GetResString(IDS_ARGUMENTS));
 		GetDlgItem(IDC_VIDEOBACKUP)->SetWindowText(GetResString(IDS_VIDEOBACKUP));		
-		GetDlgItem(IDC_BROWSEV)->SetWindowText(GetResString(IDS_PW_BROWSE));
 		GetDlgItem(IDC_REMEMBERDOWNLOADED)->SetWindowText(GetResString(IDS_PW_REMEMBERDOWNLOADED));
 		GetDlgItem(IDC_REMEMBERCANCELLED)->SetWindowText(GetResString(IDS_PW_REMEMBERCANCELLED));		
 		GetDlgItem(IDC_REMEMBERAICH)->SetWindowText(GetResString(IDS_REMEMBERAICH)); //Xman remove unused AICH-hashes
@@ -335,6 +340,16 @@ void CPPgFiles::OnSettingsChangeCat(uint8 index)
 	if (on)
 		CheckDlgButton(index == 1 ? IDC_STARTNEXTFILECAT2 : IDC_STARTNEXTFILECAT, FALSE);
 	OnSettingsChange();
+}
+
+void CPPgFiles::OnDestroy()
+{
+	CPropertyPage::OnDestroy();
+	if (m_icoBrowse)
+	{
+		VERIFY( DestroyIcon(m_icoBrowse) );
+		m_icoBrowse = NULL;
+	}
 }
 
 //Xman remove unused AICH-hashes

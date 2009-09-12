@@ -19,20 +19,23 @@
 #include "opcodes.h"
 
 /*
-					   CPartFile
-					 /
-		  CKnownFile
-		/
+										CPartFile
+										/
+							CKnownFile
+							/
+			CShareableFile
+			/
 CAbstractFile - CCollectionFile
-		\
-		  CSearchFile
+			\
+			CSearchFile
 */
 
 namespace Kademlia
 {
 	class CUInt128;
 	class CEntry;
-	typedef std::list<CStringW> WordList;
+	class CKadTagValueString;
+	typedef std::list<CKadTagValueString> WordList;
 };
 
 class CTag;
@@ -105,9 +108,9 @@ public:
 	void	LoadComment();
 	virtual void	UpdateFileRatingCommentAvail(bool bForceUpdate = true) = 0;
 
-	bool AddNote(Kademlia::CEntry* pEntry);
+	bool	AddNote(Kademlia::CEntry* pEntry);
 	void	RefilterKadNotes(bool bUpdate = true);
-	const CKadEntryPtrList& getNotes() const { return m_kadNotes; }
+	const	CKadEntryPtrList& getNotes() const { return m_kadNotes; }
 
 	bool			IsKadCommentSearchRunning() const						{ return m_bKadCommentSearchRunning; }
 	void			SetKadCommentSearchRunning(bool bVal);

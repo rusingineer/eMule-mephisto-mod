@@ -17,6 +17,7 @@ protected:
 	BOOL m_bModified;
 	bool bCreated;
 	CHyperTextCtrl m_wndMobileLink;
+	HICON m_icoBrowse;
 
 	void LoadSettings(void);
 
@@ -38,4 +39,5 @@ protected:
 	afx_msg void SetTmplButtonState();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnDataChange()				{SetModified(); SetTmplButtonState(); }
+	afx_msg void OnDestroy();
 };

@@ -157,7 +157,7 @@ void CDownloadQueue::Init(){
 	for (int i=0;i<thePrefs.tempdir.GetCount();i++) {
 		//Xman
 		CStringList metsfound;	// SLUGFILLER: SafeHash - ensure each met is loaded once per tempdir
-
+		bool allMetsSuccess = true; //zz_fly :: better .part.met file backup and recovery :: Enig123
 		CString searchPath=thePrefs.GetTempDir(i);
 
 		searchPath += _T("\\*.part.met");
@@ -179,7 +179,28 @@ void CDownloadQueue::Init(){
 			//MORPH END   - Moved Down, to allow checking for backup met files.
 			// END SLUGFILLER: SafeHash
 			CPartFile* toadd = new CPartFile();
-			if (toadd->LoadPartFile(thePrefs.GetTempDir(i), ff.GetFileName())){
+			EPartFileLoadResult eResult = toadd->LoadPartFile(thePrefs.GetTempDir(i), ff.GetFileName());
+			if (eResult == PLR_FAILED_METFILE_CORRUPT)
+			{
+				// .met file is corrupted, try to load the latest backup of this file
+				delete toadd;
+				toadd = new CPartFile();
+				//zz_fly :: better .part.met file backup and recovery :: Enig123 :: Start
+				//note: .backup is newer than .bak, if it is valid. we load .backup first. see CPartFile::SavePartFile() for details.
+				/*
+				eResult = toadd->LoadPartFile(thePrefs.GetTempDir(i), ff.GetFileName() + PARTMET_BAK_EXT);
+				*/
+				eResult = toadd->LoadPartFile(thePrefs.GetTempDir(i), ff.GetFileName() + PARTMET_TMP_EXT);
+				//zz_fly :: better .part.met file backup and recovery :: Enig123 :: End
+				if (eResult == PLR_LOADSUCCESS)
+				{
+					toadd->SavePartFile(true); // don't override our just used .bak file yet
+					AddLogLine(false, GetResString(IDS_RECOVERED_PARTMET), toadd->GetFileName());
+				}
+			}
+
+			if (eResult == PLR_LOADSUCCESS)
+			{
 				metsfound.AddTail(CString(ff.GetFileName()).MakeLower()); //MORPH - Added, fix SafeHash
 				count++;
 				filelist.AddTail(toadd);			// to downloadqueue
@@ -192,12 +213,27 @@ void CDownloadQueue::Init(){
 				theApp.emuledlg->transferwnd->downloadlistctrl.AddFile(toadd);// show in downloadwindow
 			}
 			else
+			{
 				delete toadd;
+				allMetsSuccess = false; //zz_fly :: better .part.met file backup and recovery :: Enig123
+			}
 		}
 		ff.Close();
 
+		//zz_fly :: better .part.met file backup and recovery :: Enig123 :: Start
+		//  skip recovery step if there's no failed part file load
+		if(allMetsSuccess)
+			continue;
+		//zz_fly :: better .part.met file backup and recovery :: Enig123 :: End
+
 		//try recovering any part.met files
+		//zz_fly :: better .part.met file backup and recovery :: Enig123 :: Start
+		// .backup failed, load .bak
+		/*
 		searchPath += _T(".backup");
+		*/
+		searchPath += PARTMET_BAK_EXT;
+		//zz_fly :: better .part.met file backup and recovery :: Enig123 :: Emd
 		end = !ff.FindFile(searchPath, 0);
 		while (!end){
 			end = !ff.FindNextFile();
@@ -215,11 +251,11 @@ void CDownloadQueue::Init(){
 			// END SLUGFILLER: SafeHash
 
 			CPartFile* toadd = new CPartFile();
-			if (toadd->LoadPartFile(thePrefs.GetTempDir(i),ff.GetFileName())){
+			if (toadd->LoadPartFile(thePrefs.GetTempDir(i), ff.GetFileName()) == PLR_LOADSUCCESS){
 				//MORPH START - Added, fix SafeHash
 				metsfound.AddTail(RemoveFileExtension(CString(ff.GetFileName()).MakeLower()));
 				//MORPH END   - Added, fix SafeHash
-				toadd->SavePartFile(); // resave backup
+				toadd->SavePartFile(true); // resave backup, don't overwrite existing bak files yet
 				count++;
 				filelist.AddTail(toadd);			// to downloadqueue
 				//Xman
@@ -684,7 +720,7 @@ void CDownloadQueue::Process(){
 	if( thePrefs.IsUseGlobalHL() && (::GetTickCount() - m_dwUpdateHL) >= m_dwUpdateHlTime )
 		SetHardLimits();
 	// <== Global Source Limit [Max/Stulle] - Stulle
-
+	
 	ProcessLocalRequests(); // send src requests to local server
 
 	// ==> Quick start [TPT] - Max
@@ -724,7 +760,17 @@ void CDownloadQueue::Process(){
 	// <== Quick start [TPT] - Max
 
 	// Elapsed time (TIMER_PERIOD not accurate)	
+	//zz_fly :: fix possible overflow :: start
+	//note: i am not fix the subtraction. the subtraction is right when overflow happens. but overflowed deltaTime will let if(deltaTime>0) useless.
+	/*
 	uint32 deltaTime = ::GetTickCount() - m_lastProcessTime;
+	*/
+	uint32 deltaTime = 30000 + ::GetTickCount() - m_lastProcessTime;
+	if (deltaTime > 30000)
+		deltaTime -= 30000;
+	else
+		deltaTime = 0;
+	//zz_fly :: end
 	m_lastProcessTime += deltaTime;
 
 	// - Maella -New bandwidth control-
@@ -2190,7 +2236,10 @@ void CDownloadQueue::SetAutoCat(CPartFile* newfile){
 		} else {
 			// regular expression evaluation
 			if (RegularExpressionMatch(catExt,newfile->GetFileName()))
+			{
 				newfile->SetCategory(ix);
+				return; //zz_fly :: Avi3k: fix cat assign
+			}
 		}
 	}
 }
@@ -2575,8 +2624,8 @@ void CDownloadQueue::KademliaSearchFile(uint32 searchID, const Kademlia::CUInt12
 
 void CDownloadQueue::ExportPartMetFilesOverview() const
 {
-	CString strFileListPath = thePrefs.GetMuleDirectory(EMULE_DATABASEDIR) + _T("downloads.txt");
-
+	CString strFileListPath = thePrefs.GetMuleDirectory(EMULE_CONFIGDIR) + _T("downloads.txt");
+	
 	CString strTmpFileListPath = strFileListPath;
 	PathRenameExtension(strTmpFileListPath.GetBuffer(MAX_PATH), _T(".tmp"));
 	strTmpFileListPath.ReleaseBuffer();
@@ -2816,7 +2865,6 @@ void CDownloadQueue::PrintStatistic()
 	AddLogLine(false, _T("---------------------------------------"));
 }
 #endif
-
 // ==> File Settings [sivka/Stulle] - Stulle
 void CDownloadQueue::InitTempVariables(CPartFile* file)
 {
@@ -2879,8 +2927,13 @@ void CDownloadQueue::SaveFileSettings(bool bStart)
 			m_SaveSettingsThread = new CSaveSettingsThread();
 			m_dwLastSave = ::GetTickCount();
 		}
-		else if((::GetTickCount() - m_dwLastSave) < SEC2MS(SAVE_WAIT_TIME))
-			m_bSaveAgain = true;
+		else
+		{
+			if((m_dwLastSave + SEC2MS(SAVE_WAIT_TIME)) < ::GetTickCount())
+				m_bSaveAgain = true;
+			m_dwLastSave = ::GetTickCount();
+			m_SaveSettingsThread->KeepWaiting();
+		}
 	}
 	else
 	{
@@ -2902,8 +2955,11 @@ void CDownloadQueue::SaveFileSettings(bool bStart)
 CSaveSettingsThread::CSaveSettingsThread(void) {
 	threadEndedEvent = new CEvent(0, 1);
 	pauseEvent = new CEvent(TRUE, TRUE);
+	waitEvent = new CEvent(TRUE, FALSE);
 
 	bDoRun = true;
+	bDoWait = true;
+	m_dwLastWait = 0;
 	AfxBeginThread(RunProc,(LPVOID)this,THREAD_PRIORITY_LOWEST);
 }
 
@@ -2911,13 +2967,19 @@ CSaveSettingsThread::~CSaveSettingsThread(void) {
 	EndThread();
 	delete threadEndedEvent;
 	delete pauseEvent;
+	delete waitEvent;
 }
 
 void CSaveSettingsThread::EndThread() {
+	if(!bDoRun) // we are trying to stop already
+		return;
+
 	// signal the thread to stop looping and exit.
 	bDoRun = false;
+	bDoWait = false;
 
 	Pause(false);
+	waitEvent->SetEvent();
 
 	// wait for the thread to signal that it has stopped looping.
 	threadEndedEvent->Lock();
@@ -2942,18 +3004,26 @@ UINT AFX_CDECL CSaveSettingsThread::RunProc(LPVOID pParam)
 
 UINT CSaveSettingsThread::RunInternal()
 {
-	bool bWait = true; // only wait on the first run
-	int iCount = 0;
+	while (bDoWait)
+	{
+		if(m_dwLastWait == 0) // initial wait
+			waitEvent->Lock(SEC2MS(SAVE_WAIT_TIME));
+		else if(m_dwLastWait + SEC2MS(SAVE_WAIT_TIME) > ::GetTickCount()) // we have not waited enough since last keep message
+			waitEvent->Lock(m_dwLastWait + SEC2MS(SAVE_WAIT_TIME) - ::GetTickCount()); // so wait until the time is up
+		else // we waited enough, do the actual run now
+		{
+			bDoWait = false;
+			if(bDoRun == false) // what? canceling this thread before saving
+				m_SettingsSaver.SaveSettings(); // save!
+		}
+	}
+
 	while(bDoRun) 
 	{
-		if(bWait)
-			Sleep(SEC2MS(SAVE_WAIT_TIME));
-		bWait = false; // no more waiting henceforth
-
 		if(m_SettingsSaver.SaveSettings()) // if this fails we need to run again
 		{
-			PostMessage(theApp.emuledlg->m_hWnd,TM_SAVEDONE,0,0);
 			Pause(true);
+			PostMessage(theApp.emuledlg->m_hWnd,TM_SAVEDONE,0,0);
 		}
 		pauseEvent->Lock();
 	}

@@ -891,7 +891,6 @@ void CBandWidthControl::PrintStatistic()
 	m_statisticLocker.Unlock();
 }
 #endif
-
 // ==> Multiple friendslots [ZZ] - Mephisto
 uint64 CBandWidthControl::GeteMuleOutFriends() const 
 {

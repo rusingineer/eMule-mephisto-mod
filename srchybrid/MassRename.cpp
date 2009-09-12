@@ -132,6 +132,7 @@ void CMassRenameDialog::Localize() {
 	GetDlgItem (IDC_SIMPLECLEANUP)->SetWindowText (GetResString (IDS_SIMPLECLEANUP));
 	GetDlgItem (IDC_INSERTTEXTCOLUMN)->SetWindowText (GetResString (IDS_INSERTTEXTCOLUMN));
 	GetDlgItem (IDC_RESETBUTTON)->SetWindowText (GetResString (IDS_RESETFILENAMES));
+	GetDlgItem (IDOK)->SetWindowText (GetResString(IDS_TREEOPTIONS_OK));
 	GetDlgItem (IDCANCEL)->SetWindowText (GetResString (IDS_CANCEL));
 }
 

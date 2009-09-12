@@ -763,7 +763,8 @@ void CClientList::Process()
 					if (thePrefs.GetDebugClientTCPLevel() > 0)
 						DebugSend("OP_KAD_FWTCPCHECK_ACK", cur_client);
 					Packet* pPacket = new Packet(OP_KAD_FWTCPCHECK_ACK, 0, OP_EMULEPROT);
-					cur_client->SafeSendPacket(pPacket);
+					if (!cur_client->SafeConnectAndSendPacket(pPacket))
+						cur_client = NULL;
 				}
 				else {
 					if (thePrefs.GetDebugClientKadUDPLevel() > 0)
@@ -771,7 +772,8 @@ void CClientList::Process()
 					Kademlia::CKademlia::GetUDPListener()->SendNullPacket(KADEMLIA_FIREWALLED_ACK_RES, ntohl(cur_client->GetIP()), cur_client->GetKadPort(), 0, NULL);
 				}
 				//We are done with this client. Set Kad status to KS_NONE and it will be removed in the next cycle.
-				cur_client->SetKadState(KS_NONE);
+				if (cur_client != NULL)
+					cur_client->SetKadState(KS_NONE);
 				break;
 
 			case KS_INCOMING_BUDDY:
@@ -833,7 +835,7 @@ void CClientList::Process()
 						DebugSend("OP__BuddyPing", cur_client);
 					Packet* buddyPing = new Packet(OP_BUDDYPING, 0, OP_EMULEPROT);
 					theStats.AddUpDataOverheadOther(buddyPing->size);
-					cur_client->SafeSendPacket(buddyPing);
+					VERIFY( cur_client->SendPacket(buddyPing, true, true) );
 					cur_client->SetLastBuddyPingPongTime();
 				}
 				break;

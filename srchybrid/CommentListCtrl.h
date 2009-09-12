@@ -60,6 +60,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	afx_msg void OnLvnDeleteItem(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnColumnClick(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnDeleteItem(NMHDR *pNMHDR, LRESULT *pResult);
 };

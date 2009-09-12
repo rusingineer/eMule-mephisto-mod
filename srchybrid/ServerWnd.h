@@ -109,7 +109,6 @@ protected:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnStnDblclickServlstIco();
 	afx_msg void OnSplitterMoved(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnBnClickedServerLists(); // Links for Server list and nodes file [Stulle] - Stulle
 	// ==> Design Settings [eWombat/Stulle] - Max

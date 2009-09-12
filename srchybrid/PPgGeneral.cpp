@@ -66,7 +66,7 @@ BEGIN_MESSAGE_MAP(CPPgGeneral, CPropertyPage)
 END_MESSAGE_MAP()
 
 CPPgGeneral::CPPgGeneral()
-: CPropertyPage(CPPgGeneral::IDD)
+	: CPropertyPage(CPPgGeneral::IDD)
 {
 }
 
@@ -184,6 +184,9 @@ BOOL CPPgGeneral::OnInitDialog()
 					break;
 				case LANGID_VA_ES:
 					_tcscpy(szLang,_T("Valencian") );
+					break;
+				case LANGID_VA_ES_RACV:
+					_tcscpy(szLang, _T("Valencian (RACV)"));
 					break;
 				default:
 					ASSERT(0);
@@ -313,7 +316,7 @@ BOOL CPPgGeneral::OnApply()
 
 void CPPgGeneral::UpdateEd2kLinkFixCtrl()
 {
-	GetDlgItem(IDC_ED2KFIX)->EnableWindow(HaveEd2kRegAccess() && Ask4RegFix(true, false, true));
+	GetDlgItem(IDC_ED2KFIX)->EnableWindow(Ask4RegFix(true, false, true));
 }
 
 BOOL CPPgGeneral::OnSetActive()

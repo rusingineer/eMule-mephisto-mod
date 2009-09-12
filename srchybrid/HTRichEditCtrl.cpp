@@ -744,7 +744,7 @@ static const struct
 {
 	LPCTSTR pszScheme;
 	int iLen;
-} _apszSchemes[] =
+} s_apszSchemes[] =
 {
     { _T("ed2k://"),  7 },
     { _T("http://"),  7 },
@@ -762,9 +762,9 @@ void CHTRichEditCtrl::AppendText(const CString& sText)
 	while (*psz != _T('\0'))
 	{
 		bool bFoundScheme = false;
-		for (int i = 0; i < _countof(_apszSchemes); i++)
+		for (int i = 0; i < _countof(s_apszSchemes); i++)
 		{
-			if (_tcsncmp(psz, _apszSchemes[i].pszScheme, _apszSchemes[i].iLen) == 0)
+			if (_tcsncmp(psz, s_apszSchemes[i].pszScheme, s_apszSchemes[i].iLen) == 0)
 			{
 				// output everything before the URL
 				if (psz - pszStart > 0){
@@ -829,8 +829,8 @@ BOOL CHTRichEditCtrl::OnEnLink(NMHDR *pNMHDR, LRESULT *pResult)
 
 		// check if that "URL" has a valid URL scheme. if it does not have, pass that notification up to the
 		// parent window which may interpret that "URL" in some other way.
-		for (int i = 0; i < _countof(_apszSchemes); i++){
-			if (_tcsncmp(strUrl, _apszSchemes[i].pszScheme, _apszSchemes[i].iLen) == 0){
+		for (int i = 0; i < _countof(s_apszSchemes); i++){
+			if (_tcsncmp(strUrl, s_apszSchemes[i].pszScheme, s_apszSchemes[i].iLen) == 0){
 				ShellExecute(NULL, NULL, strUrl, NULL, NULL, SW_SHOWDEFAULT);
 				*pResult = 1;
 				bMsgHandled = TRUE; // do not route this message to any parent

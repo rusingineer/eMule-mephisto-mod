@@ -122,6 +122,7 @@ public:
 	int		GetCompleteDownloads(int cat,int &total);
 	void	UpdateCurrentCategoryView();
 	void	UpdateCurrentCategoryView(CPartFile* thisfile);
+	CImageList *CreateDragImage(int iItem, LPPOINT lpPoint);
 
 	//Xman Xtreme Downloadmanager
 	void    StopSingleClient (CUpDownClient* single);	
@@ -146,9 +147,10 @@ protected:
 	typedef std::pair<void*, CtrlItem_Struct*> ListItemsPair;
 	typedef std::multimap<void*, CtrlItem_Struct*> ListItems;
     ListItems	m_ListItems;
+	CFont		m_fontBold; // may contain a locally created bold font
+	CFont*		m_pFontBold;// points to the bold font which is to be used (may be the locally created or the default bold font)
 	// ==> Design Settings [eWombat/Stulle] - Stulle
 	/*
-	CFont		m_fontBold;
 	//Xman narrow font at transferwindow
 	CFont		m_fontNarrowBold;
 	//Xman end
@@ -160,13 +162,15 @@ protected:
 	void ShowFileDialog(UINT uInvokePage);
 	void ShowClientDialog(CUpDownClient* pClient);
 	void SetAllIcons();
-	void DrawFileItem(CDC *dc, int nColumn, LPCRECT lpRect, CtrlItem_Struct *lpCtrlItem);
-	void DrawSourceItem(CDC *dc, int nColumn, LPCRECT lpRect, CtrlItem_Struct *lpCtrlItem);
+	void DrawFileItem(CDC *dc, int nColumn, LPCRECT lpRect, UINT uDrawTextAlignment, CtrlItem_Struct *pCtrlItem);
+	void DrawSourceItem(CDC *dc, int nColumn, LPCRECT lpRect, UINT uDrawTextAlignment, CtrlItem_Struct *pCtrlItem);
 	//Xman see all sources
 	/*
 	int GetFilesCountInCurCat();
 	*/
 	//Xman end
+	void GetFileItemDisplayText(CPartFile *lpPartFile, int iSubItem, LPTSTR pszText, int cchTextMax);
+	void GetSourceItemDisplayText(const CtrlItem_Struct *pCtrlItem, int iSubItem, LPTSTR pszText, int cchTextMax);
 
 	static int CALLBACK SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
     static int Compare(const CPartFile* file1, const CPartFile* file2, LPARAM lParamSort);
@@ -176,14 +180,14 @@ protected:
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnSysColorChange();
-	afx_msg void OnItemActivate(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	afx_msg	void OnColumnClick( NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnListModified(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMDblclkDownloadlist(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnGetDispInfo(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnLvnColumnClick(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnGetDispInfo(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnLvnGetInfoTip(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemActivate(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNmDblClk(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSysColorChange();
 
 	CTitleMenu m_FollowTheMajorityMenu; // Follow The Majority [AndCycle/Stulle] - Stulle
 

@@ -404,6 +404,19 @@ bool CUpDownClient::AskForDownload()
 	//see TryToConnect
 
 	bool longreask = HasTooManyFailedUDP() || (HasLowID() && (theApp.serverconnect->IsLocalServer(m_dwServerIP,m_nServerPort) || (Kademlia::CKademlia::IsConnected() && HasValidBuddyID())));
+	// ==> Timer for ReAsk File Sources [Stulle] - Stulle
+	//this code is meant to increase the ReAsk time to a value bigger higher 30 minutes under certain circumstance
+	//whenever we increase the ReAsk time there is no point in making any differences
+	//however, we want to recalculate at least once so we ensure we don't use too high values for some mods (see below)
+	static bool sRecalculate = true;
+	if(thePrefs.GetReAskTimeDif() > 0 && GetModClient() != MOD_SCAR && GetModClient() != MOD_MEPHISTO && GetModClient() != MOD_XTREME)
+	{
+		if(sRecalculate)
+			CalculateJitteredFileReaskTime(false);
+		sRecalculate = false;
+	}
+	else
+	// <== Timer for ReAsk File Sources [Stulle] - Stulle
 	if(GetJitteredFileReaskTime()< MIN2MS(30) )
 	{	
 		if(longreask)
@@ -674,7 +687,7 @@ void CUpDownClient::SendFileRequest()
 		Packet* packet = new Packet(&dataFileReq, OP_EMULEPROT);
 		packet->opcode = bUseExtMultiPacket ? OP_MULTIPACKET_EXT : OP_MULTIPACKET;
 		theStats.AddUpDataOverheadFileRequest(packet->size);
-		socket->SendPacket(packet, true);
+		SendPacket(packet, true);
 	}
 	else
 	{
@@ -688,7 +701,7 @@ void CUpDownClient::SendFileRequest()
 		Packet* packet = new Packet(&dataFileReq);
 		packet->opcode = OP_REQUESTFILENAME;
 		theStats.AddUpDataOverheadFileRequest(packet->size);
-		socket->SendPacket(packet, true);
+		SendPacket(packet, true);
 
 		// 26-Jul-2003: removed requesting the file status for files <= PARTSIZE for better compatibility with ed2k protocol (eDonkeyHybrid).
 		// if the remote client answers the OP_REQUESTFILENAME with OP_REQFILENAMEANSWER the file is shared by the remote client. if we
@@ -702,7 +715,7 @@ void CUpDownClient::SendFileRequest()
 			packet = new Packet(&dataSetReqFileID);
 			packet->opcode = OP_SETREQFILEID;
 			theStats.AddUpDataOverheadFileRequest(packet->size);
-			socket->SendPacket(packet, true);
+		   SendPacket(packet, true);
 		}
 
 		if (IsEmuleClient())
@@ -750,7 +763,7 @@ void CUpDownClient::SendFileRequest()
 			}
 
 			theStats.AddUpDataOverheadSourceExchange(packet->size);
-			socket->SendPacket(packet, true, true);
+			SendPacket(packet, true);
 			SetLastAskedForSources();
 			if (thePrefs.GetDebugSourceExchange())
 				AddDebugLogLine(false, _T("SXSend (%s): Client source request; %s, File=\"%s\""),SupportsSourceExchange2() ? _T("Version 2") : _T("Version 1"), DbgGetClientInfo(), reqfile->GetFileName());
@@ -763,7 +776,7 @@ void CUpDownClient::SendFileRequest()
 			Packet* packet = new Packet(OP_AICHFILEHASHREQ,16,OP_EMULEPROT);
 			md4cpy(packet->pBuffer,reqfile->GetFileHash());
 			theStats.AddUpDataOverheadFileRequest(packet->size);
-			socket->SendPacket(packet,true,true);
+			SendPacket(packet, true);
 		}
 	}
 
@@ -815,8 +828,8 @@ void CUpDownClient::SendStartupLoadReq()
 	protocolstepflag1=false;
 	//Xman end
 
-
-	SetDownloadState(DS_ONQUEUE);
+	m_fQueueRankPending = 1;
+	m_fUnaskQueueRankRecv = 0;
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__StartupLoadReq", this);
 	CSafeMemFile dataStartupLoadReq(16);
@@ -824,13 +837,22 @@ void CUpDownClient::SendStartupLoadReq()
 	Packet* packet = new Packet(&dataStartupLoadReq);
 	packet->opcode = OP_STARTUPLOADREQ;
 	theStats.AddUpDataOverheadFileRequest(packet->size);
-	socket->SendPacket(packet, true, true);
-	m_fQueueRankPending = 1;
-	m_fUnaskQueueRankRecv = 0;
+	SetDownloadState(DS_ONQUEUE);
+	SendPacket(packet, true);
 
 	// Maella -Unnecessary Protocol Overload-
 	// Remark: force a TCP refresh of the download session in 2 hours
 	//Xman: we increase this time if udpver >3, because we have a valid partstatus
+	// ==> Timer for ReAsk File Sources [Stulle] - Stulle
+	if(thePrefs.GetReAskTimeDif() > 0 && GetModClient() != MOD_SCAR && GetModClient() != MOD_MEPHISTO && GetModClient() != MOD_XTREME)
+	{
+		if(GetUDPVersion()>3)
+			m_dwNextTCPAskedTime = m_dwLastAskedTime + 6 * (GetJitteredFileReaskTime() - thePrefs.GetReAskTimeDif());
+		else
+			m_dwNextTCPAskedTime = m_dwLastAskedTime + 4 * (GetJitteredFileReaskTime() - thePrefs.GetReAskTimeDif());
+	}
+	else
+	// <== Timer for ReAsk File Sources [Stulle] - Stulle
 	if(GetUDPVersion()>3)
 		m_dwNextTCPAskedTime = m_dwLastAskedTime + 6 * GetJitteredFileReaskTime();
 	else
@@ -894,7 +916,7 @@ void CUpDownClient::ProcessFileInfo(CSafeMemFile* data, CPartFile* file)
 				Packet* packet = new Packet(OP_HASHSETREQUEST,16);
 				md4cpy(packet->pBuffer,reqfile->GetFileHash());
 				theStats.AddUpDataOverheadFileRequest(packet->size);
-				socket->SendPacket(packet,true,true);
+				SendPacket(packet, true);
 				SetDownloadState(DS_REQHASHSET);
 				m_fHashsetRequesting = 1;
 				reqfile->hashsetneeded = false;
@@ -1044,7 +1066,7 @@ void CUpDownClient::ProcessFileStatus(bool bUdpPacket, CSafeMemFile* data, CPart
 				Packet* packet = new Packet(OP_HASHSETREQUEST,16);
 				md4cpy(packet->pBuffer,reqfile->GetFileHash());
 				theStats.AddUpDataOverheadFileRequest(packet->size);
-				socket->SendPacket(packet, true, true);
+				SendPacket(packet, true);
 				SetDownloadState(DS_REQHASHSET);
 				m_fHashsetRequesting = 1;
 				reqfile->hashsetneeded = false;
@@ -1440,7 +1462,8 @@ void CUpDownClient::SendBlockRequests()
 	{
 		if (m_PendingBlocks_list.IsEmpty())
 		{
-			if (reqfile->GetUnrequestedSize() == 0 && reqfile->FindAndDropStalledDownload(this))
+			if (GetDownTimeDifference(false) > 10000 && //Enig123 :: 090201 :: search for stalled downloads when this client can be fully evaluated
+				reqfile->GetUnrequestedSize() == 0 && reqfile->FindAndDropStalledDownload(this) )
 				CreateBlockRequests(blockCount);
 	//zz_fly :: Drop stalled downloads :: netfinity :: end
 			if (m_PendingBlocks_list.IsEmpty()){
@@ -1594,7 +1617,7 @@ void CUpDownClient::SendBlockRequests()
 	}
 
 	theStats.AddUpDataOverheadFileRequest(packet->size);
-	socket->SendPacket(packet,true,true);
+	SendPacket(packet, true);
 }
 
 /* Barry - Originally this only wrote to disk when a full 180k block 
@@ -3354,7 +3377,7 @@ void CUpDownClient::SendAICHRequest(CPartFile* pForFile, uint16 nPart)
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__AichRequest", this, (uchar*)packet->pBuffer);
 	theStats.AddUpDataOverheadFileRequest(packet->size);
-	SafeSendPacket(packet);
+	SafeConnectAndSendPacket(packet);
 }
 
 void CUpDownClient::ProcessAICHAnswer(const uchar* packet, UINT size)
@@ -3424,7 +3447,7 @@ void CUpDownClient::ProcessAICHRequest(const uchar* packet, UINT size)
 					DebugSend("OP__AichAnswer", this, pKnownFile->GetFileHash());
 				Packet* packAnswer = new Packet(&fileResponse, OP_EMULEPROT, OP_AICHANSWER);
 				theStats.AddUpDataOverheadFileRequest(packAnswer->size);
-				SafeSendPacket(packAnswer);
+				SafeConnectAndSendPacket(packAnswer);
 				return;
 			}
 			else
@@ -3437,13 +3460,12 @@ void CUpDownClient::ProcessAICHRequest(const uchar* packet, UINT size)
 	}
 	else
 		AddDebugLogLine(DLP_HIGH, false, _T("AICH Packet Request: Failed to find requested shared file -  %s"), DbgGetClientInfo());
-
 	if (thePrefs.GetDebugClientTCPLevel() > 0)
 		DebugSend("OP__AichAnswer", this, abyHash);
 	Packet* packAnswer = new Packet(OP_AICHANSWER, 16, OP_EMULEPROT);
 	md4cpy(packAnswer->pBuffer, abyHash);
 	theStats.AddUpDataOverheadFileRequest(packAnswer->size);
-	SafeSendPacket(packAnswer);
+	SafeConnectAndSendPacket(packAnswer);
 }
 
 void CUpDownClient::ProcessAICHFileHash(CSafeMemFile* data, CPartFile* file)

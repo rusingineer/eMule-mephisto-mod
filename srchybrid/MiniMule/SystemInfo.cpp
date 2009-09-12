@@ -23,6 +23,6 @@ int CSystemInfo::GetGlobalCpuUsage(){
 	return sys;
 }
 
-uint32 CSystemInfo::GetGlobalMemoryUsage(){
-	return (uint32)(CSysInfo::GetTotalPhys()-CSysInfo::GetAvailPhys());
+uint64 CSystemInfo::GetGlobalMemoryUsage(){
+	return CSysInfo::GetTotalPhys()-CSysInfo::GetAvailPhys();
 }

@@ -182,7 +182,6 @@ BOOL CTrayDialog::TrayHide()
 		if ((theApp.minimule!= NULL) &&theApp.minimule->IsWindowVisible())
 			theApp.minimule->ShowWindow(SW_HIDE);
 		// <== TBH: minimule - Max
-
 	}
 	return bSuccess;
 }

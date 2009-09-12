@@ -20,19 +20,19 @@
 /*
 //Xman
 //ModID
-#define MOD_VERSION		_T("Xtreme 7.1") 
+#define MOD_VERSION		_T("Xtreme 7.2") 
 */
 // <== ModID [itsonlyme/SiRoB] - Stulle
 
 //Xman versions check
 #define MOD_MAIN_VER	7
-#define MOD_MIN_VER		1
+#define MOD_MIN_VER		2
 #define	MOD_BUILD_VER	1 //1=Xtreme x.x 2=Xtreme x.x.1
 
 // ==> ModID [itsonlyme/SiRoB] - Stulle
 /*
 //Xman Anti-Leecher: simple Anti-Thief
-#define MOD_MAJOR_VERSION _T("eMule v0.49b") 
+#define MOD_MAJOR_VERSION _T("eMule v0.49c") 
 //const float MOD_FLOAT_VERSION= (float)_tstof(CString(MOD_VERSION).Mid(7)) ;
 #define MOD_NICK_ADD _T(" «") + MOD_VERSION + _T("»")
 */
@@ -147,9 +147,9 @@
 */
 #define SESSIONMAXTIME			HR2MS(2)
 //Xman end
-#define	MAXFILECOMMENTLEN		50
+#define	MAXFILECOMMENTLEN		128
 #define	PARTSIZE				9728000ui64
-#define	MAX_EMULE_FILE_SIZE	0x4000000000ui64 // = 2^38 = 256GB
+#define	MAX_EMULE_FILE_SIZE		0x4000000000ui64 // = 2^38 = 256GB
 #define OLD_MAX_EMULE_FILE_SIZE	4290048000ui64	// (4294967295/PARTSIZE)*PARTSIZE = ~4GB
 // MOD Note: end
 
@@ -205,9 +205,11 @@
 //Xman end
 #define MAXPRIORITYCOLL_SIZE	10*1024		// max file size for collection file which are allowed to bypass the queue
 #define SEARCH_SPAM_THRESHOLD	60
+#define OLDFILES_PARTIALLYPURGE DAY2S(31)	// time after which some data about a know file in the known.met and known2.met is deleted
 
 // you shouldn't change anything here if you are not really sure, or emule will probaly not work
-#define	MAXFRAGSIZE				1300
+#define UDP_KAD_MAXFRAGMENT		1420		// based on a 1500 ethernet MTU, use a conservative value to leave enough room for IP/UDP headers, tunnel headers, Kad headers(16) and misconfigs 
+#define	MAXFRAGSIZE				1300 //Xman avoid the silly window syndrome
 #define EMBLOCKSIZE				184320
 #define OP_EDONKEYHEADER		0xE3
 #define OP_KADEMLIAHEADER		0xE4
@@ -315,6 +317,7 @@
 // this 'identifier' is used for referencing shared part (incomplete) files with the OP_ASKSHAREDDIRS and related opcodes
 // it was introduced with eDonkeyHybrid and is considered as part of the protocol.
 #define OP_INCOMPLETE_SHARED_FILES "!Incomplete Files"
+#define OP_OTHER_SHARED_FILES	   "!Other" // files which are not within a shared directory (single shared files)
 
 // eDonkeyHybrid truncates every received client message to 200 bytes, although it allows to send messages of any(?) size.
 #define	MAX_CLIENT_MSG_LEN		450		// using 200 is just too short
@@ -353,7 +356,7 @@
 #define OP_COMPRESSEDPART_I64	0xA1	// <HASH 16><von 8><size 4><Daten len:size>
 #define OP_SENDINGPART_I64		0xA2	// <HASH 16><von 8><bis 8><Daten len:(von-bis)>
 #define	OP_REQUESTPARTS_I64		0xA3	// <HASH 16><von[3] 8*3><bis[3] 8*3>
-#define OP_MULTIPACKET_EXT		0xA4		
+#define OP_MULTIPACKET_EXT		0xA4
 #define OP_CHATCAPTCHAREQ		0xA5	// <tags 1>[tags]<Captcha BITMAP>
 #define OP_CHATCAPTCHARES		0xA6	// <status 1>
 #define OP_FWCHECKUDPREQ		0xA7	// <Inter_Port 2><Extern_Port 2><KadUDPKey 4> *Support required for Kadversion >= 6
@@ -451,6 +454,7 @@
 #define  FT_COLLECTIONAUTHORKEY  0x32
 #define  FT_PUBLISHINFO			 0x33	// <uint32>
 #define TAG_PUBLISHINFO			"\x33"	// <uint32>
+#define  FT_LASTSHARED			 0x34	// <uint32>
 // statistic
 #define  FT_ATTRANSFERRED		 0x50	// <uint32>
 #define  FT_ATREQUESTED			 0x51	// <uint32>
@@ -530,6 +534,7 @@
 #define TAGTYPE_STR22			0x26	// accepted by eMule 0.42f (02-Mai-2004) in receiving code only because of a flaw, those tags are handled correctly, but should not be handled at all
 
 
+#define	ED2KFTSTR_ANY			""		// Baked(!!) do not send in ED2K/Kad
 #define	ED2KFTSTR_AUDIO			"Audio"	// value for eD2K tag FT_FILETYPE
 #define	ED2KFTSTR_VIDEO			"Video"	// value for eD2K tag FT_FILETYPE
 #define	ED2KFTSTR_IMAGE			"Image"	// value for eD2K tag FT_FILETYPE

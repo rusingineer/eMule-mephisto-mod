@@ -1008,7 +1008,6 @@ void CIPFilter::UpdateIPFilterURL(uint32 uNewVersion)
 	// <== Advanced Updates [MorphXT/Stulle] - Stulle
 }
 //Xman end
-
 // ==> Static IP Filter [Stulle] - Stulle
 void CIPFilter::AddFromFile2(LPCTSTR pszFilePath)
 {

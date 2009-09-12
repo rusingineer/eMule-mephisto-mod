@@ -72,6 +72,8 @@ namespace Kademlia
 			CContact*	GetRandomContact(uint32 nMaxType, uint32 nMinKadVersion) const;
 			uint32		GetNumContacts() const;
 			void		GetNumContacts(uint32& nInOutContacts, uint32& nInOutFilteredContacts, uint8 byMinVersion) const;
+			// Check if we know a conact with the same ID or IP but notmatching IP/ID and other limitations, similar checks like when adding a node to the table except allowing duplicates
+			bool		IsAcceptableContact(const CContact* pToCheck) const; 
 			// Returns a list of all contacts in all leafs of this zone.
 			void		GetAllEntries(ContactList *plistResult, bool bEmptyFirst = true);
 			// Returns the *maxRequired* tokens that are closest to the target within this zone's subtree.

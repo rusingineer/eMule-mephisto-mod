@@ -216,21 +216,21 @@ BOOL CServerWnd::OnInitDialog()
 	CString name;
 	name = GetResString(IDS_SV_SERVERINFO);
 	name.Replace(_T("&"), _T("&&"));
-	newitem.mask = TCIF_TEXT|TCIF_IMAGE;
+	newitem.mask = TCIF_TEXT | TCIF_IMAGE;
 	newitem.pszText = const_cast<LPTSTR>((LPCTSTR)name);
 	newitem.iImage = 1;
 	VERIFY( StatusSelector.InsertItem(StatusSelector.GetItemCount(), &newitem) == PaneServerInfo );
 
 	name = GetResString(IDS_SV_LOG);
 	name.Replace(_T("&"), _T("&&"));
-	newitem.mask = TCIF_TEXT|TCIF_IMAGE;
+	newitem.mask = TCIF_TEXT | TCIF_IMAGE;
 	newitem.pszText = const_cast<LPTSTR>((LPCTSTR)name);
 	newitem.iImage = 0;
 	VERIFY( StatusSelector.InsertItem(StatusSelector.GetItemCount(), &newitem) == PaneLog );
 
-	name=SZ_DEBUG_LOG_TITLE;
+	name = SZ_DEBUG_LOG_TITLE;
 	name.Replace(_T("&"), _T("&&"));
-	newitem.mask = TCIF_TEXT|TCIF_IMAGE;
+	newitem.mask = TCIF_TEXT | TCIF_IMAGE;
 	newitem.pszText = const_cast<LPTSTR>((LPCTSTR)name);
 	newitem.iImage = 0;
 	VERIFY( StatusSelector.InsertItem(StatusSelector.GetItemCount(), &newitem) == PaneVerboseLog );
@@ -339,7 +339,7 @@ BOOL CServerWnd::OnInitDialog()
 	// splitter
 	CRect rcSpl;
 	rcSpl.left = 55;
-	rcSpl.right = 300;//rcDlgItem.right;
+	rcSpl.right = 300;
 	rcSpl.top = 55;
 	rcSpl.bottom = rcSpl.top + SVWND_SPLITTER_HEIGHT;
 	m_wndSplitter.Create(WS_CHILD | WS_VISIBLE, rcSpl, this, IDC_SPLITTER_SERVER);
@@ -407,7 +407,7 @@ void CServerWnd::SetAllIcons()
 	m_ctrlMyInfoFrm.SetIcon(_T("Info"));
 
 	CImageList iml;
-	iml.Create(16,16,theApp.m_iDfltImageListColorFlags|ILC_MASK,0,1);
+	iml.Create(16, 16, theApp.m_iDfltImageListColorFlags | ILC_MASK, 0, 1);
 	iml.Add(CTempIconLoader(_T("Log")));
 	iml.Add(CTempIconLoader(_T("ServerInfo")));
 	StatusSelector.SetImageList(&iml);
@@ -424,45 +424,44 @@ void CServerWnd::Localize()
 {
 	serverlistctrl.Localize();
 
-	    GetDlgItem(IDC_SERVLIST_TEXT)->SetWindowText(GetResString(IDS_SV_SERVERLIST));
-	    m_ctrlNewServerFrm.SetWindowText(GetResString(IDS_SV_NEWSERVER));
-		GetDlgItem(IDC_SERVER_LISTS)->SetWindowText(GetResString(IDS_SERVER_LISTS)); // Links for Server list and nodes file [Stulle] - Stulle
-	    GetDlgItem(IDC_SSTATIC4)->SetWindowText(GetResString(IDS_SV_ADDRESS));
-	    GetDlgItem(IDC_SSTATIC7)->SetWindowText(GetResString(IDS_SV_PORT));
-	    GetDlgItem(IDC_SSTATIC3)->SetWindowText(GetResString(IDS_SW_NAME));
-	    GetDlgItem(IDC_ADDSERVER)->SetWindowText(GetResString(IDS_SV_ADD));
-	    m_ctrlUpdateServerFrm.SetWindowText(GetResString(IDS_SV_MET));
-	    GetDlgItem(IDC_UPDATESERVERMETFROMURL)->SetWindowText(GetResString(IDS_SV_UPDATE));
-	    GetDlgItem(IDC_LOGRESET)->SetWindowText(GetResString(IDS_PW_RESET));
-	    m_ctrlMyInfoFrm.SetWindowText(GetResString(IDS_MYINFO));
-    
-	    TCITEM item;
-	    CString name;
-	    name = GetResString(IDS_SV_SERVERINFO);
-	name.Replace(_T("&"), _T("&&"));
-	    item.mask = TCIF_TEXT;
-		item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
-		StatusSelector.SetItem(PaneServerInfo, &item);
+	serverlistctrl.ShowServerCount();
+	m_ctrlNewServerFrm.SetWindowText(GetResString(IDS_SV_NEWSERVER));
+	GetDlgItem(IDC_SSTATIC4)->SetWindowText(GetResString(IDS_SV_ADDRESS));
+	GetDlgItem(IDC_SSTATIC7)->SetWindowText(GetResString(IDS_SV_PORT));
+	GetDlgItem(IDC_SSTATIC3)->SetWindowText(GetResString(IDS_SW_NAME));
+	GetDlgItem(IDC_ADDSERVER)->SetWindowText(GetResString(IDS_SV_ADD));
+	m_ctrlUpdateServerFrm.SetWindowText(GetResString(IDS_SV_MET));
+	GetDlgItem(IDC_UPDATESERVERMETFROMURL)->SetWindowText(GetResString(IDS_SV_UPDATE));
+	GetDlgItem(IDC_LOGRESET)->SetWindowText(GetResString(IDS_PW_RESET));
+	m_ctrlMyInfoFrm.SetWindowText(GetResString(IDS_MYINFO));
 
-	    name = GetResString(IDS_SV_LOG);
+	TCITEM item;
+	CString name;
+	name = GetResString(IDS_SV_SERVERINFO);
 	name.Replace(_T("&"), _T("&&"));
-	    item.mask = TCIF_TEXT;
-		item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
-		StatusSelector.SetItem(PaneLog, &item);
+	item.mask = TCIF_TEXT;
+	item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
+	StatusSelector.SetItem(PaneServerInfo, &item);
 
-	    name = SZ_DEBUG_LOG_TITLE;
+	name = GetResString(IDS_SV_LOG);
 	name.Replace(_T("&"), _T("&&"));
-	    item.mask = TCIF_TEXT;
-		item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
-		StatusSelector.SetItem(PaneVerboseLog, &item);
+	item.mask = TCIF_TEXT;
+	item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
+	StatusSelector.SetItem(PaneLog, &item);
 
-		//Xman Anti-Leecher-Log
-		name = GetResString(IDS_LEERCHERLOGTITLE);
+	name = SZ_DEBUG_LOG_TITLE;
 	name.Replace(_T("&"), _T("&&"));
-		item.mask = TCIF_TEXT;
-		item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
-		StatusSelector.SetItem(PaneLeecherLog, &item);
-		//Xman end
+	item.mask = TCIF_TEXT;
+	item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
+	StatusSelector.SetItem(PaneVerboseLog, &item);
+
+	//Xman Anti-Leecher-Log
+	name = GetResString(IDS_LEERCHERLOGTITLE);
+	name.Replace(_T("&"), _T("&&"));
+	item.mask = TCIF_TEXT;
+	item.pszText = const_cast<LPTSTR>((LPCTSTR)name);
+	StatusSelector.SetItem(PaneLeecherLog, &item);
+	//Xman end
 
 	UpdateLogTabSelection();
 	UpdateControlsState();
@@ -726,7 +725,7 @@ void CServerWnd::ToggleDebugWindow()
 		CString name;
 		name = SZ_DEBUG_LOG_TITLE;
 		name.Replace(_T("&"), _T("&&"));
-		newitem.mask = TCIF_TEXT|TCIF_IMAGE;
+		newitem.mask = TCIF_TEXT | TCIF_IMAGE;
 		newitem.pszText = const_cast<LPTSTR>((LPCTSTR)name);
 		newitem.iImage = 0;
 		StatusSelector.InsertItem(StatusSelector.GetItemCount(),&newitem);
@@ -1003,7 +1002,7 @@ void CServerWnd::InitSplitter()
 	ReattachAnchors();
 }
 
-void CServerWnd::ReattachAnchors() 
+void CServerWnd::ReattachAnchors()
 {
 	RemoveAnchor(serverlistctrl);
 	RemoveAnchor(StatusSelector);
@@ -1015,11 +1014,11 @@ void CServerWnd::ReattachAnchors()
 
 	AddAnchor(serverlistctrl, TOP_LEFT, CSize(100, thePrefs.GetSplitterbarPositionServer()));
 	AddAnchor(StatusSelector, CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
-	AddAnchor(IDC_LOGRESET,  BOTTOM_RIGHT);
-	AddAnchor(*servermsgbox,  CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
-	AddAnchor(*logbox,  CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
-	AddAnchor(*debuglog,  CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
-	AddAnchor(*leecherlog,  CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT); //Xman Anti-Leecher-Log
+	AddAnchor(IDC_LOGRESET, MIDDLE_RIGHT);
+	AddAnchor(*servermsgbox, CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
+	AddAnchor(*logbox, CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
+	AddAnchor(*debuglog, CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT);
+	AddAnchor(*leecherlog, CSize(0, thePrefs.GetSplitterbarPositionServer()), BOTTOM_RIGHT); //Xman Anti-Leecher-Log
 
 	GetDlgItem(IDC_LOGRESET)->Invalidate();
 
@@ -1042,14 +1041,13 @@ void CServerWnd::UpdateSplitterRange()
 	ScreenToClient(rcWnd);
 
 	CRect rcDlgItem;
-
 	serverlistctrl.GetWindowRect(rcDlgItem);
 	ScreenToClient(rcDlgItem);
 
-	m_wndSplitter.SetRange(rcWnd.top+100,rcWnd.bottom-50);  //(rcDlgItem.top,rcDlgItem2.bottom-50);
+	m_wndSplitter.SetRange(rcWnd.top + 100, rcWnd.bottom - 50);
 
 	LONG splitpos = rcDlgItem.bottom + SVWND_SPLITTER_YOFF;
-	thePrefs.SetSplitterbarPositionServer( (splitpos  * 100) / rcWnd.Height());
+	thePrefs.SetSplitterbarPositionServer((splitpos  * 100) / rcWnd.Height());
 
 	GetDlgItem(IDC_LOGRESET)->GetWindowRect(rcDlgItem);
 	ScreenToClient(rcDlgItem);
@@ -1065,43 +1063,36 @@ LRESULT CServerWnd::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 		// arrange transferwindow layout
-	case WM_PAINT:
-		if (m_wndSplitter)
-		{
-			CRect rcWnd;
-			GetWindowRect(rcWnd);
-			if (rcWnd.Height() > 0)
+		case WM_PAINT:
+			if (m_wndSplitter)
 			{
-				CRect rcDown;
-				serverlistctrl.GetWindowRect(rcDown);
-				ScreenToClient(rcDown);
+				CRect rcWnd;
+				GetWindowRect(rcWnd);
+				if (rcWnd.Height() > 0)
+				{
+					CRect rcDown;
+					serverlistctrl.GetWindowRect(rcDown);
+					ScreenToClient(rcDown);
 
-				// splitter paint update
-				CRect rcSpl;
-				rcSpl.left = 10;
-				rcSpl.right = rcDown.right;
-				rcSpl.top = rcDown.bottom + SVWND_SPLITTER_YOFF;
-				rcSpl.bottom = rcSpl.top + SVWND_SPLITTER_HEIGHT;
-				m_wndSplitter.MoveWindow(rcSpl, TRUE);
-				UpdateSplitterRange();
+					// splitter paint update
+					CRect rcSpl;
+					rcSpl.left = 10;
+					rcSpl.right = rcDown.right;
+					rcSpl.top = rcDown.bottom + SVWND_SPLITTER_YOFF;
+					rcSpl.bottom = rcSpl.top + SVWND_SPLITTER_HEIGHT;
+					m_wndSplitter.MoveWindow(rcSpl, TRUE);
+					UpdateSplitterRange();
+				}
 			}
-		}
-		break;
+			break;
+
+		case WM_WINDOWPOSCHANGED:
+			if (m_wndSplitter)
+				m_wndSplitter.Invalidate();
+			break;
 	}
 
 	return CResizableDialog::DefWindowProc(message, wParam, lParam);
-}
-
-void CServerWnd::OnWindowPosChanged(WINDOWPOS* lpwndpos)
-{
-	if (m_wndSplitter)
-	{
-		CRect rcWnd;
-		GetWindowRect(rcWnd);
-		if (rcWnd.Height() > 0)
-			Invalidate();
-	}
-	CResizableDialog::OnWindowPosChanged(lpwndpos);
 }
 
 void CServerWnd::OnSplitterMoved(NMHDR* pNMHDR, LRESULT* /*pResult*/)

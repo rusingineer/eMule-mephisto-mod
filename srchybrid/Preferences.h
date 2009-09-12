@@ -185,7 +185,6 @@ enum eMasterStyles
 	server_styles,
 	background_styles,
 	window_styles,
-	feedback_styles,
 	master_count
 };
 

@@ -266,7 +266,7 @@ private:
 	time_t	m_timeLastSeen; // we only "see" files when they are in a shared directory
 
 public:
-	float	GetFileRatio() const; // push rare file - Stulle
+	float	GetFileRatio() /*const*/; // push rare file - Stulle
 
 	bool	IsPushSmallFile(); // push small files [sivka] - Stulle
 

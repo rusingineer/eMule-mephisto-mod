@@ -1004,7 +1004,7 @@ int CQueueListCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 
 		// ==> push rare file - Stulle
 		case 13:
-			iResult=(int)(item1->GetRareFilePushRatio()*100 - item2->GetRareFilePushRatio()*100);
+			iResult=CompareFloat(item1->GetRareFilePushRatio(),item2->GetRareFilePushRatio());
 			break;
 		// <== push rare file - Stulle
 	}

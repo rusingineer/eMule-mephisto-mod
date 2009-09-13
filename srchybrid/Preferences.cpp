@@ -864,6 +864,14 @@ DWORD		CPreferences::nWindowStyleFlags[style_w_count];
 COLORREF	CPreferences::nWindowStyleFontColor[style_w_count];
 COLORREF	CPreferences::nWindowStyleBackColor[style_w_count];
 short		CPreferences::nWindowStyleOnOff[style_w_count];
+
+// ==> Feedback personalization [Stulle] - Stulle
+// window styles
+DWORD		CPreferences::nFeedBackStyleFlags[style_f_count]; 
+COLORREF	CPreferences::nFeedBackStyleFontColor[style_f_count];
+COLORREF	CPreferences::nFeedBackStyleBackColor[style_f_count];
+short		CPreferences::nFeedBackStyleOnOff[style_f_count];
+// <== Feedback personalization [Stulle] - Stulle
 // <== Design Settings [eWombat/Stulle] - Stulle
 
 int		CPreferences::PsAmountLimit; // Limit PS by amount of data uploaded [Stulle] - Stulle
@@ -974,7 +982,7 @@ bool	CPreferences::m_bFineCS; // Modified FineCS [CiccioBastardo/Stulle] - Stull
 
 bool	CPreferences::m_bTrayComplete; // Completed in Tray [Stulle] - Stulle
 
-bool	CPreferences::m_bColorFeedback; // Color Feedback [Myth88] - MyTh88 
+bool	CPreferences::m_bColorFeedback; // Feedback personalization [Stulle] - Stulle 
 
 bool	CPreferences::m_bSplitWindow; // Advanced Transfer Window Layout [Stulle] - Stulle
 
@@ -1061,6 +1069,8 @@ void CPreferences::Init()
 	CString strFullPath;
 	strFullPath = GetMuleDirectory(EMULE_CONFIGDIR) + L"preferences.dat";
 	FILE* preffile = _tfsopen(strFullPath, L"rb", _SH_DENYWR);
+
+	InitStyles(); // Design Settings [eWombat/Stulle] - Stulle
 
 	LoadPreferences();
 
@@ -2967,7 +2977,7 @@ void CPreferences::SavePreferences()
 
 	ini.WriteBool(_T("TrayComplete"), m_bTrayComplete); // Completed in Tray [Stulle] - Stulle
 
-	ini.WriteBool(_T("ColorFeedback"), m_bColorFeedback); // Color Feedback [Myth88] - MyTh88
+	ini.WriteBool(_T("ColorFeedback"), m_bColorFeedback); // Feedback personalization [Stulle] - Stulle
 
 	// ==> Advanced Transfer Window Layout [Stulle] - Stulle
 	ini.WriteInt(L"TransferWnd1",m_uTransferWnd1);
@@ -4251,7 +4261,7 @@ void CPreferences::LoadPreferences()
 
 	m_bTrayComplete = ini.GetBool(_T("TrayComplete"),false); // Completed in Tray [Stulle] - Stulle
 
-	m_bColorFeedback = ini.GetBool(_T("ColorFeedback"),false); // Color Feedback [Myth88] - MyTh88
+	m_bColorFeedback = ini.GetBool(_T("ColorFeedback"),false); // Feedback personalization [Stulle] - Stulle
 
 	// ==> Advanced Transfer Window Layout [Stulle] - Stulle
 	m_uTransferWnd1 = ini.GetInt(L"TransferWnd1",1);
@@ -5467,6 +5477,17 @@ void CPreferences::InitStyles()
 		nWindowStyleBackColor[i]	= CLR_DEFAULT;
 		nWindowStyleOnOff[i] = 0;
 	}
+
+	// ==> Feedback personalization [Stulle] - Stulle
+	// feedback styles
+	for (int i=0;i<style_f_count;i++)
+	{
+		nFeedBackStyleFlags[i] = 0;
+		nFeedBackStyleFontColor[i]	= CLR_DEFAULT;
+		nFeedBackStyleBackColor[i]	= CLR_DEFAULT;
+		nFeedBackStyleOnOff[i] = 0;
+	}
+	// <== Feedback personalization [Stulle] - Stulle
 }
 
 DWORD CPreferences::GetStyleFlags(int nMaster, int nStyle)
@@ -5492,6 +5513,11 @@ DWORD CPreferences::GetStyleFlags(int nMaster, int nStyle)
 		case window_styles:
 			dwTemp = nWindowStyleFlags[nStyle];
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			dwTemp = nFeedBackStyleFlags[nStyle];
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5521,6 +5547,11 @@ COLORREF CPreferences::GetStyleFontColor(int nMaster, int nStyle)
 		case window_styles:
 			crTemp = nWindowStyleFontColor[nStyle];
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			crTemp = nFeedBackStyleFontColor[nStyle];
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5550,6 +5581,11 @@ COLORREF CPreferences::GetStyleBackColor(int nMaster, int nStyle)
 		case window_styles:
 			crTemp = nWindowStyleBackColor[nStyle];
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			crTemp = nFeedBackStyleOnOff[nStyle];
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5579,6 +5615,11 @@ short CPreferences::GetStyleOnOff(int nMaster, int nStyle)
 		case window_styles:
 			sTemp = nWindowStyleOnOff[nStyle];
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			sTemp = nFeedBackStyleOnOff[nStyle];
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5596,7 +5637,7 @@ bool CPreferences::GetStyle(int nMaster, int nStyle, StylesStruct *style)
 		style->nBackColor = GetStyleBackColor(nMaster,nStyle);
 		style->nOnOff = GetStyleOnOff(nMaster,nStyle);
 	}
-	else		
+	else
 	{
 		style->nFlags = 0;
 		style->nFontColor = CLR_DEFAULT;
@@ -5628,6 +5669,11 @@ void CPreferences::SetStyleFlags(int nMaster, int nStyle, DWORD dwNew)
 		case window_styles:
 			nWindowStyleFlags[nStyle] = dwNew;
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			nFeedBackStyleFlags[nStyle] = dwNew;
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5655,6 +5701,11 @@ void CPreferences::SetStyleFontColor(int nMaster, int nStyle, COLORREF crNew)
 		case window_styles:
 			nWindowStyleFontColor[nStyle] = crNew;
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			nFeedBackStyleFontColor[nStyle] = crNew;
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5682,6 +5733,11 @@ void CPreferences::SetStyleBackColor(int nMaster, int nStyle, COLORREF crNew)
 		case window_styles:
 			nWindowStyleBackColor[nStyle] = crNew;
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			nFeedBackStyleBackColor[nStyle] = crNew;
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5709,6 +5765,11 @@ void CPreferences::SetStyleOnOff(int nMaster, int nStyle, short sNew)
 		case window_styles:
 			nWindowStyleOnOff[nStyle] = sNew;
 			break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			nFeedBackStyleOnOff[nStyle] = sNew;
+			break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -5773,12 +5834,25 @@ void CPreferences::SaveStylePrefs(CIni &ini)
 	// window styles
 	ini.SerGet(false, nWindowStyleFlags,		ELEMENT_COUNT(nWindowStyleFlags), L"WindowStyleFlags");
 	ini.SerGet(false, nWindowStyleBackColor,	ELEMENT_COUNT(nWindowStyleBackColor), L"WindowStyleBackColor");
+
+	// ==> Feedback personalization [Stulle] - Stulle
+	// feedback styles
+	ini.SerGet(false, nFeedBackStyleFlags,		ELEMENT_COUNT(nFeedBackStyleFlags), L"FeedBackStyleFlags");
+	ini.SerGet(false, nFeedBackStyleFontColor,	ELEMENT_COUNT(nFeedBackStyleFontColor), L"FeedBackStyleFontColor");
+	// <== Feedback personalization [Stulle] - Stulle
 }
 
 void CPreferences::LoadStylePrefs(CIni &ini)
 {
 	ini.SetSection(L"STYLES");
 	int iVersion = ini.GetInt(L"Version");
+
+	// import v2 settings for new font mask
+	if(iVersion == 2)
+	{
+		LoadStylePrefsV2(ini);
+		return;
+	}
 
 	// client styles
 	ini.SerGet(true, nClientStyleFlags,		ELEMENT_COUNT(nClientStyleFlags), L"ClientStyleFlags");
@@ -5966,6 +6040,58 @@ void CPreferences::LoadStylePrefs(CIni &ini)
 		}
 	}
 
+	// ==> Feedback personalization [Stulle] - Stulle
+	// feedback styles
+	ini.SerGet(true, nFeedBackStyleFlags,	ELEMENT_COUNT(nFeedBackStyleFlags), L"FeedBackStyleFlags");
+	ini.SerGet(true, nFeedBackStyleFontColor,	ELEMENT_COUNT(nFeedBackStyleFontColor), L"FeedBackStyleFontColor");
+
+	for (int i=0;i<style_f_count;i++)
+	{
+		if ((nFeedBackStyleFlags[i] & STYLE_USED) != STYLE_USED)
+		{
+			switch(i)
+			{
+				case style_f_names:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,0,255));
+					break;
+				case style_f_fileinfo:
+					nFeedBackStyleFlags[i] = STYLE_BOLD|STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,0,255));
+					break;
+				case style_f_filestate:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,128,0));
+					break;
+				case style_f_transferred:
+					nFeedBackStyleFlags[i] = STYLE_BOLD|STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(255,0,0));
+					break;
+				case style_f_requests:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,128,0));
+					break;
+				case style_f_sources:
+					nFeedBackStyleFlags[i] = STYLE_ITALIC|STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,0,255));
+					break;
+				case style_f_clientsonqueue:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(255,0,0));
+					break;
+				case style_f_compeltesrc:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(255,0,0));
+					break;
+				default:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= CLR_DEFAULT;
+					break;
+			}
+		}
+	}
+	// <== Feedback personalization [Stulle] - Stulle
+
 	// import v1 settings
 	if(iVersion == 0)
 	{
@@ -6009,6 +6135,119 @@ void CPreferences::LoadStylePrefs(CIni &ini)
 			}
 		}
 	}
+}
+
+// import v2 settings
+// this will ensure the new font mask is set properly
+#define STYLE_ITALIC_OLD	0x0003
+#define STYLE_FONTMASK_OLD	0x0003
+void CPreferences::LoadStylePrefsV2(CIni &ini)
+{
+	// client styles
+	ini.SerGet(true, nClientStyleFlags,		ELEMENT_COUNT(nClientStyleFlags), L"ClientStyleFlags");
+	ini.SerGet(true, nClientStyleFontColor,	ELEMENT_COUNT(nClientStyleFontColor), L"ClientStyleFontColor");
+	ini.SerGet(true, nClientStyleBackColor,	ELEMENT_COUNT(nClientStyleBackColor), L"ClientStyleBackColor");
+	ini.SerGet(true, nClientStyleOnOff,		ELEMENT_COUNT(nClientStyleOnOff), L"ClientStyleOnOff");
+
+	for (int i=0;i<style_c_count;i++)
+	{
+		if ((nClientStyleFlags[i] & STYLE_FONTMASK_OLD) == STYLE_ITALIC_OLD)
+			nClientStyleFlags[i] = STYLE_ITALIC|STYLE_USED;
+	}
+
+	// download styles
+	ini.SerGet(true, nDownloadStyleFlags,		ELEMENT_COUNT(nDownloadStyleFlags), L"DownloadStyleFlags");
+	ini.SerGet(true, nDownloadStyleFontColor,	ELEMENT_COUNT(nDownloadStyleFontColor), L"DownloadStyleFontColor");
+	ini.SerGet(true, nDownloadStyleBackColor,	ELEMENT_COUNT(nDownloadStyleBackColor), L"DownloadStyleBackColor");
+	ini.SerGet(true, nDownloadStyleOnOff,		ELEMENT_COUNT(nDownloadStyleOnOff), L"DownloadStyleOnOff");
+
+	for (int i=0;i<style_d_count;i++)
+	{
+		if ((nDownloadStyleFlags[i] & STYLE_FONTMASK_OLD) == STYLE_ITALIC_OLD)
+			nDownloadStyleFlags[i] = STYLE_ITALIC|STYLE_USED;
+	}
+
+	// share styles
+	ini.SerGet(true, nShareStyleFlags,		ELEMENT_COUNT(nShareStyleFlags), L"ShareStyleFlags");
+	ini.SerGet(true, nShareStyleFontColor,	ELEMENT_COUNT(nShareStyleFontColor), L"ShareStyleFontColor");
+	ini.SerGet(true, nShareStyleBackColor,	ELEMENT_COUNT(nShareStyleBackColor), L"ShareStyleBackColor");
+	ini.SerGet(true, nShareStyleOnOff,		ELEMENT_COUNT(nShareStyleOnOff), L"ShareStyleOnOff");
+
+	for (int i=0;i<style_s_count;i++)
+	{
+		if ((nShareStyleFlags[i] & STYLE_FONTMASK_OLD) == STYLE_ITALIC_OLD)
+			nShareStyleFlags[i] = STYLE_ITALIC|STYLE_USED;
+	}
+
+	// server styles
+	ini.SerGet(true, nServerStyleFlags,		ELEMENT_COUNT(nServerStyleFlags), L"ServerStyleFlags");
+	ini.SerGet(true, nServerStyleFontColor,	ELEMENT_COUNT(nServerStyleFontColor), L"ServerStyleFontColor");
+	ini.SerGet(true, nServerStyleBackColor,	ELEMENT_COUNT(nServerStyleBackColor), L"ServerStyleBackColor");
+	ini.SerGet(true, nServerStyleOnOff,		ELEMENT_COUNT(nServerStyleOnOff), L"ServerStyleOnOff");
+
+	for (int i=0;i<style_se_count;i++)
+	{
+		if ((nServerStyleFlags[i] & STYLE_FONTMASK_OLD) == STYLE_ITALIC_OLD)
+			nServerStyleFlags[i] = STYLE_ITALIC|STYLE_USED;
+	}
+
+	// background styles
+	ini.SerGet(true, nBackgroundStyleFlags,		ELEMENT_COUNT(nBackgroundStyleFlags), L"BackgroundStyleFlags");
+	ini.SerGet(true, nBackgroundStyleBackColor,	ELEMENT_COUNT(nBackgroundStyleBackColor), L"BackgroundStyleBackColor");
+
+	// window styles
+	ini.SerGet(true, nWindowStyleFlags,	ELEMENT_COUNT(nWindowStyleFlags), L"WindowStyleFlags");
+	ini.SerGet(true, nWindowStyleBackColor,	ELEMENT_COUNT(nWindowStyleBackColor), L"WindowStyleBackColor");
+
+	// ==> Feedback personalization [Stulle] - Stulle
+	// get us the defaults
+	// feedback styles
+	for (int i=0;i<style_f_count;i++)
+	{
+		if ((nFeedBackStyleFlags[i] & STYLE_USED) != STYLE_USED)
+		{
+			switch(i)
+			{
+				case style_f_names:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,0,255));
+					break;
+				case style_f_fileinfo:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,0,255));
+					break;
+				case style_f_filestate:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,128,0));
+					break;
+				case style_f_transferred:
+					nFeedBackStyleFlags[i] = STYLE_BOLD|STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(255,0,0));
+					break;
+				case style_f_requests:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,128,0));
+					break;
+				case style_f_sources:
+					nFeedBackStyleFlags[i] = STYLE_ITALIC|STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(0,0,255));
+					break;
+				case style_f_clientsonqueue:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(255,0,0));
+					break;
+				case style_f_compeltesrc:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= COLORREF(RGB(255,0,0));
+					break;
+				default:
+					nFeedBackStyleFlags[i] = STYLE_USED;
+		            nFeedBackStyleFontColor[i]	= CLR_DEFAULT;
+					break;
+			}
+		}
+	}
+	// <== Feedback personalization [Stulle] - Stulle
 }
 // <== Design Settings [eWombat/Stulle] - Stulle
 

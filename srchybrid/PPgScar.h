@@ -116,7 +116,7 @@ protected:
 	bool m_bShowInMSN7; // Show in MSN7 [TPT] - Stulle
 	bool m_bQueueProgressBar; // Client queue progress bar [Commander] - Stulle
 	bool m_bTrayComplete; // Completed in Tray [Stulle] - Stulle
-	bool m_bColorFeedback; // Color Feedback [Myth88] - MyTh88
+	bool m_bColorFeedback; // Feedback personalization [Stulle] - Stulle
 	bool m_bShowClientPercentage; // Show Client Percentage optional [Stulle] - Stulle
 	bool m_bFollowTheMajority; // Follow The Majority [AndCycle/Stulle] - Stulle
 	bool m_bShowSpeedMeter; // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -343,7 +343,7 @@ protected:
 	HTREEITEM m_htiShowInMSN7; // Show in MSN7 [TPT] - Stulle
 	HTREEITEM m_htiQueueProgressBar; // Client queue progress bar [Commander] - Stulle
 	HTREEITEM m_htiTrayComplete; // Completed in Tray [Stulle] - Stulle
-	HTREEITEM m_htiColorFeedback; // Color Feedback [Myth88] - MyTh88
+	HTREEITEM m_htiColorFeedback; // Feedback personalization [Stulle] - Stulle
 	HTREEITEM m_htiShowClientPercentage; // Show Client Percentage optional [Stulle] - Stulle
 	HTREEITEM m_htiFollowTheMajority; // Follow The Majority [AndCycle/Stulle] - Stulle
 	HTREEITEM m_htiShowSpeedMeter; // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -611,13 +611,19 @@ private:
 	StylesStruct nServerStyles[style_se_count];
 	StylesStruct nBackgroundStyles[style_b_count];
 	StylesStruct nWindowStyles[style_w_count];
+	// ==> Feedback personalization [Stulle] - Stulle
+	StylesStruct nFeedBackStyles[style_f_count];
+	// <== Feedback personalization [Stulle] - Stulle
 	bool m_bFocusWasOnCombo;
 	bool m_bDesignChanged;
+	bool m_bBold;
+	bool m_bUnderlined;
+	bool m_bItalic;
 public:
 	void InitMasterStyleCombo();
 	void InitSubStyleCombo();
 	void UpdateStyles();
-	void OnFontStyle(int iStyle);
+	void OnFontStyle();
 	StylesStruct GetStyle(int nMaster, int nStyle);
 	void SetStyle(int nMaster, int nStyle, StylesStruct *style=NULL);
 

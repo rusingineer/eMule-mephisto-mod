@@ -6234,7 +6234,18 @@ BEGIN
     IDS_FINECS              "Fine Credit System (Threshold: 4 chunks)" // Modified FineCS [CiccioBastardo/Stulle] - Stulle
     IDS_IPFILTERWHITELOADED "%u IPs loaded to the IP Filter White List" // IP Filter White List [Stulle] - Stulle
     IDS_TRAY_COMPLETE       "Display completed Downloads in Tray" // Completed in Tray [Stulle] - Stulle
-    IDS_COLOR_FEEDBACK      "Color Upload Feedback" // Color Upload Feedback - MyTh88
+    // ==> Feedback personalization [Stulle] - Stulle
+    IDS_COLOR_FEEDBACK      "Personalize Upload Feedback"
+    IDS_COLOR_MASTER7       "Feedback"
+    IDS_COLOR_F1            "Label"
+    IDS_COLOR_F2            "Names"
+    IDS_COLOR_F3            "File type and file size"
+    IDS_COLOR_F4            "Download state"
+    IDS_COLOR_F5            "Transferred data"
+    IDS_COLOR_F6            "Requests"
+    IDS_COLOR_F7            "Sources (Partfiles)"
+    IDS_COLOR_F8            "Clients on queue"
+    // <== Feedback personalization [Stulle] - Stulle
     IDS_STATIC_ICON         "Always display Tray Icon" // Static Tray Icon - MyTh88
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"

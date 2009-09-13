@@ -4410,3 +4410,85 @@ CString CastItoUIXBytes(uint64 count)
 	return buffer;
 }
 // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
+
+// ==> Feedback personalization [Stulle] - Stulle
+CString GetColorHex(COLORREF clr)
+{
+	CString strRes,tmp;
+	tmp.Format(_T("%X"),GetRValue(clr));
+	if(tmp.GetLength() < 2)
+		strRes.AppendFormat(_T("0%s"),tmp);
+	else
+		strRes.Append(tmp);
+
+	tmp.Format(_T("%X"),GetGValue(clr));
+	if(tmp.GetLength() < 2)
+		strRes.AppendFormat(_T("0%s"),tmp);
+	else
+		strRes.Append(tmp);
+
+	tmp.Format(_T("%X"),GetBValue(clr));
+	if(tmp.GetLength() < 2)
+		strRes.AppendFormat(_T("0%s"),tmp);
+	else
+		strRes.Append(tmp);
+	return strRes;
+}
+
+CString GetColoredText(UINT in, int iStyle)
+{
+	CString strRes;
+	strRes.Format(_T("%u"),in);
+	return GetColoredText(strRes,iStyle);
+}
+
+CString GetColoredText(CString str, int iStyle)
+{
+	// Get styles
+	StylesStruct style, defaultStyle;
+	thePrefs.GetStyle(feedback_styles, abs(iStyle), &style);
+	thePrefs.GetStyle(feedback_styles, style_f_default, &defaultStyle);
+
+	// Merge styles
+	DWORD nFlags = 0;
+	COLORREF nFontColor = CLR_DEFAULT;
+	nFlags = style.nFlags;
+	if((nFlags & STYLE_FONTMASK) == 0)
+		nFlags = defaultStyle.nFlags;
+	nFontColor = style.nFontColor;
+	if(nFontColor == CLR_DEFAULT)
+		nFontColor = defaultStyle.nFontColor;
+
+	// Create resulting string and empty it for sure
+	CString strRes;
+	strRes.Empty();
+
+	if(iStyle != -style_f_label)
+	{
+		if(nFontColor != CLR_DEFAULT)
+			strRes.AppendFormat(_T("[color=#%s]"),GetColorHex(nFontColor));
+		if(nFlags & STYLE_BOLD)
+			strRes.Append(_T("[b]"));
+		if(nFlags & STYLE_UNDERLINE)
+			strRes.Append(_T("[u]"));
+		if(nFlags & STYLE_ITALIC)
+			strRes.Append(_T("[i]"));
+
+		strRes.Append(str);
+	}
+
+	if(iStyle != style_f_label)
+	{
+		if(nFlags & STYLE_ITALIC)
+			strRes.Append(_T("[/i]"));
+		if(nFlags & STYLE_UNDERLINE)
+			strRes.Append(_T("[/u]"));
+		if(nFlags & STYLE_BOLD)
+			strRes.Append(_T("[/b]"));
+		if(nFontColor != CLR_DEFAULT)
+			strRes.Append(_T("[/color]"));
+	}
+
+	return strRes;
+}
+// <== Feedback personalization [Stulle] - Stulle

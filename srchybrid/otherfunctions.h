@@ -509,3 +509,8 @@ int wildcmp(TCHAR *wild, TCHAR *string);
 // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
 
 #define ELEMENT_COUNT(X) (sizeof(X) / sizeof(X[0])) // Design Settings [eWombat/Stulle] - Stulle
+
+// ==> Feedback personalization [Stulle] - Stulle
+CString GetColoredText(UINT in, int iStyle);
+CString GetColoredText(CString str, int iStyle);
+// <== Feedback personalization [Stulle] - Stulle

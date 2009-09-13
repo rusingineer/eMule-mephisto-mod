@@ -3075,40 +3075,38 @@ CString CKnownFile::GetFeedback(bool isUS)
 	}
 
 	POSITION pos=LabelList.GetHeadPosition();
-	if (thePrefs.GetColorFeedback())
-	{
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=blue]%s[/color]\r\n"),LabelList.GetNext(pos),GetFileName());
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=#00BF00]%s[/color]\r\n"),LabelList.GetNext(pos),GetFileType());
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=blue]%s[/color]\r\n"),LabelList.GetNext(pos), CastItoXBytes(GetFileSize(),false,false,3,isUS));
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=#00BF00]%s[/color]\r\n"),LabelList.GetNext(pos), (IsPartFile()==false)?GetResString(IDS_COMPLETE):CastItoXBytes(((CPartFile*)this)->GetCompletedSize(),false,false,3,isUS));
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=red]%s[/color] ([b][color=red]%s[/color][/b])\r\n"),LabelList.GetNext(pos), CastItoXBytes(statistic.GetTransferred(),false,false,3,isUS), CastItoXBytes(statistic.GetAllTimeTransferred(),false,false,3,isUS)); 
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=#40BFBF]%i[/color] ([b][color=#40BFBF]%i[/color][/b])\r\n"),LabelList.GetNext(pos), statistic.GetRequests(), statistic.GetAllTimeRequests()); 
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=#40BFBF]%i[/color] ([b][color=#40BFBF]%i[/color][/b])\r\n"),LabelList.GetNext(pos), statistic.GetAccepts(),statistic.GetAllTimeAccepts()); 
-		if(IsPartFile()){
-			feed.AppendFormat(_T("[color=orange]%s:[/color] [color=blue]%i[/color]\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetSourceCount());
-			feed.AppendFormat(_T("[color=orange]%s:[/color] [color=#00BF00]%i[/color]\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetAvailableSrcCount());
-			feed.AppendFormat(_T("[color=orange]%s:[/color] [color=blue]%i[/color]\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetSrcStatisticsValue(DS_NONEEDEDPARTS));
-		}
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [color=red]%i[/color]\r\n"),LabelList.GetNext(pos),onuploadqueue);
-		feed.AppendFormat(_T("[color=orange]%s:[/color] [b][color=red]%i[/color][/b]\r\n"),LabelList.GetNext(pos),m_nCompleteSourcesCount);
+	// ==> Feedback personalization [Stulle] - Stulle
+	/*
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos),GetFileName());
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos),GetFileType());
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), CastItoXBytes(GetFileSize(),false,false,3,isUS));
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), (IsPartFile()==false)?GetResString(IDS_COMPLETE):CastItoXBytes(((CPartFile*)this)->GetCompletedSize(),false,false,3,isUS));
+	feed.AppendFormat(_T("%s: %s (%s)\r\n"),LabelList.GetNext(pos), CastItoXBytes(statistic.GetTransferred(),false,false,3,isUS), CastItoXBytes(statistic.GetAllTimeTransferred(),false,false,3,isUS)); 
+	feed.AppendFormat(_T("%s: %i (%i)\r\n"),LabelList.GetNext(pos), statistic.GetRequests(), statistic.GetAllTimeRequests()); 
+	feed.AppendFormat(_T("%s: %i (%i)\r\n"),LabelList.GetNext(pos), statistic.GetAccepts(),statistic.GetAllTimeAccepts()); 
+	if(IsPartFile()){
+		feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetSourceCount());
+		feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetAvailableSrcCount());
+		feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetSrcStatisticsValue(DS_NONEEDEDPARTS));
 	}
-	else
-	{
-		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos),GetFileName());
-		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos),GetFileType());
-		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), CastItoXBytes(GetFileSize(),false,false,3,isUS));
-		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), (IsPartFile()==false)?GetResString(IDS_COMPLETE):CastItoXBytes(((CPartFile*)this)->GetCompletedSize(),false,false,3,isUS));
-		feed.AppendFormat(_T("%s: %s (%s)\r\n"),LabelList.GetNext(pos), CastItoXBytes(statistic.GetTransferred(),false,false,3,isUS), CastItoXBytes(statistic.GetAllTimeTransferred(),false,false,3,isUS)); 
-		feed.AppendFormat(_T("%s: %i (%i)\r\n"),LabelList.GetNext(pos), statistic.GetRequests(), statistic.GetAllTimeRequests()); 
-		feed.AppendFormat(_T("%s: %i (%i)\r\n"),LabelList.GetNext(pos), statistic.GetAccepts(),statistic.GetAllTimeAccepts()); 
-		if(IsPartFile()){
-			feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetSourceCount());
-			feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetAvailableSrcCount());
-			feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),((CPartFile*)this)->GetSrcStatisticsValue(DS_NONEEDEDPARTS));
-		}
-		feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),onuploadqueue);
-		feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),m_nCompleteSourcesCount);
+	feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),onuploadqueue);
+	feed.AppendFormat(_T("%s: %i\r\n"),LabelList.GetNext(pos),m_nCompleteSourcesCount);
+	*/
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText(GetFileName(),style_f_names));
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText(GetFileType(),style_f_fileinfo));
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText(CastItoXBytes(GetFileSize(),false,false,3,isUS),style_f_fileinfo));
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText((IsPartFile()==false)?GetResString(IDS_COMPLETE):CastItoXBytes(((CPartFile*)this)->GetCompletedSize(),false,false,3,isUS),style_f_filestate));
+	feed.AppendFormat(_T("%s: %s (%s)\r\n"),LabelList.GetNext(pos), GetColoredText(CastItoXBytes(statistic.GetTransferred(),false,false,3,isUS),style_f_transferred), GetColoredText(CastItoXBytes(statistic.GetAllTimeTransferred(),false,false,3,isUS),style_f_transferred)); 
+	feed.AppendFormat(_T("%s: %s (%s)\r\n"),LabelList.GetNext(pos), GetColoredText(statistic.GetRequests(),style_f_requests), GetColoredText(statistic.GetAllTimeRequests(),style_f_requests)); 
+	feed.AppendFormat(_T("%s: %s (%s)\r\n"),LabelList.GetNext(pos), GetColoredText(statistic.GetAccepts(),style_f_requests), GetColoredText(statistic.GetAllTimeAccepts(),style_f_requests)); 
+	if(IsPartFile()){
+		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText(((CPartFile*)this)->GetSourceCount(),style_f_sources));
+		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText(((CPartFile*)this)->GetAvailableSrcCount(),style_f_sources));
+		feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText(((CPartFile*)this)->GetSrcStatisticsValue(DS_NONEEDEDPARTS),style_f_sources));
 	}
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText((UINT)onuploadqueue,style_f_clientsonqueue));
+	feed.AppendFormat(_T("%s: %s\r\n"),LabelList.GetNext(pos), GetColoredText((UINT)m_nCompleteSourcesCount,style_f_compeltesrc));
+	// <== Feedback personalization [Stulle] - Stulle
 	return feed;
 }
 // <== Copy feedback feature [MorphXT] - Stulle

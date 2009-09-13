@@ -264,7 +264,7 @@ CPPgScar::CPPgScar()
 	m_htiShowInMSN7 = NULL; // Show in MSN7 [TPT] - Stulle
 	m_htiQueueProgressBar = NULL; // Client queue progress bar [Commander] - Stulle
 	m_htiTrayComplete = NULL; // Completed in Tray [Stulle] - Stulle
-	m_htiColorFeedback = NULL; // Color Feedback [Myth88] - MyTh88
+	m_htiColorFeedback = NULL; // Feedback personalization [Stulle] - Stulle
 	m_htiShowClientPercentage = NULL; // Show Client Percentage optional [Stulle] - Stulle
 	m_htiFollowTheMajority = NULL; // Follow The Majority [AndCycle/Stulle] - Stulle
 	m_htiShowSpeedMeter = NULL; // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -708,7 +708,7 @@ void CPPgScar::DoDataExchange(CDataExchange* pDX)
 		m_htiShowInMSN7 = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_SHOWINMSN7), m_htiDisplay, m_bShowInMSN7); // Show in MSN7 [TPT] - Stulle
 		m_htiQueueProgressBar = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_CLIENTQUEUEPROGRESSBAR), m_htiDisplay, m_bQueueProgressBar); // Client queue progress bar [Commander] - Stulle
 		m_htiTrayComplete = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_TRAY_COMPLETE), m_htiDisplay, m_bTrayComplete); // Completed in Tray [Stulle] - Stulle
-		m_htiColorFeedback = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_COLOR_FEEDBACK), m_htiDisplay, m_bColorFeedback); // Color Feedback [Myth88] - MyTh88
+		m_htiColorFeedback = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_COLOR_FEEDBACK), m_htiDisplay, m_bColorFeedback); // Feedback personalization [Stulle] - Stulle
 		m_htiShowClientPercentage = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_CLIENTPERCENTAGE), m_htiDisplay, m_bShowClientPercentage); // Show Client Percentage optional [Stulle] - Stulle
 		m_htiFollowTheMajority = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_FOLLOWTHEMAJORITY), m_htiDisplay, m_bFollowTheMajority); // Follow The Majority [AndCycle/Stulle] - Stulle
 		m_htiShowSpeedMeter = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_SHOW_SPEED_METER), m_htiDisplay, m_bShowSpeedMeter); // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -998,7 +998,7 @@ void CPPgScar::DoDataExchange(CDataExchange* pDX)
 	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiShowInMSN7, m_bShowInMSN7); // Show in MSN7 [TPT] - Stulle
 	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiQueueProgressBar, m_bQueueProgressBar); // Client queue progress bar [Commander] - Stulle
 	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiTrayComplete, m_bTrayComplete); // Completed in Tray [Stulle] - Stulle
-	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiColorFeedback, m_bColorFeedback); // Color Feedback [Myth88] - MyTh88
+	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiColorFeedback, m_bColorFeedback); // Feedback personalization [Stulle] - Stulle
 	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiShowClientPercentage, m_bShowClientPercentage); // Show Client Percentage optional [Stulle] - Stulle
 	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiFollowTheMajority, m_bFollowTheMajority); // Follow The Majority [AndCycle/Stulle] - Stulle
 	DDX_TreeCheck(pDX, IDC_SCAR_OPTS, m_htiShowSpeedMeter, m_bShowSpeedMeter); // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -1400,7 +1400,7 @@ BOOL CPPgScar::OnInitDialog()
 	m_bShowInMSN7 = thePrefs.GetShowMSN7(); // Show in MSN7 [TPT] - Stulle
 	m_bQueueProgressBar = thePrefs.ShowClientQueueProgressBar(); // Client queue progress bar [Commander] - Stulle
 	m_bTrayComplete = thePrefs.GetTrayComplete(); // Completed in Tray [Stulle] - Stulle
-	m_bColorFeedback = thePrefs.GetColorFeedback(); // Color Feedback [Myth88] - MyTh88
+	m_bColorFeedback = thePrefs.GetColorFeedback(); // Feedback personalization [Stulle] - Stulle
 	m_bShowClientPercentage = thePrefs.GetShowClientPercentage(); // Show Client Percentage optional [Stulle] - Stulle
 	m_bFollowTheMajority = thePrefs.IsFollowTheMajorityEnabled(); // Follow The Majority [AndCycle/Stulle] - Stulle
 	m_bShowSpeedMeter = thePrefs.GetShowSpeedMeter(); // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -1581,9 +1581,6 @@ BOOL CPPgScar::OnInitDialog()
 	m_underlined.SetIcon((HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE((int)IDI_FONTUL), IMAGE_ICON, 16, 16, 0));
 	m_italic.SetWindowText(_T(""));
 	m_italic.SetIcon((HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE((int)IDI_FONTI), IMAGE_ICON, 16, 16, 0));
-	m_bold.SetFont(theApp.GetBoldFont());
-	m_underlined.SetFont(theApp.GetULFont());
-	m_italic.SetFont(theApp.GetItalicFont());
 
 	m_FontColor.SetColor(GetSysColor(COLOR_WINDOWTEXT));
 	m_FontColor.SetDefaultColor(GetSysColor(COLOR_WINDOWTEXT));
@@ -1650,6 +1647,11 @@ void CPPgScar::LoadSettings(void)
 
 		for (int i=0;i<style_w_count;i++)
 			thePrefs.GetStyle(window_styles, i, &nWindowStyles[i]);
+
+		// ==> Feedback personalization [Stulle] - Stulle
+		for (int i=0;i<style_f_count;i++)
+			thePrefs.GetStyle(feedback_styles, i, &nFeedBackStyles[i]);
+		// <== Feedback personalization [Stulle] - Stulle
 		// <== Design Settings [eWombat/Stulle] - Stulle
 
 		// ==> Advanced Updates [MorphXT/Stulle] - Stulle
@@ -1877,7 +1879,7 @@ BOOL CPPgScar::OnApply()
 	thePrefs.m_bShowInMSN7 = m_bShowInMSN7; // Show in MSN7 [TPT] - Stulle
 	thePrefs.m_bClientQueueProgressBar = m_bQueueProgressBar; // Client queue progress bar [Commander] - Stulle
 	thePrefs.m_bTrayComplete = m_bTrayComplete; // Completed in Tray [Stulle] - Stulle
-	thePrefs.m_bColorFeedback = m_bColorFeedback; // Color Feedback [Myth88] - MyTh88
+	thePrefs.m_bColorFeedback = m_bColorFeedback; // Feedback personalization [Stulle] - Stulle
 	thePrefs.m_bShowClientPercentage = m_bShowClientPercentage; // Show Client Percentage optional [Stulle] - Stulle
 	thePrefs.m_bFollowTheMajority = m_bFollowTheMajority; // Follow The Majority [AndCycle/Stulle] - Stulle
 	// ==> High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
@@ -2051,6 +2053,11 @@ BOOL CPPgScar::OnApply()
 
 	for (int i=0;i<style_w_count;i++)
 		thePrefs.SetStyle(window_styles, i, &nWindowStyles[i]);
+
+	// ==> Feedback personalization [Stulle] - Stulle
+	for (int i=0;i<style_f_count;i++)
+		thePrefs.SetStyle(feedback_styles, i, &nFeedBackStyles[i]);
+	// <== Feedback personalization [Stulle] - Stulle
 
 	if(m_bDesignChanged)
 	{
@@ -2718,7 +2725,7 @@ void CPPgScar::OnDestroy()
 	m_htiShowInMSN7 = NULL; // Show in MSN7 [TPT] - Stulle
 	m_htiQueueProgressBar = NULL;
 	m_htiTrayComplete = NULL; // Completed in Tray [Stulle] - Stulle
-	m_htiColorFeedback = NULL; // Color Feedback [Myth88] - MyTh88
+	m_htiColorFeedback = NULL; // Feedback personalization [Stulle] - Stulle
 	m_htiShowClientPercentage = NULL; // Show Client Percentage optional [Stulle] - Stulle
 	m_htiFollowTheMajority = NULL; // Follow The Majority [AndCycle/Stulle] - Stulle
 	m_htiShowSpeedMeter = NULL; // High resulution speedmeter on toolbar [eFMod/Stulle] - Stulle
@@ -4158,6 +4165,9 @@ void CPPgScar::InitMasterStyleCombo()
 	iItem = m_MasterCombo.AddString(GetResString(IDS_COLOR_MASTER4));		m_MasterCombo.SetItemData(iItem, server_styles);
 	iItem = m_MasterCombo.AddString(GetResString(IDS_COLOR_MASTER5));		m_MasterCombo.SetItemData(iItem, background_styles);
 	iItem = m_MasterCombo.AddString(GetResString(IDS_COLOR_MASTER6));		m_MasterCombo.SetItemData(iItem, window_styles);
+	// ==> Feedback personalization [Stulle] - Stulle
+	iItem = m_MasterCombo.AddString(GetResString(IDS_COLOR_MASTER7));		m_MasterCombo.SetItemData(iItem, feedback_styles);
+	// <== Feedback personalization [Stulle] - Stulle
 
 	m_MasterCombo.SetCurSel(iSel != CB_ERR ? iSel : 0);
 
@@ -4251,6 +4261,21 @@ void CPPgScar::InitSubStyleCombo()
 			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_W9));		m_SubCombo.SetItemData(iItem, style_w_statusbar);
 			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_W10));		m_SubCombo.SetItemData(iItem, style_w_toolbar);
 		}break;
+		// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles: // feedback styles
+		{
+			iItem = m_SubCombo.AddString(GetResString(IDS_DEFAULT));		m_SubCombo.SetItemData(iItem, style_f_default);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F1));		m_SubCombo.SetItemData(iItem, style_f_label);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F2));		m_SubCombo.SetItemData(iItem, style_f_names);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F3));		m_SubCombo.SetItemData(iItem, style_f_fileinfo);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F4));		m_SubCombo.SetItemData(iItem, style_f_filestate);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F5));		m_SubCombo.SetItemData(iItem, style_f_transferred);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F6));		m_SubCombo.SetItemData(iItem, style_f_requests);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F7));		m_SubCombo.SetItemData(iItem, style_f_sources);
+			iItem = m_SubCombo.AddString(GetResString(IDS_COLOR_F8));		m_SubCombo.SetItemData(iItem, style_f_clientsonqueue);
+			iItem = m_SubCombo.AddString(GetResString(IDS_FEEDBACK_COMPLETE));		m_SubCombo.SetItemData(iItem, style_f_compeltesrc);
+		}break;
+		// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}
@@ -4329,18 +4354,21 @@ void CPPgScar::UpdateStyles()
 		m_OnOff.SetWindowText( GetResString(IDS_COLOR_ON) );
 	}
 
-	m_bold.EnableWindow(bEnable && iMasterValue < background_styles);
-	m_underlined.EnableWindow(bEnable && iMasterValue < background_styles);
-	m_italic.EnableWindow(bEnable && iMasterValue < background_styles);
-	m_FontColor.EnableWindow(bEnable && iMasterValue < background_styles);
-	m_BackColor.EnableWindow(bEnable);
+	m_bold.EnableWindow(bEnable && (iMasterValue < background_styles || iMasterValue == feedback_styles));
+	m_underlined.EnableWindow(bEnable && (iMasterValue < background_styles || iMasterValue == feedback_styles));
+	m_italic.EnableWindow(bEnable && (iMasterValue < background_styles || iMasterValue == feedback_styles));
+	m_FontColor.EnableWindow(bEnable && (iMasterValue < background_styles || iMasterValue == feedback_styles));
+	m_BackColor.EnableWindow(bEnable && iMasterValue != feedback_styles);
 
 	if(bEnable)
 	{
 		int iStyle = (styles.nFlags & STYLE_FONTMASK);
-		m_bold.SetCheck(iStyle== STYLE_BOLD ? 1:0);
-		m_underlined.SetCheck(iStyle== STYLE_UNDERLINE ? 1:0);
-		m_italic.SetCheck(iStyle== STYLE_ITALIC ? 1:0);
+		m_bold.SetCheck(iStyle & STYLE_BOLD ? 1:0);
+		m_bBold = (iStyle & STYLE_BOLD) ? true : false;
+		m_underlined.SetCheck(iStyle & STYLE_UNDERLINE ? 1:0);
+		m_bUnderlined = (iStyle & STYLE_UNDERLINE) ? true : false;
+		m_italic.SetCheck(iStyle & STYLE_ITALIC ? 1:0);
+		m_bItalic = (iStyle & STYLE_ITALIC) ? true : false;
 		m_FontColor.SetColor(styles.nFontColor);
 		m_BackColor.SetColor(styles.nBackColor);
 	}
@@ -4348,19 +4376,16 @@ void CPPgScar::UpdateStyles()
 	RedrawWindow(); // work around all glitches. :D
 }
 
-void CPPgScar::OnFontStyle(int iStyle)
+void CPPgScar::OnFontStyle()
 {
-	m_bold.SetCheck(iStyle==1 ? 1:0);
-	m_underlined.SetCheck(iStyle==2 ? 1:0);
-	m_italic.SetCheck(iStyle==3 ? 1:0);
-	iStyle = 0 ; //Now select font
-
+	// Get font style
+	int iStyle = 0 ;
 	if (m_bold.GetCheck())
-		iStyle = STYLE_BOLD;
-	else if (m_underlined.GetCheck())
-		iStyle = STYLE_UNDERLINE;
-	else if (m_italic.GetCheck())
-		iStyle = STYLE_ITALIC;
+		iStyle |= STYLE_BOLD;
+	if (m_underlined.GetCheck())
+		iStyle |= STYLE_UNDERLINE;
+	if (m_italic.GetCheck())
+		iStyle |= STYLE_ITALIC;
 
 	int iCurStyle = 0;
 	int iMasterValue = 0;
@@ -4397,7 +4422,7 @@ LONG CPPgScar::OnColorPopupSelChange(UINT /*lParam*/, LONG /*wParam*/)
 	StylesStruct styles;
 	styles = GetStyle(iMasterValue, iCurStyle);
 
-	// font
+	// font color
 	if (iCurStyle >= 0)
 	{
 		COLORREF crColor = m_FontColor.GetColor();
@@ -4411,7 +4436,7 @@ LONG CPPgScar::OnColorPopupSelChange(UINT /*lParam*/, LONG /*wParam*/)
 		}
 	}
 
-	// background
+	// background color
 	if (iCurStyle >= 0)
 	{
 		COLORREF crColor = m_BackColor.GetColor();
@@ -4429,17 +4454,53 @@ LONG CPPgScar::OnColorPopupSelChange(UINT /*lParam*/, LONG /*wParam*/)
 
 void CPPgScar::OnBnClickedBold()
 {
-	OnFontStyle(m_bold.GetCheck() ? 1:0);
+	// reverse 
+	if(m_bBold)
+	{
+		m_bold.SetCheck(FALSE);
+		m_bBold = false;
+	}
+	else
+	{
+		m_bold.SetCheck(TRUE);
+		m_bBold = true;
+	}
+
+	OnFontStyle();
 }
 
 void CPPgScar::OnBnClickedUnderlined()
 {
-	OnFontStyle(m_underlined.GetCheck() ? 2:0);
+	// reverse 
+	if(m_bUnderlined)
+	{
+		m_underlined.SetCheck(FALSE);
+		m_bUnderlined = false;
+	}
+	else
+	{
+		m_underlined.SetCheck(TRUE);
+		m_bUnderlined = true;
+	}
+
+	OnFontStyle();
 }
 
 void CPPgScar::OnBnClickedItalic()
 {
-	OnFontStyle(m_italic.GetCheck() ? 3:0);
+	// reverse 
+	if(m_bItalic)
+	{
+		m_italic.SetCheck(FALSE);
+		m_bItalic = false;
+	}
+	else
+	{
+		m_italic.SetCheck(TRUE);
+		m_bItalic = true;
+	}
+
+	OnFontStyle();
 }
 
 void CPPgScar::OnCbnSelchangeStyleselMaster()
@@ -4500,6 +4561,10 @@ StylesStruct CPPgScar::GetStyle(int nMaster, int nStyle)
 		return nBackgroundStyles[nStyle];
 	else if(nMaster == window_styles)
 		return nWindowStyles[nStyle];
+	// ==> Feedback personalization [Stulle] - Stulle
+	else if(nMaster == feedback_styles)
+		return nFeedBackStyles[nStyle];
+	// <== Feedback personalization [Stulle] - Stulle
 	return nClientStyles[nStyle];
 }
 
@@ -4543,6 +4608,13 @@ void CPPgScar::SetStyle(int nMaster, int nStyle, StylesStruct *style)
 			{
 				nWindowStyles[nStyle].nBackColor = style->nBackColor;
 			}break;
+			// ==> Feedback personalization [Stulle] - Stulle
+		case feedback_styles:
+			{
+				nFeedBackStyles[nStyle].nFlags = style->nFlags;
+				nFeedBackStyles[nStyle].nFontColor = style->nFontColor;
+			}break;
+			// <== Feedback personalization [Stulle] - Stulle
 		default:
 			break;
 	}

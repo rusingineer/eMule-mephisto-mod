@@ -3349,7 +3349,18 @@
 #define IDS_FINECS                      61400 // Modified FineCS [CiccioBastardo/Stulle] - Stulle
 #define IDS_IPFILTERWHITELOADED         61410 // IP Filter White List [Stulle] - Stulle
 #define IDS_TRAY_COMPLETE               61420 // Completed in Tray [Stulle] - Stulle
-#define IDS_COLOR_FEEDBACK              61430 // Color Upload Feedback - MyTh88
+// ==> Feedback personalization [Stulle] - Stulle
+#define IDS_COLOR_FEEDBACK              61430
+#define IDS_COLOR_MASTER7               61431
+#define IDS_COLOR_F1                    61432
+#define IDS_COLOR_F2                    61433
+#define IDS_COLOR_F3                    61434
+#define IDS_COLOR_F4                    61435
+#define IDS_COLOR_F5                    61436
+#define IDS_COLOR_F6                    61437
+#define IDS_COLOR_F7                    61438
+#define IDS_COLOR_F8                    61439
+// <== Feedback personalization [Stulle] - Stulle
 #define IDS_STATIC_ICON                 61450 // Static Tray Icon - MyTh88
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000

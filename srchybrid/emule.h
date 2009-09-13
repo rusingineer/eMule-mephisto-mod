@@ -363,16 +363,9 @@ public:
 	// ==> Design Settings [eWombat/Stulle] - Stulle
 	void	CreateExtraFonts(CFont *font);
 	void	DestroyExtraFonts();
-	CFont *GetBoldFont()		{return &m_ExtraFonts[0];}
-	CFont *GetULFont()			{return &m_ExtraFonts[1];}
-	CFont *GetItalicFont()		{return &m_ExtraFonts[2];}
-	CFont *GetNarrowFont()		{return &m_ExtraFonts[3];}
-	CFont *GetBoldNarFont()		{return &m_ExtraFonts[4];}
-	CFont *GetULNarFont()		{return &m_ExtraFonts[5];}
-	CFont *GetItalicNarFont()	{return &m_ExtraFonts[6];}
 	CFont *GetFontByStyle(DWORD nStyle,bool bNarrow);
 protected:
-	CFont			m_ExtraFonts[7];
+	CFont			m_ExtraFonts[15];
 	// <== Design Settings [eWombat/Stulle] - Stulle
 
 	// ==> Automatic shared files updater [MoNKi] - Stulle

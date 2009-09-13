@@ -2788,6 +2788,7 @@ bool CemuleApp::IsEd2kFriendLinkInClipboard()
 	return IsEd2kLinkInClipboard(_szEd2kFriendLink, ARRSIZE(_szEd2kFriendLink)-1);
 }
 // Commander - Added: FriendLinks [emulEspaa] - End
+
 // ==> Design Settings [eWombat/Stulle] - Stulle
 void CemuleApp::CreateExtraFonts(CFont *font)
 {
@@ -2796,24 +2797,40 @@ void CemuleApp::CreateExtraFonts(CFont *font)
 	font->GetLogFont(&lf);
 	lf.lfWeight=FW_BOLD;
 	m_ExtraFonts[0].CreateFontIndirect(&lf); // bold
-	lf.lfWeight=FW_NORMAL;
 	lf.lfUnderline=TRUE;
-	m_ExtraFonts[1].CreateFontIndirect(&lf); // underlined
-	lf.lfUnderline=FALSE;
+	m_ExtraFonts[1].CreateFontIndirect(&lf); // bold underlined
 	lf.lfItalic = TRUE;
-	m_ExtraFonts[2].CreateFontIndirect(&lf); // italic
+	m_ExtraFonts[2].CreateFontIndirect(&lf); // bold underlined italic
+	lf.lfWeight=FW_NORMAL;
+	m_ExtraFonts[3].CreateFontIndirect(&lf); // underlined italic
+	lf.lfUnderline=FALSE;
+	m_ExtraFonts[4].CreateFontIndirect(&lf); // italic
+	lf.lfWeight=FW_BOLD;
+	m_ExtraFonts[5].CreateFontIndirect(&lf); // italic bold
+	lf.lfWeight=FW_NORMAL;
+	lf.lfItalic = FALSE;
+	lf.lfUnderline=TRUE;
+	m_ExtraFonts[6].CreateFontIndirect(&lf); // underlined
 
 	// narrow
 	_tcscpy(lf.lfFaceName, _T("Arial Narrow"));
-	m_ExtraFonts[3].CreateFontIndirect(&lf); // normal
+	m_ExtraFonts[7].CreateFontIndirect(&lf); // normal
 	lf.lfWeight=FW_BOLD;
-	m_ExtraFonts[4].CreateFontIndirect(&lf); // bold
-	lf.lfWeight=FW_NORMAL;
+	m_ExtraFonts[8].CreateFontIndirect(&lf); // bold
 	lf.lfUnderline=TRUE;
-	m_ExtraFonts[5].CreateFontIndirect(&lf); // underlined
-	lf.lfUnderline=FALSE;
+	m_ExtraFonts[9].CreateFontIndirect(&lf); // bold underlined
 	lf.lfItalic = TRUE;
-	m_ExtraFonts[6].CreateFontIndirect(&lf); // italic
+	m_ExtraFonts[10].CreateFontIndirect(&lf); // bold underlined italic
+	lf.lfWeight=FW_NORMAL;
+	m_ExtraFonts[11].CreateFontIndirect(&lf); // underlined italic
+	lf.lfUnderline=FALSE;
+	m_ExtraFonts[12].CreateFontIndirect(&lf); // italic
+	lf.lfWeight=FW_BOLD;
+	m_ExtraFonts[13].CreateFontIndirect(&lf); // italic bold
+	lf.lfWeight=FW_NORMAL;
+	lf.lfItalic = FALSE;
+	lf.lfUnderline=TRUE;
+	m_ExtraFonts[14].CreateFontIndirect(&lf); // underlined
 }
 
 void CemuleApp::DestroyExtraFonts()
@@ -2828,23 +2845,35 @@ void CemuleApp::DestroyExtraFonts()
 CFont* CemuleApp::GetFontByStyle(DWORD nStyle,bool bNarrow)
 {
 	nStyle &= STYLE_FONTMASK;
+	int i = 0;
 	if(bNarrow)
 	{
-		if (nStyle == STYLE_BOLD)
-			return &m_ExtraFonts[4];
-		if (nStyle == STYLE_UNDERLINE)
-			return &m_ExtraFonts[5];
-		if (nStyle == STYLE_ITALIC)
-			return &m_ExtraFonts[6];
-		return &m_ExtraFonts[3];
+		i = 8;
+		if(nStyle == 0)
+			return &m_ExtraFonts[7];
 	}
 
-	if (nStyle == STYLE_BOLD)
-		return &m_ExtraFonts[0];
-	if (nStyle == STYLE_UNDERLINE)
-		return &m_ExtraFonts[1];
-	if (nStyle == STYLE_ITALIC)
-		return &m_ExtraFonts[2];
+	if(nStyle & STYLE_BOLD)
+	{
+		if(nStyle & STYLE_UNDERLINE)
+		{
+			if(nStyle & STYLE_ITALIC)
+				return &m_ExtraFonts[2+i];
+			return &m_ExtraFonts[1+i];
+		}
+		return &m_ExtraFonts[0+i];
+	}
+	else if(nStyle & STYLE_ITALIC)
+	{
+		if(nStyle & STYLE_UNDERLINE)
+			return &m_ExtraFonts[3+i];
+		if(nStyle & STYLE_BOLD)
+			return &m_ExtraFonts[5+i];
+		return &m_ExtraFonts[4+i];
+	}
+	else if(nStyle & STYLE_UNDERLINE)
+		return &m_ExtraFonts[6+i];
+
 	return emuledlg->GetFont();
 }
 // <== Design Settings [eWombat/Stulle] - Stulle

@@ -2569,7 +2569,7 @@ BOOL CDownloadListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
  				case MP_COPYFEEDBACK:
 				case MP_COPYFEEDBACK_US:
 				{
-					CString feed;
+					CString feed,tmp;
 					uint64 uTransferredSum = 0;
 					uint64 uTransferredAllSum = 0;
 					int iCount = 0;
@@ -2577,31 +2577,35 @@ BOOL CDownloadListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 
 					if(wParam == MP_COPYFEEDBACK_US)
 					{
-						if (thePrefs.GetColorFeedback())
-							feed.AppendFormat(_T("[color=green][b]Feedback from %s on [%s][/b][/color]\r\n"),thePrefs.GetUserNick(),theApp.m_strModLongVersion);
-						else
-							feed.AppendFormat(_T("Feedback from %s on [%s]\r\n"),thePrefs.GetUserNick(),theApp.m_strModLongVersion);
+						// ==> Feedback personalization [Stulle] - Stulle
+						/*
+						feed.AppendFormat(_T("Feedback from %s on [%s]\r\n"),thePrefs.GetUserNick(),theApp.m_strModLongVersion);
+						*/
+						tmp.Format(_T("Feedback from %s on [%s]"),GetColoredText(thePrefs.GetUserNick(),style_f_names),GetColoredText(theApp.m_strModLongVersion,style_f_names));
+						feed.Append(GetColoredText(tmp,style_f_label));
+						feed.Append(_T("\r\n"));
+						// <== Feedback personalization [Stulle] - Stulle
 					}
 					else
 					{
-						if (thePrefs.GetColorFeedback())
-						{
-							feed.Append(_T("[color=green][b]"));
-							feed.AppendFormat(GetResString(IDS_FEEDBACK_FROM),thePrefs.GetUserNick(), theApp.m_strModLongVersion);
-							feed.Append(_T("[/b][/color]\r\n"));
-						}
-						else
-						{
-							feed.AppendFormat(GetResString(IDS_FEEDBACK_FROM),thePrefs.GetUserNick(), theApp.m_strModLongVersion);
-							feed.Append(_T("\r\n"));
-						}
+						// ==> Feedback personalization [Stulle] - Stulle
+						/*
+						feed.AppendFormat(GetResString(IDS_FEEDBACK_FROM),thePrefs.GetUserNick(), theApp.m_strModLongVersion);
+						feed.Append(_T("\r\n"));
+						*/
+						tmp.Format(GetResString(IDS_FEEDBACK_FROM),GetColoredText(thePrefs.GetUserNick(),style_f_names),GetColoredText(theApp.m_strModLongVersion,style_f_names));
+						feed.Append(GetColoredText(tmp,style_f_label));
+						feed.Append(_T("\r\n"));
+						// <== Feedback personalization [Stulle] - Stulle
 					}
 
 					while (pos != NULL)
 					{
 						CKnownFile* file = selectedList.GetNext(pos);
 						feed.Append(file->GetFeedback(wParam == MP_COPYFEEDBACK_US));
-						feed.Append(_T(" \r\n"));
+
+						if(pos != NULL) // Feedback personalization [Stulle] - Stulle
+							feed.Append(_T("\r\n"));
 
 						uTransferredSum += file->statistic.GetTransferred();
 						uTransferredAllSum += file->statistic.GetAllTimeTransferred();
@@ -2610,21 +2614,28 @@ BOOL CDownloadListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 
 					if(iCount>1)
 					{
+						feed.Append(_T("\r\n"));
 						if(wParam == MP_COPYFEEDBACK_US)
 						{
-							if (thePrefs.GetColorFeedback())
-								feed.AppendFormat(_T("[color=orange]Transferred (all files):[/color] [color=red]%s (%s)[/color]\r\n"),CastItoXBytes(uTransferredSum,false,false,3,true),CastItoXBytes(uTransferredAllSum,false,false,3,true));
-							else
-								feed.AppendFormat(_T("Transferred (all files): %s (%s)\r\n"),CastItoXBytes(uTransferredSum,false,false,3,true),CastItoXBytes(uTransferredAllSum,false,false,3,true));
+							// ==> Feedback personalization [Stulle] - Stulle
+							/*
+							feed.AppendFormat(_T("Transferred (all files): %s (%s)\r\n"),CastItoXBytes(uTransferredSum,false,false,3,true),CastItoXBytes(uTransferredAllSum,false,false,3,true));
+							*/
+							feed.AppendFormat(_T("Transferred (all files): %s (%s)"),GetColoredText(CastItoXBytes(uTransferredSum,false,false,3,true),style_f_transferred),GetColoredText(CastItoXBytes(uTransferredAllSum,false,false,3,true),style_f_transferred));
+							// <== Feedback personalization [Stulle] - Stulle
 						}
 						else
 						{
-							if (thePrefs.GetColorFeedback())
-								feed.AppendFormat(_T("[color=orange]%s:[/color] [color=red]%s (%s)[/color]\r\n"),GetResString(IDS_FEEDBACK_ALL_TRANSFERRED),CastItoXBytes(uTransferredSum,false,false,3),CastItoXBytes(uTransferredAllSum,false,false,3));
-							else
-								feed.AppendFormat(_T("%s: %s (%s)\r\n"),GetResString(IDS_FEEDBACK_ALL_TRANSFERRED),CastItoXBytes(uTransferredSum,false,false,3),CastItoXBytes(uTransferredAllSum,false,false,3));
+							// ==> Feedback personalization [Stulle] - Stulle
+							/*
+							feed.AppendFormat(_T("%s: %s (%s)\r\n"),GetResString(IDS_FEEDBACK_ALL_TRANSFERRED),CastItoXBytes(uTransferredSum,false,false,3),CastItoXBytes(uTransferredAllSum,false,false,3));
+							*/
+							feed.AppendFormat(_T("%s: %s (%s)"),GetResString(IDS_FEEDBACK_ALL_TRANSFERRED),GetColoredText(CastItoXBytes(uTransferredSum,false,false,3,true),style_f_transferred),GetColoredText(CastItoXBytes(uTransferredAllSum,false,false,3,true),style_f_transferred));
+							// <== Feedback personalization [Stulle] - Stulle
 						}
 					}
+					feed.Append(GetColoredText(_T(""),-style_f_label)); // Feedback personalization [Stulle] - Stulle
+					feed.Append(_T("\r\n"));
 					//Todo: copy all the comments too
 					theApp.CopyTextToClipboard(feed);
 					break;

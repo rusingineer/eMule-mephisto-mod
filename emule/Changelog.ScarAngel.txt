@@ -11,6 +11,7 @@ Updated with code from zz_fly's Xtreme
 
 Added: Static Tray Icon [MorphXT] - MyTh88
 Added: (Design Settings) Shareable file style for SharedFilesCtrl [Stulle] - Stulle
+Added: Feedback personalization [Stulle] - Stulle
 
 Changed: Updated ASFU to v3.4 to work with single shared files [Stulle] - Stulle
 Changed: Updated Design Settings for new code (also improves implementation) [Stulle] - Stulle
@@ -19,10 +20,21 @@ Changed: Write FileSettings.ini sequentially (faster) [Stulle] - Stulle
 Changed: Global SysInfo RAM stats will support usage of more than 4GB [Stulle] - Stulle
 Changed: Min small files push size to 1 kB [Stulle] - Stulle
 Changed: Small files push size slider kB based (makes keyboard input usable) [Stulle] - Stulle
+Changed: (Design Settings) Allow to use multiple font styles (B/U/I) at once [Stulle] - Stulle
+Changed: (Design Settings) Changed version to v3 for above change [Stulle] - Stulle
+	+ import of v2 is done automatically on startup
 
 Fixed: Save known or FileSettings threads were not terminated properly [Stulle] - Stulle
 Fixed: Some glitches around Timer for ReAsk File Sources [Stulle] - Stulle
 Fixed: Changing the small files push size reset changes in the Tree options [Stulle] - Stulle
+
+Removed: Color Upload Feedback [MyTh88]- MyTh88
+
+Feedback personalization:
++ integrated into Design Settings
++ allows you to change font style and color of the feedback
++ Label style will be applied to the whole feedback block
++ Default style will be applied if color is default and no font style is set
 
 
 eMule v0.49b ScarAngel v3.1:

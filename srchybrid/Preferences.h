@@ -161,7 +161,7 @@ struct Category_Struct{
 // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
 
 // ==> Design Settings [eWombat/Stulle] - Stulle
-#define STYLE_VERSION 2
+#define STYLE_VERSION 3
 struct StylesStruct 
 {
 	short nOnOff;
@@ -170,11 +170,11 @@ struct StylesStruct
 	COLORREF nBackColor;
 };
 
-#define STYLE_BOLD		0x0001
-#define STYLE_UNDERLINE	0x0002
-#define STYLE_ITALIC	0x0003
+#define STYLE_BOLD		0x00000001
+#define STYLE_UNDERLINE	0x00000002
+#define STYLE_ITALIC	0x00000004
+#define STYLE_FONTMASK	0x00000007
 #define STYLE_USED		0x80000000
-#define STYLE_FONTMASK	0x0003
 
 // master styles
 enum eMasterStyles
@@ -185,6 +185,7 @@ enum eMasterStyles
 	server_styles,
 	background_styles,
 	window_styles,
+	feedback_styles, // Feedback personalization [Stulle] - Stulle
 	master_count
 };
 
@@ -276,6 +277,24 @@ enum eWindowStyles
 	style_w_toolbar,
 	style_w_count
 };
+
+// ==> Feedback personalization [Stulle] - Stulle
+// feedback styles
+enum eFeedBackStyles
+{
+	style_f_default = 0,
+	style_f_label,
+	style_f_names,
+	style_f_fileinfo,
+	style_f_filestate,
+	style_f_transferred,
+	style_f_requests,
+	style_f_sources,
+	style_f_clientsonqueue,
+	style_f_compeltesrc,
+	style_f_count
+};
+// <== Feedback personalization [Stulle] - Stulle
 // <== Design Settings [eWombat/Stulle] - Stulle
 
 // ==> Multiple Part Transfer [Stulle] - Mephisto
@@ -1037,6 +1056,14 @@ public:
 	static COLORREF		nWindowStyleFontColor[style_w_count];
 	static COLORREF		nWindowStyleBackColor[style_w_count];
 	static short		nWindowStyleOnOff[style_w_count];
+
+	// ==> Feedback personalization [Stulle] - Stulle
+	// feedback styles
+	static DWORD		nFeedBackStyleFlags[style_f_count]; 
+	static COLORREF		nFeedBackStyleFontColor[style_f_count];
+	static COLORREF		nFeedBackStyleBackColor[style_f_count];
+	static short		nFeedBackStyleOnOff[style_f_count];
+	// <== Feedback personalization [Stulle] - Stulle
 	// <== Design Settings [eWombat/Stulle] - Stulle
 
 	// ==> Enforce Ratio [Stulle] - Stulle
@@ -1138,7 +1165,7 @@ public:
 
 	static bool m_bTrayComplete; // Completed in Tray [Stulle] - Stulle
 
-	static bool m_bColorFeedback; // Color Feedback [Myth88] - MyTh88
+	static bool m_bColorFeedback; // Feedback personalization [Stulle] - Stulle
 
 	static bool		m_bSplitWindow; // Advanced Transfer Window Layout [Stulle] - Stulle
 
@@ -2428,6 +2455,7 @@ public:
 	static void		SetStyleOnOff(int nMaster, int nStyle, short sNew);
 	static void		SaveStylePrefs(CIni &ini);
 	static void		LoadStylePrefs(CIni &ini);
+	static void		LoadStylePrefsV2(CIni &ini);
 	// <== Design Settings [eWombat/Stulle] - Stulle
 
 	// ==> Enforce Ratio [Stulle] - Stulle
@@ -2581,7 +2609,7 @@ public:
 
 	static	bool	GetTrayComplete()		{ return m_bTrayComplete; } // Completed in Tray [Stulle] - Stulle
 
-	static	bool	GetColorFeedback()		{ return m_bColorFeedback; } // Color Feedback [Myth88] - MyTh88
+	static	bool	GetColorFeedback()		{ return m_bColorFeedback; } // Feedback personalization [Stulle] - Stulle
 
 	// ==> Advanced Transfer Window Layout [Stulle] - Stulle
 	static	bool	GetSplitWindow()		{ return m_bSplitWindow; }

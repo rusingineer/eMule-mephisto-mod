@@ -3264,6 +3264,7 @@
 #define IDS_X_SHOWVERTICALHOURMARKERS   61256
 #define IDS_X_REBARTOOLBAR              61257
 #define IDS_BINDADDR                    61258
+#define IDS_MEDIAINFO_MEDIADET          61259
 // <== Advanced Options [Official/MorphXT] - Stulle
 // ==> Advanced Updates [MorphXT/Stulle] - Stulle
 #define IDC_ANTI_LEECH_BOX              61300

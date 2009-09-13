@@ -650,6 +650,7 @@ protected:
 	CString  sMediaInfo_MediaInfoDllPath;
 	bool bMediaInfo_RIFF;
 	bool bMediaInfo_ID3LIB;
+	bool m_bMediaInfo_MediaDet;
 	int iMaxLogBuff;
 	int m_iMaxChatHistory;
 	int m_iPreviewSmallBlocks;
@@ -698,6 +699,7 @@ protected:
 	HTREEITEM m_hti_sMediaInfo_MediaInfoDllPath;
 	HTREEITEM m_hti_bMediaInfo_RIFF;
 	HTREEITEM m_hti_bMediaInfo_ID3LIB;
+	HTREEITEM m_hti_MediaInfo_MediaDet;
 
 	HTREEITEM m_hti_AdvDisplay;
 	HTREEITEM m_hti_m_iMaxChatHistory;

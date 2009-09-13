@@ -12,6 +12,7 @@ Updated with code from zz_fly's Xtreme
 Added: Static Tray Icon [MorphXT] - MyTh88
 Added: (Design Settings) Shareable file style for SharedFilesCtrl [Stulle] - Stulle
 Added: Feedback personalization [Stulle] - Stulle
+Added: Advanced option to disable/enable MediaDet usage for media files [Stulle] - Stulle
 
 Changed: Updated ASFU to v3.4 to work with single shared files [Stulle] - Stulle
 Changed: Updated Design Settings for new code (also improves implementation) [Stulle] - Stulle

@@ -857,6 +857,7 @@ public:
 	static CString sMediaInfo_MediaInfoDllPath ;
 	static bool bMediaInfo_RIFF ;
 	static bool bMediaInfo_ID3LIB; 
+	static bool m_bMediaInfo_MediaDet;
 	static CString sInternetSecurityZone;
 	// <== Advanced Options [Official/MorphXT] - Stulle
 

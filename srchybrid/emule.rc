@@ -6176,6 +6176,7 @@ BEGIN
     IDS_X_SHOWVERTICALHOURMARKERS "Stats- Show vertical hour markers"
     IDS_X_REBARTOOLBAR      "* ReBar Toolbar"
     IDS_BINDADDR            "Bind emule to interface"
+    IDS_MEDIAINFO_MEDIADET  "Use Media Detector (MediaDet) to retrieve information about media files"
     // <== Advanced Options [Official/MorphXT] - Stulle
     // ==> Advanced Updates [MorphXT/Stulle] - Stulle
     IDS_UPDATEANTILEECHERONSTART "Update antiLeech.dll on startup"

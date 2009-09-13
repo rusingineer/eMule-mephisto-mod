@@ -667,6 +667,7 @@ CString CPreferences::sNotifierMailEncryptCertName;
 CString CPreferences::sMediaInfo_MediaInfoDllPath ;
 bool CPreferences::bMediaInfo_RIFF;
 bool CPreferences::bMediaInfo_ID3LIB ;
+bool CPreferences::m_bMediaInfo_MediaDet;
 CString CPreferences::sInternetSecurityZone;
 // <== Advanced Options [Official/MorphXT] - Stulle
 
@@ -2702,6 +2703,7 @@ void CPreferences::SavePreferences()
 	}
 	ini.WriteBool(_T("MediaInfo_RIFF"),bMediaInfo_RIFF);
 	ini.WriteBool(_T("MediaInfo_ID3LIB"),bMediaInfo_ID3LIB);
+	ini.WriteBool(_T("MediaInfo_MediaDet"),m_bMediaInfo_MediaDet);
 	ini.WriteInt(_T("MaxLogBuff"),iMaxLogBuff/1024);
 	ini.WriteInt(_T("MaxChatHistoryLines"),m_iMaxChatHistory);
 	ini.WriteInt(_T("PreviewSmallBlocks"),m_iPreviewSmallBlocks);
@@ -3940,6 +3942,7 @@ void CPreferences::LoadPreferences()
 	sMediaInfo_MediaInfoDllPath=ini.GetString(L"MediaInfo_MediaInfoDllPath",_T("MEDIAINFO.DLL")) ;
 	bMediaInfo_RIFF=ini.GetBool(_T("MediaInfo_RIFF"),true);
 	bMediaInfo_ID3LIB =ini.GetBool(_T("MediaInfo_ID3LIB"),true);
+	m_bMediaInfo_MediaDet =ini.GetBool(_T("MediaInfo_MediaDet"),true);
 	sInternetSecurityZone=ini.GetString(_T("InternetSecurityZone"),_T("Untrusted"));
     m_iDebugSearchResultDetailLevel = ini.GetInt(L"DebugSearchResultDetailLevel", 0); // NOTE: this variable is also initialized to 0 above! 
 	// <== Advanced Options [Official/MorphXT] - Stulle

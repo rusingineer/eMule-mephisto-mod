@@ -309,49 +309,12 @@ void CMuleToolbarCtrl::OnSize(UINT nType, int cx, int cy)
 	CToolBarCtrl::OnSize(nType, cx, cy);
 
 	// ==> High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
-	theApp.emuledlg->Resize_TrafficGraph();
+	theApp.emuledlg->Reposition_TrafficGraph();
 	// <== High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 
 	SetAllButtonsWidth();
 	AutoSize();
 }
-
-// ==> High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
-void CMuleToolbarCtrl::ShowSpeedMeter(bool bShow)
-{
-	if (bShow)
-	{
-		if (theApp.emuledlg->m_co_UpTrafficGraph.IsWindowVisible() == false ||
-			theApp.emuledlg->m_co_DownTrafficGraph.IsWindowVisible() == false)
-		{
-			theApp.emuledlg->m_co_UpTrafficGraph.EnableWindow(true);
-			theApp.emuledlg->m_co_UpTrafficGraph.ShowWindow(SW_SHOW);
-			theApp.emuledlg->m_co_DownTrafficGraph.EnableWindow(true);
-			theApp.emuledlg->m_co_DownTrafficGraph.ShowWindow(SW_SHOW);
-
-			CRect		r;
-
-			GetWindowRect(&r);
-			OnSize(0,r.Width(),r.Height());
-		}
-	}
-	else
-	{
-		theApp.emuledlg->m_co_UpTrafficGraph.EnableWindow(false);
-		theApp.emuledlg->m_co_UpTrafficGraph.ShowWindow(SW_HIDE);
-		theApp.emuledlg->m_co_DownTrafficGraph.EnableWindow(false);
-		theApp.emuledlg->m_co_DownTrafficGraph.ShowWindow(SW_HIDE);
-
-		CRect		rInvalidateUp, rInvalidateDown;
-		theApp.emuledlg->m_co_UpTrafficGraph.GetWindowRect(&rInvalidateUp);
-		ScreenToClient(rInvalidateUp);
-		InvalidateRect(rInvalidateUp);
-		theApp.emuledlg->m_co_DownTrafficGraph.GetWindowRect(&rInvalidateDown);
-		ScreenToClient(rInvalidateDown);
-		InvalidateRect(rInvalidateDown);
-	}
-}
-// <== High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 
 void CMuleToolbarCtrl::SetAllButtonsWidth()
 {
@@ -841,7 +804,10 @@ BOOL CMuleToolbarCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 			// ==> High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 			// always show big icons when speedmeter enabled!
 			if(thePrefs.GetShowSpeedMeter())
+			{
+				thePrefs.SetToolbarIconSize(CSize(16,16));
 				break;
+			}
 			// <== High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 			m_sizBtnBmp.cx = m_sizBtnBmp.cy = 16;
 			ForceRecalcLayout();
@@ -1365,3 +1331,40 @@ void CMuleToolbarCtrl::UpdateBackground()
 		}
 	}
 }
+
+// ==> High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
+void CMuleToolbarCtrl::ShowSpeedMeter(bool bShow)
+{
+	if (bShow)
+	{
+		if (theApp.emuledlg->m_co_UpTrafficGraph.IsWindowVisible() == false ||
+			theApp.emuledlg->m_co_DownTrafficGraph.IsWindowVisible() == false)
+		{
+			theApp.emuledlg->m_co_UpTrafficGraph.EnableWindow(true);
+			theApp.emuledlg->m_co_UpTrafficGraph.ShowWindow(SW_SHOW);
+			theApp.emuledlg->m_co_DownTrafficGraph.EnableWindow(true);
+			theApp.emuledlg->m_co_DownTrafficGraph.ShowWindow(SW_SHOW);
+
+			CRect		r;
+
+			GetWindowRect(&r);
+			OnSize(0,r.Width(),r.Height());
+		}
+	}
+	else
+	{
+		theApp.emuledlg->m_co_UpTrafficGraph.EnableWindow(false);
+		theApp.emuledlg->m_co_UpTrafficGraph.ShowWindow(SW_HIDE);
+		theApp.emuledlg->m_co_DownTrafficGraph.EnableWindow(false);
+		theApp.emuledlg->m_co_DownTrafficGraph.ShowWindow(SW_HIDE);
+
+		CRect		rInvalidateUp, rInvalidateDown;
+		theApp.emuledlg->m_co_UpTrafficGraph.GetWindowRect(&rInvalidateUp);
+		ScreenToClient(rInvalidateUp);
+		InvalidateRect(rInvalidateUp);
+		theApp.emuledlg->m_co_DownTrafficGraph.GetWindowRect(&rInvalidateDown);
+		ScreenToClient(rInvalidateDown);
+		InvalidateRect(rInvalidateDown);
+	}
+}
+// <== High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88

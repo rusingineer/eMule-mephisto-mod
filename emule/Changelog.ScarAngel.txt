@@ -29,6 +29,7 @@ Changed: Localize ScarAngel string in Preferences panel list [Stulle] - Stulle
 Fixed: Save known or FileSettings threads were not terminated properly [Stulle] - Stulle
 Fixed: Some glitches around Timer for ReAsk File Sources [Stulle] - Stulle
 Fixed: Changing the small files push size reset changes in the Tree options [Stulle] - Stulle
+Fixed: Some glitches around enabling/disabling the Speedbars in the toolbar [Stulle] - Stulle
 
 Removed: Color Upload Feedback [MyTh88]- MyTh88
 

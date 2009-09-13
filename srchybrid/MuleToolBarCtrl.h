@@ -66,7 +66,9 @@ protected:
 #endif
 
 	void AutoSize();
+public: // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 	virtual	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+protected: // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnNmRClick(NMHDR *pNMHDR, LRESULT *pResult);

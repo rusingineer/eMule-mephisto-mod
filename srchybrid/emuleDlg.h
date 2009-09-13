@@ -418,7 +418,7 @@ public:
 	CSpeedGraph m_co_DownTrafficGraph;
 
 	void Update_TrafficGraph();
-	void Resize_TrafficGraph();
+	void Reposition_TrafficGraph();
 // <== High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 
 	// ==> Design Settings [eWombat/Stulle] - Max

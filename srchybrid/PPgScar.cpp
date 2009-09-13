@@ -1891,6 +1891,25 @@ BOOL CPPgScar::OnApply()
 	{
 		thePrefs.m_bShowSpeedMeter = m_bShowSpeedMeter;
 		theApp.emuledlg->toolbar->ShowSpeedMeter(m_bShowSpeedMeter);
+		LONG cx = thePrefs.GetToolbarIconSize().cx;
+		LONG cy = thePrefs.GetToolbarIconSize().cy;
+		if(m_bShowSpeedMeter || cx != 16)
+			theApp.emuledlg->toolbar->OnCommand(MP_LARGEICONS,NULL);
+		else 
+			theApp.emuledlg->toolbar->OnCommand(MP_SMALLICONS,NULL);
+		thePrefs.SetToolbarIconSize(CSize(cx,cy));
+		switch(thePrefs.GetToolbarLabelSettings())
+		{
+		case NoLabels:
+			theApp.emuledlg->toolbar->OnCommand(MP_NOTEXTLABELS,NULL);
+			break;
+		case LabelsBelow:
+			theApp.emuledlg->toolbar->OnCommand(MP_TEXTLABELS,NULL);
+			break;
+		case LabelsRight:
+			theApp.emuledlg->toolbar->OnCommand(MP_TEXTLABELSONRIGHT,NULL);
+			break;
+		}
 	}
 	// <== High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
 	// ==> Static Tray Icon [MorphXT] - MyTh88
@@ -4369,13 +4388,13 @@ void CPPgScar::UpdateStyles()
 
 	if(bEnable)
 	{
-		int iStyle = (styles.nFlags & STYLE_FONTMASK);
-		m_bold.SetCheck(iStyle & STYLE_BOLD ? 1:0);
-		m_bBold = (iStyle & STYLE_BOLD) ? true : false;
-		m_underlined.SetCheck(iStyle & STYLE_UNDERLINE ? 1:0);
-		m_bUnderlined = (iStyle & STYLE_UNDERLINE) ? true : false;
-		m_italic.SetCheck(iStyle & STYLE_ITALIC ? 1:0);
-		m_bItalic = (iStyle & STYLE_ITALIC) ? true : false;
+		//int iStyle = (styles.nFlags & STYLE_FONTMASK); // not needed, we do it bitwise
+		m_bold.SetCheck(styles.nFlags & STYLE_BOLD ? 1:0);
+		m_bBold = (styles.nFlags & STYLE_BOLD) ? true : false;
+		m_underlined.SetCheck(styles.nFlags & STYLE_UNDERLINE ? 1:0);
+		m_bUnderlined = (styles.nFlags & STYLE_UNDERLINE) ? true : false;
+		m_italic.SetCheck(styles.nFlags & STYLE_ITALIC ? 1:0);
+		m_bItalic = (styles.nFlags & STYLE_ITALIC) ? true : false;
 		m_FontColor.SetColor(styles.nFontColor);
 		m_BackColor.SetColor(styles.nBackColor);
 	}

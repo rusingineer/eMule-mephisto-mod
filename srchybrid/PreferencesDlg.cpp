@@ -216,7 +216,7 @@ void CPreferencesDlg::Localize()
 		pTree->SetItemText(GetPageTreeItem(c++), RemoveAmbersand(GetResString(IDS_XTREMESETTINGS)) + _T(" II")); //Xman Xtreme Mod
 		// ==> Mephisto mod [Stulle] - Mephisto
 		/*
-		pTree->SetItemText(GetPageTreeItem(c++), RemoveAmbersand(_T("ScarAngel"))); // ScarAngel Preferences window - Stulle
+		pTree->SetItemText(GetPageTreeItem(c++), RemoveAmbersand(GetResString(IDS_SCARANGEL))); // ScarAngel Preferences window - Stulle
 		*/
 		pTree->SetItemText(GetPageTreeItem(c++), RemoveAmbersand(GetResString(IDS_MEPHISTO)));
 		// <== Mephisto mod [Stulle] - Mephisto

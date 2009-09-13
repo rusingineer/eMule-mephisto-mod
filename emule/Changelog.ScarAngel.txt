@@ -23,6 +23,7 @@ Changed: Small files push size slider kB based (makes keyboard input usable) [St
 Changed: (Design Settings) Allow to use multiple font styles (B/U/I) at once [Stulle] - Stulle
 Changed: (Design Settings) Changed version to v3 for above change [Stulle] - Stulle
 	+ import of v2 is done automatically on startup
+Changed: Localize ScarAngel string in Preferences panel list [Stulle] - Stulle
 
 Fixed: Save known or FileSettings threads were not terminated properly [Stulle] - Stulle
 Fixed: Some glitches around Timer for ReAsk File Sources [Stulle] - Stulle

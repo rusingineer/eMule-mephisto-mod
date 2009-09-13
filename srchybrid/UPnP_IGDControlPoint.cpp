@@ -1637,7 +1637,11 @@ int  CUPnP_IGDControlPoint::GetStatusString(CString & displaystring,bool verbose
 				if (verbose)
 					displaystring +=  port + ((mapping.protocol == UNAT_UDP)?_T(":UDP\t"): _T(":TCP\t")) +  mapping.description +_T("\r\n");
 				else
-					displaystring +=  port + ((mapping.protocol == UNAT_UDP)?_T(":UDP"): _T(":TCP")) + _T(", ");
+				{
+					displaystring +=  port + ((mapping.protocol == UNAT_UDP)?_T(":UDP"): _T(":TCP"));
+					if(map_pos)
+						displaystring += _T(", ");
+				}
 		}
 	}
 	else 

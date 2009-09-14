@@ -2938,7 +2938,12 @@ void CUpDownClient::InitClientSoftwareVersion()
 			nClientMinVersion = (m_nClientVersion - uMaj*100000) / 100;
 			nClientUpVersion = m_nClientVersion % 100;
 		}
+		// ==> Enhanced Client Recognition [Spike] - Stulle
+		/*
 		else if (m_nClientVersion >= 10100 && m_nClientVersion <= 10309){
+		*/
+		else if (m_nClientVersion >= 10100 && m_nClientVersion <= 10409){ // netfinity
+		// <== Enhanced Client Recognition [Spike] - Stulle
 			UINT uMaj = m_nClientVersion/10000;
 			nClientMajVersion = uMaj;
 			nClientMinVersion = (m_nClientVersion - uMaj*10000) / 100;

@@ -2106,6 +2106,7 @@ LRESULT CemuleDlg::OnWMData(WPARAM /*wParam*/, LPARAM lParam)
 			//Xman Xtreme Upload:
 			thePrefs.CheckSlotSpeed();
 			//Xman end
+			theApp.scheduler->SaveOriginals(); // Don't reset Connection Settings for Webserver/CML/MM [Stulle] - Stulle
 
 			return true;
 		}

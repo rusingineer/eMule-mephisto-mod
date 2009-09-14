@@ -2811,6 +2811,7 @@ void CemuleApp::CreateExtraFonts(CFont *font)
 	lf.lfItalic = FALSE;
 	lf.lfUnderline=TRUE;
 	m_ExtraFonts[6].CreateFontIndirect(&lf); // underlined
+	lf.lfUnderline=FALSE;
 
 	// narrow
 	_tcscpy(lf.lfFaceName, _T("Arial Narrow"));

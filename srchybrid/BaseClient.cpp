@@ -1620,12 +1620,12 @@ void CUpDownClient::SendHelloTypePacket(CSafeMemFile* data)
 	memcpy(hash,thePrefs.GetUserHash(), 16);
 	if (thePrefs.IsEmuMLDonkey() && GetClientSoft() == SO_MLDONKEY)
 	{
-		if(GetHashType() == SO_OLD_MLDONKEY)
+//		if(GetHashType() == SO_OLD_MLDONKEY)
 		{
 			hash[5] = 'M'; //WiZaRd::Proper Hash Fake :P
 			hash[14] = 'L'; //WiZaRd::Proper Hash Fake :P
 			if (thePrefs.IsEmuLog())
-				AddDebugLogLine(false,_T("[EMULATE] Emulate MLDonkey(old) (%s)"),DbgGetClientInfo());
+				AddDebugLogLine(false,_T("[EMULATE] Emulate MLDonkey (%s)"),DbgGetClientInfo());
 		}
 	}
 	else if ((thePrefs.IsEmueDonkey() && GetClientSoft() == SO_EDONKEY)

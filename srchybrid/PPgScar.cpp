@@ -398,6 +398,10 @@ CPPgScar::CPPgScar()
 	m_hti_bMediaInfo_RIFF=NULL;
 	m_hti_bMediaInfo_ID3LIB=NULL;
 	m_hti_MediaInfo_MediaDet=NULL;
+	m_hti_MediaInfo_RM=NULL;
+#ifdef HAVE_WMSDK_H
+	m_hti_MediaInfo_WM=NULL;
+#endif//HAVE_WMSDK_H
 
 	m_hti_AdvDisplay=NULL;
 	m_hti_m_iMaxChatHistory=NULL;
@@ -1170,6 +1174,10 @@ void CPPgScar::DoDataExchange(CDataExchange* pDX)
 		m_hti_bMediaInfo_RIFF=m_ctrlAdvTreeOptions.InsertCheckBox(GetResString(IDS_MEDIAINFO_RIFF),m_hti_MediaInfo,bMediaInfo_RIFF);
 		m_hti_bMediaInfo_ID3LIB=m_ctrlAdvTreeOptions.InsertCheckBox(GetResString(IDS_MEDIAINFO_ID3LIB),m_hti_MediaInfo,bMediaInfo_ID3LIB);
 		m_hti_MediaInfo_MediaDet=m_ctrlAdvTreeOptions.InsertCheckBox(GetResString(IDS_MEDIAINFO_MEDIADET),m_hti_MediaInfo,m_bMediaInfo_MediaDet);
+		m_hti_MediaInfo_RM=m_ctrlAdvTreeOptions.InsertCheckBox(GetResString(IDS_MEDIAINFO_RM),m_hti_MediaInfo,m_bMediaInfo_RM);
+#ifdef HAVE_WMSDK_H
+		m_hti_MediaInfo_WM=m_ctrlAdvTreeOptions.InsertCheckBox(GetResString(IDS_MEDIAINFO_WM),m_hti_MediaInfo,m_bMediaInfo_WM);
+#endif//HAVE_WMSDK_H
 
 		m_hti_AdvDisplay = m_ctrlAdvTreeOptions.InsertGroup(GetResString(IDS_PW_DISPLAY), iImgAdvDisplay, TVI_ROOT);
 		m_hti_m_iMaxChatHistory= m_ctrlAdvTreeOptions.InsertItem(GetResString(IDS_MAXCHATHISTORY),TREEOPTSCTRLIMG_EDIT, TREEOPTSCTRLIMG_EDIT,m_hti_AdvDisplay);
@@ -1245,6 +1253,10 @@ void CPPgScar::DoDataExchange(CDataExchange* pDX)
 	DDX_TreeCheck(pDX,IDC_ADVANCED_OPTS,m_hti_bMediaInfo_RIFF,bMediaInfo_RIFF);
 	DDX_TreeCheck(pDX,IDC_ADVANCED_OPTS,m_hti_bMediaInfo_ID3LIB,bMediaInfo_ID3LIB);
 	DDX_TreeCheck(pDX,IDC_ADVANCED_OPTS,m_hti_MediaInfo_MediaDet,m_bMediaInfo_MediaDet);
+	DDX_TreeCheck(pDX,IDC_ADVANCED_OPTS,m_hti_MediaInfo_RM,m_bMediaInfo_RM);
+#ifdef HAVE_WMSDK_H
+	DDX_TreeCheck(pDX,IDC_ADVANCED_OPTS,m_hti_MediaInfo_WM,m_bMediaInfo_WM);
+#endif//HAVE_WMSDK_H
 
 	DDX_TreeEdit(pDX, IDC_ADVANCED_OPTS, m_hti_m_iMaxChatHistory, m_iMaxChatHistory);
 	DDV_MinMaxInt(pDX, m_iMaxChatHistory, 3, 2048);
@@ -1517,6 +1529,10 @@ BOOL CPPgScar::OnInitDialog()
 	bMediaInfo_RIFF=thePrefs.bMediaInfo_RIFF;
 	bMediaInfo_ID3LIB=thePrefs.bMediaInfo_ID3LIB;
 	m_bMediaInfo_MediaDet=thePrefs.m_bMediaInfo_MediaDet;
+	m_bMediaInfo_RM=thePrefs.m_bMediaInfo_RM;
+#ifdef HAVE_WMSDK_H
+	m_bMediaInfo_WM=thePrefs.m_bMediaInfo_WM;
+#endif//HAVE_WMSDK_H
 	iMaxLogBuff=thePrefs.GetMaxLogBuff()/1024;
 	m_iMaxChatHistory=thePrefs.m_iMaxChatHistory;
 	m_iPreviewSmallBlocks=thePrefs.m_iPreviewSmallBlocks;
@@ -2046,12 +2062,6 @@ BOOL CPPgScar::OnApply()
 	if(m_iCompressLevel == 0)
 		thePrefs.m_bUseCompression = false;
 	// <=== Adjust Compress Level [Stulle] - Stulle
-	// ==> Automatic shared files updater [MoNKi] - Stulle
-	if(m_bAutoSharedUpdater != thePrefs.GetDirectoryWatcher()){
-		thePrefs.SetDirectoryWatcher(m_bAutoSharedUpdater);
-		theApp.ResetDirectoryWatcher();
-	}
-	// <== Automatic shared files updater [MoNKi] - Stulle
 
 	// ==> TBH: Backup [TBH/EastShare/MorphXT] - Stulle
 	thePrefs.m_bAutoBackup = m_AutoBackup.GetCheck() == BST_CHECKED;
@@ -2123,6 +2133,10 @@ BOOL CPPgScar::OnApply()
 	thePrefs.bMediaInfo_RIFF=bMediaInfo_RIFF;
 	thePrefs.bMediaInfo_ID3LIB=bMediaInfo_ID3LIB;
 	thePrefs.m_bMediaInfo_MediaDet=m_bMediaInfo_MediaDet;
+	thePrefs.m_bMediaInfo_RM=m_bMediaInfo_RM;
+#ifdef HAVE_WMSDK_H
+	thePrefs.m_bMediaInfo_WM=m_bMediaInfo_WM;
+#endif//HAVE_WMSDK_H
 	thePrefs.iMaxLogBuff=iMaxLogBuff*1024;
 	thePrefs.m_iMaxChatHistory=m_iMaxChatHistory;
 	thePrefs.m_iPreviewSmallBlocks=m_iPreviewSmallBlocks;
@@ -2476,6 +2490,10 @@ void CPPgScar::Localize(void)
 		if (m_hti_bMediaInfo_RIFF) m_ctrlAdvTreeOptions.SetItemText(m_hti_bMediaInfo_RIFF, GetResString(IDS_MEDIAINFO_RIFF));
 		if (m_hti_bMediaInfo_ID3LIB) m_ctrlAdvTreeOptions.SetItemText(m_hti_bMediaInfo_ID3LIB, GetResString(IDS_MEDIAINFO_ID3LIB));
 		if (m_hti_MediaInfo_MediaDet) m_ctrlAdvTreeOptions.SetItemText(m_hti_MediaInfo_MediaDet, GetResString(IDS_MEDIAINFO_MEDIADET));
+		if (m_hti_MediaInfo_RM) m_ctrlAdvTreeOptions.SetItemText(m_hti_MediaInfo_RM, GetResString(IDS_MEDIAINFO_RM));
+#ifdef HAVE_WMSDK_H
+		if (m_hti_MediaInfo_WM) m_ctrlAdvTreeOptions.SetItemText(m_hti_MediaInfo_WM, GetResString(IDS_MEDIAINFO_WM));
+#endif//HAVE_WMSDK_H
 
 		if (m_hti_m_iMaxChatHistory) m_ctrlAdvTreeOptions.SetEditLabel(m_hti_m_iMaxChatHistory, GetResString(IDS_MAXCHATHISTORY));
 		if (m_hti_m_bRestoreLastMainWndDlg) m_ctrlAdvTreeOptions.SetItemText(m_hti_m_bRestoreLastMainWndDlg, GetResString(IDS_RESTORELASTMAINWNDDLG));
@@ -2882,6 +2900,10 @@ void CPPgScar::OnDestroy()
 	m_hti_bMediaInfo_RIFF=NULL;
 	m_hti_bMediaInfo_ID3LIB=NULL;
 	m_hti_MediaInfo_MediaDet=NULL;
+	m_hti_MediaInfo_RM=NULL;
+#ifdef HAVE_WMSDK_H
+	m_hti_MediaInfo_WM=NULL;
+#endif//HAVE_WMSDK_H
 
 	m_hti_AdvDisplay=NULL;
 	m_hti_m_iMaxChatHistory=NULL;

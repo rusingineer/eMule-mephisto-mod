@@ -668,6 +668,10 @@ CString CPreferences::sMediaInfo_MediaInfoDllPath ;
 bool CPreferences::bMediaInfo_RIFF;
 bool CPreferences::bMediaInfo_ID3LIB ;
 bool CPreferences::m_bMediaInfo_MediaDet;
+bool CPreferences::m_bMediaInfo_RM;
+#ifdef HAVE_WMSDK_H
+bool CPreferences::m_bMediaInfo_WM;
+#endif//HAVE_WMSDK_H
 CString CPreferences::sInternetSecurityZone;
 // <== Advanced Options [Official/MorphXT] - Stulle
 
@@ -2704,6 +2708,10 @@ void CPreferences::SavePreferences()
 	ini.WriteBool(_T("MediaInfo_RIFF"),bMediaInfo_RIFF);
 	ini.WriteBool(_T("MediaInfo_ID3LIB"),bMediaInfo_ID3LIB);
 	ini.WriteBool(_T("MediaInfo_MediaDet"),m_bMediaInfo_MediaDet);
+	ini.WriteBool(_T("MediaInfo_RM"),m_bMediaInfo_RM);
+#ifdef HAVE_WMSDK_H
+	ini.WriteBool(_T("MediaInfo_WM"),m_bMediaInfo_WM);
+#endif//HAVE_WMSDK_H
 	ini.WriteInt(_T("MaxLogBuff"),iMaxLogBuff/1024);
 	ini.WriteInt(_T("MaxChatHistoryLines"),m_iMaxChatHistory);
 	ini.WriteInt(_T("PreviewSmallBlocks"),m_iPreviewSmallBlocks);
@@ -3943,6 +3951,10 @@ void CPreferences::LoadPreferences()
 	bMediaInfo_RIFF=ini.GetBool(_T("MediaInfo_RIFF"),true);
 	bMediaInfo_ID3LIB =ini.GetBool(_T("MediaInfo_ID3LIB"),true);
 	m_bMediaInfo_MediaDet =ini.GetBool(_T("MediaInfo_MediaDet"),true);
+	m_bMediaInfo_RM =ini.GetBool(_T("MediaInfo_RM"),true);
+#ifdef HAVE_WMSDK_H
+	m_bMediaInfo_WM =ini.GetBool(_T("MediaInfo_WM"),true);
+#endif//HAVE_WMSDK_H
 	sInternetSecurityZone=ini.GetString(_T("InternetSecurityZone"),_T("Untrusted"));
     m_iDebugSearchResultDetailLevel = ini.GetInt(L"DebugSearchResultDetailLevel", 0); // NOTE: this variable is also initialized to 0 above! 
 	// <== Advanced Options [Official/MorphXT] - Stulle

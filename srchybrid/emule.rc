@@ -6177,6 +6177,8 @@ BEGIN
     IDS_X_REBARTOOLBAR      "* ReBar Toolbar"
     IDS_BINDADDR            "Bind emule to interface"
     IDS_MEDIAINFO_MEDIADET  "Use Media Detector (MediaDet) to retrieve information about media files"
+    IDS_MEDIAINFO_RM        "Use mediainfo.dll to recognise Real Media files"
+    IDS_MEDIAINFO_WM        "Use mediainfo.dll to recognise Windows Media files"
     // <== Advanced Options [Official/MorphXT] - Stulle
     // ==> Advanced Updates [MorphXT/Stulle] - Stulle
     IDS_UPDATEANTILEECHERONSTART "Update antiLeech.dll on startup"

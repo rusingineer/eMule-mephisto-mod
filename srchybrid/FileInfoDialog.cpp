@@ -982,6 +982,7 @@ bool CGetMediaInfoThread::GetMediaInfo(HWND hWndOwner, const CShareableFile* pFi
 	/*
 	if (theApp.GetProfileInt(_T("eMule"), _T("MediaInfo_RIFF"), 1))
 	*/
+	if (CPreferences::bMediaInfo_RIFF) 
 	// <== Advanced Options [Official/MorphXT] - Stulle
 	{
 		try
@@ -1006,7 +1007,12 @@ bool CGetMediaInfoThread::GetMediaInfo(HWND hWndOwner, const CShareableFile* pFi
 	// Check for RM file
 	//
 	bool bIsRM = false;
+	// ==> Advanced Options [Official/MorphXT] - Stulle
+	/*
 	if (theApp.GetProfileInt(_T("eMule"), _T("MediaInfo_RM"), 1))
+	*/
+	if (CPreferences::m_bMediaInfo_RM)
+	// <== Advanced Options [Official/MorphXT] - Stulle
 	{
 		try
 		{
@@ -1031,7 +1037,12 @@ bool CGetMediaInfoThread::GetMediaInfo(HWND hWndOwner, const CShareableFile* pFi
 	//
 #ifdef HAVE_WMSDK_H
 	bool bIsWM = false;
+	// ==> Advanced Options [Official/MorphXT] - Stulle
+	/*
 	if (theApp.GetProfileInt(_T("eMule"), _T("MediaInfo_WM"), 1))
+	*/
+	if (CPreferences::m_bMediaInfo_WM)
+	// <== Advanced Options [Official/MorphXT] - Stulle
 	{
 		try
 		{
@@ -1059,7 +1070,12 @@ bool CGetMediaInfoThread::GetMediaInfo(HWND hWndOwner, const CShareableFile* pFi
 	////////////////////////////////////////////////////////////////////////////
 	// Check for MPEG Audio file
 	//
+	// ==> Advanced Options [Official/MorphXT] - Stulle
+	/*
 	if (theApp.GetProfileInt(_T("eMule"), _T("MediaInfo_ID3LIB"), 1) &&
+	*/
+	if (CPreferences::bMediaInfo_ID3LIB &&
+	// <== Advanced Options [Official/MorphXT] - Stulle
 		(_tcscmp(szExt, _T(".mp3"))==0 || _tcscmp(szExt, _T(".mp2"))==0 || _tcscmp(szExt, _T(".mp1"))==0 || _tcscmp(szExt, _T(".mpa"))==0))
 	{
 		try
@@ -2014,7 +2030,12 @@ bool CGetMediaInfoThread::GetMediaInfo(HWND hWndOwner, const CShareableFile* pFi
 		//
 		// Avoid processing of some file types which are known to crash due to bugged DirectShow filters.
 #ifdef HAVE_QEDIT_H
+		// ==> Advanced Options [Official/MorphXT] - Stulle
+		/*
 		if (theApp.GetProfileInt(_T("eMule"), _T("MediaInfo_MediaDet"), 1)
+		*/
+		if (CPreferences::m_bMediaInfo_MediaDet
+		// <== Advanced Options [Official/MorphXT] - Stulle
 			&& (   thePrefs.GetInspectAllFileTypes() 
 			    || (_tcscmp(szExt, _T(".ogm"))!=0 && _tcscmp(szExt, _T(".ogg"))!=0 && _tcscmp(szExt, _T(".mkv"))!=0)))
 		{

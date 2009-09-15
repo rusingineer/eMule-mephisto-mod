@@ -858,6 +858,9 @@ public:
 	static bool bMediaInfo_RIFF ;
 	static bool bMediaInfo_ID3LIB; 
 	static bool m_bMediaInfo_MediaDet;
+#ifdef HAVE_WMSDK_H
+	static bool m_bMediaInfo_WM;
+#endif//HAVE_WMSDK_H
 	static CString sInternetSecurityZone;
 	// <== Advanced Options [Official/MorphXT] - Stulle
 

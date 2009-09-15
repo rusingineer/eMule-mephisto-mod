@@ -2642,10 +2642,6 @@ int GetHashType(const uchar* hash)
 	else if (hash[5] == 14 && hash[14] == 111)
 		return SO_EMULE;
  	else if (hash[5] == 'M' && hash[14] == 'L')
-	// ==> Enhanced Client Recognition [Spike] - Stulle
-		return SO_OLD_MLDONKEY; // was: SO_MLDONKEY
-	else if (hash[5] == 0x0E && hash[14] == 0x6F) 
-	// <== Enhanced Client Recognition [Spike] - Stulle
 		return SO_MLDONKEY;
 	else
 		return SO_UNKNOWN;
@@ -2658,10 +2654,6 @@ LPCTSTR DbgGetHashTypeString(const uchar* hash)
 		return _T("eMule");
 	if (iHashType == SO_MLDONKEY)
 		return _T("MLdonkey");
-	// ==> Enhanced Client Recognition [Spike] - Stulle
-	else if (iHashType == SO_OLD_MLDONKEY) 
-		return _T("Old MLdonkey");
-	// <== Enhanced Client Recognition [Spike] - Stulle
 	if (iHashType == SO_OLDEMULE)
 		return _T("Old eMule");
 	ASSERT( iHashType == SO_UNKNOWN );

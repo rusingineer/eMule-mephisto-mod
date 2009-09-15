@@ -105,7 +105,6 @@ enum EClientSoftware{
 	SO_OLDEMULE			= 53,
 	SO_SHAREAZA4		= 68,
 	SO_MLDONKEY3		= 152,
-	SO_OLD_MLDONKEY,
 	// <== Enhanced Client Recognition [Spike] - Stulle
 	SO_URL,
 	SO_UNKNOWN

@@ -2829,13 +2829,17 @@ void CUpDownClient::InitClientSoftwareVersion()
 				else if (m_byCompatibleClient != 0){
 					// ==> Enhanced Client Recognition [Spike] - Stulle
 					// Recognize other Shareazas - just to be sure :)
+					//WiZaRd: this is highly unreliable and thus I removed it
+					/*
 					if (StrStrI(m_pszUsername,_T("shareaza")))
 					{
 						m_clientSoft = SO_SHAREAZA;
 						pszSoftware = _T("Shareaza");
 					}
+					else
+					*/
 					// Recognize all eMulePlus - just to be sure !
-					else if (StrStr(m_strModVersion,_T("Plus 1")))
+					if (StrStr(m_strModVersion,_T("Plus 1")))
 					{
 						m_clientSoft = SO_EMULEPLUS;
 						pszSoftware = _T("eMule Plus");
@@ -2993,12 +2997,7 @@ void CUpDownClient::InitClientSoftwareVersion()
 		return;
 	}
 
-	// ==> Enhanced Client Recognition [Spike] - Stulle
-	/*
 	if (m_bIsML || iHashType == SO_MLDONKEY){
-	*/
-	if (m_bIsML || iHashType == SO_MLDONKEY || iHashType == SO_OLD_MLDONKEY){
-	// <== Enhanced Client Recognition [Spike] - Stulle
 		m_clientSoft = SO_MLDONKEY;
 		UINT nClientMinVersion = m_nClientVersion;
 		m_nClientVersion = MAKE_CLIENT_VERSION(0, nClientMinVersion, 0);
@@ -3042,10 +3041,6 @@ int CUpDownClient::GetHashType() const
 	else if (m_achUserHash[5] == 14 && m_achUserHash[14] == 111)
 		return SO_EMULE;
  	else if (m_achUserHash[5] == 'M' && m_achUserHash[14] == 'L')
-	// ==> Enhanced Client Recognition [Spike] - Stulle
-		return SO_OLD_MLDONKEY;
-	else if (m_achUserHash[5] == 0x0E && m_achUserHash[14] == 0x6F) // Spike2 by Torni - recognize newer MLdonkeys (needed for Enhanced Client Recognization & emulate-Settings!)
-	// <== Enhanced Client Recognition [Spike] - Stulle
 		return SO_MLDONKEY;
 	else
 		return SO_UNKNOWN;
@@ -5368,6 +5363,7 @@ bool CUpDownClient::AntiUploaderBanActive()
 	return false;
 }
 // <== Anti Uploader Ban [Stulle] - Stulle
+
 // ==> Mephisto Upload - Mephisto
 void CUpDownClient::SetFriendSlot(bool bNV)
 {

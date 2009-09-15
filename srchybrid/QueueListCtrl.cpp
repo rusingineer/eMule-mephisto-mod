@@ -294,7 +294,6 @@ void CQueueListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		return;
 
 	CMemDC dc(CDC::FromHandle(lpDrawItemStruct->hDC), &lpDrawItemStruct->rcItem);
-
 	BOOL bCtrlFocused;
 	// ==> Design Settings [eWombat/Stulle] - Stulle
 	/*
@@ -495,6 +494,8 @@ void CQueueListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 							dc.DrawText(szItem, -1, &cur_rec, MLC_DT_TEXT | uDrawTextAlignment);
 							dc->SetTextColor(crOldTxtColor);
 						}
+						else
+							dc.DrawText(szItem, -1, &cur_rec, MLC_DT_TEXT | uDrawTextAlignment);
 						break;
 					}
 					//Xman end

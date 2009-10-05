@@ -858,6 +858,7 @@ public:
 	static bool bMediaInfo_RIFF ;
 	static bool bMediaInfo_ID3LIB; 
 	static bool m_bMediaInfo_MediaDet;
+	static bool m_bMediaInfo_RM;
 #ifdef HAVE_WMSDK_H
 	static bool m_bMediaInfo_WM;
 #endif//HAVE_WMSDK_H

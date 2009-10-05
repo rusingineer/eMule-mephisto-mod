@@ -3,7 +3,7 @@ CHANGELOG FOR EMULE Mephisto MOD
 
 eMule v0.49c Mephisto v2.2:
 ------------------------
-- 06.10.2008 -
+- 06.10.2009 -
 -------------------------------------------------------------------------------
 based on eMule 0.49c ScarAngel 3.2 compiled with vs2005 SP1
 

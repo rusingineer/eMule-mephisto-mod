@@ -1646,6 +1646,7 @@ BOOL CSharedFilesCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 
 						if (pKnownFile->IsKindOf(RUNTIME_CLASS(CPartFile)))
 						{
+							((CPartFile*) file)->SetFollowTheMajority(false); // Follow The Majority [AndCycle/Stulle] - Stulle
 							pKnownFile->SetFileName(newname);
 							STATIC_DOWNCAST(CPartFile, pKnownFile)->SetFullName(newpath); 
 						}
@@ -2181,36 +2182,36 @@ BOOL CSharedFilesCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 							continue;
 						// .part files could be renamed by simply changing the filename
 						// in the CKnownFile object.
-						if ((!file->IsPartFile()) && (_trename(file->GetFilePath(), newpath) != 0)){
+							if ((!((CKnownFile*)file)->IsPartFile()) && (_trename(((CKnownFile*)file)->GetFilePath(), newpath) != 0)){
 							// Use the "Format"-Syntax of AddLogLine here instead of
 							// CString.Format+AddLogLine, because if "%"-characters are
 							// in the string they would be misinterpreted as control sequences!
 							AddLogLine(false,_T("Failed to rename '%s' to '%s', Error: %hs"), file->GetFilePath(), newpath, _tcserror(errno));
 						} else {
-							CString strres;
-							if (!file->IsPartFile()) {
+								//CString strres; // obsolete
+								if (!((CKnownFile*)file)->IsPartFile()) {
 								// Use the "Format"-Syntax of AddLogLine here instead of
 								// CString.Format+AddLogLine, because if "%"-characters are
 								// in the string they would be misinterpreted as control sequences!
-								AddLogLine(false,_T("Successfully renamed '%s' to '%s'"), file->GetFilePath(), newpath);
-								file->SetFileName(newname);
-								if (file->IsKindOf(RUNTIME_CLASS(CPartFile)))
-									((CPartFile*) file)->SetFullName(newpath);
+									AddLogLine(false,_T("Successfully renamed '%s' to '%s'"), ((CKnownFile*)file)->GetFilePath(), newpath);
+									((CKnownFile*)file)->SetFileName(newname);
+									if (file->IsKindOf(RUNTIME_CLASS(CPartFile)))
+										((CPartFile*) file)->SetFullName(newpath);
 							} else {
 								// Use the "Format"-Syntax of AddLogLine here instead of
 								// CString.Format+AddLogLine, because if "%"-characters are
 								// in the string they would be misinterpreted as control sequences!
-								AddLogLine(false,_T("Successfully renamed .part file '%s' to '%s'"), file->GetFileName(), newname);
-								file->SetFileName(newname, true); 
+								AddLogLine(false,_T("Successfully renamed .part file '%s' to '%s'"), ((CKnownFile*)file)->GetFileName(), newname);
+								((CPartFile*) file)->SetFollowTheMajority(false); // Follow The Majority [AndCycle/Stulle] - Stulle
+								((CKnownFile*)file)->SetFileName(newname, true); 
 								((CPartFile*) file)->UpdateDisplayedInfo();
 								((CPartFile*) file)->SavePartFile(); 
 							}
-							file->SetFilePath(newpath);
+							((CKnownFile*)file)->SetFilePath(newpath);
 							UpdateFile(file);
 						}
 
-						// Next item
-						selectedList.GetNext (pos);
+							// Next item (pos is iterated when retriving the current file)
 						i++;
 					}
 				}

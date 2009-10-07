@@ -1449,6 +1449,7 @@ void CMuleListCtrl::InitItemMemDC(CMemDC *dc, LPDRAWITEMSTRUCT lpDrawItemStruct,
 	default:
 		ASSERT( false ); // this should not happen! proceed to default
 	case -1:
+		thePrefs.GetStyle(master_count, 0, &style); // initialize to avoid warning
 		break;
 	}
 

@@ -352,6 +352,7 @@ void CPPgWiz1Ports::DoDataExchange(CDataExchange* pDX)
 	CDlgPageWizard::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_TCP, m_sTCP);
 	DDX_Text(pDX, IDC_UDP, m_sUDP);
+	DDX_Check(pDX, IDC_ENABLE_PNP  , uPnPNAT); // UPnP support [MoNKi] - leuk_he
 }
 
 void CPPgWiz1Ports::OnEnChangeTCP() {
@@ -908,17 +909,28 @@ BOOL FirstTimeWizard()
 	page3.m_pbUDPDisabled = &bUDPDisabled;
 	page6.m_pbUDPDisabled = &bUDPDisabled;
 
+	// ==> Random Ports [MoNKi] - Stulle
+	/*
 	uint16 oldtcpport=thePrefs.GetPort();
 	uint16 oldudpport=thePrefs.GetUDPPort();
+	*/
+	uint16 oldtcpport=thePrefs.GetPort(false,true);
+	uint16 oldudpport=thePrefs.GetUDPPort(false,true);
+	// <== Random Ports [MoNKi] - Stulle
 
 	int iResult = sheet.DoModal();
 	if (iResult == IDCANCEL) {
 
 		// restore port settings?
+		// ==> Random Ports [MoNKi] - Stulle
+		if (thePrefs.GetPort(false,true)!=oldtcpport || thePrefs.GetUDPPort(false,true)!=oldudpport)
+		{
+		// <== Random Ports [MoNKi] - Stulle
 		thePrefs.port=oldtcpport;
 		thePrefs.udpport=oldudpport;
 		theApp.listensocket->Rebind() ;
 		theApp.clientudp->Rebind();
+		} // Random Ports [MoNKi] - Stulle
 
 		return FALSE;
 	}

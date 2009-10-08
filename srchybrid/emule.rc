@@ -1909,26 +1909,55 @@ BEGIN
                     WS_BORDER | WS_TABSTOP | 0x800,4,4,222,132
 END
 
-IDD_MULETRAYDLG DIALOGEX 0, 0, 114, 89
-STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | 
+IDD_MULETRAYDLG DIALOGEX 0, 0, 179, 166
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | WS_POPUP
 EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Restore",IDC_RESTORE,16,50,94,14,NOT WS_VISIBLE | 
+    LTEXT           "eMule Speed",IDC_SPEED,17,0,161,14,NOT WS_VISIBLE |
                     WS_BORDER
-    LTEXT           "Connect to any server",IDC_CONNECT,16,2,94,14,NOT 
+    LTEXT           "All to max",IDC_TOMAX,17,50,161,14,NOT WS_VISIBLE |
+                    WS_BORDER
+    LTEXT           "Restore",IDC_RESTORE,17,134,161,15,NOT WS_VISIBLE | 
+                    WS_BORDER
+    LTEXT           "All to min",IDC_TOMIN,17,66,161,14,NOT WS_VISIBLE | 
+                    WS_BORDER
+    LTEXT           "Connect to any server",IDC_CONNECT,17,84,161,14,NOT
                     WS_VISIBLE | WS_BORDER
-    LTEXT           "Disconnect",IDC_DISCONNECT,16,15,94,14,NOT WS_VISIBLE | 
+    LTEXT           "Disconnect",IDC_DISCONNECT,17,98,161,15,NOT WS_VISIBLE | 
                     WS_BORDER
-    LTEXT           "Options",IDC_PREFERENCES,16,34,94,14,NOT WS_VISIBLE | 
+    LTEXT           "Options",IDC_PREFERENCES,17,116,161,15,NOT WS_VISIBLE | 
                     WS_BORDER
-    LTEXT           "Exit",IDC_TRAY_EXIT,16,70,94,14,NOT WS_VISIBLE | 
+    LTEXT           "Exit",IDC_TRAY_EXIT,17,152,161,14,NOT WS_VISIBLE | 
                     WS_BORDER
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,67,110,1
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,62,110,1
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,31,110,1
-    LTEXT           "eMule",IDC_SIDEBAR,0,0,16,89
+    LTEXT           "Download:",IDC_DOWNLBL,32,18,37,12,SS_CENTERIMAGE
+    CONTROL         "",IDC_DOWNSLD,"msctls_trackbar32",0x0,71,18,56,12
+    //Xman
+    /*
+    EDITTEXT        IDC_DOWNTXT,131,18,24,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Upload:",IDC_UPLBL,32,34,37,12,SS_CENTERIMAGE
+    CONTROL         "",IDC_UPSLD,"msctls_trackbar32",0x0,71,34,56,12
+    EDITTEXT        IDC_UPTXT,131,34,24,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER | NOT WS_TABSTOP
+    */
+    EDITTEXT        IDC_DOWNTXT,131,18,24,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    LTEXT           "Upload:",IDC_UPLBL,32,34,37,12,SS_CENTERIMAGE
+    CONTROL         "",IDC_UPSLD,"msctls_trackbar32",0x0,71,34,56,12
+    EDITTEXT        IDC_UPTXT,131,34,24,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    //Xman end
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,17,150,162,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,17,132,162,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,17,114,162,1
+    LTEXT           "KB/s",IDC_DOWNKB,159,18,19,12,SS_CENTERIMAGE
+    LTEXT           "KB/s",IDC_UPKB,159,34,19,12,SS_CENTERIMAGE
+    LTEXT           "eMule",IDC_SIDEBAR,0,0,16,166
+    ICON            "",IDC_TRAYDOWN,18,18,20,20
+    ICON            "",IDC_TRAYUP,18,34,20,20
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,17,82,162,1
 END
 
 IDD_IPFILTER DIALOGEX 0, 0, 413, 143

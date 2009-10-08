@@ -2898,8 +2898,8 @@ void CemuleDlg::OnTrayRButtonUp(CPoint pt)
 										thePrefs.GetMaxGraphUploadRate(true), thePrefs.GetMaxGraphDownloadRate(),
 										thePrefs.GetMaxUpload(), thePrefs.GetMaxDownload());
 										*/
-										(int)thePrefs.GetMaxGraphUploadRate(), (int)thePrefs.GetMaxGraphDownloadRate(),
-										(int)thePrefs.GetMaxUpload(), (int)thePrefs.GetMaxDownload());
+										thePrefs.GetMaxGraphUploadRate(), thePrefs.GetMaxGraphDownloadRate(),
+										thePrefs.GetMaxUpload(), thePrefs.GetMaxDownload());
 										//Xman end
 	if (m_pSystrayDlg)
 	{

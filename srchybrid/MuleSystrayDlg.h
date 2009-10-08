@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NumEdit.h" //Xman
+
 class CInputBox : public CEdit
 {
 protected:
@@ -20,25 +22,33 @@ class CMuleSystrayDlg : public CDialog
 {
 // Construction
 public:
+	//Xman
+	/*
 	CMuleSystrayDlg(CWnd* pParent, CPoint pt, int iMaxUp, int iMaxDown, int iCurUp, int iCurDown);
+	*/
+	CMuleSystrayDlg(CWnd* pParent, CPoint pt, float iMaxUp, float iMaxDown, float iCurUp, float iCurDown);
+	//Xman end
 	~CMuleSystrayDlg();
     
 // Dialog Data
 	//{{AFX_DATA(CMuleSystrayDlg)
 	enum { IDD = IDD_MULETRAYDLG };
-	//Xman
-	/*
 	CStatic	m_ctrlUpArrow;
 	CStatic	m_ctrlDownArrow;
 	CGradientStatic	m_ctrlSidebar;
 	CSliderCtrl	m_ctrlUpSpeedSld;
 	CSliderCtrl	m_ctrlDownSpeedSld;
+	//Xman
+	/*
 	CInputBox	m_DownSpeedInput;
 	CInputBox	m_UpSpeedInput;
 	int		m_nDownSpeedTxt;
 	int		m_nUpSpeedTxt;
 	*/
-	CGradientStatic	m_ctrlSidebar;
+	CNumEdit m_DownSpeedInput;
+	CNumEdit m_UpSpeedInput;
+	float	m_nDownSpeedTxt;
+	float	m_nUpSpeedTxt;
 	//Xman end
 	//}}AFX_DATA
 
@@ -53,13 +63,9 @@ public:
 
 // Implementation
 protected:
-	//Xman
-	/*
 	CTrayMenuBtn m_ctrlSpeed;
 	CTrayMenuBtn m_ctrlAllToMax;
 	CTrayMenuBtn m_ctrlAllToMin;
-	*/
-	//Xman end
 	CTrayMenuBtn m_ctrlRestore;
 	CTrayMenuBtn m_ctrlDisconnect;
 	CTrayMenuBtn m_ctrlConnect;
@@ -72,13 +78,14 @@ protected:
 	/*
 	int m_iMaxUp;
 	int m_iMaxDown;
+	*/
+	float m_iMaxUp;
+	float m_iMaxDown;
+	//Xman end
 	CPoint m_ptInitialPosition;
 
 	HICON m_hUpArrow;
 	HICON m_hDownArrow;
-	*/
-	CPoint m_ptInitialPosition;
-	//Xman end
 
 	UINT m_nExitCode;
 
@@ -86,13 +93,9 @@ protected:
 	//{{AFX_MSG(CMuleSystrayDlg)
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	virtual BOOL OnInitDialog();
-	//Xman
-	/*
 	afx_msg void OnChangeDowntxt();
 	afx_msg void OnChangeUptxt();
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	*/
-	//Xman end
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnKillFocus(CWnd* pNewWnd);

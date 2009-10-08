@@ -2405,7 +2405,7 @@ int CSharedFilesCtrl::SortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort
 						p2 = 0;
 					iResult = p1 - p2;
 					*/
-					if (!kitem1->GetPowerShared() && kitem1->GetPowerShared())
+					if (!kitem1->GetPowerShared() && kitem2->GetPowerShared())
 						iResult=-1;			
 					else if (kitem1->GetPowerShared() && !kitem2->GetPowerShared())
 						iResult=1;

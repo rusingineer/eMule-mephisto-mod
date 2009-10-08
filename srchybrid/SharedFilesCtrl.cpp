@@ -1442,7 +1442,7 @@ void CSharedFilesCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 	m_PowerShareLimitMenu.ModifyMenu(MP_POWERSHARE_LIMIT, MF_STRING,MP_POWERSHARE_LIMIT, GetResString(IDS_DEFAULT) + buffer);
 	*/
 	m_PowerShareLimitMenu.RemoveMenu(MP_POWERSHARE_LIMIT,MF_BYCOMMAND);
-	m_PowerShareLimitMenu.InsertMenu(2,MF_STRING|MF_BYPOSITION,MP_POWERSHARE_LIMIT,GetResString(IDS_DEFAULT) + buffer);
+	m_PowerShareLimitMenu.InsertMenu(1,MF_STRING|MF_BYPOSITION,MP_POWERSHARE_LIMIT,GetResString(IDS_DEFAULT) + buffer);
 	// <== XP Style Menu [Xanatos] - Stulle
 	if (iPowerShareLimit==-1)
 		buffer = GetResString(IDS_EDIT);
@@ -1485,7 +1485,7 @@ void CSharedFilesCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 	m_PsAmountLimitMenu.RemoveMenu(MP_PS_AMOUNT_LIMIT_SET,MF_BYCOMMAND);
 	m_PsAmountLimitMenu.InsertMenu(2,MF_STRING|MF_BYPOSITION,MP_PS_AMOUNT_LIMIT_SET,buffer);
 	// <== XP Style Menu [Xanatos] - Stulle
-	m_PowerShareLimitMenu.CheckMenuRadioItem(MP_PS_AMOUNT_LIMIT, MP_PS_AMOUNT_LIMIT_SET, uPsAmountLimitMenuItem, 0);
+	m_PsAmountLimitMenu.CheckMenuRadioItem(MP_PS_AMOUNT_LIMIT, MP_PS_AMOUNT_LIMIT_SET, uPsAmountLimitMenuItem, 0);
 	// <== Limit PS by amount of data uploaded [Stulle] - Stulle
 	// ==> Copy feedback feature [MorphXT] - Stulle
 	/*

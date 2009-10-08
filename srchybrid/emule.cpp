@@ -2991,11 +2991,25 @@ UINT CemuleApp::CheckDirectoryForChangesThread(LPVOID /*pParam*/)
 		}
 	}
 
+	int nChangeHandles = dirList.GetCount() + 2; // We have 2 additional events
+
+	// v3.5: There is a limit to WaitForMultipleObjects which is MAXIMUM_WAIT_OBJECTS == 64.
+	// To prevent ASFU from crashing eMule entirely we disable ASFU. Working around the limit
+	// might be possible but it would involve multiple threads checking parts of the above
+	// created dirList. Coding that is too much of a pain at this point so we stick to the
+	// easier way.
+	if(nChangeHandles > MAXIMUM_WAIT_OBJECTS)
+	{
+		AddLogLine(true, _T("ASFU: You are sharing too many folders for ASFU! Disabling!"));
+		thePrefs.SetDirectoryWatcher(false);
+		m_directoryWatcherCS.Unlock();
+		return 1;
+	}
+
 	// Save the position of the first parent in the list
 	POSITION parentListPos = dirList.FindIndex(parentsStartPosition);
 
 	HANDLE *dwChangeHandles = NULL;
-	int nChangeHandles = dirList.GetCount() + 2; // We have 2 additional events
 	dwChangeHandles = new HANDLE[nChangeHandles];
 	
 	if(!m_directoryWatcherCloseEvent)
@@ -3254,11 +3268,13 @@ void CemuleApp::ResetDirectoryWatcher(){
 			// This is based on v3.2. v3.3 was never called this but
 			// adding capabilities for shareSubdir is worth considering
 			// the previous version as v3.3. New v3.4 addresses single
-			// shared files and some gui handling around device changes
+			// shared files and some gui handling around device changes.
+			// v3.5 fixes crashes when too many dirs are shared. See 
+			// above for a more detaied explanation.
 
 			// ScarAngel note: the capability to work with sub dirs has been
 			// removed for the time being.
-			AddDebugLogLine(false, _T("ASFU: Starting v3.4"));
+			AddDebugLogLine(false, _T("ASFU: Starting v3.5"));
 
 			// Starts new thread
 			AfxBeginThread(CheckDirectoryForChangesThread, this);

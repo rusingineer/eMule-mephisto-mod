@@ -6295,7 +6295,7 @@ BEGIN
     IDS_FULL_LOOPS          "Full loops until set to Full slot in %"
     IDS_MONITOR_LOOPS       "Seconds to monitor loops"
     IDS_NOT_REACHED_BW      "Sec. until new slot opened if BW not reached"
-    IDS_MOVE_DOWN_KB        "KB to go gefore moving ending client down"
+    IDS_MOVE_DOWN_KB        "KB to go before moving ending client down"
     // <== Mephisto Upload - Mephisto
     // ==> Multiple Part Transfer [Stulle] - Mephisto
     IDS_CHUNKS_GROUP        "Chunk Transfer Modes"

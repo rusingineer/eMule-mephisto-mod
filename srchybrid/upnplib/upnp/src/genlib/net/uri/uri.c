@@ -33,11 +33,19 @@
 * Purpose: This file contains functions for uri, url parsing utility. 
 ************************************************************************/
 
-#include "uri.h"
-#ifdef _WIN32
-#include "ws2tcpip.h"
-#define strncasecmp strnicmp
+#ifdef __FreeBSD__
+#include <osreldate.h>
+#if __FreeBSD_version < 601103
+#include <lwres/netdb.h>
 #endif
+#endif
+#include "config.h"
+#include "uri.h"
+
+#ifdef WIN32
+ #include "Ws2tcpip.h"
+#endif
+
 
 /************************************************************************
 *	Function :	is_reserved
@@ -120,7 +128,7 @@ is_unreserved( char in )
 *	Note :
 ************************************************************************/
 int
-is_escaped( char *in )
+is_escaped( const char *in )
 {
 
     if( ( in[0] == '%' ) && ( isxdigit( in[1] ) ) && isxdigit( in[2] ) ) {
@@ -152,7 +160,7 @@ is_escaped( char *in )
 int
 replace_escaped( char *in,
                  int index,
-                 int *max )
+                 size_t *max )
 {
     int tempInt = 0;
     char tempChar = 0;
@@ -199,7 +207,7 @@ replace_escaped( char *in,
 *	Note :
 ************************************************************************/
 int
-parse_uric( char *in,
+parse_uric( const char *in,
             int max,
             token * out )
 {
@@ -359,16 +367,20 @@ free_URL_list( URL_list * list )
 *		uri_type *in ;	URI object
 *
 *	Description : Function useful in debugging for printing a parsed uri.
-*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-DBGONLY( void print_uri( uri_type * in ) {
-         print_token( &in->scheme );
-         print_token( &in->hostport.text );
-         print_token( &in->pathquery ); print_token( &in->fragment );} )
+#ifdef DEBUG
+void print_uri( uri_type *in )
+{
+    print_token( &in->scheme );
+    print_token( &in->hostport.text );
+    print_token( &in->pathquery );
+    print_token( &in->fragment );
+}
+#endif
 
 /************************************************************************
 *	Function :	print_token
@@ -377,20 +389,23 @@ DBGONLY( void print_uri( uri_type * in ) {
 *		token * in ;	token
 *
 *	Description : Function useful in debugging for printing a token.
-*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-DBGONLY( void print_token( token * in ) {
-         int i = 0;
-         printf( "Token Size : %d\n\'", in->size );
-         for( i = 0; i < in->size; i++ ) {
-         putchar( in->buff[i] );}
-         putchar( '\'' ); putchar( '\n' );}
-
- )
+#ifdef DEBUG
+void print_token(token * in)
+{
+    int i = 0;
+    printf( "Token Size : %"PRIzu"\n\'", in->size );
+    for( i = 0; i < in->size; i++ ) {
+        putchar( in->buff[i] );
+    }
+    putchar( '\'' );
+    putchar( '\n' );
+}
+#endif
 
 /************************************************************************
 *	Function :	token_string_casecmp
@@ -409,8 +424,10 @@ DBGONLY( void print_token( token * in ) {
 *
 *	Note :
 ************************************************************************/
-    int token_string_casecmp( token * in1,
-                              char *in2 ) {
+int token_string_casecmp(
+    token * in1,
+    char *in2 )
+{
     int in2_length = strlen( in2 );
 
     if( in1->size != in2_length )
@@ -491,12 +508,12 @@ token_cmp( token * in1,
 ************************************************************************/
 int
 parse_port( int max,
-            char *port,
+            const char *port,
             unsigned short *out )
 {
 
-    char *finger = port;
-    char *max_ptr = finger + max;
+    const char *finger = port;
+    const char *max_ptr = finger + max;
     unsigned short temp = 0;
 
     while( ( finger < max_ptr ) && ( isdigit( *finger ) ) ) {
@@ -547,7 +564,7 @@ copy_port_name(int max,
 *	Note :
 ************************************************************************/
 int
-parse_hostport( char *in,
+parse_hostport( const char *in,
                 int max,
                 hostport_type * out )
 {
@@ -557,9 +574,9 @@ parse_hostport( char *in,
     int begin_port;
     int hostport_size = 0;
     int host_size = 0;
-#ifndef _WIN32
-	struct hostent h_buf;
+#if !defined(WIN32) && !(defined(__OSX__) || defined(__APPLE__))
     char temp_hostbyname_buff[BUFFER_SIZE];
+    struct hostent h_buf;
 #endif
     struct hostent *h = NULL;
     int errcode = 0;
@@ -575,14 +592,12 @@ parse_hostport( char *in,
     out->text.size = 0;
     out->text.buff = NULL;
 
-	out->IPv4address.sin_port = htons( 80 );    //default port is 80
+    out->IPv4address.sin_port = htons( 80 );    //default port is 80
     memset( &out->IPv4address.sin_zero, 0, 8 );
 #ifdef _WIN32
 	sprintf(port_name, "%d", 80); //default port is 80
 #endif
 
-	// look at the input string, up to the first ":" or "/"
-	// and find the last "."
     while( ( i < max ) && ( in[i] != ':' ) && ( in[i] != '/' )
            && ( ( isalnum( in[i] ) ) || ( in[i] == '.' )
                 || ( in[i] == '-' ) ) ) {
@@ -592,12 +607,9 @@ parse_hostport( char *in,
         }
     }
 
-    // this is where in the in string the host name ends
     host_size = i;
 
-	// what is hostport_size?
     if( ( i < max ) && ( in[i] == ':' ) ) {
-	// there is a port in the address
         begin_port = i + 1;
         //convert port
         if( !( hostport_size = parse_port( max - begin_port,
@@ -606,12 +618,12 @@ parse_hostport( char *in,
         {
             return UPNP_E_INVALID_URL;
         }
-        hostport_size += begin_port; // hostport_size is the offset past the port
+        hostport_size += begin_port;
 #ifdef _WIN32
 		copy_port_name(max - begin_port, &in[begin_port], port_name);
 #endif
     } else
-        hostport_size = host_size; // hostport_size is the offset past the port
+        hostport_size = host_size;
 
     //convert to temporary null terminated string
     temp_host_name = ( char * )malloc( host_size + 1 );
@@ -622,12 +634,9 @@ parse_hostport( char *in,
     memcpy( temp_host_name, in, host_size );
     temp_host_name[host_size] = '\0';
 
-    // now temp_host_name has the whole host name, less the port if there is one
-
     //check to see if host name is an ipv4 address
     if( ( last_dot != -1 ) && ( last_dot + 1 < host_size )
         && ( isdigit( temp_host_name[last_dot + 1] ) ) ) {
-	// has a ., so it is a dotted quad
         //must be ipv4 address
 
 #ifndef _WIN32
@@ -650,12 +659,13 @@ parse_hostport( char *in,
 	out->IPv4address.sin_family = AF_INET;
 #endif
     } else {
-	// it is not ipv4
         int errCode = 0;
 
         //call gethostbyname_r (reentrant form of gethostbyname)
-#ifdef _WIN32
-        errcode = getaddrinfo( temp_host_name, port_name, 0, &addrInfoPtr);
+        // TODO: Use autoconf to discover this rather than the
+        // platform-specific stuff below
+#if defined(WIN32) || defined(__CYGWIN__)
+         errCode = getaddrinfo( temp_host_name, port_name, 0, &addrInfoPtr);
 
 		if (errCode == 0 ) {
 			if ((addrInfoPtr->ai_family == PF_INET) && ( addrInfoPtr->ai_addrlen == 4 )) {
@@ -671,12 +681,61 @@ parse_hostport( char *in,
         }
 		freeaddrinfo(addrInfoPtr);
 #else
-        errcode = gethostbyname_r( temp_host_name,
-                                   &h_buf,
-                                   temp_hostbyname_buff,
-                                   BUFFER_SIZE, &h, &errcode );
+#if defined(SPARC_SOLARIS)
+        errCode = gethostbyname_r(
+                temp_host_name,
+                &h,
+                temp_hostbyname_buff,
+                BUFFER_SIZE, &errcode );
+#elif defined(__FreeBSD__) && __FreeBSD_version < 601103
+        h = lwres_gethostbyname_r(
+                temp_host_name,
+                &h_buf,
+                temp_hostbyname_buff,
+                BUFFER_SIZE, &errcode );
+        if ( h == NULL ) {
+                errCode = 1;
+        }
+#elif defined(__OSX__) || defined(__APPLE__)
+        h = gethostbyname(temp_host_name);
+        if ( h == NULL ) {
+                errCode = 1;
+        }
+#elif defined(__linux__)
+        errCode = gethostbyname_r(
+                temp_host_name,
+                &h_buf,
+                temp_hostbyname_buff,
+                BUFFER_SIZE, &h, &errcode );
+#else
+        {
+        struct addrinfo hints, *res, *res0;
 
-        if( errcode == 0 ) {
+        h = NULL;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = PF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+        errCode = getaddrinfo(temp_host_name, "http", &hints, &res0);
+
+        if (!errCode) {
+            for (res = res0; res; res = res->ai_next) {
+                if (res->ai_family == PF_INET &&
+                    res->ai_addr->sa_family == AF_INET)
+                {
+                    h = &h_buf;
+                    h->h_addrtype = res->ai_addr->sa_family;
+                    h->h_length = 4;
+                    h->h_addr = (void *) temp_hostbyname_buff;
+                    *(struct in_addr *)h->h_addr =
+                        ((struct sockaddr_in *)res->ai_addr)->sin_addr;
+                        break;
+                }
+            }
+            freeaddrinfo(res0);
+        }
+        }
+#endif
+        if( errCode == 0 ) {
             if( h ) {
                 if( ( h->h_addrtype == AF_INET ) && ( h->h_length == 4 ) ) {
                     out->IPv4address.sin_addr =
@@ -725,7 +784,7 @@ parse_hostport( char *in,
 *	Note :
 ************************************************************************/
 int
-parse_scheme( char *in,
+parse_scheme( const char *in,
               int max,
               token * out )
 {
@@ -775,7 +834,7 @@ parse_scheme( char *in,
 ************************************************************************/
 int
 remove_escaped_chars( INOUT char *in,
-                      INOUT int *size )
+                      INOUT size_t *size )
 {
     int i = 0;
 
@@ -829,9 +888,8 @@ remove_dots( char *in,
         return UPNP_E_OUTOF_MEMORY;
 
     Segments[0] = NULL;
-    DBGONLY( UpnpPrintf
-             ( UPNP_ALL, API, __FILE__, __LINE__,
-               "REMOVE_DOTS: before: %s\n", in ) );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "REMOVE_DOTS: before: %s\n", in );
     while( ( copyFrom < max ) && ( *copyFrom != '?' )
            && ( *copyFrom != '#' ) ) {
 
@@ -876,9 +934,8 @@ remove_dots( char *in,
     }
     ( *copyTo ) = 0;
     free( Segments );
-    DBGONLY( UpnpPrintf
-             ( UPNP_ALL, API, __FILE__, __LINE__,
-               "REMOVE_DOTS: after: %s\n", in ) );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "REMOVE_DOTS: after: %s\n", in );
     return UPNP_E_SUCCESS;
 }
 
@@ -1038,7 +1095,7 @@ resolve_rel_url( char *base_url,
 *	Note :
 ************************************************************************/
 int
-parse_uri( char *in,
+parse_uri( const char *in,
            int max,
            uri_type * out )
 {
@@ -1111,15 +1168,15 @@ parse_uri( char *in,
 int
 parse_uri_and_unescape( char *in,
                         int max,
-                        uri_type * out )
+                        uri_type *out )
 {
     int ret;
 
     if( ( ret = parse_uri( in, max, out ) ) != HTTP_SUCCESS )
         return ret;
     if( out->pathquery.size > 0 )
-        remove_escaped_chars( out->pathquery.buff, &out->pathquery.size );
+        remove_escaped_chars( (char *)out->pathquery.buff, &out->pathquery.size );
     if( out->fragment.size > 0 )
-        remove_escaped_chars( out->fragment.buff, &out->fragment.size );
+        remove_escaped_chars( (char *)out->fragment.buff, &out->fragment.size );
     return HTTP_SUCCESS;
 }

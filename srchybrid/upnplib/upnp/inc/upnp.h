@@ -1,101 +1,133 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * * Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #ifndef UPNP_H
 #define UPNP_H
 
 /** @name The API */
 
-//@{
+/*! @{ */
+
+
+#if defined MYLIB_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
+	#if defined __GNUC__
+		#warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
+	#else
+		#error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
+	#endif
+#endif 
+
 
 #include <stdio.h>
+#ifndef WIN32
+	#include <sys/param.h>
+#endif
+#if (defined(BSD) && BSD >= 199306)
+	#include <time.h>
+#endif
 #include "ixml.h"
-#include "config.h"
+#include "..\..\..\build\inc\upnpconfig.h"
 
-#ifndef _WIN32
-// conflicts with definitions in minmax.h
-#define max(a, b)   (((a)>(b))? (a):(b))
-#define min(a, b)   (((a)<(b))? (a):(b))
-#endif
 
-#ifndef UPNP_STATIC_LIB
-#ifdef UPNP_BUILD
-// set up declspec for dll export to make functions visible to library users
-#define EXPORT_SPEC __declspec(dllexport)
+#ifdef WIN32
+	#ifndef UPNP_STATIC_LIB
+		#ifdef LIBUPNP_EXPORTS
+			/* set up declspec for dll export to make functions visible to library users */
+			#define EXPORT_SPEC __declspec(dllexport)
+		#else
+			#define EXPORT_SPEC __declspec(dllimport)
+		#endif
+	#else
+		#define EXPORT_SPEC
+	#endif
+	#ifdef UPNP_USE_MSVCPP
+		/* define some things the M$ VC++ doesn't know */
+		#define UPNP_INLINE
+		typedef __int64 int64_t;
+		#define PRId64 "I64d"
+		#define PRIzu "lu"
+	#endif
+	#ifdef UPNP_USE_BCBPP
+		/* define some things Borland Builder doesn't know */
+		#define UPNP_INLINE inline
+		typedef __int64 int64_t;
+#warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
+		#define PRId64 "I64d"
+		#define PRIzu "zu"
+	#endif
 #else
-#define EXPORT_SPEC __declspec(dllimport)
+	#define EXPORT_SPEC
+	#define UPNP_INLINE inline
+	/* Invented this macro so that we can live a little longer with MSVC lack of C99. */
+	#define PRIzu "zu"
 #endif
+
+/*
+ * Defining this macro here gives some interesting information about unused
+ * functions in the code. Of course, this should never go uncommented on a
+ * release.
+ */
+/*#define inline*/
+
+
+#ifndef WIN32
+	#define UpnpCloseSocket close
 #else
-#define EXPORT_SPEC
+	#define UpnpCloseSocket closesocket
+	#define fseeko fseek
+#endif
+#ifndef WIN32
+	#define SOCKET int
 #endif
 
 
-#ifdef _WIN32
-// use the windows _stricmp
-#define strcasecmp _stricmp
+#ifndef WIN32
+	#include <netinet/in.h>
+#else
+	#include <winsock2.h>
+	#include <time.h>
 #endif
 
-#ifndef _WIN32
-#define UpnpCloseSocket         close
-#else
-// winsock provides closesocket instead of close
-#define UpnpCloseSocket         closesocket
-#endif
-#ifdef _WIN32
-#define UPNP_SOCKETERROR        SOCKET_ERROR
-#define UPNP_INVALID_SOCKET     INVALID_SOCKET
-#else
-#define UPNP_SOCKETERROR        -1
-#define UPNP_INVALID_SOCKET     -1
-#endif
-#ifndef _WIN32
-// already defined in windows
-#define SOCKET                  int
-#endif
 
-#ifndef _WIN32
-#include <netinet/in.h>
-#else
-#include <winsock2.h>
-#endif
+#include <sys/types.h>
+
 
 #define NUM_HANDLE 200
 #define LINE_SIZE  180
-#define UPNP_NAME_SIZE  256
-#define MNFT_UPNP_NAME_SIZE  64
-#define MODL_UPNP_NAME_SIZE  32
+#define NAME_SIZE  256
+#define MNFT_NAME_SIZE  64
+#define MODL_NAME_SIZE  32
 #define SERL_NUMR_SIZE  64
 #define MODL_DESC_SIZE  64
 #define UPNP_INFINITE -1
-
 #define UPNP_USING_CHUNKED			-3
 #define UPNP_UNTIL_CLOSE			-4
 
@@ -107,7 +139,7 @@
  *  code means.  Refer to the documentation for each function for a 
  *  description of what an error code means in that context.
  */
-//@{
+/*! @{ */
 
 /** @name UPNP_E_SUCCESS [0]
  *  {\tt UPNP_E_SUCCESS} signifies that the operation completed successfully.
@@ -115,35 +147,35 @@
  *  the operation was successfully transmitted on the network.  The result of 
  *  the entire operation comes as part of the callback for that operation.
  */
-//@{
+/*! @{ */
 #define UPNP_E_SUCCESS          0
-//@}
+/*! @} */
 
 /** @name UPNP_E_INVALID_HANDLE [-100]
  *  {\tt UPNP_E_INVALID_HANDLE} signifies that the handle passed to a 
  *  function is not a recognized as a valid handle.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_HANDLE   -100
-//@}
+/*! @} */
 
 /** @name UPNP_E_INVALID_PARAM [-101]
  *  {\tt UPNP_E_INVALID_PARAM} signifies that one or more of the parameters 
  *  passed to the function is not valid.  Refer to the documentation for each 
  *  function for more information on the valid ranges of the parameters.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_PARAM    -101
-//@}
+/*! @} */
 
 /** @name UPNP_E_OUTOF_HANDLE [-102]
  *  {\tt UPNP_E_OUTOF_HANDLE} signifies that the SDK does not have any
  *  more space for additional handles.  The SDK allocates space for only 
  *  a few handles in order to conserve memory.
  */
-//@{
+/*! @{ */
 #define UPNP_E_OUTOF_HANDLE     -102
-//@}
+/*! @} */
 
 #define UPNP_E_OUTOF_CONTEXT    -103
 
@@ -152,9 +184,9 @@
  *  currently available to complete the operation.  Most operations require 
  *  some free memory in order to complete their work.
  */
-//@{
+/*! @{ */
 #define UPNP_E_OUTOF_MEMORY     -104
-//@}
+/*! @} */
 
 /** @name UPNP_E_INIT [-105]
  *  {\tt UPNP_E_INIT} signifies that the SDK has already been 
@@ -162,9 +194,9 @@
  *  Any additional initialization attempts simply return this error with
  *  no other ill effects.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INIT             -105
-//@}
+/*! @} */
 
 #define UPNP_E_BUFFER_TOO_SMALL -106
 
@@ -173,9 +205,9 @@
  *  to {\bf UpnpRegisterRootDevice} or {\bf UpnpRegisterRootDevice2} is an 
  *  invalid description document.  
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_DESC     -107
-//@}
+/*! @} */
 
 /** @name UPNP_E_INVALID_URL [-108]
  *  {\tt UPNP_E_INVALID_URL} signifies that a URL passed into the function
@@ -183,9 +215,9 @@
  *  URL itself might be malformed (e.g. have invalid characters in it) or
  *  the host might be unreachable.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_URL      -108
-//@}
+/*! @} */
 
 #define UPNP_E_INVALID_SID      -109
 #define UPNP_E_INVALID_DEVICE   -110
@@ -196,18 +228,18 @@
  *  {\bf UpnpAcceptSubscriptionExt} to signify that the device ID/service
  *  ID pair does not refer to a valid service.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_SERVICE  -111
-//@}
+/*! @} */
 
 /** @name UPNP_E_BAD_RESPONSE [-113]
  *  {\tt UPNP_E_BAD_RESPONSE} signifies that the response received from the 
  *  remote side of a connection is not correct for the protocol.  This applies
  *  to the GENA, SOAP, and HTTP protocols.
  */
-//@{
+/*! @{ */
 #define UPNP_E_BAD_RESPONSE     -113
-//@}
+/*! @} */
 
 #define UPNP_E_BAD_REQUEST      -114
 
@@ -216,26 +248,26 @@
  *  invalid.  This can be because the DOM document passed to the function was
  *  malformed or the action message is not correct for the given action.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_ACTION   -115
-//@}
+/*! @} */
 
 /** @name UPNP_E_FINISH [-116]
  *  {\tt UPNP_E_FINISH} signifies that {\bf UpnpInit} has not been called, or
  *  that {\bf UpnpFinish} has already been called.  None of the API functions 
  *  operate until {\bf UpnpInit} successfully completes.
  */
-//@{
+/*! @{ */
 #define UPNP_E_FINISH           -116
-//@}
+/*! @} */
 
 /** @name UPNP_E_INIT_FAILED [-117]
  *  {\tt UPNP_E_INIT_FAILED} signifies that {\bf UpnpInit} cannot complete.  
  *  The typical reason is failure to allocate sufficient resources.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INIT_FAILED      -117
-//@}
+/*! @} */
 
 /** @name UPNP_E_URL_TOO_BIG [-118]
  *  {\tt UPNP_E_URL_TOO_BIG} signifies that the URL passed into a function 
@@ -251,18 +283,18 @@
  *  message (e.g. {\bf UpnpSubscribe}), GENA event notifications (e.g. {\bf
  *  UpnpNotify}), and HTTP transfers (e.g. {\bf UpnpDownloadXmlDoc}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_BAD_HTTPMSG      -119
-//@}
+/*! @} */
 
 /** @name UPNP_E_ALREADY_REGISTERED [-120]
  *  {\tt UPNP_E_ALREADY_REGISTERED} signifies that a client or a device is
  *  already registered.  The SDK currently has a limit of one registered 
  *  client and one registered device per process.
  */
-//@{
+/*! @{ */
 #define UPNP_E_ALREADY_REGISTERED -120
-//@}
+/*! @} */
 
 /** @name UPNP_E_NETWORK_ERROR [-200]
  *  {\tt UPNP_E_NETWORK_ERROR} signifies that a network error occurred.  It 
@@ -271,9 +303,9 @@
  *  failed to read the local IP address or had problems configuring one of
  *  the sockets.
  */
-//@{
+/*! @{ */
 #define UPNP_E_NETWORK_ERROR    -200
-//@}
+/*! @} */
 
 /** @name UPNP_E_SOCKET_WRITE [-201]
  *  {\tt UPNP_E_SOCKET_WRITE} signifies an error writing to a socket.  This
@@ -282,9 +314,9 @@
  *  control (e.g. {\bf UpnpSendAction}), eventing (e.g. {\bf UpnpNotify}), 
  *  and HTTP functions (e.g. {\bf UpnpDownloadXmlDoc}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_SOCKET_WRITE     -201
-//@}
+/*! @} */
 
 /** @name UPNP_E_SOCKET_READ [-202]
  *  {\tt UPNP_E_SOCKET_READ} signifies an error reading from a socket.  This
@@ -293,9 +325,9 @@
  *  control (e.g. {\bf UpnpSendAction}), eventing (e.g. {\bf UpnpNotify}), 
  *  and HTTP functions (e.g. {\bf UpnpDownloadXmlDoc}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_SOCKET_READ      -202
-//@}
+/*! @} */
 
 /** @name UPNP_E_SOCKET_BIND [-203]
  *  {\tt UPNP_E_SOCKET_BIND} signifies that the SDK had a problem binding
@@ -305,9 +337,9 @@
  *  (e.g. {\bf UpnpNotify}), and HTTP functions (e.g. 
  *  {\bf UpnpDownloadXmlDoc}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_SOCKET_BIND      -203
-//@}
+/*! @} */
 
 /** @name UPNP_E_SOCKET_CONNECT [-204]
  *  {\tt UPNP_E_SOCKET_CONNECT} signifies that the SDK had a problem
@@ -317,9 +349,9 @@
  *  (e.g. {\bf UpnpNotify}), and HTTP functions (e.g. 
  *  {\bf UpnpDownloadXmlDoc}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_SOCKET_CONNECT   -204
-//@}
+/*! @} */
 
 /** @name UPNP_E_OUTOF_SOCKET [-205]
  *  {\tt UPNP_E_OUTOF_SOCKET} signifies that the SDK cannot create any
@@ -329,96 +361,106 @@
  *  (e.g. {\bf UpnpNotify}), and HTTP functions (e.g. 
  *  {\bf UpnpDownloadXmlDoc}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_OUTOF_SOCKET     -205
-//@}
+/*! @} */
 
 /** @name UPNP_E_LISTEN [-206]
  *  {\tt UPNP_E_LISTEN} signifies that the SDK had a problem setting the
  *  socket to listen for incoming connections.  This error only happens during
  *  initialization (i.e. {\bf UpnpInit}).
  */
-//@{
+/*! @{ */
 #define UPNP_E_LISTEN           -206
-//@}
+/*! @} */
 
 /** @name UPNP_E_TIMEDOUT [-207]
  *  {\tt UPNP_E_TIMEDOUT} signifies that too much time elapsed before the
  *  required number of bytes were sent or received over a socket.  This error
  *  can be returned by any function that performs network operations.
  */
-//@{
+/*! @{ */
 #define UPNP_E_TIMEDOUT         -207
-//@}
+/*! @} */
 
 /** @name UPNP_E_SOCKET_ERROR [-208]
  *  {\tt UPNP_E_SOCKET_ERROR} is the generic socket error code for
  *  conditions not covered by other error codes.  This error can be returned
- *  by any functions that performs network operations.
+ *  by any function that performs network operations.
  */
-//@{
+/*! @{ */
 #define UPNP_E_SOCKET_ERROR	    -208
-//@}
+/*! @} */
 
-#define UPNP_E_FILE_WRITE_ERROR       -209
+#define UPNP_E_FILE_WRITE_ERROR -209
+
+/** @name UPNP_E_CANCELED [-210]
+ *  {\tt UPNP_E_CANCELED} signifies that the operation was canceled. This
+ *  error can be returned by any function that allows for external
+ *  cancelation.
+ */
+/*! @{ */
+#define UPNP_E_CANCELED         -210
+/*! @} */
+
 #define UPNP_E_EVENT_PROTOCOL         -300
 
 /** @name UPNP_E_SUBSCRIBE_UNACCEPTED [-301]
  *  {\tt UPNP_E_SUBSCRIBE_UNACCEPTED} signifies that a subscription
  *  request was rejected from the remote side.  
  */
-//@{
+/*! @{ */
 #define UPNP_E_SUBSCRIBE_UNACCEPTED   -301
-//@}
+/*! @} */
 
-/** @name UPNP_E_UNSUBSCRIBE_UNACCAPTED [-302]
+/** @name UPNP_E_UNSUBSCRIBE_UNACCEPTED [-302]
  *  {\tt UPNP_E_UNSUBSCRIBE_UNACCEPTED} signifies that an unsubscribe
  *  request was rejected from the remote side.
  */
-//@{
+/*! @{ */
 #define UPNP_E_UNSUBSCRIBE_UNACCEPTED -302
-//@}
+/*! @} */
 
 /** @name UPNP_E_NOTIFY_UNACCEPTED [-303]
  *  {\tt UPNP_E_NOTIFY_UNACCEPTED} signifies that the remote host did not
  *  accept the notify sent from the local device.
  */
-//@{
+/*! @{ */
 #define UPNP_E_NOTIFY_UNACCEPTED      -303
-//@}
+/*! @} */
 
 /** @name UPNP_E_INVALID_ARGUMENT [-501]
  *  {\tt UPNP_E_INVALID_ARGUMENT} signifies that one or more of the parameters
  *  passed to a function is invalid.  Refer to the individual function
  *  descriptions for the acceptable ranges for parameters.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INVALID_ARGUMENT       -501
-//@}
+/*! @} */
 
 /** @name UPNP_E_FILE_NOT_FOUND [-502]
  *  {\tt UPNP_E_FILE_NOT_FOUND} signifies that the filename passed
  *  to one of the device registration functions was not found or was not
  *  accessible.
  */
-//@{
+/*! @{ */
 #define UPNP_E_FILE_NOT_FOUND         -502
-//@}
+/*! @} */
 
 /** @name UPNP_E_FILE_READ_ERROR [-503]
  *  {\tt UPNP_E_FILE_READ_ERROR} signifies an error when reading a file.
  */
-//@{
+/*! @{ */
 #define UPNP_E_FILE_READ_ERROR        -503
-//@}
+/*! @} */
 
 /** @name UPNP_E_EXT_NOT_XML [-504]
  *  {\tt UPNP_E_EXT_NOT_XML} signifies that the file name of the description
  *  document passed to {\bf UpnpRegisterRootDevice2} does not end in ".xml".
  */
-//@{
+/*! @{ */
 #define UPNP_E_EXT_NOT_XML            -504
-//@}
+/*! @} */
 
 #define UPNP_E_NO_WEB_SERVER          -505
 #define UPNP_E_OUTOF_BOUNDS	      -506
@@ -427,26 +469,26 @@
  *  {\tt UPNP_E_NOT_FOUND} signifies that the response to a SOAP request
  *  did not contain the required XML constructs.  
  */
-//@{
+/*! @{ */
 #define UPNP_E_NOT_FOUND	      -507
-//@}
+/*! @} */
 
 /** @name UPNP_E_INTERNAL_ERROR [-911]
  *  {\tt UPNP_E_INTERNAL_ERROR} is the generic error code for internal
  *  conditions not covered by other error codes.
  */
-//@{
+/*! @{ */
 #define UPNP_E_INTERNAL_ERROR         -911
-//@}
+/*! @} */
 
-// SOAP-related error codes
+/* SOAP-related error codes */
 #define UPNP_SOAP_E_INVALID_ACTION    401
 #define UPNP_SOAP_E_INVALID_ARGS      402
 #define UPNP_SOAP_E_OUT_OF_SYNC       403
 #define UPNP_SOAP_E_INVALID_VAR       404
 #define UPNP_SOAP_E_ACTION_FAILED     501
 
-//@}
+/*! @} */
 
 #ifndef OUT
 #define OUT
@@ -460,10 +502,12 @@
 #define INOUT
 #endif
 
+#include "upnpdebug.h"
+
 enum UpnpOpenFileMode{UPNP_READ, UPNP_WRITE};
 
-/// @name Constants, Structures, and Types
-//@{
+/*! @name Constants, Structures, and Types */
+/*! @{ */
 
 /** Returned when a control point application registers with {\bf
  *  UpnpRegisterClient}.  Client handles can only be used with 
@@ -486,9 +530,9 @@ typedef int  UpnpDevice_Handle;
 
 enum Upnp_EventType_e {
 
-  //
-  // Control callbacks
-  //
+  /*
+   * Control callbacks
+   */
 
   /** Received by a device when a control point issues a control
    *  request.  The {\bf Event} parameter contains a pointer to a {\bf
@@ -516,9 +560,9 @@ enum Upnp_EventType_e {
 
   UPNP_CONTROL_GET_VAR_COMPLETE,
 
-  //
-  // Discovery callbacks
-  //
+  /*
+   * Discovery callbacks
+   */
 
   /** Received by a control point when a new device or service is available.  
    *  The {\bf Event} parameter contains a pointer to a {\bf
@@ -547,9 +591,9 @@ enum Upnp_EventType_e {
 
   UPNP_DISCOVERY_SEARCH_TIMEOUT,
 
-  //
-  // Eventing callbacks
-  //
+  /*
+   * Eventing callbacks
+   */
 
   /** Received by a device when a subscription arrives.
    *  The {\bf Event} parameter contains a pointer to a {\bf
@@ -678,13 +722,13 @@ struct Upnp_Action_Request
   char ErrStr[LINE_SIZE];
 
  /** The Action Name. */
-  char ActionName[UPNP_NAME_SIZE];
+  char ActionName[NAME_SIZE];
 
   /** The unique device ID. */
-  char DevUDN[UPNP_NAME_SIZE];
+  char DevUDN[NAME_SIZE];
 
   /** The service ID. */
-  char ServiceID[UPNP_NAME_SIZE];
+  char ServiceID[NAME_SIZE];
 
   /** The DOM document describing the action. */
   IXML_Document *ActionRequest;
@@ -706,7 +750,7 @@ struct Upnp_Action_Complete
   int ErrCode;
 
   /** The control URL for service. */
-  char CtrlUrl[UPNP_NAME_SIZE];
+  char CtrlUrl[NAME_SIZE];
 
   /** The DOM document describing the action. */
   IXML_Document *ActionRequest;
@@ -731,13 +775,13 @@ struct Upnp_State_Var_Request
   char ErrStr[LINE_SIZE];
 
   /** The unique device ID. */
-  char DevUDN[UPNP_NAME_SIZE];
+  char DevUDN[NAME_SIZE];
 
   /** The  service ID. */
-  char ServiceID[UPNP_NAME_SIZE];
+  char ServiceID[NAME_SIZE];
 
   /** The name of the variable. */
-  char StateVarName[UPNP_NAME_SIZE];
+  char StateVarName[NAME_SIZE];
 
   /** IP address of sender requesting the state variable. */
   struct in_addr CtrlPtIPAddr;
@@ -756,10 +800,10 @@ struct Upnp_State_Var_Complete
   int ErrCode;
 
   /** The control URL for the service. */
-  char CtrlUrl[UPNP_NAME_SIZE];
+  char CtrlUrl[NAME_SIZE];
 
   /** The name of the variable. */
-  char StateVarName[UPNP_NAME_SIZE];
+  char StateVarName[NAME_SIZE];
 
   /** The current value of the variable or error string in case of error. */
   DOMString CurrentVal;
@@ -780,51 +824,47 @@ struct Upnp_Event
 
 };
 
-//
-// This typedef is required by Doc++ to parse the last entry of the 
-// Upnp_Discovery structure correctly.
-//
+/*
+ * This typedef is required by Doc++ to parse the last entry of the 
+ * Upnp_Discovery structure correctly.
+ */
 
-typedef struct sockaddr_in SOCKADDRIN;
 
 /** Returned in a {\bf UPNP_DISCOVERY_RESULT} callback. */
-
 struct Upnp_Discovery
 {
-
-  /** The result code of the {\bf UpnpSearchAsync} call. */
-  int  ErrCode;                  
+	/** The result code of the {\bf UpnpSearchAsync} call. */
+	int  ErrCode;                  
 				     
-  /** The expiration time of the advertisement. */
-  int  Expires;                  
-                                     
-  /** The unique device identifier. */
-  char DeviceId[LINE_SIZE];      
-
-  /** The device type. */
-  char DeviceType[LINE_SIZE];    
-
-  /** The service type. */
-  char ServiceType[LINE_SIZE];
-
-  /** The service version. */
-  char ServiceVer[LINE_SIZE];    
-
-  /** The URL to the UPnP description document for the device. */
-  char Location[LINE_SIZE];      
-
-  /** The operating system the device is running. */
-  char Os[LINE_SIZE];            
+	/** The expiration time of the advertisement. */
+	int  Expires;                  
 				     
-  /** Date when the response was generated. */
-  char Date[LINE_SIZE];            
-				     
-  /** Confirmation that the MAN header was understood by the device. */
-  char Ext[LINE_SIZE];           
-				     
-  /** The host address of the device responding to the search. */
-  SOCKADDRIN * DestAddr; 
+	/** The unique device identifier. */
+	char DeviceId[LINE_SIZE];      
 
+	/** The device type. */
+	char DeviceType[LINE_SIZE];    
+
+	/** The service type. */
+	char ServiceType[LINE_SIZE];
+
+	/** The service version. */
+	char ServiceVer[LINE_SIZE];    
+
+	/** The URL to the UPnP description document for the device. */
+	char Location[LINE_SIZE];      
+
+	/** The operating system the device is running. */
+	char Os[LINE_SIZE];            
+				     
+	/** Date when the response was generated. */
+	char Date[LINE_SIZE];            
+				     
+	/** Confirmation that the MAN header was understood by the device. */
+	char Ext[LINE_SIZE];           
+				     
+	/** The host address of the device responding to the search. */
+	struct sockaddr_in DestAddr; 
 };
 
 /** Returned along with a {\bf UPNP_EVENT_SUBSCRIBE_COMPLETE} or {\bf
@@ -844,7 +884,7 @@ struct Upnp_Event_Subscribe {
   int ErrCode;              
 
   /** The event URL being subscribed to or removed from. */
-  char PublisherUrl[UPNP_NAME_SIZE]; 
+  char PublisherUrl[NAME_SIZE]; 
 
   /** The actual subscription time (for subscriptions only). */
   int TimeOut;              
@@ -873,7 +913,7 @@ struct File_Info
   /** The length of the file. A length less than 0 indicates the size 
    *  is unknown, and data will be sent until 0 bytes are returned from
    *  a read call. */
-  int file_length;
+  off_t file_length;
 
   /** The time at which the contents of the file was modified;
    *  The time system is always local (not GMT). */
@@ -967,7 +1007,7 @@ struct UpnpVirtualDirCallbacks
    int (*seek) (
      IN UpnpWebFileHandle fileHnd,  /** The handle of the file to move the 
                                         file pointer. */
-     IN long offset,                /** The number of bytes to move in the 
+     IN off_t offset,                /** The number of bytes to move in the 
                                         file.  Positive values move foward and 
                                         negative values move backward.  Note 
                                         that this must be positive if the 
@@ -994,7 +1034,7 @@ struct UpnpVirtualDirCallbacks
 typedef struct virtual_Dir_List
 {
     struct virtual_Dir_List *next;
-    char dirName[UPNP_NAME_SIZE];
+    char dirName[NAME_SIZE];
 } virtualDirList;
 
 /** All callback functions share the same prototype, documented below.
@@ -1028,14 +1068,14 @@ typedef int  (*Upnp_FunPtr) (
     IN void *Cookie
     );
 
-//@} // Constants, Structures, and Types
+/*! @} */ /* Constants, Structures, and Types */
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif /* __cplusplus */
 
-///@name Initialization and Registration
-//@{
+/*! @name Initialization and Registration */
+/*! @{ */
 /** Initializes the Linux SDK for UPnP Devices. This function must be called
  *  before any other API function can be called.  It should be called
  *  only once.  Subsequent calls to this API return a {\tt UPNP_E_INIT}
@@ -1318,42 +1358,46 @@ EXPORT_SPEC int UpnpUnRegisterRootDevice(
    );
 
 
-/** Sets the size of the receive buffer for incoming SOAP requests. This API 
- *  allows devices that have memory constraints to exhibit consistent 
- *  behaviour if the size of the incoming SOAP request exceeds the memory 
- *  that device can allocate for incoming SOAP messages. The default 
- *  value set by the SDK for the buffer is 16K bytes.  Trying to set a value 
- *  greater than 32K will result in an error.
+/** OBSOLETE METHOD : use {\bf UpnpSetMaxContentLength} instead.
+ * Warning: the Handle argument provided here is not used, so the effect
+ * of this function is global to the SDK (= same as 
+ * {\bf UpnpSetMaxContentLength} ).
+ */
+EXPORT_SPEC int UpnpSetContentLength(
+    IN UpnpClient_Handle Hnd,  
+    IN int contentLength       
+    );
+
+
+/** Sets the maximum content-length that the SDK will process on an incoming 
+ *  SOAP requests or responses. This API allows devices that have memory 
+ *  constraints to exhibit consistent behaviour if the size of the 
+ *  incoming SOAP message exceeds the memory that device can allocate. 
+ *  The default maximum content-length is {\tt DEFAULT_SOAP_CONTENT_LENGTH} 
+ *  = 16K bytes.
  *   
  *  @return [int] An integer representing one of the following:
  *    \begin{itemize}
  *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_HANDLE}: The handle is not a valid 
- *              device handle.
- *      \item {\tt UPNP_E_LARGE_BUFFER_SIZE}: The buffer size requested was 
- *              too large.
  *    \end{itemize}
  */
-EXPORT_SPEC int UpnpSetContentLength(
-    IN UpnpClient_Handle Hnd,  /** The handle of the device instance 
-                                   for which the coincoming content length 
-				   needs to be set. */
-    IN int contentLength       /** The maximum permissible content length 
-			           for incoming SOAP actions. */
+EXPORT_SPEC int UpnpSetMaxContentLength(
+    IN size_t contentLength    /** The maximum permissible content length 
+			           for incoming SOAP actions, in bytes. */
     );
 
-//@} // Initialization and Registration
+/*! @} */ /* Initialization and Registration */
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-//                                                                    //
-//                        D I S C O V E R Y                           //
-//                                                                    //
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
+/******************************************************************************
+ ******************************************************************************
+ *                                                                            *
+ *                        D I S C O V E R Y                                   *
+ *                                                                            *
+ ******************************************************************************
+ ******************************************************************************/
 
-///@name Discovery
-//@{
+/*! @name Discovery */
+/*! @{ */
 
 /** {\bf UpnpSearchAsync} searches for devices matching the given
  *  search target.  The function returns immediately and the SDK 
@@ -1412,18 +1456,18 @@ EXPORT_SPEC int UpnpSendAdvertisement(
                                   the announcements. */
     );
 
-//@} // Discovery
+/*! @} */ /* Discovery */
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-//                                                                    //
-//                            C O N T R O L                           //
-//                                                                    //
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
+/******************************************************************************
+ ******************************************************************************
+ *                                                                            *
+ *                            C O N T R O L                                   *
+ *                                                                            *
+ ******************************************************************************
+ ******************************************************************************/
 
-///@name Control
-//@{
+/*! @name Control */
+/*! @{ */
 
 /** {\bf UpnpGetServiceVarStatus} queries the state of a state 
  *  variable of a service on another device.  This is a synchronous call.
@@ -1646,18 +1690,18 @@ EXPORT_SPEC int UpnpSendActionExAsync(
                                     passed to the callback when invoked. */
     );
 
-//@} // Control
+/*! @} */ /* Control */
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-//                                                                    //
-//                        E V E N T I N G                             //
-//                                                                    //
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
+/******************************************************************************
+ ******************************************************************************
+ *                                                                            *
+ *                        E V E N T I N G                                     *
+ *                                                                            *
+ ******************************************************************************
+ ******************************************************************************/
 
-///@name Eventing
-//@{
+/*! @name Eventing */
+/*! @{ */
 
 /** {\bf UpnpAcceptSubscription} accepts a subscription request and sends
  *  out the current state of the eventable variables for a service.  
@@ -2160,19 +2204,19 @@ EXPORT_SPEC int UpnpUnSubscribeAsync(
                                   callback function when invoked. */
     );
 
-//@} // Eventing
+/*! @} */ /* Eventing */
 
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-//                                                                    //
-//                        C L I E N T - A P I                         //
-//                                                                    //
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
+/******************************************************************************
+ ******************************************************************************
+ *                                                                            *
+ *                        C L I E N T - A P I                                 *
+ *                                                                            *
+ ******************************************************************************
+ ******************************************************************************/
 
-///@name Control Point HTTP API
-//@{
+/*! @name Control Point HTTP API */
+/*! @{ */
 
 /** {\bf UpnpDownloadUrlItem} downloads a file specified in a URL.
  *  The SDK allocates the memory for {\bf outBuf} and the 
@@ -2256,6 +2300,54 @@ EXPORT_SPEC int UpnpOpenHttpGet(
 					the user. */		 
 	  );
 
+/** {\bf UpnpOpenHttpGetProxy} gets a file specified in a URL through the
+ * specified proxy.
+ *  The SDK allocates the memory for {\bf handle} and 
+ *  {\bf contentType}, the application is responsible for freeing this memory.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt UPNP_E_INVALID_PARAM}: Either {\bf url}, {\bf handle},  
+ *              {\bf contentType}, {\bf contentLength} or {\bf httpStatus} 
+ *		is not a valid pointer.
+ *      \item {\tt UPNP_E_INVALID_URL}: The {\bf url} is not a valid 
+ *              URL.
+ *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
+ *              download this file.
+ *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occurred.
+ *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
+ *              to a socket.
+ *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
+ *              from a socket.
+ *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding a socket.
+ *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting a 
+ *              socket.
+ *      \item {\tt UPNP_E_OUTOF_SOCKET}: Too many sockets are currently 
+ *              allocated.
+ *	\item {\tt UPNP_E_BAD_RESPONSE}: A bad response was received from the 
+ *	        remote server.
+ *    \end{itemize}
+ */
+
+EXPORT_SPEC int UpnpOpenHttpGetProxy(
+	IN const char *url,	    /** The URL of an item to get. */
+    IN const char *proxy_str,    /** The URL of the proxy. */
+	IN OUT void **handle,       /** A pointer to store the handle for 
+				        this connection. */
+	IN OUT char **contentType,  /** A buffer to store the media type of 
+				        the item. */
+	IN OUT int *contentLength,  /** A pointer to store the length of the 
+				        item. */
+	IN OUT int *httpStatus,	    /** The status returned on receiving a 
+				        response message. */
+	IN int timeout		    /** The time out value sent with the 
+				        request during which a response is 
+					expected from the server, failing 
+					which, an error is reported back to 
+					the user. */		 
+	  );
+
 /** {\bf UpnpOpenHttpGetEx} gets specified number of bytes from a file 
  *  specified in the URL. The number of bytes is specified through a low 
  *  count and a high count which are passed as a range of bytes for the 
@@ -2316,10 +2408,11 @@ EXPORT_SPEC int UpnpOpenHttpGetEx(
  *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
  *      \item {\tt UPNP_E_INVALID_PARAM}: Either {\bf handle}, {\bf buf} 
  *              or {\bf size} is not a valid pointer.
- *	\item {\tt UPNP_E_BAD_RESPONSE}: A bad response was received from the 
- *	        remote server.
+ *	    \item {\tt UPNP_E_BAD_RESPONSE}: A bad response was received from the 
+ *	            remote server.
  *      \item {\tt UPNP_E_BAD_HTTPMSG}: Either the request or response was in 
  *              the incorrect format.
+ *      \item {\tt UPNP_E_CANCELED}: another thread called UpnpCancelHttpGet.
  *    \end{itemize}
  *
  *  Note: In case of return values, the status code parameter of the passed 
@@ -2338,6 +2431,37 @@ EXPORT_SPEC int UpnpReadHttpGet(
 				       which, an error is reported back to 
 				       the user. */
 	);
+
+/** {\bf UpnpHttpGetProgress} rettrieve progress information of a http-get 
+ *  transfer. 
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt UPNP_E_INVALID_PARAM}: Either {\bf handle}, {\bf length} 
+ *              or {\bf total} is not a valid pointer.
+ *    \end{itemize}
+ *
+ */
+EXPORT_SPEC int UpnpHttpGetProgress(
+    IN void *handle,           /** The token created by the call to
+				       {\bf UpnpOpenHttpGet}. */
+	OUT unsigned int *length, /** The number of bytes received. */
+	OUT unsigned int *total   /** The content length. */
+    );
+
+
+/** {\bf UpnpCancelHttpGet} set the cancel flag of the  {\bf handle}
+ * parameter. 
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf handle} is not a valid pointer.
+ *    \end{itemize}
+ */  
+
+EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
 
 /** {\bf UpnpCloseHttpGet} closes the connection and frees memory that was 
  *	allocated for the {\bf handle} parameter.
@@ -2485,18 +2609,18 @@ EXPORT_SPEC int UpnpDownloadXmlDoc(
 				     XML document. */
     );
 
-//@} // Control Point HTTP API
+/*! @} */ /* Control Point HTTP API */
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-//                                                                    //
-//                    W E B  S E R V E R  A P I                       //
-//                                                                    //
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
+/******************************************************************************
+ ******************************************************************************
+ *                                                                            *
+ *                    W E B  S E R V E R  A P I                               *
+ *                                                                            *
+ ******************************************************************************
+ ******************************************************************************/
 
-///@name Web Server API
-//@{
+/*! @name Web Server API */
+/*! @{ */
 
 /** {\bf UpnpSetWebServerRootDir} sets the document root directory for
  *  the internal web server. This directory is considered the
@@ -2612,13 +2736,13 @@ EXPORT_SPEC void UpnpFree(
     IN void *item /* The item to free. */
     );
 
-//@} // Web Server API
+/*! @} */ /* Web Server API */
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif /* __cplusplus */
 
-//@} The API
+/*! @} */ /* The API */
 
 #endif
 

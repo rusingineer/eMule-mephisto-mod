@@ -29,24 +29,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-const char *ContentTypeHeader =
-    "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-
+#include "config.h"
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SOAP == 0
 
 #define SOAP_BODY "Body"
-#define SOAP_URN "http://schemas.xmlsoap.org/soap/envelope/"
+#define SOAP_URN "http:/""/schemas.xmlsoap.org/soap/envelope/"
 
 #define QUERY_STATE_VAR_URN "urn:schemas-upnp-org:control-1-0"
 
-#include "config.h"
 #include "upnpapi.h"
 #include "parsetools.h"
 #include "statcodes.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "unixutil.h"
+#include "soaplib.h"
+#include "ssdplib.h"
+
+#ifdef WIN32
+ #define snprintf _snprintf
+#endif
 
 // timeout duration in secs for transmission/reception
 #define SOAP_TIMEOUT UPNP_TIMEOUT
@@ -66,6 +69,9 @@ static const char *Soap_Invalid_Action = "Invalid Action";
 static const char *Soap_Action_Failed = "Action Failed";
 static const char *Soap_Invalid_Var = "Invalid Var";
 
+const char *ContentTypeHeader =
+    "CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
+
 /****************************************************************************
 *	Function :	get_request_type
 *
@@ -79,7 +85,7 @@ static const char *Soap_Invalid_Var = "Invalid Var";
 *		0 if successful else returns appropriate error.
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_request_type( IN http_message_t * request,
                   OUT memptr * action_name )
 {
@@ -116,7 +122,7 @@ get_request_type( IN http_message_t * request,
                                 ns_value.buf, ns_value.length )
               == UPNP_E_OUTOF_MEMORY ) ||
             ( membuffer_append_str( &soap_action_name,
-                                    "-SOAPAction" ) ==
+                                    "-SOAPACTION" ) ==
               UPNP_E_OUTOF_MEMORY )
              ) {
             membuffer_destroy( &soap_action_name );
@@ -183,12 +189,12 @@ send_error_response( IN SOCKINFO * info,
                      IN const char *err_msg,
                      IN http_message_t * hmsg )
 {
-    int content_length;
+    off_t content_length;
     int timeout_secs = SOAP_TIMEOUT;
     int major,
       minor;
     const char *start_body =
-		"<?xml version=\"1.0\"?>\n"
+//		"<?xml version=\"1.0\"?>\n" required??
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -222,14 +228,16 @@ send_error_response( IN SOCKINFO * info,
 
     // make headers
     membuffer_init( &headers );
-    if( http_MakeMessage( &headers, major, minor,
-                          "RNsDsSc" "sssss",
-                          500,
-                          content_length,
-                          ContentTypeHeader,
-                          "Ext:\r\n",
-                          start_body, err_code_str, mid_body, err_msg,
-                          end_body ) != 0 ) {
+    if (http_MakeMessage(
+        &headers, major, minor,
+        "RNsDsSXcc" "sssss",
+        500,
+        content_length,
+        ContentTypeHeader,
+        "EXT:\r\n",
+        X_USER_AGENT,
+        start_body, err_code_str, mid_body, err_msg,
+        end_body ) != 0 ) {
         membuffer_destroy( &headers );
         return;                 // out of mem
     }
@@ -254,17 +262,16 @@ send_error_response( IN SOCKINFO * info,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 send_var_query_response( IN SOCKINFO * info,
                          IN const char *var_value,
                          IN http_message_t * hmsg )
 {
-    int content_length;
+    off_t content_length;
     int timeout_secs = SOAP_TIMEOUT;
-    int major,
-      minor;
+    int major;
+    int minor;
     const char *start_body =
-		"<?xml version=\"1.0\"?>\n"
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -287,16 +294,20 @@ send_var_query_response( IN SOCKINFO * info,
 
     // make headers
     membuffer_init( &response );
-    if( http_MakeMessage( &response, major, minor,
-                          "RNsDsSc" "sss",
-                          HTTP_OK,
-                          content_length,
-                          ContentTypeHeader,
-                          "Ext:\r\n",
-                          start_body, var_value, end_body ) != 0 ) {
+    
+    if (http_MakeMessage(
+        &response, major, minor,
+        "RNsDsSXcc" "sss",
+        HTTP_OK,
+        content_length,
+        ContentTypeHeader,
+        "EXT:\r\n",
+        X_USER_AGENT,
+        start_body, var_value, end_body ) != 0 ) {
         membuffer_destroy( &response );
         return;                 // out of mem
     }
+    
     // send msg
     http_SendMessage( info, &timeout_secs, "b",
                       response.buf, response.length );
@@ -315,12 +326,12 @@ send_var_query_response( IN SOCKINFO * info,
 *	Description :	This function separates the action node from 
 *	the root DOM node.
 *
-*	Return :	static XINLINE int
+*	Return :	static UPNP_INLINE int
 *		0 if successful, or -1 if fails.
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_action_node( IN IXML_Document * TempDoc,
                  IN char *NodeName,
                  OUT IXML_Document ** RespNode )
@@ -333,11 +344,10 @@ get_action_node( IN IXML_Document * TempDoc,
     int ret_code = -1;          // error, by default
     IXML_NodeList *nl = NULL;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "get_action_node(): node name =%s\n ", NodeName );
-         )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "get_action_node(): node name =%s\n ", NodeName );
 
-        * RespNode = NULL;
+    *RespNode = NULL;
 
     // Got the Envelope node here
     EnvpNode = ixmlNode_getFirstChild( ( IXML_Node * ) TempDoc );
@@ -371,7 +381,7 @@ get_action_node( IN IXML_Document * TempDoc,
     if( strstr( nodeName, NodeName ) == NULL ) {
         goto error_handler;
     } else {
-        ActNodeName = ixmlPrintDocument( ActNode );
+        ActNodeName = ixmlPrintNode( ActNode );
         if( ActNodeName == NULL ) {
             goto error_handler;
         }
@@ -433,9 +443,9 @@ check_soap_body( IN IXML_Document * doc,
             if( actionNode ) {
                 ns = ixmlNode_getNamespaceURI( actionNode );
                 name = ixmlNode_getLocalName( actionNode );
-
-                if( ( !strcmp( actionName, name ) )
-                    && ( !strcmp( urn, ns ) ) ) {
+                if (name && ns &&
+                    !strcmp( actionName, name ) &&
+                    !strcmp( urn, ns ) ) {
                     ret_code = UPNP_E_SUCCESS;
                 }
             }
@@ -526,7 +536,7 @@ check_soap_action_header( IN http_message_t * request,
         return ret_code;
     }
 
-    _snprintf( ns_compare, tempSize, "\"%s", urn );
+    snprintf( ns_compare, tempSize, "\"%s", urn );
 
     if( strcmp( temp_header_value, ns_compare ) ) {
         ret_code = UPNP_E_INVALID_ACTION;
@@ -589,15 +599,15 @@ get_device_info( IN http_message_t * request,
     service_info *serv_info;
     char save_char;
     int ret_code = -1;          // error by default
-    char *control_url;
+    const char *control_url;
     char *actionName = NULL;
 
     // null-terminate pathquery of url
     control_url = request->uri.pathquery.buff;
     save_char = control_url[request->uri.pathquery.size];
-    control_url[request->uri.pathquery.size] = '\0';
+    ((char *)control_url)[request->uri.pathquery.size] = '\0';
 
-    HandleLock(  );
+    HandleLock();
 
     if( GetDeviceHandleInfo( &device_hnd, &device_info ) != HND_DEVICE ) {
         goto error_handler;
@@ -652,8 +662,8 @@ get_device_info( IN http_message_t * request,
     ret_code = 0;
 
   error_handler:
-    control_url[request->uri.pathquery.size] = save_char;   // restore
-    HandleUnlock(  );
+    ((char *)control_url)[request->uri.pathquery.size] = save_char;   // restore
+    HandleUnlock();
     return ret_code;
 }
 
@@ -671,7 +681,7 @@ get_device_info( IN http_message_t * request,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 send_action_response( IN SOCKINFO * info,
                       IN IXML_Document * action_resp,
                       IN http_message_t * request )
@@ -681,14 +691,15 @@ send_action_response( IN SOCKINFO * info,
     int major,
       minor;
     int err_code;
-    int content_length;
+    off_t content_length;
     int ret_code;
     int timeout_secs = SOAP_TIMEOUT;
     static char *start_body =
-        "<?xml version=\"1.0\"?>\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap."
+//        "<?xml version=\"1.0\"?>" required??
+        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap."
         "org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap."
-        "org/soap/encoding/\">\n<s:Body>\n";
-    static char *end_body = "</s:Body>\n</s:Envelope>\n\n";
+        "org/soap/encoding/\"><s:Body>\n";
+    static char *end_body = "</s:Body> </s:Envelope>";
 
     // init
     http_CalcResponseVersion( request->major_version,
@@ -697,20 +708,28 @@ send_action_response( IN SOCKINFO * info,
     err_code = UPNP_E_OUTOF_MEMORY; // one error only
 
     // get xml
-    xml_response = ixmlPrintDocument( ( IXML_Node * ) action_resp );
+    xml_response = ixmlPrintNode( ( IXML_Node * ) action_resp );
     if( xml_response == NULL ) {
         goto error_handler;
     }
 
-    content_length = strlen( start_body ) + strlen( xml_response ) +
+    content_length =
+        strlen( start_body ) +
+        strlen( xml_response ) +
         strlen( end_body );
 
     // make headers
-    if( http_MakeMessage( &headers, major, minor, "RNsDsSc", HTTP_OK,   // status code
-                          content_length, ContentTypeHeader, "Ext:\r\n" // EXT header
-         ) != 0 ) {
+    if (http_MakeMessage(
+        &headers, major, minor,
+        "RNsDsSXcc",
+        HTTP_OK,   // status code
+        content_length,
+        ContentTypeHeader,
+        "EXT:\r\n",
+        X_USER_AGENT) != 0 ) {
         goto error_handler;
     }
+
     // send whole msg
     ret_code = http_SendMessage( info, &timeout_secs, "bbbb",
                                  headers.buf, headers.length,
@@ -718,15 +737,15 @@ send_action_response( IN SOCKINFO * info,
                                  xml_response, strlen( xml_response ),
                                  end_body, strlen( end_body ) );
 
-    DBGONLY( if( ret_code != 0 ) {
-             UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Failed to send response: err code = %d\n",
-                         ret_code );}
-     )
+    if( ret_code != 0 ) {
+        UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+            "Failed to send response: err code = %d\n",
+            ret_code );
+    }
 
-        err_code = 0;
+    err_code = 0;
 
-  error_handler:
+error_handler:
     ixmlFreeDOMString( xml_response );
     membuffer_destroy( &headers );
     if( err_code != 0 ) {
@@ -750,7 +769,7 @@ send_action_response( IN SOCKINFO * info,
 *		returns 0 if successful else returns -1.
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_var_name( IN IXML_Document * TempDoc,
               OUT char *VarName )
 {
@@ -760,7 +779,7 @@ get_var_name( IN IXML_Document * TempDoc,
     IXML_Node *VarNameNode = NULL;
     IXML_Node *VarNode = NULL;
     const DOMString StNodeName = NULL;
-    DOMString Temp = NULL;
+    const DOMString Temp = NULL;
     int ret_val = -1;
 
     // Got the Envelop node here
@@ -794,14 +813,13 @@ get_var_name( IN IXML_Document * TempDoc,
     Temp = ixmlNode_getNodeValue( VarNode );
     linecopy( VarName, Temp );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Received query for variable  name %s\n",
-                         VarName );
-         )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Received query for variable  name %s\n",
+        VarName );
 
-        ret_val = 0;            // success
+    ret_val = 0;            // success
 
-  error_handler:
+error_handler:
     return ret_val;
 }
 
@@ -822,7 +840,7 @@ get_var_name( IN IXML_Document * TempDoc,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 handle_query_variable( IN SOCKINFO * info,
                        IN http_message_t * request,
                        IN IXML_Document * xml_doc )
@@ -858,8 +876,8 @@ handle_query_variable( IN SOCKINFO * info,
     // send event
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Return from callback for var request\n" ) );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Return from callback for var request\n" );
 
     // validate, and handle result
     if( variable.CurrentVal == NULL ) {
@@ -948,8 +966,8 @@ handle_invoke_action( IN SOCKINFO * info,
     action.ErrCode = UPNP_E_SUCCESS;
     action.CtrlPtIPAddr = info->foreign_ip_addr;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Calling Callback\n" ) );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+                         "Calling Callback\n" );
 
     soap_event_callback( UPNP_CONTROL_ACTION_REQUEST, &action, cookie );
 

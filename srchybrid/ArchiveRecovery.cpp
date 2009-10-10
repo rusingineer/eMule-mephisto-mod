@@ -1091,7 +1091,12 @@ RAR_BlockFile *CArchiveRecovery::scanForRarFileHeader(CFile *input, archiveScann
 					retVal->FTIME			= calcUInt32(&checkCRC[18]);
 					retVal->UNP_VER			= checkCRC[22];
 					retVal->METHOD			= checkCRC[23];
+					// ==> UPnP support [MoNKi] - leuk_he
+					/*
 					retVal->NAME_SIZE		= lenFileName;
+					*/
+					retVal->NAME_SIZE_var	= lenFileName;
+					// <== UPnP support [MoNKi] - leuk_he
 					retVal->ATTR			= calcUInt32(&checkCRC[26]);
 					// Optional values, present only if bit 0x100 in HEAD_FLAGS is set.
 					if ((retVal->HEAD_FLAGS & 0x100) == 0x100) {
@@ -1176,12 +1181,22 @@ bool CArchiveRecovery::validateRarFileBlock(RAR_BlockFile *block)
 	
 	if (block->HEAD_FLAGS & 0x0200) {
 		// ANSI+Unicode name
+		// ==> UPnP support [MoNKi] - leuk_he
+		/*
 		if (block->NAME_SIZE > MAX_PATH + MAX_PATH*2)
+		*/
+		if (block->NAME_SIZE_var > MAX_PATH + MAX_PATH*2)
+		// <== UPnP support [MoNKi] - leuk_he
 			return false;
 	}
 	else {
 		// ANSI+Unicode name
+		// ==> UPnP support [MoNKi] - leuk_he
+		/*
 		if (block->NAME_SIZE > MAX_PATH)
+		*/
+		if (block->NAME_SIZE_var > MAX_PATH)
+		// <== UPnP support [MoNKi] - leuk_he
 			return false;
 	}
 
@@ -1208,14 +1223,24 @@ void CArchiveRecovery::writeRarBlock(CFile *input, CFile *output, RAR_BlockFile 
 		writeUInt32(output, block->FTIME);
 		output->Write(&block->UNP_VER, 1);
 		output->Write(&block->METHOD, 1);
+		// ==> UPnP support [MoNKi] - leuk_he
+		/*
 		writeUInt16(output, block->NAME_SIZE);
+		*/
+		writeUInt16(output, block->NAME_SIZE_var);
+		// <== UPnP support [MoNKi] - leuk_he
 		writeUInt32(output, block->ATTR);
 		// Optional values, present only if bit 0x100 in HEAD_FLAGS is set.
 		if ((block->HEAD_FLAGS & 0x100) == 0x100) {
 			writeUInt32(output, block->HIGH_PACK_SIZE);
 			writeUInt32(output, block->HIGH_UNP_SIZE);
 		}
+		// ==> UPnP support [MoNKi] - leuk_he
+		/*
 		output->Write(block->FILE_NAME, block->NAME_SIZE);
+		*/
+		output->Write(block->FILE_NAME, block->NAME_SIZE_var);
+		// <== UPnP support [MoNKi] - leuk_he
 		if (block->HEAD_FLAGS & 0x0400/*LHD_SALT*/)
 			output->Write(block->SALT, sizeof block->SALT);
 		output->Write(block->EXT_DATE, block->EXT_DATE_SIZE);

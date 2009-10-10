@@ -17,14 +17,15 @@
    ** this software for any purpose.
    */
 
+#include "config.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#ifndef _WIN32
-#include <netinet/in.h>
+#ifndef WIN32
+ #include <netinet/in.h>
 #else
-#include "Winsock2.h"
+ #include <winsock2.h>
 #endif
 #include "sysdep.h"
 #include "uuid.h"
@@ -52,10 +53,10 @@ static unsigned16 true_random( void );
    uuid_create -- generator a UUID 
  */
 int
-uuid_create( uuid_upnp * uid )
+uuid_create(uuid_upnp *uid)
 {
-    uuid_time_t timestamp,
-      last_time;
+    uuid_time_t timestamp;
+    uuid_time_t last_time;
     unsigned16 clockseq;
     uuid_node_t node;
     uuid_node_t last_node;
@@ -64,61 +65,64 @@ uuid_create( uuid_upnp * uid )
     /*
        acquire system wide lock so we're alone 
      */
-    UUIDLock(  );
+    UUIDLock();
 
     /*
        get current time 
      */
-    get_current_time( &timestamp );
+    get_current_time(&timestamp);
 
     /*
        get node ID 
      */
-    get_ieee_node_identifier( &node );
+    get_ieee_node_identifier(&node);
 
     /*
        get saved state from NV storage 
      */
-    f = read_state( &clockseq, &last_time, &last_node );
+    f = read_state(&clockseq, &last_time, &last_node);
 
     /*
        if no NV state, or if clock went backwards, or node ID changed
        (e.g., net card swap) change clockseq 
      */
-    if( !f || memcmp( &node, &last_node, sizeof( uuid_node_t ) ) )
-        clockseq = true_random(  );
-    else if( timestamp < last_time )
+    if (!f || memcmp(&node, &last_node, sizeof(uuid_node_t))) {
+        clockseq = true_random();
+    } else if (timestamp < last_time) {
         clockseq++;
+    }
 
     /*
        stuff fields into the UUID 
      */
-    format_uuid_v1( uid, clockseq, timestamp, node );
+    format_uuid_v1(uid, clockseq, timestamp, node);
 
     /*
        save the state for next time 
      */
-    write_state( clockseq, timestamp, node );
+    write_state(clockseq, timestamp, node);
 
-    UUIDUnlock(  );
-    return ( 1 );
+    UUIDUnlock();
+    return 1;
 };
 
 /*-----------------------------------------------------------------------------*/
 void
-uuid_unpack( uuid_upnp * u,
-             char *out )
+uuid_unpack(uuid_upnp *u, char *out)
 {
-
-    sprintf( out,
-             "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
-             ( unsigned int )u->time_low, u->time_mid,
-             u->time_hi_and_version, u->clock_seq_hi_and_reserved,
-             u->clock_seq_low, u->node[0], u->node[1], u->node[2],
-             u->node[3], u->node[4], u->node[5] );
-
-    *( out + 36 ) = '\0';
-
+	sprintf(out,
+		"%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
+		(unsigned int)u->time_low,
+		u->time_mid,
+		u->time_hi_and_version,
+		u->clock_seq_hi_and_reserved,
+		u->clock_seq_low,
+		u->node[0],
+		u->node[1],
+		u->node[2],
+		u->node[3],
+		u->node[4],
+		u->node[5]);
 };
 
 /*-----------------------------------------------------------------------------*/
@@ -136,11 +140,10 @@ format_uuid_v1( uuid_upnp * uid,
        Construct a version 1 uuid with the information we've gathered
        * plus a few constants. 
      */
-    uid->time_low = ( unsigned long )( timestamp & 0xFFFFFFFF );
-    uid->time_mid = ( unsigned short )( ( timestamp >> 32 ) & 0xFFFF );
-    uid->time_hi_and_version = ( unsigned short )( ( timestamp >> 48 ) &
-                                                   0x0FFF );
-    uid->time_hi_and_version |= ( 1 << 12 );
+    uid->time_low = (unsigned long)(timestamp & 0xFFFFFFFF);
+    uid->time_mid = (unsigned short)((timestamp >> 32) & 0xFFFF);
+    uid->time_hi_and_version = (unsigned short)((timestamp >> 48) & 0x0FFF);
+    uid->time_hi_and_version |= (1 << 12);
     uid->clock_seq_low = clock_seq & 0xFF;
     uid->clock_seq_hi_and_reserved = ( clock_seq & 0x3F00 ) >> 8;
     uid->clock_seq_hi_and_reserved |= 0x80;
@@ -226,7 +229,6 @@ get_current_time( uuid_time_t * timestamp )
     static int inited = 0;
 
     if( !inited ) {
-        get_system_time( &time_now );
         uuids_this_tick = UUIDS_PER_TICK;
         inited = 1;
     };
@@ -280,7 +282,7 @@ true_random( void )
         inited = 1;
     };
 
-    return ( rand(  ) );
+    return ( rand() );
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -308,9 +310,9 @@ uuid_create_from_name( uuid_upnp * uid, /* resulting UUID */
        no matter what endian machine we're on 
      */
     net_nsid = nsid;
-    htonl( net_nsid.time_low );
-    htons( net_nsid.time_mid );
-    htons( net_nsid.time_hi_and_version );
+    net_nsid.time_low=htonl( net_nsid.time_low );
+    net_nsid.time_mid=htons( net_nsid.time_mid );
+    net_nsid.time_hi_and_version=htons( net_nsid.time_hi_and_version );
 
     MD5Init( &c );
     MD5Update( &c, &net_nsid, sizeof( uuid_upnp ) );
@@ -341,9 +343,9 @@ format_uuid_v3( uuid_upnp * uid,
     /*
        convert UUID to local byte order 
      */
-    ntohl( uid->time_low );
-    ntohs( uid->time_mid );
-    ntohs( uid->time_hi_and_version );
+    uid->time_low=ntohl( uid->time_low );
+    uid->time_mid=ntohs( uid->time_mid );
+    uid->time_hi_and_version=ntohs( uid->time_hi_and_version );
 
     /*
        put in the variant and version bits 

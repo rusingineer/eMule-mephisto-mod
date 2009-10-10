@@ -648,15 +648,26 @@ int CArchivePreviewDlg::ShowRarResults(int succ, archiveScannerThreadParams_s* t
 				uArchiveFileEntries++;
 
 			// file/folder name
+			// ==> UPnP support [MoNKi] - leuk_he
+			/*
 			memcpy(buf, block->FILE_NAME, block->NAME_SIZE);
 			buf[block->NAME_SIZE] = 0;
+			*/
+			memcpy(buf, block->FILE_NAME, block->NAME_SIZE_var);
+			buf[block->NAME_SIZE_var] = 0;
+			// <== UPnP support [MoNKi] - leuk_he
 
 			// read unicode name from namebuffer and decode it
 			if (block->HEAD_FLAGS & 0x0200) {
 				unsigned int asciilen = strlen(buf) + 1;
 				wchar_t nameuc[MAX_PATH];
 				EncodeFileName enc;
+				// ==> UPnP support [MoNKi] - leuk_he
+				/*
 				enc.Decode(buf, (byte*)buf + asciilen, block->NAME_SIZE - asciilen, nameuc, _countof(nameuc));
+				*/
+				enc.Decode(buf, (byte*)buf + asciilen, block->NAME_SIZE_var - asciilen, nameuc, _countof(nameuc));
+				// <== UPnP support [MoNKi] - leuk_he
 				temp = nameuc;
 			} else
 				temp = buf;

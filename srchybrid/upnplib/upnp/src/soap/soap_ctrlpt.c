@@ -29,6 +29,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
+#include "config.h"
 #ifdef INCLUDE_CLIENT_APIS
 #if EXCLUDE_SOAP == 0
 
@@ -38,7 +39,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "config.h"
 #include "miniserver.h"
 #include "membuffer.h"
 #include "httpparser.h"
@@ -212,11 +212,11 @@ dom_find_deep_node( IN char *names[],
 *
 *	Note :The given node must have a text node as its first child
 ****************************************************************************/
-static DOMString
+static const DOMString
 get_node_value( IN IXML_Node * node )
 {
     IXML_Node *text_node = NULL;
-    DOMString text_value = NULL;
+    const DOMString text_value = NULL;
 
     text_node = ixmlNode_getFirstChild( node );
     if( text_node == NULL ) {
@@ -244,20 +244,21 @@ get_node_value( IN IXML_Node * node )
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_host_and_path( IN char *ctrl_url,
-                   OUT memptr * host,
-                   OUT memptr * path,
+                   OUT const memptr *host,
+                   OUT const memptr *path,
                    OUT uri_type * url )
 {
     if( parse_uri( ctrl_url, strlen( ctrl_url ), url ) != HTTP_SUCCESS ) {
         return -1;
     }
-    host->buf = url->hostport.text.buff;
-    host->length = url->hostport.text.size;
+    // This is done to ensure that the buffer is kept const
+    ((memptr *)host)->buf = (char *)url->hostport.text.buff;
+    ((memptr *)host)->length = url->hostport.text.size;
 
-    path->buf = url->pathquery.buff;
-    path->length = url->pathquery.size;
+    ((memptr *)path)->buf = (char *)url->pathquery.buff;
+    ((memptr *)path)->length = url->pathquery.size;
 
     return 0;
 }
@@ -276,7 +277,7 @@ get_host_and_path( IN char *ctrl_url,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_action_name( IN char *action,
                  OUT memptr * name )
 {
@@ -302,7 +303,7 @@ get_action_name( IN char *action,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 add_man_header( INOUT membuffer * headers )
 {
     char *soap_action_hdr;
@@ -314,7 +315,7 @@ add_man_header( INOUT membuffer * headers )
         return UPNP_E_OUTOF_MEMORY;
     }
 
-    soap_action_hdr = strstr( headers->buf, "SOAPAction:" );
+    soap_action_hdr = strstr( headers->buf, "SOAPACTION:" );
     assert( soap_action_hdr != NULL );  // can't fail
 
     // insert MAN header
@@ -414,12 +415,12 @@ get_response_value( IN http_message_t * hmsg,
     IXML_Node *error_node = NULL;
     IXML_Document *doc = NULL;
     char *node_str = NULL;
-    char *temp_str = NULL;
+    const char *temp_str = NULL;
     DOMString error_node_str = NULL;
     int err_code;
     xboolean done = FALSE;
     char *names[5];
-    DOMString nodeValue;
+    const DOMString nodeValue;
 
     err_code = UPNP_E_BAD_RESPONSE; // default error
 
@@ -455,7 +456,7 @@ get_response_value( IN http_message_t * hmsg,
         names[2] = name;
         if( dom_find_deep_node( names, 3, root_node, &node ) ==
             UPNP_E_SUCCESS ) {
-            node_str = ixmlPrintDocument( node );
+            node_str = ixmlPrintNode( node );
             if( node_str == NULL ) {
                 err_code = UPNP_E_OUTOF_MEMORY;
                 goto error_handler;
@@ -541,7 +542,7 @@ get_response_value( IN http_message_t * hmsg,
         }
 
         else if( code == SOAP_ACTION_RESP ) {
-            error_node_str = ixmlPrintDocument( error_node );
+            error_node_str = ixmlPrintNode( error_node );
             if( error_node_str == NULL ) {
                 err_code = UPNP_E_OUTOF_MEMORY;
                 goto error_handler;
@@ -601,29 +602,31 @@ SoapSendAction( IN char *action_url,
     char *upnp_error_str;
     xboolean got_response = FALSE;
 
+    off_t content_length;
     char *xml_start =
-        "<?xml version=\"1.0\"?>\n"
-		"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+        "<s:Envelope "
+        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\r\n"
         "<s:Body>";
-    char *xml_end = "</s:Body>\n" "</s:Envelope>\n";
-    int xml_start_len;
-    int xml_end_len;
-    int action_str_len;
+    char *xml_end =
+        "</s:Body>\r\n"
+        "</s:Envelope>\r\n\r\n";
+    size_t xml_start_len;
+    size_t xml_end_len;
+    size_t action_str_len;
 
     *response_node = NULL;      // init
 
     err_code = UPNP_E_OUTOF_MEMORY; // default error
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Inside SoapSendAction():" );
-         )
-        // init
-        membuffer_init( &request );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Inside SoapSendAction():" );
+    // init
+    membuffer_init( &request );
     membuffer_init( &responsename );
 
     // print action
-    action_str = ixmlPrintDocument( ( IXML_Node * ) action_node );
+    action_str = ixmlPrintNode( ( IXML_Node * ) action_node );
     if( action_str == NULL ) {
         goto error_handler;
     }
@@ -638,29 +641,30 @@ SoapSendAction( IN char *action_url,
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "path=%.*s, hostport=%.*s\n",
-                         url.pathquery.size, url.pathquery.buff,
-                         url.hostport.text.size,
-                         url.hostport.text.buff ); )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "path=%.*s, hostport=%.*s\n",
+        (int)url.pathquery.size,
+        url.pathquery.buff,
+        (int)url.hostport.text.size,
+        url.hostport.text.buff );
 
-        xml_start_len = strlen( xml_start );
+    xml_start_len = strlen( xml_start );
     xml_end_len = strlen( xml_end );
     action_str_len = strlen( action_str );
 
     // make request msg
     request.size_inc = 50;
-    // if( http_MakeMessage( &request, 1, 1, "Q" "s" "sssbs" "Hc" "Nc" "C" "s" "c" "bbbc", // leuk_he add newlines, remove user agent ???
-    if( http_MakeMessage( &request, 1, 1, "Q" "s" "sssbs" "U" "H" "N" "C" "s" "c" "bbb",
-                          SOAPMETHOD_POST, url.pathquery.buff, url.pathquery.size,
-                          ContentTypeHeader,
-                          "SOAPAction: \"", service_type, "#", name.buf, name.length, "\"\r\n",
-						  &url,
-						  xml_start_len + action_str_len + xml_end_len,   // content-length
-						  "Cache-Control: no-cache\r\nPragma: no-cache\r\n",
-						  xml_start, xml_start_len,
-                          action_str, action_str_len, xml_end,
-                          xml_end_len ) != 0 ) {
+    content_length = xml_start_len + action_str_len + xml_end_len;
+    if (http_MakeMessage(
+       	&request, 1, 1,
+        "q" "N" "s" "sssbsc" "Uc" "b" "b" "b",
+        SOAPMETHOD_POST, &url, 
+        content_length,
+        ContentTypeHeader,
+        "SOAPACTION: \"", service_type, "#", name.buf, name.length, "\"",
+        xml_start, xml_start_len,
+        action_str, action_str_len,
+        xml_end, xml_end_len ) != 0 ) {
         goto error_handler;
     }
 
@@ -689,7 +693,7 @@ SoapSendAction( IN char *action_url,
         err_code = ret_code;
     }
 
-  error_handler:
+error_handler:
     ixmlFreeDOMString( action_str );
     membuffer_destroy( &request );
     membuffer_destroy( &responsename );
@@ -741,39 +745,44 @@ SoapSendActionEx( IN char *action_url,
     xboolean got_response = FALSE;
 
     char *xml_start =
-		"<?xml version=\"1.0\"?>\n"
-        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n";
-    char *xml_body_start = "<s:Body>";
-    char *xml_end = "</s:Body>\n" "</s:Envelope>\n";
-    int xml_start_len;
-    int xml_end_len;
-    char *xml_header_start = "<s:Header>\n";
-    char *xml_header_end = "</s:Header>\n";
-    int xml_header_start_len;
-    int xml_header_end_len;
-    int xml_header_str_len;
-    int action_str_len;
-    int xml_body_start_len;
+        "<s:Envelope "
+        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\r\n";
+    char *xml_header_start =
+        "<s:Header>\r\n";
+    char *xml_header_end =
+        "</s:Header>\r\n";
+    char *xml_body_start =
+        "<s:Body>";
+    char *xml_end =
+        "</s:Body>\r\n"
+        "</s:Envelope>\r\n";
+    size_t xml_start_len;
+    size_t xml_header_start_len;
+    size_t xml_header_str_len;
+    size_t xml_header_end_len;
+    size_t xml_body_start_len;
+    size_t action_str_len;
+    size_t xml_end_len;
+    off_t content_length;
 
     *response_node = NULL;      // init
 
     err_code = UPNP_E_OUTOF_MEMORY; // default error
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Inside SoapSendActionEx():" );
-         )
-        // init
-        membuffer_init( &request );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Inside SoapSendActionEx():" );
+    // init
+    membuffer_init( &request );
     membuffer_init( &responsename );
 
     // header string
-    xml_header_str = ixmlPrintDocument( ( IXML_Node * ) header );
+    xml_header_str = ixmlPrintNode( ( IXML_Node * ) header );
     if( xml_header_str == NULL ) {
         goto error_handler;
     }
     // print action
-    action_str = ixmlPrintDocument( ( IXML_Node * ) action_node );
+    action_str = ixmlPrintNode( ( IXML_Node * ) action_node );
     if( action_str == NULL ) {
         goto error_handler;
     }
@@ -788,13 +797,14 @@ SoapSendActionEx( IN char *action_url,
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "path=%.*s, hostport=%.*s\n",
-                         url.pathquery.size, url.pathquery.buff,
-                         url.hostport.text.size,
-                         url.hostport.text.buff ); )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "path=%.*s, hostport=%.*s\n",
+        (int)url.pathquery.size,
+        url.pathquery.buff,
+        (int)url.hostport.text.size,
+        url.hostport.text.buff );
 
-        xml_start_len = strlen( xml_start );
+    xml_start_len = strlen( xml_start );
     xml_body_start_len = strlen( xml_body_start );
     xml_end_len = strlen( xml_end );
     action_str_len = strlen( action_str );
@@ -805,20 +815,24 @@ SoapSendActionEx( IN char *action_url,
 
     // make request msg
     request.size_inc = 50;
-    if( http_MakeMessage( &request, 1, 1, "Q" "s" "sssbs" "U" "H" "N" "C" "s" "c" "bbbbbbb",
-                          SOAPMETHOD_POST, url.pathquery.buff, url.pathquery.size,
-                          ContentTypeHeader,
-                          "SOAPAction: \"", service_type, "#", name.buf, name.length, "\"\r\n",
-						  &url,
-						  xml_start_len + xml_header_start_len + xml_header_str_len + xml_header_end_len + xml_body_start_len + action_str_len + xml_end_len,   // content-length
-						  "Cache-Control: no-cache\r\nPragma: no-cache\r\n",
-                          xml_start, xml_start_len,
-                          xml_header_start, xml_header_start_len,
-                          xml_header_str, xml_header_str_len,
-                          xml_header_end, xml_header_end_len,
-                          xml_body_start, xml_body_start_len,
-                          action_str, action_str_len,
-                          xml_end, xml_end_len ) != 0 ) {
+    content_length =
+        xml_start_len +
+        xml_header_start_len + xml_header_str_len + xml_header_end_len +
+        xml_body_start_len + action_str_len + xml_end_len;
+    if (http_MakeMessage(
+        &request, 1, 1,
+        "q" "N" "s" "sssbsc" "Uc" "b" "b" "b" "b" "b" "b" "b",
+        SOAPMETHOD_POST, &url,
+        content_length,
+        ContentTypeHeader,
+        "SOAPACTION: \"", service_type, "#", name.buf, name.length, "\"",
+        xml_start, xml_start_len,
+        xml_header_start, xml_header_start_len,
+        xml_header_str, xml_header_str_len,
+        xml_header_end, xml_header_end_len,
+        xml_body_start, xml_body_start_len,
+        action_str, action_str_len,
+        xml_end, xml_end_len ) != 0 ) {
         goto error_handler;
     }
 
@@ -881,24 +895,28 @@ SoapGetServiceVarStatus( IN char *action_url,
                          IN char *var_name,
                          OUT char **var_value )
 {
-    memptr host;                // value for HOST header
-    memptr path;                // ctrl path in first line in msg
+    const memptr host;                // value for HOST header
+    const memptr path;                // ctrl path in first line in msg
     uri_type url;
     membuffer request;
     int ret_code;
     http_parser_t response;
     int upnp_error_code;
 
+    off_t content_length;
     char *xml_start =
-		"<?xml version=\"1.0\"?>\n"
-        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-        "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-        "<s:Body>\n"
-        "<u:QueryStateVariable xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\n"
+        "<s:Envelope "
+        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+        "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\r\n"
+        "<s:Body>\r\n"
+        "<u:QueryStateVariable xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\r\n"
         "<u:varName>";
 
-    char *xml_end = "</u:varName>\n"
-        "</u:QueryStateVariable>\n" "</s:Body>\n" "</s:Envelope>\n";
+    char *xml_end =
+        "</u:varName>\r\n"
+        "</u:QueryStateVariable>\r\n"
+        "</s:Body>\r\n"
+        "</s:Envelope>\r\n";
 
     *var_value = NULL;          // return NULL in case of an error
 
@@ -910,16 +928,17 @@ SoapGetServiceVarStatus( IN char *action_url,
     }
     // make headers
     request.size_inc = 50;
-    if( http_MakeMessage( &request, 1, 1, "Q" "s" "s" "U" "sbc" "N" "C" "s" "c" "sss",
-                          SOAPMETHOD_POST, url.pathquery.buff, url.pathquery.size,
-                          ContentTypeHeader,
-                          "SOAPAction: \"urn:schemas"
-                          "-upnp-org:control-1-0#QueryStateVariable\"\r\n",
-						  "Host: ", host.buf, host.length,
-						  strlen( xml_start ) + strlen( var_name ) + strlen( xml_end ),   // content-length
-						  "Cache-Control: no-cache\r\nPragma: no-cache\r\n",
-						  xml_start, var_name, xml_end ) != 0 ) {
-	    return UPNP_E_OUTOF_MEMORY;
+    content_length = strlen( xml_start ) + strlen( var_name ) + strlen( xml_end );
+    if (http_MakeMessage(
+	&request, 1, 1,
+	"Q" "sbc" "N" "s" "s" "Ucc" "sss",
+	SOAPMETHOD_POST, path.buf, path.length,
+	"HOST: ", host.buf, host.length,
+	content_length,
+	ContentTypeHeader,
+	"SOAPACTION: \"urn:schemas-upnp-org:control-1-0#QueryStateVariable\"",
+	xml_start, var_name, xml_end ) != 0 ) {
+        return UPNP_E_OUTOF_MEMORY;
     }
     // send msg and get reply
     ret_code = soap_request_and_response( &request, &url, &response );

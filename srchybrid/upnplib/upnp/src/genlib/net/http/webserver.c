@@ -29,12 +29,18 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-/************************************************************************
-* Purpose: This file defines the Web Server and has functions to carry out 
-* operations of the Web Server.										
-************************************************************************/
+/******************************************************************************
+ * Purpose: This file defines the Web Server and has functions to carry out
+ * operations of the Web Server.
+ ******************************************************************************/
 
+#include "config.h"
 #include <assert.h>
+#include <fcntl.h>
+#ifndef UPNP_USE_BCBPP
+    #include "..\..\..\..\..\build\msvc\inttypes.h"
+    #include "..\..\..\..\..\build\msvc\stdint.h"
+#endif
 #include "util.h"
 #include "strintmap.h"
 #include "membuffer.h"
@@ -43,11 +49,11 @@
 #include "statcodes.h"
 #include "webserver.h"
 #include "upnp.h"
-#include "config.h"
 #include "upnpapi.h"
+#include "ssdplib.h"
 
-#ifndef _WIN32
-#include <unistd.h>
+#ifndef WIN32
+    #include <unistd.h>
 #endif
 #include <sys/stat.h>
 #include "ithread.h"
@@ -56,8 +62,12 @@
 /*
    Response Types 
  */
-enum resp_type { RESP_FILEDOC, RESP_XMLDOC, RESP_HEADERS, RESP_WEBDOC,
-        RESP_POST };
+enum resp_type {
+	RESP_FILEDOC,
+	RESP_XMLDOC,
+	RESP_HEADERS,
+	RESP_WEBDOC,
+	RESP_POST };
 
 // mapping of file extension to content-type of document
 struct document_type_t {
@@ -87,18 +97,18 @@ static const char *gMediaTypes[] = {
  */
 
 // index into 'gMediaTypes'
-#define AUDIO_STR		"\1"
-#define VIDEO_STR		"\2"
-#define IMAGE_STR		"\3"
-#define APPLICATION_STR "\4"
-#define TEXT_STR		"\5"
+#define AUDIO_STR        "\1"
+#define VIDEO_STR        "\2"
+#define IMAGE_STR        "\3"
+#define APPLICATION_STR  "\4"
+#define TEXT_STR         "\5"
 
 // int index
-#define APPLICATION_INDEX	4
-#define TEXT_INDEX			5
+#define APPLICATION_INDEX 4
+#define TEXT_INDEX        5
 
 // general
-#define NUM_MEDIA_TYPES 69
+#define NUM_MEDIA_TYPES       69
 #define NUM_HTTP_HEADER_NAMES 33
 
 // sorted by file extension; must have 'NUM_MEDIA_TYPES' extensions
@@ -174,12 +184,9 @@ static const char *gEncodedMediaTypes =
     "zip\0" APPLICATION_STR "zip\0" "\0";
     // *** end ***
 
-/***********************************************************************/
-/*
+/************************************************************************
    module variables - Globals, static and externs                      
- */
-
-/***********************************************************************/
+************************************************************************/
 static struct document_type_t gMediaTypeList[NUM_MEDIA_TYPES];
 membuffer gDocumentRootDir;     // a local dir which serves as webserver root
 static struct xml_alias_t gAliasDoc;    // XML document
@@ -187,17 +194,17 @@ static ithread_mutex_t gWebMutex;
 extern str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES];
 
 /************************************************************************
-* Function: has_xml_content_type										
-*																		
-* Parameters:															
-*	none																
-*																		
-* Description: decodes list and stores it in gMediaTypeList				
-*																		
-* Returns:																
-*	 void																
-************************************************************************/
-static XINLINE void
+ * Function: has_xml_content_type
+ *
+ * Parameters:
+ *	none
+ *
+ * Description: decodes list and stores it in gMediaTypeList
+ *
+ * Returns:
+ *	 void
+ ************************************************************************/
+static UPNP_INLINE void
 media_list_init( void )
 {
     int i;
@@ -221,21 +228,21 @@ media_list_init( void )
 }
 
 /************************************************************************
-* Function: has_xml_content_type										
-*																		
-* Parameters:															
-*	IN const char* extension ; 											
-*	OUT const char** con_type,											
-*	OUT const char** con_subtype										
-*																		
-* Description: Based on the extension, returns the content type and 	
-*	content subtype														
-*																		
-* Returns:																
-*	 0 on success;														
-*	-1 on error															
-************************************************************************/
-static XINLINE int
+ * Function: has_xml_content_type
+ *
+ * Parameters:
+ *	IN const char* extension ;
+ *	OUT const char** con_type,
+ *	OUT const char** con_subtype
+ *
+ * Description: Based on the extension, returns the content type and
+ *	content subtype
+ *
+ * Returns:
+ *	 0 on success;
+ *	-1 on error
+ ************************************************************************/
+static UPNP_INLINE int
 search_extension( IN const char *extension,
                   OUT const char **con_type,
                   OUT const char **con_subtype )
@@ -250,11 +257,7 @@ search_extension( IN const char *extension,
 
     while( top <= bot ) {
         mid = ( top + bot ) / 2;
-#ifndef _WIN32
         cmp = strcasecmp( extension, gMediaTypeList[mid].file_ext );
-#else
-        cmp = _stricmp( extension, gMediaTypeList[mid].file_ext );
-#endif
 
         if( cmp > 0 ) {
             top = mid + 1;      // look below mid
@@ -272,21 +275,21 @@ search_extension( IN const char *extension,
 }
 
 /************************************************************************
-* Function: get_content_type											
-*																		
-* Parameters:															
-*	IN const char* filename,											
-*	OUT DOMString* content_type											
-*																		
-* Description: Based on the extension, clones an XML string based on	
-*	type and content subtype. If content type and sub type are not		
-*	found, unknown types are used										
-*																		
-* Returns:																
-*	 0 - On Sucess														
-*	 UPNP_E_OUTOF_MEMORY - on memory allocation failures				
-************************************************************************/
-XINLINE int
+ * Function: get_content_type
+ *
+ * Parameters:
+ *	IN const char* filename,
+ *	OUT DOMString* content_type
+ *
+ * Description: Based on the extension, clones an XML string based on
+ *	type and content subtype. If content type and sub type are not
+ *	found, unknown types are used
+ *
+ * Returns:
+ *	 0 - On Sucess
+ *	 UPNP_E_OUTOF_MEMORY - on memory allocation failures
+ ************************************************************************/
+UPNP_INLINE int
 get_content_type( IN const char *filename,
                   OUT DOMString * content_type )
 {
@@ -333,57 +336,57 @@ get_content_type( IN const char *filename,
 }
 
 /************************************************************************
-* Function: glob_alias_init												
-*																		
-* Parameters:															
-*	none																
-*																		
-* Description: Initialize the global XML document. Allocate buffers		
-*	for the XML document												
-*																		
-* Returns:																
-*	 void																
-************************************************************************/
-static XINLINE void
+ * Function: glob_alias_init
+ *
+ * Parameters:
+ *	none
+ *
+ * Description: Initialize the global XML document. Allocate buffers
+ *	for the XML document
+ *
+ * Returns:
+ *	 void
+ ************************************************************************/
+static UPNP_INLINE void
 glob_alias_init( void )
 {
     struct xml_alias_t *alias = &gAliasDoc;
 
-	membuffer_init( &alias->doc );
-	membuffer_init( &alias->name );
-	alias->ct = NULL;
-	alias->last_modified = 0;
+    membuffer_init( &alias->doc );
+    membuffer_init( &alias->name );
+    alias->ct = NULL;
+    alias->last_modified = 0;
 }
 
 /************************************************************************
-* Function: is_valid_alias												
-*																		
-* Parameters:															
-*	IN const struct xml_alias_t* alias ; XML alias object				
-*																		
-* Description: Check for the validity of the XML object buffer													
-*																		
-* Returns:																
-*	 BOOLEAN															
-************************************************************************/
-static XINLINE xboolean
+ * Function: is_valid_alias
+ *
+ * Parameters:
+ *	IN const struct xml_alias_t* alias ; XML alias object
+ *
+ * Description: Check for the validity of the XML object buffer
+ *
+ * Returns:
+ *	 BOOLEAN
+ ************************************************************************/
+static UPNP_INLINE xboolean
 is_valid_alias( IN const struct xml_alias_t *alias )
 {
     return alias->doc.buf != NULL;
 }
 
 /************************************************************************
-* Function: alias_grab													
-*																		
-* Parameters:															
-*	OUT struct xml_alias_t* alias ; XML alias object										
-*																		
-* Description: Copy the contents of the global XML document into the	
-*	local OUT parameter																							
-*																		
-* Returns:																
-*	 void																
-************************************************************************/
+ * Function: alias_grab
+ *
+ * Parameters:
+ *	OUT struct xml_alias_t* alias ; XML alias object
+ *
+ * Description: Copy the contents of the global XML document into the
+ *	local OUT parameter
+ *
+ * Returns:
+ *	 void
+ ************************************************************************/
 static void
 alias_grab( OUT struct xml_alias_t *alias )
 {
@@ -398,17 +401,17 @@ alias_grab( OUT struct xml_alias_t *alias )
 }
 
 /************************************************************************
-* Function: alias_release												
-*																		
-* Parameters:															
-*	IN struct xml_alias_t* alias ; XML alias object										
-*																		
-* Description: Release the XML document referred to by the IN parameter 
-*	Free the allocated buffers associated with this object				
-*																		
-* Returns:																
-*	void																
-************************************************************************/
+ * Function: alias_release
+ *
+ * Parameters:
+ *	IN struct xml_alias_t* alias ; XML alias object
+ *
+ * Description: Release the XML document referred to by the IN parameter
+ *	Free the allocated buffers associated with this object
+ *
+ * Returns:
+ *	void
+ ************************************************************************/
 static void
 alias_release( IN struct xml_alias_t *alias )
 {
@@ -432,24 +435,24 @@ alias_release( IN struct xml_alias_t *alias )
 }
 
 /************************************************************************
-* Function: web_server_set_alias										
-*																		
-* Parameters:															
-*	alias_name: webserver name of alias; created by caller and freed by 
-*				caller (doesn't even have to be malloc()d .)					
-*	alias_content:	the xml doc; this is allocated by the caller; and	
-*					freed by the web server											
-*	alias_content_length: length of alias body in bytes					
-*	last_modified:	time when the contents of alias were last			
-*					changed (local time)											
-*																		
-* Description: Replaces current alias with the given alias. To remove	
-*	the current alias, set alias_name to NULL.							
-*																		
-* Returns:																
-*	0 - OK																
-*	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here			
-************************************************************************/
+ * Function: web_server_set_alias
+ *
+ * Parameters:
+ *	alias_name: webserver name of alias; created by caller and freed by
+ *		caller (doesn't even have to be malloc()d .)
+ *	alias_content:	the xml doc; this is allocated by the caller; and
+ *		freed by the web server
+ *	alias_content_length: length of alias body in bytes
+ *	last_modified:	time when the contents of alias were last
+ *		changed (local time)
+ *
+ * Description: Replaces current alias with the given alias. To remove
+ *	the current alias, set alias_name to NULL.
+ *
+ * Returns:
+ *	0 - OK
+ *	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here
+ ************************************************************************/
 int
 web_server_set_alias( IN const char *alias_name,
                       IN const char *alias_content,
@@ -496,7 +499,7 @@ web_server_set_alias( IN const char *alias_name,
 
         // save in module var
         ithread_mutex_lock( &gWebMutex );
-	gAliasDoc = alias;
+        gAliasDoc = alias;
         ithread_mutex_unlock( &gWebMutex );
 
         return 0;
@@ -512,28 +515,28 @@ web_server_set_alias( IN const char *alias_name,
 }
 
 /************************************************************************
-* Function: web_server_init												
-*																		
-* Parameters:															
-*	none																
-*																		
-* Description: Initilialize the different documents. Initialize the		
-*	memory for root directory for web server. Call to initialize global 
-*	XML document. Sets bWebServerState to WEB_SERVER_ENABLED			
-*																		
-* Returns:																
-*	0 - OK																
-*	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here			
-************************************************************************/
+ * Function: web_server_init
+ *
+ * Parameters:
+ *	none
+ *
+ * Description: Initilialize the different documents. Initialize the
+ *	memory for root directory for web server. Call to initialize global
+ *	XML document. Sets bWebServerState to WEB_SERVER_ENABLED
+ *
+ * Returns:
+ *	0 - OK
+ *	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here
+ ************************************************************************/
 int
 web_server_init( void )
 {
     int ret_code;
 
     if( bWebServerState == WEB_SERVER_DISABLED ) {
-        media_list_init(  );    // decode media list
+        media_list_init();    // decode media list
         membuffer_init( &gDocumentRootDir );
-        glob_alias_init(  );
+        glob_alias_init();
 
         pVirtualDirList = NULL;
 
@@ -548,18 +551,18 @@ web_server_init( void )
 }
 
 /************************************************************************
-* Function: web_server_destroy											
-*																		
-* Parameters:															
-*	none																
-*																		
-* Description: Release memory allocated for the global web server root	
-*	directory and the global XML document								
-*	Resets the flag bWebServerState to WEB_SERVER_DISABLED				
-*																		
-* Returns:																
-*	void																
-************************************************************************/
+ * Function: web_server_destroy
+ *
+ * Parameters:
+ *	none
+ *
+ * Description: Release memory allocated for the global web server root
+ *	directory and the global XML document
+ *	Resets the flag bWebServerState to WEB_SERVER_DISABLED
+ *
+ * Returns:
+ *	void
+ ************************************************************************/
 void
 web_server_destroy( void )
 {
@@ -580,23 +583,22 @@ web_server_destroy( void )
 }
 
 /************************************************************************
-* Function: get_file_info												
-*																		
-* Parameters:															
-*	IN const char* filename ; 	Filename having the description document
-*	OUT struct File_Info * info ; File information object having file 
-*								  attributes such as filelength, when was 
-*								  the file last modified, whether a file 
-*								  or a directory and whether the file or
-*								  directory is readable. 
-*																		
-* Description: Release memory allocated for the global web server root	
-*	directory and the global XML document								
-*	Resets the flag bWebServerState to WEB_SERVER_DISABLED				
-*																		
-* Returns:																
-*	int																	
-************************************************************************/
+ * Function: get_file_info
+ *
+ * Parameters:
+ *	IN const char* filename ;     Filename having the description document
+ *	OUT struct File_Info * info ; File information object having file 
+ *		attributes such as filelength, when was the file last
+ *		modified, whether a file or a directory and whether the
+ *		file or directory is readable.
+ *
+ * Description: Release memory allocated for the global web server root
+ *	directory and the global XML document
+ *	Resets the flag bWebServerState to WEB_SERVER_DISABLED
+ *
+ * Returns:
+ *	int
+ ************************************************************************/
 static int
 get_file_info( IN const char *filename,
                OUT struct File_Info *info )
@@ -613,17 +615,9 @@ get_file_info( IN const char *filename,
         return -1;
     }
 
-#ifndef _WIN32
     if( S_ISDIR( s.st_mode ) ) {
-#else
-    if( S_IFDIR & s.st_mode ) {
-#endif
         info->is_directory = TRUE;
-#ifndef _WIN32
     } else if( S_ISREG( s.st_mode ) ) {
-#else
-    } else if( S_IFREG & s.st_mode ) {
-#endif
         info->is_directory = FALSE;
     } else {
         return -1;
@@ -641,29 +635,29 @@ get_file_info( IN const char *filename,
 
     rc = get_content_type( filename, &info->content_type );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "file info: %s, length: %d, last_mod=%s readable=%d\n",
-                         filename, info->file_length,
-                         asctime( gmtime( &info->last_modified ) ),
-                         info->is_readable ); )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "file info: %s, length: %lld, last_mod=%s readable=%d\n",
+        filename, (long long)info->file_length,
+        asctime( gmtime( &info->last_modified ) ),
+        info->is_readable );
 
-        return rc;
+    return rc;
 }
 
 /************************************************************************
-* Function: web_server_set_root_dir										
-*																		
-* Parameters:															
-*	IN const char* root_dir ; String having the root directory for the 
-*								document		 						
-*																		
-* Description: Assign the path specfied by the IN const char* root_dir	
-*	parameter to the global Document root directory. Also check for		
-*	path names ending in '/'											
-*																		
-* Returns:																
-*	int																	
-************************************************************************/
+ * Function: web_server_set_root_dir
+ *
+ * Parameters:
+ *	IN const char* root_dir ; String having the root directory for the
+ *		document
+ *
+ * Description: Assign the path specfied by the IN const char* root_dir
+ *	parameter to the global Document root directory. Also check for
+ *	path names ending in '/'
+ *
+ * Returns:
+ *	int
+ ************************************************************************/
 int
 web_server_set_root_dir( IN const char *root_dir )
 {
@@ -686,25 +680,24 @@ web_server_set_root_dir( IN const char *root_dir )
 }
 
 /************************************************************************
-* Function: get_alias													
-*																		
-* Parameters:															
-*	IN const char* request_file ; request file passed in to be compared with
-*	OUT struct xml_alias_t* alias ; xml alias object which has a file name 
-*									stored										
-*   OUT struct File_Info * info	 ; File information object which will be 
-*									filled up if the file comparison 
-*									succeeds										
-*																		
-* Description: Compare the files names between the one on the XML alias 
-*	the one passed in as the input parameter. If equal extract file 
-*	information
-*																		
-* Returns:																
-*	TRUE - On Success													
-*	FALSE if request is not an alias									
-************************************************************************/
-static XINLINE xboolean
+ * Function: get_alias
+ *
+ * Parameters:
+ *	IN const char* request_file ; request file passed in to be compared with
+ *	OUT struct xml_alias_t* alias ; xml alias object which has a file name
+ *		stored
+ *   OUT struct File_Info * info	 ; File information object which will be
+ *		filled up if the file comparison succeeds
+ *
+ * Description: Compare the files names between the one on the XML alias
+ *	the one passed in as the input parameter. If equal extract file
+ *	information
+ *
+ * Returns:
+ *	TRUE - On Success
+ *	FALSE if request is not an alias
+ ************************************************************************/
+static UPNP_INLINE xboolean
 get_alias( IN const char *request_file,
            OUT struct xml_alias_t *alias,
            OUT struct File_Info *info )
@@ -724,17 +717,17 @@ get_alias( IN const char *request_file,
 }
 
 /************************************************************************
-* Function: isFileInVirtualDir											
-*																		
-* Parameters:															
-*	IN char *filePath ; directory path to be tested for virtual directory
-*																		
-* Description: Compares filePath with paths from the list of virtual
-*				directory lists
-*																		
-* Returns:																
-*	BOOLEAN																
-************************************************************************/
+ * Function: isFileInVirtualDir
+ *
+ * Parameters:
+ *	IN char *filePath ; directory path to be tested for virtual directory
+ *
+ * Description: Compares filePath with paths from the list of virtual
+ *	directory lists
+ *
+ * Returns:
+ *	BOOLEAN	
+ ************************************************************************/
 int
 isFileInVirtualDir( IN char *filePath )
 {
@@ -750,7 +743,7 @@ isFileInVirtualDir( IN char *filePath )
                 return TRUE;
         } else {
             if( ( strncmp( pCurVirtualDir->dirName, filePath, webDirLen )
-                  == 0 ) && ( filePath[webDirLen] == '/' ) )
+                  == 0 ) && ( filePath[webDirLen] == '/' || filePath[webDirLen] == '\0' || filePath[webDirLen] == '?' ) )
                 return TRUE;
         }
 
@@ -761,16 +754,16 @@ isFileInVirtualDir( IN char *filePath )
 }
 
 /************************************************************************
-* Function: ToUpperCase													
-*																		
-* Parameters:															
-*	INOUT char * Str ; Input string to be converted					
-*																		
-* Description: Converts input string to upper case						
-*																		
-* Returns:																
-*	int																	
-************************************************************************/
+ * Function: ToUpperCase
+ *
+ * Parameters:
+ *	INOUT char * Str ; Input string to be converted
+ *
+ * Description: Converts input string to upper case
+ *
+ * Returns:
+ *	int
+ ************************************************************************/
 int
 ToUpperCase( char *Str )
 {
@@ -783,17 +776,17 @@ ToUpperCase( char *Str )
 }
 
 /************************************************************************
-* Function: StrStr														
-*																		
-* Parameters:															
-*	IN char * S1 ; Input string
-*	IN char * S2 ; Input sub-string										
-*																		
-* Description: Finds a substring from a string							
-*																		
-* Returns:																
-*	char * ptr - pointer to the first occurence of S2 in S1				
-************************************************************************/
+ * Function: StrStr
+ *
+ * Parameters:
+ *	IN char * S1 ; Input string
+ *	IN char * S2 ; Input sub-string
+ *
+ * Description: Finds a substring from a string
+ *
+ * Returns:
+ *	char * ptr - pointer to the first occurence of S2 in S1
+ ************************************************************************/
 char *
 StrStr( char *S1,
         char *S2 )
@@ -805,9 +798,13 @@ StrStr( char *S1,
     int Pos;
 
     Str1 = ( char * )malloc( strlen( S1 ) + 2 );
+    if(!Str1) return NULL;
     Str2 = ( char * )malloc( strlen( S2 ) + 2 );
-    if( !Str1 || !Str2 )
-        return NULL;
+    if (!Str2)
+       {
+       free(Str1);
+       return NULL;
+       }
 
     strcpy( Str1, S1 );
     strcpy( Str2, S2 );
@@ -829,17 +826,17 @@ StrStr( char *S1,
 }
 
 /************************************************************************
-* Function: StrTok														
-*																		
-* Parameters:															
-*	IN char ** Src ; String containing the token													
-*	IN char * del ; Set of delimiter characters														
-*																		
-* Description: Finds next token in a string							
-*																		
-* Returns:																
-*	char * ptr - pointer to the first occurence of S2 in S1				
-************************************************************************/
+ * Function: StrTok
+ *
+ * Parameters:
+ *	IN char ** Src ; String containing the token
+ *	IN char * del ; Set of delimiter characters
+ *
+ * Description: Finds next token in a string
+ *
+ * Returns:
+ *	char * ptr - pointer to the first occurence of S2 in S1
+ ************************************************************************/
 char *
 StrTok( char **Src,
         char *Del )
@@ -863,39 +860,41 @@ StrTok( char **Src,
 }
 
 /************************************************************************
-* Function: GetNextRange												
-*																		
-* Parameters:															
-*	IN char ** SrcRangeStr ; string containing the token / range										
-*	OUT int * FirstByte ;	 gets the first byte of the token												
-*	OUT int * LastByte	; gets the last byte of the token												
-*																		
-* Description: Returns a range of integers from a sring					
-*																		
-* Returns: int	;
-*	always returns 1;				
-************************************************************************/
+ * Function: GetNextRange
+ *
+ * Parameters:
+ *	IN char ** SrcRangeStr ; string containing the token / range
+ *	OUT int * FirstByte ;	 gets the first byte of the token
+ *	OUT int * LastByte	; gets the last byte of the token
+ *
+ * Description: Returns a range of integers from a string
+ *
+ * Returns: int	;
+ *	always returns 1;
+ ************************************************************************/
 int
 GetNextRange( char **SrcRangeStr,
-              int *FirstByte,
-              int *LastByte )
+              off_t *FirstByte,
+              off_t *LastByte )
 {
-    char *Ptr,
-     *Tok;
-    int i,
-      F = -1,
-      L = -1;
+    char *Ptr;
+    char *Tok;
+    int i;
+    int64_t F = -1;
+    int64_t L = -1;
     int Is_Suffix_byte_Range = 1;
 
-    if( *SrcRangeStr == NULL )
+    if( *SrcRangeStr == NULL ) {
         return -1;
+    }
 
     Tok = StrTok( SrcRangeStr, "," );
 
-    if( ( Ptr = strstr( Tok, "-" ) ) == NULL )
+    if( ( Ptr = strstr( Tok, "-" ) ) == NULL ) {
         return -1;
+    }
     *Ptr = ' ';
-    sscanf( Tok, "%d%d", &F, &L );
+    sscanf( Tok, "%"SCNd64"%"SCNd64, &F, &L );
 
     if( F == -1 || L == -1 ) {
         *Ptr = '-';
@@ -910,43 +909,42 @@ GetNextRange( char **SrcRangeStr,
         }
 
         if( Is_Suffix_byte_Range ) {
-            *FirstByte = L;
-            *LastByte = F;
+            *FirstByte = (off_t)L;
+            *LastByte = (off_t)F;
             return 1;
         }
     }
+    *FirstByte = (off_t)F;
+    *LastByte = (off_t)L;
 
-    *FirstByte = F;
-    *LastByte = L;
     return 1;
-
 }
 
 /************************************************************************
-* Function: CreateHTTPRangeResponseHeader								
-*																		
-* Parameters:															
-*	char * ByteRangeSpecifier ; String containing the range 	
-*	long FileLength ; Length of the file													
-*	OUT struct SendInstruction * Instr ; SendInstruction object	where the 
-*										range operations will be stored
-*																		
-* Description: Fills in the Offset, read size and contents to send out	
-*	as an HTTP Range Response											
-*																		
-* Returns:																
-*	HTTP_BAD_REQUEST													
-*	UPNP_E_OUTOF_MEMORY													
-*	HTTP_REQUEST_RANGE_NOT_SATISFIABLE									
-*	HTTP_OK																
-************************************************************************/
+ * Function: CreateHTTPRangeResponseHeader
+ *
+ * Parameters:
+ *	char * ByteRangeSpecifier ; String containing the range
+ *	long FileLength ; Length of the file
+ *	OUT struct SendInstruction * Instr ; SendInstruction object
+ *		where the range operations will be stored
+ *
+ * Description: Fills in the Offset, read size and contents to send out
+ *	as an HTTP Range Response
+ *
+ * Returns:
+ *	HTTP_BAD_REQUEST
+ *	UPNP_E_OUTOF_MEMORY
+ *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
+ *	HTTP_OK	
+ ************************************************************************/
 int
 CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
-                               long FileLength,
+                               off_t FileLength,
                                OUT struct SendInstruction *Instr )
 {
 
-    int FirstByte,
+    off_t FirstByte,
       LastByte;
     char *RangeInput,
      *Ptr;
@@ -990,28 +988,36 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
 
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = LastByte - FirstByte + 1;
-            sprintf( Instr->RangeHeader, "CONTENT-RANGE: bytes %d-%d/%ld\r\n", FirstByte, LastByte, FileLength );   //Data between two range.
+            sprintf( Instr->RangeHeader,
+                "CONTENT-RANGE: bytes %"PRId64"-%"PRId64"/%"PRId64"\r\n",
+                (int64_t)FirstByte,
+                (int64_t)LastByte,
+                (int64_t)FileLength );   //Data between two range.
         } else if( FirstByte >= 0 && LastByte == -1
                    && FirstByte < FileLength ) {
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = FileLength - FirstByte;
             sprintf( Instr->RangeHeader,
-                     "CONTENT-RANGE: bytes %d-%ld/%ld\r\n", FirstByte,
-                     FileLength - 1, FileLength );
+                     "CONTENT-RANGE: bytes %"PRId64"-%"PRId64"/%"PRId64"\r\n",
+                     (int64_t)FirstByte,
+                     (int64_t)(FileLength - 1),
+                     (int64_t)FileLength );
         } else if( FirstByte == -1 && LastByte > 0 ) {
             if( LastByte >= FileLength ) {
                 Instr->RangeOffset = 0;
                 Instr->ReadSendSize = FileLength;
                 sprintf( Instr->RangeHeader,
-                         "CONTENT-RANGE: bytes 0-%ld/%ld\r\n",
-                         FileLength - 1, FileLength );
+                         "CONTENT-RANGE: bytes 0-%"PRId64"/%"PRId64"\r\n",
+                         (int64_t)(FileLength - 1),
+                         (int64_t)FileLength );
             } else {
                 Instr->RangeOffset = FileLength - LastByte;
                 Instr->ReadSendSize = LastByte;
                 sprintf( Instr->RangeHeader,
-                         "CONTENT-RANGE: bytes %ld-%ld/%ld\r\n",
-                         FileLength - LastByte + 1, FileLength,
-                         FileLength );
+                         "CONTENT-RANGE: bytes %"PRId64"-%"PRId64"/%"PRId64"\r\n",
+                         (int64_t)(FileLength - LastByte + 1),
+                         (int64_t)FileLength,
+                         (int64_t)FileLength );
             }
         } else {
             free( RangeInput );
@@ -1027,28 +1033,28 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
 }
 
 /************************************************************************
-* Function: CheckOtherHTTPHeaders										
-*																		
-* Parameters:															
-*	IN http_message_t * Req ;  HTTP Request message
-*	OUT struct SendInstruction * RespInstr ; Send Instruction object to 
-*							data for the response
-*	int FileSize ;	Size of the file containing the request document
-*																		
-* Description: Get header id from the request parameter and take		
-*	appropriate action based on the ids.								
-*	as an HTTP Range Response											
-*																		
-* Returns:																
-*	HTTP_BAD_REQUEST													
-*	UPNP_E_OUTOF_MEMORY													
-*	HTTP_REQUEST_RANGE_NOT_SATISFIABLE									
-*	HTTP_OK																
-************************************************************************/
+ * Function: CheckOtherHTTPHeaders
+ *
+ * Parameters:
+ *	IN http_message_t * Req ;  HTTP Request message
+ *	OUT struct SendInstruction * RespInstr ; Send Instruction object to
+ *		data for the response
+ *	int FileSize ;	Size of the file containing the request document
+ *
+ * Description: Get header id from the request parameter and take
+ *	appropriate action based on the ids.
+ *	as an HTTP Range Response
+ *
+ * Returns:
+ *	HTTP_BAD_REQUEST
+ *	UPNP_E_OUTOF_MEMORY
+ *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
+ *	HTTP_OK
+ ************************************************************************/
 int
 CheckOtherHTTPHeaders( IN http_message_t * Req,
                        OUT struct SendInstruction *RespInstr,
-                       int FileSize )
+                       off_t FileSize )
 {
     http_header_t *header;
     ListNode *node;
@@ -1158,27 +1164,27 @@ CheckOtherHTTPHeaders( IN http_message_t * Req,
 }
 
 /************************************************************************
-* Function: process_request												
-*																		
-* Parameters:															
-*	IN http_message_t *req ; HTTP Request message												
-*	OUT enum resp_type *rtype ; Tpye of response											
-*	OUT membuffer *headers ; 												
-*	OUT membuffer *filename ; Get filename from request document
-*	OUT struct xml_alias_t *alias ; Xml alias document from the 
-*									request document,										
-*	OUT struct SendInstruction * RespInstr ; Send Instruction object 
-*					where the response is set up.										
-*																		
-* Description: Processes the request and returns the result in the OUT	
-*	parameters															
-*																		
-* Returns:																
-*	HTTP_BAD_REQUEST													
-*	UPNP_E_OUTOF_MEMORY													
-*	HTTP_REQUEST_RANGE_NOT_SATISFIABLE									
-*	HTTP_OK																
-************************************************************************/
+ * Function: process_request
+ *
+ * Parameters:
+ *	IN http_message_t *req ; HTTP Request message
+ *	OUT enum resp_type *rtype ; Tpye of response
+ *	OUT membuffer *headers ;
+ *	OUT membuffer *filename ; Get filename from request document
+ *	OUT struct xml_alias_t *alias ; Xml alias document from the
+ *		request document,
+ *	OUT struct SendInstruction * RespInstr ; Send Instruction object
+ *		where the response is set up.
+ *
+ * Description: Processes the request and returns the result in the OUT
+ *	parameters
+ *
+ * Returns:
+ *	HTTP_BAD_REQUEST
+ *	UPNP_E_OUTOF_MEMORY
+ *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
+ *	HTTP_OK
+ ************************************************************************/
 static int
 process_request( IN http_message_t * req,
                  OUT enum resp_type *rtype,
@@ -1190,7 +1196,6 @@ process_request( IN http_message_t * req,
     int code;
     int err_code;
 
-    //membuffer content_type;
     char *request_doc;
     struct File_Info finfo;
     xboolean using_alias;
@@ -1200,7 +1205,7 @@ process_request( IN http_message_t * req,
     int resp_major,
       resp_minor;
     xboolean alias_grabbed;
-    int dummy;
+    size_t dummy;
     struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
 
     print_http_headers( req );
@@ -1214,7 +1219,6 @@ process_request( IN http_message_t * req,
     // init
     request_doc = NULL;
     finfo.content_type = NULL;
-    //membuffer_init( &content_type );
     alias_grabbed = FALSE;
     err_code = HTTP_INTERNAL_SERVER_ERROR;  // default error
     using_virtual_dir = FALSE;
@@ -1368,7 +1372,7 @@ process_request( IN http_message_t * req,
 
     RespInstr->ReadSendSize = finfo.file_length;
 
-    //Check other header field.
+    // Check other header field.
     if( ( err_code =
           CheckOtherHTTPHeaders( req, RespInstr,
                                  finfo.file_length ) ) != HTTP_OK ) {
@@ -1382,70 +1386,76 @@ process_request( IN http_message_t * req,
     }
 
     if( RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
-        //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-        //Transfer-Encoding: chunked
-        // K means add chunky header ang G means range header.
-        if( http_MakeMessage( headers, resp_major, resp_minor, "RTGKDstcSCc", HTTP_PARTIAL_CONTENT, // status code
-                              // RespInstr->ReadSendSize,// content length
-                              finfo.content_type,
-                              //     content_type.buf,            // content type
-                              RespInstr,    // Range
-                              "LAST-MODIFIED: ",
-                              &finfo.last_modified ) != 0 ) {
+        // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+        // Transfer-Encoding: chunked
+        if (http_MakeMessage(
+            headers, resp_major, resp_minor,
+            "R" "T" "GKD" "s" "tcS" "XcCc",
+            HTTP_PARTIAL_CONTENT, // status code
+            finfo.content_type,   // content type
+            RespInstr,            // range info
+            "LAST-MODIFIED: ",
+	    &finfo.last_modified,
+            X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
     } else if( RespInstr->IsRangeActive && !RespInstr->IsChunkActive ) {
 
-        //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-        //Transfer-Encoding: chunked
-        // K means add chunky header ang G means range header.
-        if( http_MakeMessage( headers, resp_major, resp_minor, "RNTGDstcSCc", HTTP_PARTIAL_CONTENT, // status code
-                              RespInstr->ReadSendSize,  // content length
-                              finfo.content_type,
-                              //content_type.buf,            // content type
-                              RespInstr,    //Range Info
-                              "LAST-MODIFIED: ",
-                              &finfo.last_modified ) != 0 ) {
+        // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+        // Transfer-Encoding: chunked
+        if (http_MakeMessage(
+            headers, resp_major, resp_minor,
+            "R" "N" "T" "GD" "s" "tcS" "XcCc",
+            HTTP_PARTIAL_CONTENT,     // status code
+            RespInstr->ReadSendSize,  // content length
+            finfo.content_type,       // content type
+            RespInstr,                // range info
+            "LAST-MODIFIED: ",
+	    &finfo.last_modified,
+            X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
 
     } else if( !RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
-
-        //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-        //Transfer-Encoding: chunked
-        // K means add chunky header ang G means range header.
-        if( http_MakeMessage( headers, resp_major, resp_minor, "RKTDstcSCc", HTTP_OK,   // status code
-                              //RespInstr->ReadSendSize,// content length
-                              finfo.content_type,
-                              // content_type.buf,            // content type
-                              "LAST-MODIFIED: ",
-                              &finfo.last_modified ) != 0 ) {
+        // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+        // Transfer-Encoding: chunked
+        if (http_MakeMessage(
+            headers, resp_major, resp_minor,
+            "RK" "TD" "s" "tcS" "XcCc",
+            HTTP_OK,            // status code
+            finfo.content_type, // content type
+            "LAST-MODIFIED: ",
+	    &finfo.last_modified,
+            X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
 
-    } else {
-        if( RespInstr->ReadSendSize >= 0 ) {
-            //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-            //Transfer-Encoding: chunked
-            // K means add chunky header ang G means range header.
-            if( http_MakeMessage( headers, resp_major, resp_minor, "RNTDstcSCc", HTTP_OK,   // status code
-                                  RespInstr->ReadSendSize,  // content length
-                                  finfo.content_type,
-                                  //content_type.buf,          // content type
-                                  "LAST-MODIFIED: ",
-                                  &finfo.last_modified ) != 0 ) {
+    } else { // !RespInstr->IsRangeActive && !RespInstr->IsChunkActive
+        if (RespInstr->ReadSendSize >= 0) {
+            // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+            // Transfer-Encoding: chunked
+            if (http_MakeMessage(
+                headers, resp_major, resp_minor,
+                "R" "N" "TD" "s" "tcS" "XcCc",
+                HTTP_OK,                 // status code
+                RespInstr->ReadSendSize, // content length
+                finfo.content_type,      // content type
+                "LAST-MODIFIED: ",
+		&finfo.last_modified,
+                X_USER_AGENT) != 0 ) {
                 goto error_handler;
             }
         } else {
-            //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-            //Transfer-Encoding: chunked
-            // K means add chunky header ang G means range header.
-            if( http_MakeMessage( headers, resp_major, resp_minor, "RTDstcSCc", HTTP_OK,    // status code
-                                  //RespInstr->ReadSendSize,// content length
-                                  finfo.content_type,
-                                  //content_type.buf,          // content type
-                                  "LAST-MODIFIED: ",
-                                  &finfo.last_modified ) != 0 ) {
+            // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+            // Transfer-Encoding: chunked
+            if (http_MakeMessage(
+                headers, resp_major, resp_minor,
+                "R" "TD" "s" "tcS" "XcCc",
+                HTTP_OK,            // status code
+                finfo.content_type, // content type
+                "LAST-MODIFIED: ",
+		&finfo.last_modified,
+                X_USER_AGENT) != 0 ) {
                 goto error_handler;
             }
         }
@@ -1463,8 +1473,8 @@ process_request( IN http_message_t * req,
         *rtype = RESP_FILEDOC;
     }
 
-    //simple get http 0.9 as specified in http 1.0
-    //don't send headers
+    // simple get http 0.9 as specified in http 1.0
+    // don't send headers
     if( req->method == HTTPMETHOD_SIMPLEGET ) {
         membuffer_destroy( headers );
     }
@@ -1474,7 +1484,6 @@ process_request( IN http_message_t * req,
   error_handler:
     free( request_doc );
     ixmlFreeDOMString( finfo.content_type );
-    //  membuffer_destroy( &content_type );
     if( err_code != UPNP_E_SUCCESS && alias_grabbed ) {
         alias_release( alias );
     }
@@ -1483,23 +1492,23 @@ process_request( IN http_message_t * req,
 }
 
 /************************************************************************
-* Function: http_RecvPostMessage										
-*																		
-* Parameters:															
-*	http_parser_t* parser ; HTTP Parser object							
-*	IN SOCKINFO *info ; Socket Information object													
-*	char * filename ; 	File where received data is copied to
-*	struct SendInstruction * Instr	; Send Instruction object which gives
-*			information whether the file is a virtual file or not.
-*																		
-* Description: Receives the HTTP post message														
-*																		
-* Returns:																
-*	HTTP_INTERNAL_SERVER_ERROR											
-*	HTTP_UNAUTHORIZED													
-*	HTTP_REQUEST_RANGE_NOT_SATISFIABLE									
-*	HTTP_OK																
-************************************************************************/
+ * Function: http_RecvPostMessage
+ *
+ * Parameters:
+ *	http_parser_t* parser ; HTTP Parser object
+ *	IN SOCKINFO *info ; Socket Information object
+ *	char * filename ; 	File where received data is copied to
+ *	struct SendInstruction * Instr	; Send Instruction object which gives
+ *		information whether the file is a virtual file or not.
+ *
+ * Description: Receives the HTTP post message
+ *
+ * Returns:
+ *	HTTP_INTERNAL_SERVER_ERROR
+ *	HTTP_UNAUTHORIZED
+ *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
+ *	HTTP_OK
+ ************************************************************************/
 int
 http_RecvPostMessage( http_parser_t * parser,
                       IN SOCKINFO * info,
@@ -1520,7 +1529,7 @@ http_RecvPostMessage( http_parser_t * parser,
 
     if( Instr && Instr->IsVirtualFile ) {
 
-        Fp = virtualDirCallback.open( filename, UPNP_WRITE );
+        Fp = (virtualDirCallback.open)( filename, UPNP_WRITE );
         if( Fp == NULL ) {
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -1547,6 +1556,7 @@ http_RecvPostMessage( http_parser_t * parser,
                    && ( status != PARSE_CONTINUE_1 )
                    && ( status != PARSE_INCOMPLETE ) ) {
             //error
+            fclose( Fp );
             return HTTP_BAD_REQUEST;
         }
         //read more if necessary entity
@@ -1574,14 +1584,11 @@ http_RecvPostMessage( http_parser_t * parser,
                 }
             } else if( num_read == 0 ) {
                 if( ok_on_close ) {
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                               "<<< (RECVD) <<<\n%s\n-----------------\n",
-                               parser->msg.msg.buf );
-                             //print_http_headers( &parser->msg );
-                         )
-
-                        parser->position = POS_COMPLETE;
+                    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                        "<<< (RECVD) <<<\n%s\n-----------------\n",
+                        parser->msg.msg.buf );
+                    print_http_headers( &parser->msg );
+                    parser->position = POS_COMPLETE;
                 } else {
                     // partial msg
                     parser->http_error_code = HTTP_BAD_REQUEST; // or response
@@ -1649,19 +1656,19 @@ http_RecvPostMessage( http_parser_t * parser,
 }
 
 /************************************************************************
-* Function: web_server_callback											
-*																		
-* Parameters:															
-*	IN http_parser_t *parser ; HTTP Parser Object						
-*	INOUT http_message_t* req ; HTTP Message request										
-*	IN SOCKINFO *info ;			Socket information object													
-*																		
-* Description: main entry point into web server;						
-*	handles HTTP GET and HEAD requests									
-*																		
-* Returns:																
-*	void																
-************************************************************************/
+ * Function: web_server_callback
+ *
+ * Parameters:
+ *	IN http_parser_t *parser ; HTTP Parser Object
+ *	INOUT http_message_t* req ; HTTP Message request
+ *	IN SOCKINFO *info ;	Socket information object
+ *
+ * Description: main entry point into web server;
+ *	handles HTTP GET and HEAD requests
+ *
+ * Returns:
+ *	void
+ ************************************************************************/
 void
 web_server_callback( IN http_parser_t * parser,
                      INOUT http_message_t * req,
@@ -1669,7 +1676,7 @@ web_server_callback( IN http_parser_t * parser,
 {
     int ret;
     int timeout = 0;
-    enum resp_type rtype;
+    enum resp_type rtype = 0;
     membuffer headers;
     membuffer filename;
     struct xml_alias_t xmldoc;
@@ -1731,8 +1738,14 @@ web_server_callback( IN http_parser_t * parser,
                     http_RecvPostMessage( parser, info, filename.buf,
                                           &RespInstr );
                 //Send response.
-                http_MakeMessage( &headers, 1, 1, "RTDSCc", ret,
-                                  "text/html" );
+
+                http_MakeMessage(
+                    &headers, 1, 1,
+                    "RTDSXcCc",
+                    ret,
+                    "text/html",
+                    X_USER_AGENT );
+
                 http_SendMessage( info, &timeout, "b", headers.buf,
                                   headers.length );
                 break;
@@ -1742,10 +1755,10 @@ web_server_callback( IN http_parser_t * parser,
         }
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "webserver: request processed...\n" );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "webserver: request processed...\n" );
 
-        membuffer_destroy( &headers );
+    membuffer_destroy( &headers );
     membuffer_destroy( &filename );
 }
+

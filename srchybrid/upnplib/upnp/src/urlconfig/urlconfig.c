@@ -29,13 +29,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
+#include "config.h"
 #include <assert.h>
-#ifndef _WIN32
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#ifndef WIN32
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
 #else
-#include <winsock2.h>
+ #include <winsock2.h>
 #endif
 #include "upnp.h"
 #include "util.h"
@@ -43,6 +45,7 @@
 #include "uri.h"
 #include "membuffer.h"
 #include "urlconfig.h"
+#include "unixutil.h"
 
 /************************************************************************
 *	Function :	addrToString
@@ -60,7 +63,7 @@
 *
 *	Note :
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 addrToString( IN const struct sockaddr_in *addr,
               OUT char ipaddr_port[] )
 {
@@ -85,7 +88,7 @@ addrToString( IN const struct sockaddr_in *addr,
 *
 *	Note : 'newAlias' should be freed using free()
 ************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 calc_alias( IN const char *alias,
             IN const char *rootPath,
             OUT char **newAlias )
@@ -146,7 +149,7 @@ calc_alias( IN const char *alias,
 *
 *	Note :
 ************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 calc_descURL( IN const char *ipPortStr,
               IN const char *alias,
               OUT char descURL[LINE_SIZE] )
@@ -166,11 +169,10 @@ calc_descURL( IN const char *ipPortStr,
     strcat( descURL, ipPortStr );
     strcat( descURL, alias );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "desc url: %s\n", descURL );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "desc url: %s\n", descURL );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -211,7 +213,7 @@ config_description_doc( INOUT IXML_Document * doc,
     IXML_Node *rootNode = NULL;
     IXML_Node *urlbase_node = NULL;
     char *urlBaseStr = "URLBase";
-    DOMString domStr = NULL;
+    const DOMString domStr = NULL;
     uri_type uri;
     int err_code;
     int len;
@@ -401,23 +403,21 @@ configure_urlbase( INOUT IXML_Document * doc,
         goto error_handler;
     }
     // xml doc to str
-    xml_str = ixmlPrintDocument( ( IXML_Node * ) doc );
+    xml_str = ixmlPrintDocument( doc );
     if( xml_str == NULL ) {
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "desc url: %s\n", docURL );
-         )
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "doc = %s\n", xml_str );
-         )
-        // store in web server
-        err_code =
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "desc url: %s\n", docURL );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "doc = %s\n", xml_str );
+    // store in web server
+    err_code =
         web_server_set_alias( new_alias, xml_str, strlen( xml_str ),
                               last_modified );
 
-  error_handler:
+error_handler:
     free( root_path );
     free( new_alias );
 

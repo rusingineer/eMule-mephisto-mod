@@ -80,6 +80,7 @@ CPPgTweaks::CPPgTweaks()
 	// <== CreditSystems [EastShare/ MorphXT] - Stulle
 	m_bLog2Disk = false;
 	m_bDebug2Disk = false;
+	m_bDateFileNameLog = false; // Date File Name Log [AndCycle] - Stulle
 	m_iCommitFiles = 0;
 	m_bFilterLANIPs = false;
 	m_bExtControls = false;
@@ -144,6 +145,7 @@ CPPgTweaks::CPPgTweaks()
 	// <== CreditSystems [EastShare/ MorphXT] - Stulle
 	m_htiLog2Disk = NULL;
 	m_htiDebug2Disk = NULL;
+	m_htiDateFileNameLog = NULL; // Date File Name Log [AndCycle] - Stulle
 	m_htiCommit = NULL;
 	m_htiCommitNever = NULL;
 	m_htiCommitOnShutdown = NULL;
@@ -314,6 +316,7 @@ void CPPgTweaks::DoDataExchange(CDataExchange* pDX)
 		// Logging group
 		//
 		m_htiLog2Disk = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_LOG2DISK), TVI_ROOT, m_bLog2Disk);
+		m_htiDateFileNameLog = m_ctrlTreeOptions.InsertCheckBox(GetResString(IDS_DATEFILENAMELOG), TVI_ROOT, m_bDateFileNameLog); // Date File Name Log [AndCycle] - Stulle
 		if (thePrefs.GetEnableVerboseOptions())
 		{
 			m_htiVerboseGroup = m_ctrlTreeOptions.InsertGroup(GetResString(IDS_VERBOSE), iImgLog, TVI_ROOT);
@@ -464,6 +467,7 @@ void CPPgTweaks::DoDataExchange(CDataExchange* pDX)
 	// Logging group
 	//
 	DDX_TreeCheck(pDX, IDC_EXT_OPTS, m_htiLog2Disk, m_bLog2Disk);
+	DDX_TreeCheck(pDX, IDC_EXT_OPTS, m_htiDateFileNameLog, m_bDateFileNameLog); // Date File Name Log [AndCycle] - Stulle
 	if (m_htiLogLevel){
 		DDX_TreeEdit(pDX, IDC_EXT_OPTS, m_htiLogLevel, m_iLogLevel);
 		DDV_MinMaxInt(pDX, m_iLogLevel, 1, 5);
@@ -568,6 +572,7 @@ BOOL CPPgTweaks::OnInitDialog()
 		m_iLogLevel = 5 - thePrefs.m_byLogLevel;
 	}
 	m_bLog2Disk = thePrefs.log2disk;
+	m_bDateFileNameLog = thePrefs.m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
 	// ==> CreditSystems [EastShare/ MorphXT] - Stulle
 	/*
 	m_bCreditSystem = thePrefs.m_bCreditSystem;
@@ -694,6 +699,26 @@ BOOL CPPgTweaks::OnApply()
 	else if (thePrefs.log2disk && !m_bLog2Disk)
 		theLog.Close();
 	thePrefs.log2disk = m_bLog2Disk;
+
+	// ==> Date File Name Log [AndCycle] - Stulle
+	if(thePrefs.m_bDateFileNameLog != (m_bDateFileNameLog != 0))
+	{
+		//close log first
+		theLog.Close();
+		theVerboseLog.Close();
+
+		//reset path
+		// Mighty Knife: log files are places in the "log" folder
+		VERIFY( theLog.SetFilePath(thePrefs.GetMuleDirectory(EMULE_LOGDIR) + _T("eMule.log")) );
+		VERIFY( theVerboseLog.SetFilePath(thePrefs.GetMuleDirectory(EMULE_LOGDIR) + _T("eMule_Verbose.log")) );
+		// [end] Mighty Knife
+
+		//open log again
+		theLog.Open();
+		theVerboseLog.Open();
+	}
+	thePrefs.m_bDateFileNameLog = m_bDateFileNameLog;
+	// <== Date File Name Log [AndCycle] - Stulle
 
 	if (thePrefs.GetEnableVerboseOptions())
 	{
@@ -847,6 +872,7 @@ void CPPgTweaks::Localize(void)
 		*/
 		// <== CreditSystems [EastShare/ MorphXT] - Stulle
 		if (m_htiLog2Disk) m_ctrlTreeOptions.SetItemText(m_htiLog2Disk, GetResString(IDS_LOG2DISK));
+		if (m_htiDateFileNameLog) m_ctrlTreeOptions.SetItemText(m_htiDateFileNameLog, GetResString(IDS_DATEFILENAMELOG)); // Date File Name Log [AndCycle] - Stulle
 		if (m_htiVerboseGroup) m_ctrlTreeOptions.SetItemText(m_htiVerboseGroup, GetResString(IDS_VERBOSE));
 		if (m_htiVerbose) m_ctrlTreeOptions.SetItemText(m_htiVerbose, GetResString(IDS_ENABLED));
 		if (m_htiDebug2Disk) m_ctrlTreeOptions.SetItemText(m_htiDebug2Disk, GetResString(IDS_LOG2DISK));
@@ -954,6 +980,7 @@ void CPPgTweaks::OnDestroy()
 	// <== CreditSystems [EastShare/ MorphXT] - Stulle
 	m_htiLog2Disk = NULL;
 	m_htiDebug2Disk = NULL;
+	m_htiDateFileNameLog = NULL; // Date File Name Log [AndCycle] - Stulle
 	m_htiCommit = NULL;
 	m_htiCommitNever = NULL;
 	m_htiCommitOnShutdown = NULL;

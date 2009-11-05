@@ -991,6 +991,8 @@ bool	CPreferences::m_bColorFeedback; // Feedback personalization [Stulle] - Stul
 
 bool	CPreferences::m_bSplitWindow; // Advanced Transfer Window Layout [Stulle] - Stulle
 
+bool	CPreferences::m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
+
 bool	CPreferences::m_bCloseEasteregg; // Diabolic Easteregg [Stulle] - Mephisto
 
 // ==> Mephisto Upload - Mephisto
@@ -2995,6 +2997,8 @@ void CPreferences::SavePreferences()
 	ini.WriteBool(_T("SplitWindow"), m_bSplitWindow);
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
 
+	ini.WriteBool(_T("DateFileNameLog"), m_bDateFileNameLog); // Date File Name Log [AndCycle] - Stulle
+
 	// ==> Mephisto Upload - Mephisto
 	ini.WriteInt(_T("MinSlotsNew"), m_uMinSlots);
 	ini.WriteInt(_T("NoNewSlotTimer"), m_uNoNewSlotTimer);
@@ -3910,7 +3914,6 @@ void CPreferences::LoadPreferences()
 	m_dropblockingsockets=ini.GetBool(L"DropBlockingSocketsNew", true);
 	// <== Drop blocking clients [Stulle] - Mephisto
 
-
 	//Xman Funny-Nick (Stulle/Morph)
 	m_bFunnyNick = ini.GetBool(_T("DisplayFunnyNick"), false);
 	//Xman end
@@ -4283,6 +4286,8 @@ void CPreferences::LoadPreferences()
 	m_uTransferWnd2 = ini.GetInt(L"TransferWnd2",1);
 	m_bSplitWindow = ini.GetBool(_T("SplitWindow"), true);
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
+
+	m_bDateFileNameLog=ini.GetBool(_T("DateFileNameLog"), true); // Date File Name Log [AndCycle] - Stulle
 
 	m_bCloseEasteregg=false; // Diabolic Easteregg [Stulle] - Mephisto
 

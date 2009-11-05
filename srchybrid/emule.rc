@@ -6279,6 +6279,7 @@ BEGIN
     IDS_COLOR_F8            "Clients on queue"
     // <== Feedback personalization [Stulle] - Stulle
     IDS_STATIC_ICON         "Always display Tray Icon" // Static Tray Icon - MyTh88
+    IDS_DATEFILENAMELOG     "Date as part of File Name of log file." // Date File Name Log [AndCycle] - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

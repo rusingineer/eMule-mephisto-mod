@@ -86,6 +86,12 @@ protected:
 	UINT m_uMaxFileSize;
 	bool m_bInOpenCall;
 	ELogFileFormat m_eFileFormat;
+
+	// ==> Date File Name Log [AndCycle] - Stulle
+private:
+	CString m_strOriginFileName;
+	DWORD	m_dwNextRenameTick;
+	// <== Date File Name Log [AndCycle] - Stulle
 };
 
 extern CLogFile theLog;

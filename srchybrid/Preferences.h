@@ -1174,6 +1174,8 @@ public:
 
 	static bool		m_bSplitWindow; // Advanced Transfer Window Layout [Stulle] - Stulle
 
+	static bool		m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
+
 	static bool		m_bCloseEasteregg; // Diabolic Easteregg [Stulle] - Mephisto
 
 	// ==> Mephisto Upload - Mephisto
@@ -2620,6 +2622,8 @@ public:
 	static	bool	GetSplitWindow()		{ return m_bSplitWindow; }
 	static	void	SetSplitWindow(bool in)	{ m_bSplitWindow = in; }
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
+
+	static	bool	DateFileNameLog()		{ return m_bDateFileNameLog;} // Date File Name Log [AndCycle] - Stulle
 
 	// ==> Mephisto Upload - Mephisto
 	static uint8	GetMinSlots()			{return m_uMinSlots;}

@@ -287,6 +287,27 @@ bool CLogFile::SetFilePath(LPCTSTR pszFilePath)
 	if (IsOpen())
 		return false;
 	m_strFilePath = pszFilePath;
+
+	// ==> Date File Name Log [AndCycle] - Stulle
+	//get the original file name
+	TCHAR szDrv[_MAX_DRIVE];
+	TCHAR szDir[_MAX_DIR];
+	TCHAR szNam[_MAX_FNAME];
+	TCHAR szExt[_MAX_EXT];
+	_tsplitpath(m_strFilePath, szDrv, szDir, szNam, szExt);
+	m_strOriginFileName = szNam;
+
+	//to calibrate milliseconds, would wate out one second
+	for(time_t start = time(NULL); thePrefs.DateFileNameLog();){
+		//the step to next second
+		if(time(NULL) > start){
+			//now the tick shoud really close to the second start
+			m_dwNextRenameTick = ::GetTickCount();
+			break;
+		}
+	}
+	// <== Date File Name Log [AndCycle] - Stulle
+
 	return true;
 }
 
@@ -399,6 +420,46 @@ bool CLogFile::Log(LPCTSTR pszMsg, int iLen)
 	if (m_fp == NULL)
 		return false;
 
+	// ==> Date File Name Log [AndCycle] - Stulle
+	//it DateNameLog enable, and it's time to change filename
+	if (thePrefs.DateFileNameLog() && ::GetTickCount() >= m_dwNextRenameTick){
+
+		time_t tCurrent;
+		time(&tCurrent);
+		struct tm *currentDate = localtime(&tCurrent);
+
+		//set next rename tick, rename at next day reach
+		m_dwNextRenameTick += (86400 - (currentDate->tm_hour*3600 + currentDate->tm_min*60 + currentDate->tm_sec))*1000;
+
+		//go on rename
+		TCHAR szDateLogCurrent[40];
+		_tcsftime(szDateLogCurrent, ARRSIZE(szDateLogCurrent), _T("%Y.%m.%d"), currentDate);
+
+		TCHAR szDrv[_MAX_DRIVE];
+		TCHAR szDir[_MAX_DIR];
+		TCHAR szNam[_MAX_FNAME];
+		TCHAR szExt[_MAX_EXT];
+		_tsplitpath(m_strFilePath, szDrv, szDir, szNam, szExt);
+
+		CString strNewNam;
+		strNewNam = m_strOriginFileName;
+		strNewNam += _T(" - ");
+		strNewNam += szDateLogCurrent;
+
+		//remake path
+		TCHAR szNewFilePath[MAX_PATH];
+		_tmakepath(szNewFilePath, szDrv, szDir, strNewNam, szExt);
+		m_strFilePath = szNewFilePath;
+
+		//close then open new file name
+		Close();
+		Open();
+     	if (m_fp == NULL)
+		   return false; // leuk_he extra check
+
+	}
+	// <== Date File Name Log [AndCycle] - Stulle
+
 	size_t uWritten;
 	if (m_eFileFormat == Unicode)
 	{
@@ -414,7 +475,13 @@ bool CLogFile::Log(LPCTSTR pszMsg, int iLen)
 	bool bResult = !ferror(m_fp);
 	m_uBytesWritten += uWritten;
 
+	// ==> Date File Name Log [AndCycle] - Stulle
+	/*
 	if (m_uBytesWritten >= m_uMaxFileSize)
+	*/
+	//the start time (m_tStarted) is so strange, so I wanna keep my date log name intact
+	if (m_uBytesWritten >= m_uMaxFileSize && !thePrefs.DateFileNameLog())
+	// <== Date File Name Log [AndCycle] - Stulle
 		StartNewLogFile();
 	else
 		fflush(m_fp);

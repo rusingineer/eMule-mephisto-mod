@@ -3365,6 +3365,7 @@
 #define IDS_COLOR_F8                    61439
 // <== Feedback personalization [Stulle] - Stulle
 #define IDS_STATIC_ICON                 61450 // Static Tray Icon - MyTh88
+#define IDS_DATEFILENAMELOG             61460 // Date File Name Log [AndCycle] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000
 #define IDS_EASTEREGG                   62001

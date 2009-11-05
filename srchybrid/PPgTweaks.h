@@ -39,6 +39,7 @@ protected:
 	// <== CreditSystems [EastShare/ MorphXT] - Stulle
 	bool m_bLog2Disk;
 	bool m_bDebug2Disk;
+	bool m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
 	int m_iCommitFiles;
 	bool m_bFilterLANIPs;
 	bool m_bExtControls;
@@ -112,6 +113,7 @@ protected:
 	// <== CreditSystems [EastShare/ MorphXT] - Stulle
 	HTREEITEM m_htiLog2Disk;
 	HTREEITEM m_htiDebug2Disk;
+	HTREEITEM m_htiDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
 	HTREEITEM m_htiCommit;
 	HTREEITEM m_htiCommitNever;
 	HTREEITEM m_htiCommitOnShutdown;

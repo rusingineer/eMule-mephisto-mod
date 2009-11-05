@@ -1459,7 +1459,6 @@ void CClientCreditsList::Process()
 						*/
 						cur_credit = NULL;
 						result->clientCredit = NULL; //fix crash
-						AddDebugLogLine(false, _T("CClientCredits::Process --> Removed clientCredit"));
 					}
 					// ==> SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 					/*
@@ -1468,7 +1467,6 @@ void CClientCreditsList::Process()
 					if(ul==0 && dl==0 && bCanRemoveStruct)
 					// <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
 					{
-						AddDebugLogLine(false, _T("CClientCredits::Process --> Removed entirely"));
 						m_mapClients.RemoveKey(tmpkey);
 						delete result;
 					}

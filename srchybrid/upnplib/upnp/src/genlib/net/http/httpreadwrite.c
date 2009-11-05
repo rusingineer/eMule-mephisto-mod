@@ -631,7 +631,7 @@ http_Download( IN const char *url_str,
 
     ret_code = http_MakeMessage(
         &request, 1, 1,
-        "Q" "s" "bcDCUc",
+        "Q" "s" "bcc", // leuk_he: remove user agent.
         HTTPMETHOD_GET, url.pathquery.buff, url.pathquery.size,
         "HOST: ",
         hoststr, hostlen );
@@ -1916,7 +1916,8 @@ http_MakeMessage( INOUT membuffer * buf,
         } else if( c == 'S' || c == 'U' ) {
             // SERVER or USER-AGENT header
             temp_str = ( c == 'S' ) ? "SERVER: " : "USER-AGENT: ";
-            get_sdk_info( tempbuf );
+            //get_sdk_info( tempbuf );
+			strcpy(tempbuf,"Morph"); // shorter is more compatible, leuk_he
             if (http_MakeMessage(
                 buf, http_major_version, http_minor_version,
                 "ss",

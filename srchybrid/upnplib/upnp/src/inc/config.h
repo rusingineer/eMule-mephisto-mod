@@ -78,7 +78,7 @@
  */
 
 //@{
-#define MIN_THREADS 2 
+#define MIN_THREADS 1 // changed like leuk_he did
 //@}
 
 /** @name MAX_THREADS

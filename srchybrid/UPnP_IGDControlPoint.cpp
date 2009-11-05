@@ -222,7 +222,9 @@ if(thePrefs.GetUPnPVerboseLog())
 	AddDebugLogLine(false, _T("Waiting short for upnp to complete registration.") );
 
 if (InitializingEvent) 
-       return (InitializingEvent->Lock((MINIMUM_DELAY*1000)+1)==S_OK) ; // 10 secs...  (should be UPNPTIMEOUT, btu 40 seconds is too long....)
+       // MINIMUM_DELAY was 10 but is no more in libupnp 1.6.6. replacing this.
+       //return (InitializingEvent->Lock((MINIMUM_DELAY*1000)+1)==S_OK) ; // 10 secs...  (should be UPNPTIMEOUT, btu 40 seconds is too long....)
+	   return (InitializingEvent->Lock(10001)==S_OK) ; // 10 secs...  (should be UPNPTIMEOUT, btu 40 seconds is too long....)
 
 return 0;
 }

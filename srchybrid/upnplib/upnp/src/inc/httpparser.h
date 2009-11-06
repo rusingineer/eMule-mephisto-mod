@@ -38,9 +38,11 @@
 
 #include "LinkedList.h"
 
+
+// Content Type Header
+extern const char *ContentTypeHeader;
+
 ////// private types ////////////
-
-
 //////////////////////
 // scanner
 ///////////////////////
@@ -448,17 +450,15 @@ int matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... );
 int raw_to_int( IN memptr* raw_value, int base );
 
 /************************************************************************
-* Function: raw_find_str
-*
-* Parameters:
-*	IN memptr* raw_value ; Buffer containg the string
-*	IN const char* str ;	Substring to be found
-*
-* Description: Find a substring from raw character string buffer
-*
-* Side effects: raw_value is transformed to lowercase.
-*
-* Returns:
+* Function: raw_find_str												
+*																		
+* Parameters:															
+*	IN memptr* raw_value ; Buffer containg the string												
+*	IN const char* str ;	Substring to be found													
+*																		
+* Description: Find a substring from raw character string buffer					
+*																		
+* Returns:																
 *	 int - index at which the substring is found.						
 ************************************************************************/
 int raw_find_str( IN memptr* raw_value, IN const char* str );
@@ -478,21 +478,17 @@ int raw_find_str( IN memptr* raw_value, IN const char* str );
 const char* method_to_str( IN http_method_t method );
 
 /************************************************************************
-* Function: print_http_headers
-*
-* Parameters:
-*	http_message_t* hmsg ; HTTP Message object
-*
-* Description:
-*
-* Returns:
-*	 void
+* Function: print_http_headers											
+*																		
+* Parameters:															
+*	http_message_t* hmsg ; HTTP Message object									
+*																		
+* Description:															
+*																		
+* Returns:																
+*	 void																
 ************************************************************************/
-#ifdef DEBUG
-void print_http_headers( IN http_message_t *hmsg );
-#else
-static UPNP_INLINE void print_http_headers( IN http_message_t *hmsg ) {}
-#endif
+void print_http_headers( IN http_message_t* hmsg );
 
 #ifdef __cplusplus
 }		// extern "C"
@@ -500,4 +496,3 @@ static UPNP_INLINE void print_http_headers( IN http_message_t *hmsg ) {}
 
 
 #endif // GENLIB_NET_HTTP_HTTPPARSER_H
-

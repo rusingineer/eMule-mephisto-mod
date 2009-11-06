@@ -137,8 +137,6 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
   int result = 0;
   sem_t s = *sem;
 
-  pthread_testcancel();
-
   if (sem == NULL)
     {
       result = EINVAL;
@@ -159,20 +157,11 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	  milliseconds = ptw32_relmillisecs (abstime);
 	}
 
+      pthread_testcancel();
+
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
 	{
-	  int v;
-
-	  /* See sem_destroy.c
-	   */
-	  if (*sem == NULL)
-	    {
-	      (void) pthread_mutex_unlock (&s->lock);
-	      errno = EINVAL;
-	      return -1;
-	    }
-
-	  v = --s->value;
+	  int v = --s->value;
 	  (void) pthread_mutex_unlock (&s->lock);
 
 	  if (v < 0)
@@ -203,13 +192,6 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 
 	      if (!timedout && pthread_mutex_lock (&s->lock) == 0)
 	        {
-        	  if (*sem == NULL)
-        	    {
-        	      (void) pthread_mutex_unlock (&s->lock);
-        	      errno = EINVAL;
-        	      return -1;
-        	    }
-
 	          if (s->leftToUnblock > 0)
 	            {
 		      --s->leftToUnblock;

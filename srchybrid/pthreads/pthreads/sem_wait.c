@@ -54,13 +54,12 @@ ptw32_sem_wait_cleanup(void * sem)
   if (pthread_mutex_lock (&s->lock) == 0)
     {
       /*
-       * If sema is destroyed do nothing, otherwise:-
        * If the sema is posted between us being cancelled and us locking
        * the sema again above then we need to consume that post but cancel
        * anyway. If we don't get the semaphore we indicate that we're no
        * longer waiting.
        */
-      if (*((sem_t *)sem) != NULL && !(WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0))
+      if (!(WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0))
 	{
 	  ++s->value;
 #ifdef NEED_SEM
@@ -113,28 +112,20 @@ sem_wait (sem_t * sem)
   int result = 0;
   sem_t s = *sem;
 
-  pthread_testcancel();
-
   if (s == NULL)
     {
       result = EINVAL;
     }
   else
     {
+
+      /* Faster to test before adjusting the count */
+      pthread_testcancel();
+
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
 	{
-	  int v;
+	  int v = --s->value;
 
-	  /* See sem_destroy.c
-	   */
-	  if (*sem == NULL)
-	    {
-	      (void) pthread_mutex_unlock (&s->lock);
-	      errno = EINVAL;
-	      return -1;
-	    }
-
-          v = --s->value;
 	  (void) pthread_mutex_unlock (&s->lock);
 
 	  if (v < 0)
@@ -145,7 +136,6 @@ sem_wait (sem_t * sem)
 	      /* Must wait */
 	      pthread_cleanup_push(ptw32_sem_wait_cleanup, (void *) s);
 	      result = pthreadCancelableWait (s->sem);
-	      /* Cleanup if we're canceled or on any other error */
 	      pthread_cleanup_pop(result);
 #ifdef _MSC_VER
 #pragma inline_depth()
@@ -155,13 +145,6 @@ sem_wait (sem_t * sem)
 
 	  if (!result && pthread_mutex_lock (&s->lock) == 0)
 	    {
-	      if (*sem == NULL)
-	        {
-	          (void) pthread_mutex_unlock (&s->lock);
-	          errno = EINVAL;
-	          return -1;
-	        }
-
 	      if (s->leftToUnblock > 0)
 		{
 		  --s->leftToUnblock;

@@ -39,22 +39,18 @@ extern "C" {
 #include <fcntl.h>
 #include <string.h>
 #include <sys/types.h>
-//#include <malloc.h>
+#include <malloc.h>
 #include <time.h>
 #include <errno.h>
 #include <ctype.h>
 #include <stdlib.h>
-#ifndef WIN32
- #include <arpa/inet.h>
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <unistd.h>
- #include <netdb.h>
- #include <sys/time.h>
-#else
- #include <time.h>
-
- #define strncasecmp strnicmp
+#ifndef _WIN32
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <sys/time.h>
 #endif
 
 #include "upnp.h"
@@ -76,7 +72,7 @@ extern "C" {
 
 enum hostType { HOSTNAME, IPv4address };
 enum pathType { ABS_PATH, REL_PATH, OPAQUE_PART };
-#ifndef WIN32
+#ifndef _WIN32
 // there is a conflict in windows with other symbols
 enum uriType  { ABSOLUTE, RELATIVE };
 #else
@@ -86,8 +82,8 @@ enum uriType  { absolute, relative };
 /*	Buffer used in parsinghttp messages, urls, etc. generally this simply
 *	holds a pointer into a larger array									*/
 typedef struct TOKEN {
-  const char *buff;
-  size_t size;
+   char * buff;
+  int size;
 } token;
 
 
@@ -124,7 +120,7 @@ typedef struct URL_LIST {
 *	Parameters :
 *		char * in ;	string of characters
 *		int index ;	index at which to start checking the characters
-*		size_t *max ;	
+*		int *max ;	
 *
 *	Description : Replaces an escaped sequence with its unescaped version 
 *		as in http://www.ietf.org/rfc/rfc2396.txt  (RFC explaining URIs)
@@ -137,7 +133,7 @@ typedef struct URL_LIST {
 *		string are shifted over, and NULL characters are placed at the 
 *		end of the string.
 ************************************************************************/
-int replace_escaped(char * in, int index, size_t *max);
+int replace_escaped(char * in, int index, int *max);
 
 /************************************************************************
 *	Function :	copy_URL_list
@@ -182,16 +178,13 @@ void free_URL_list(URL_list * list);
 *		uri_type *in ;	URI object
 *
 *	Description : Function useful in debugging for printing a parsed uri.
+*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-#ifdef DEBUG
-void print_uri(uri_type *in);
-#else
-static UPNP_INLINE void print_uri(uri_type *in) {}
-#endif
+DBGONLY(void print_uri( uri_type *in);)
 
 /************************************************************************
 *	Function :	print_token
@@ -200,16 +193,13 @@ static UPNP_INLINE void print_uri(uri_type *in) {}
 *		token * in ;	
 *
 *	Description : Function useful in debugging for printing a token.
+*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-#ifdef DEBUG
-void print_token(token *in);
-#else
-static UPNP_INLINE void print_token(token * in) {}
-#endif
+void print_token(  token * in);
 
 /************************************************************************
 *	Function :	token_string_casecmp
@@ -282,7 +272,7 @@ int token_cmp( token *in1,  token *in2);
 *
 *	Note :
 ************************************************************************/
-int parse_port(int max, const char *port, unsigned short int *out);
+int parse_port(int max,   char * port, unsigned short int * out);
 
 /************************************************************************
 *	Function :	parse_hostport
@@ -302,14 +292,14 @@ int parse_port(int max, const char *port, unsigned short int *out);
 *
 *	Note :
 ************************************************************************/
-int parse_hostport(const char *in, int max, hostport_type *out );
+int parse_hostport(  char* in, int max, hostport_type *out );
 
 /************************************************************************
 *	Function :	remove_escaped_chars
 *
 *	Parameters :
 *		INOUT char *in ;	string of characters to be modified
-*		INOUT size_t *size ;	size limit for the number of characters
+*		INOUT int *size ;	size limit for the number of characters
 *
 *	Description : removes http escaped characters such as: "%20" and 
 *		replaces them with their character representation. i.e. 
@@ -321,7 +311,7 @@ int parse_hostport(const char *in, int max, hostport_type *out );
 *
 *	Note :
 ************************************************************************/
-int remove_escaped_chars(char *in, size_t *size);
+int remove_escaped_chars(char *in,int *size);
 
 /************************************************************************
 *	Function :	remove_dots
@@ -397,7 +387,7 @@ char * resolve_rel_url( char * base_url,  char * rel_url);
 *
 *	Note :
 ************************************************************************/
-int parse_uri(const char * in, int max, uri_type * out);
+int parse_uri(  char * in, int max, uri_type * out);
 
 /************************************************************************
 *	Function :	parse_uri_and_unescape

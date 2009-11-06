@@ -44,11 +44,12 @@
 #include "httpparser.h"
 #include "sock.h"
 
+#ifndef EXTERN_C
+// make sure that EXTERN_C doesn't get defined multiple times
 #ifdef __cplusplus
 #define EXTERN_C extern "C"
 #else 
-#ifndef EXTERN_C
- #define EXTERN_C 
+#define EXTERN_C 
 #endif
 #endif
 
@@ -89,26 +90,25 @@
 #define DEFAULT_TIMEOUT 1801
 
 
+
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
-// Lock the subscription
+//Lock the subscription
 #define SubscribeLock() \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
-		"Trying Subscribe Lock");  \
+	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__, \
+	"Trying Subscribe Lock"));  \
 	ithread_mutex_lock(&GlobalClientSubscribeMutex); \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
-		"Subscribe Lock");
+	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__,"Subscribe Lock");)
 
-// Unlock the subscription
+//Unlock the subscription
 #define SubscribeUnlock() \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
-		"Trying Subscribe UnLock"); \
+	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__, \
+		"Trying Subscribe UnLock")); \
 	ithread_mutex_unlock(&GlobalClientSubscribeMutex); \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
-		"Subscribe UnLock");
+	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__,"Subscribe UnLock");)
 
 
-// Structure to send NOTIFY message to all subscribed control points
+//Structure to send NOTIFY message to all subscribed control points
 typedef struct NOTIFY_THREAD_STRUCT {
   char * headers;
   DOMString propertySet;
@@ -162,13 +162,11 @@ EXTERN_C void genaCallback (IN http_parser_t *parser,
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
-#ifdef INCLUDE_CLIENT_APIS
-EXTERN_C int genaSubscribe(
-	UpnpClient_Handle client_handle,
-	char * PublisherURL,
-	int * TimeOut, 
-	Upnp_SID  out_sid );
-#endif
+CLIENTONLY(
+	EXTERN_C int genaSubscribe(UpnpClient_Handle client_handle,
+				char * PublisherURL,
+				int * TimeOut, 
+				Upnp_SID  out_sid );)
 
 
 /************************************************************************
@@ -187,11 +185,8 @@ EXTERN_C int genaSubscribe(
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
-#ifdef INCLUDE_CLIENT_APIS
-EXTERN_C int genaUnSubscribe(
-	UpnpClient_Handle client_handle,
-	const Upnp_SID in_sid);
-#endif
+CLIENTONLY(EXTERN_C int genaUnSubscribe(UpnpClient_Handle client_handle,
+		   const Upnp_SID in_sid);)
 
 /************************************************************************
 * Function : genaUnregisterClient									
@@ -208,9 +203,8 @@ EXTERN_C int genaUnSubscribe(
 * Returns: int
 *	return UPNP_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
-#ifdef INCLUDE_CLIENT_APIS
-EXTERN_C int genaUnregisterClient(UpnpClient_Handle client_handle);
-#endif
+CLIENTONLY(EXTERN_C int genaUnregisterClient(
+			UpnpClient_Handle client_handle);)
 
 //server
 /************************************************************************
@@ -225,9 +219,8 @@ EXTERN_C int genaUnregisterClient(UpnpClient_Handle client_handle);
 * Returns: int
 *	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
 ****************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
-EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
-#endif
+DEVICEONLY(EXTERN_C int genaUnregisterDevice(
+				UpnpDevice_Handle device_handle);)
 
 
 /************************************************************************
@@ -250,12 +243,10 @@ EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
-#ifdef INCLUDE_CLIENT_APIS
-EXTERN_C int genaRenewSubscription(
-	IN UpnpClient_Handle client_handle,
-	IN const Upnp_SID in_sid,
-	OUT int * TimeOut);
-#endif
+CLIENTONLY(EXTERN_C int genaRenewSubscription(
+							IN UpnpClient_Handle client_handle,
+							IN const Upnp_SID in_sid,
+							OUT int * TimeOut);)
 /****************************************************************************
 *	Function :	genaNotifyAll
 *
@@ -275,40 +266,33 @@ EXTERN_C int genaRenewSubscription(
 *	Note : This function is similar to the genaNotifyAllExt. The only difference
 *			is it takes event variable array instead of xml document.
 ****************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
-EXTERN_C int genaNotifyAll(
-	UpnpDevice_Handle device_handle,
-	char *UDN,
-	char *servId,
-	char **VarNames,
-	char **VarValues,
-	int var_count);
-#endif
+DEVICEONLY(EXTERN_C int genaNotifyAll(UpnpDevice_Handle device_handle,
+			   char *UDN,
+			   char *servId,
+			   char **VarNames,
+			   char **VarValues,
+		    int var_count
+				      );)
 
 /****************************************************************************
-* Function :	genaNotifyAllExt
+*	Function :	genaNotifyAllExt
 *
-* Parameters :
-*	IN UpnpDevice_Handle device_handle : Device handle
-*	IN char *UDN :			Device udn
-*	IN char *servId :		Service ID
-*	IN IXML_Document *PropSet :	XML document Event varible property set
+*	Parameters :
+*			IN UpnpDevice_Handle device_handle : Device handle
+*			IN char *UDN :	Device udn
+*			IN char *servId :	Service ID
+*           IN IXML_Document *PropSet :	XML document Event varible property set
 *
-* Description : This function sends a notification to all the subscribed
+*	Description : 	This function sends a notification to all the subscribed
 *	control points
 *
-* Return : int
+*	Return :	int
 *
-* Note : This function is similar to the genaNotifyAll. the only difference
-*	is it takes the document instead of event variable array
+*	Note : This function is similar to the genaNotifyAll. the only difference
+*			is it takes the document instead of event variable array
 ****************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
-EXTERN_C int genaNotifyAllExt(
-	UpnpDevice_Handle device_handle, 
-	char *UDN,
-	char *servId,
-	IN IXML_Document *PropSet);
-#endif
+DEVICEONLY(EXTERN_C int genaNotifyAllExt(UpnpDevice_Handle device_handle, 
+		   char *UDN, char *servId,IN IXML_Document *PropSet);)
 
 /****************************************************************************
 *	Function :	genaInitNotify
@@ -331,15 +315,13 @@ EXTERN_C int genaNotifyAllExt(
 *	Note : No other event will be sent to this control point before the 
 *			intial state table dump.
 ****************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
-EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
-	IN char *UDN,
-	IN char *servId,
-	IN char **VarNames,
-	IN char **VarValues,
-	IN int var_count,
-	IN Upnp_SID sid);
-#endif
+DEVICEONLY(EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
+			    IN char *UDN,
+			    IN char *servId,
+			    IN char **VarNames,
+			    IN char **VarValues,
+				IN int var_count,
+				IN Upnp_SID sid);)
 
 /****************************************************************************
 *	Function :	genaInitNotifyExt
@@ -361,14 +343,12 @@ EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
 *	Note : No other event will be sent to this control point before the 
 *			intial state table dump.
 ****************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
-EXTERN_C  int genaInitNotifyExt(
-	IN UpnpDevice_Handle device_handle, 
-	IN char *UDN, 
-	IN char *servId,
-	IN IXML_Document *PropSet, 
-	IN Upnp_SID sid);
-#endif
+DEVICEONLY(EXTERN_C  int genaInitNotifyExt(
+		   IN UpnpDevice_Handle device_handle, 
+		   IN char *UDN, 
+		   IN char *servId,
+		   IN IXML_Document *PropSet, 
+		   IN Upnp_SID sid);)
 
 
 /************************************************************************

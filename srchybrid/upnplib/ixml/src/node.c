@@ -175,7 +175,7 @@ ixmlNode_getLocalName( IN IXML_Node * nodeptr )
 *=================================================================*/
 int
 ixmlNode_setNamespaceURI( IN IXML_Node * nodeptr,
-                          IN const char *namespaceURI )
+                          IN char *namespaceURI )
 {
 
     if( nodeptr == NULL ) {
@@ -207,7 +207,7 @@ ixmlNode_setNamespaceURI( IN IXML_Node * nodeptr,
 *=================================================================*/
 int
 ixmlNode_setPrefix( IN IXML_Node * nodeptr,
-                    IN const char *prefix )
+                    IN char *prefix )
 {
 
     if( nodeptr == NULL ) {
@@ -240,7 +240,7 @@ ixmlNode_setPrefix( IN IXML_Node * nodeptr,
 *=================================================================*/
 int
 ixmlNode_setLocalName( IN IXML_Node * nodeptr,
-                       IN const char *localName )
+                       IN char *localName )
 {
 
     assert( nodeptr != NULL );
@@ -261,7 +261,7 @@ ixmlNode_setLocalName( IN IXML_Node * nodeptr,
 }
 
 /*================================================================
-*   ixmlNode_getNamespaceURI
+*   ixmlNode_getNodeNamespaceURI
 *       Returns the node namespaceURI
 *       External function.
 *   Returns:		
@@ -288,10 +288,10 @@ ixmlNode_getNamespaceURI( IN IXML_Node * nodeptr )
 *       the prefix of the node.
 *
 *=================================================================*/
-const DOMString
+DOMString
 ixmlNode_getPrefix( IN IXML_Node * nodeptr )
 {
-    const DOMString prefix = NULL;
+    DOMString prefix = NULL;
 
     if( nodeptr != NULL ) {
         prefix = nodeptr->prefix;
@@ -309,7 +309,7 @@ ixmlNode_getPrefix( IN IXML_Node * nodeptr )
 *       the nodeValue of the node.
 *
 *=================================================================*/
-const DOMString
+DOMString
 ixmlNode_getNodeValue( IN IXML_Node * nodeptr )
 {
 
@@ -330,7 +330,7 @@ ixmlNode_getNodeValue( IN IXML_Node * nodeptr )
 *=================================================================*/
 int
 ixmlNode_setNodeValue( IN IXML_Node * nodeptr,
-                       IN const char *newNodeValue )
+                       IN char *newNodeValue )
 {
     int rc = IXML_SUCCESS;
 
@@ -359,7 +359,7 @@ ixmlNode_setNodeValue( IN IXML_Node * nodeptr,
 *       External function.
 *
 *=================================================================*/
-unsigned short
+const unsigned short
 ixmlNode_getNodeType( IN IXML_Node * nodeptr )
 {
     if( nodeptr != NULL ) {
@@ -929,7 +929,6 @@ ixmlNode_cloneElement( IN IXML_Element * nodeptr )
     rc = ixmlElement_setTagName( newElement, nodeptr->tagName );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
-	return NULL;
     }
 
     elementNode = ( IXML_Node * ) newElement;
@@ -937,31 +936,26 @@ ixmlNode_cloneElement( IN IXML_Element * nodeptr )
     rc = ixmlNode_setNodeName( elementNode, srcNode->nodeName );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
-        return NULL;
     }
 
     rc = ixmlNode_setNodeValue( elementNode, srcNode->nodeValue );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
-        return NULL;
     }
 
     rc = ixmlNode_setNamespaceURI( elementNode, srcNode->namespaceURI );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
-        return NULL;
     }
 
     rc = ixmlNode_setPrefix( elementNode, srcNode->prefix );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
-        return NULL;
     }
 
     rc = ixmlNode_setLocalName( elementNode, srcNode->localName );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
-        return NULL;
     }
 
     elementNode->nodeType = eELEMENT_NODE;
@@ -1253,10 +1247,6 @@ ixmlNode_cloneNodeTree( IN IXML_Node * nodeptr,
         case eDOCUMENT_TYPE_NODE:
         case eDOCUMENT_FRAGMENT_NODE:
         case eNOTATION_NODE:
-/* create a new node here?            newNode = (IXML_Node *)malloc(sizeof(IXML_Node));
-            if( newNode == NULL ) {
-                return NULL;
-            }*/
             break;
     }
 
@@ -1425,7 +1415,7 @@ ixmlNode_hasAttributes( IXML_Node * nodeptr )
 *=================================================================*/
 void
 ixmlNode_getElementsByTagNameRecursive( IN IXML_Node * n,
-                                        IN const char *tagname,
+                                        IN char *tagname,
                                         OUT IXML_NodeList ** list )
 {
     const char *name;
@@ -1457,7 +1447,7 @@ ixmlNode_getElementsByTagNameRecursive( IN IXML_Node * n,
 *=================================================================*/
 void
 ixmlNode_getElementsByTagName( IN IXML_Node * n,
-                               IN const char *tagname,
+                               IN char *tagname,
                                OUT IXML_NodeList ** list )
 {
     const char *name;
@@ -1484,8 +1474,8 @@ ixmlNode_getElementsByTagName( IN IXML_Node * n,
 *=================================================================*/
 void
 ixmlNode_getElementsByTagNameNSRecursive( IN IXML_Node * n,
-                                          IN const char *namespaceURI,
-                                          IN const char *localName,
+                                          IN char *namespaceURI,
+                                          IN char *localName,
                                           OUT IXML_NodeList ** list )
 {
     const DOMString nsURI;
@@ -1525,8 +1515,8 @@ ixmlNode_getElementsByTagNameNSRecursive( IN IXML_Node * n,
 *=================================================================*/
 void
 ixmlNode_getElementsByTagNameNS( IN IXML_Node * n,
-                                 IN const char *namespaceURI,
-                                 IN const char *localName,
+                                 IN char *namespaceURI,
+                                 IN char *localName,
                                  OUT IXML_NodeList ** list )
 {
     const DOMString nsURI;
@@ -1560,7 +1550,7 @@ ixmlNode_getElementsByTagNameNS( IN IXML_Node * n,
 *=================================================================*/
 int
 ixmlNode_setNodeName( IN IXML_Node * node,
-                      IN const DOMString qualifiedName )
+                      IN DOMString qualifiedName )
 {
     int rc = IXML_SUCCESS;
 

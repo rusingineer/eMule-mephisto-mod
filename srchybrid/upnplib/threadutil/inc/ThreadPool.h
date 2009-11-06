@@ -1,58 +1,52 @@
-/*******************************************************************************
- *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
- *
- * * Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * * Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * * Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
- * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
- * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- ******************************************************************************/
+///////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2000-2003 Intel Corporation 
+// All rights reserved. 
+//
+// Redistribution and use in source and binary forms, with or without 
+// modification, are permitted provided that the following conditions are met: 
+//
+// * Redistributions of source code must retain the above copyright notice, 
+// this list of conditions and the following disclaimer. 
+// * Redistributions in binary form must reproduce the above copyright notice, 
+// this list of conditions and the following disclaimer in the documentation 
+// and/or other materials provided with the distribution. 
+// * Neither name of Intel Corporation nor the names of its contributors 
+// may be used to endorse or promote products derived from this software 
+// without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+///////////////////////////////////////////////////////////////////////////
 
 #ifndef THREADPOOL_H
 #define THREADPOOL_H
-
-#ifdef UPNP_USE_MSVCPP
-	#define UPNP_INLINE
-#else
-	#define UPNP_INLINE inline
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Size of job free list */
+//Size of job free list
 #define JOBFREELISTSIZE 100
 
 #define INFINITE_THREADS -1
 
 #define EMAXTHREADS (-8 & 1<<29)
 
-/* Invalid Policy */
+//Invalid Policy
 #define INVALID_POLICY (-9 & 1<<29)
 
-/* Invalid JOB Id */
+//Invalid JOB Id
 #define INVALID_JOB_ID (-2 & 1<<29)
 
 typedef enum duration {SHORT_TERM,PERSISTENT} Duration;
@@ -61,48 +55,46 @@ typedef enum priority {LOW_PRIORITY,
 		       MED_PRIORITY,
 		       HIGH_PRIORITY} ThreadPriority;
 
-#define DEFAULT_PRIORITY MED_PRIORITY /* default priority used by TPJobInit */
-#define DEFAULT_MIN_THREADS 1	      /* default minimum used by TPAttrInit */
-#define DEFAULT_MAX_THREADS 10	      /* default max used by TPAttrInit	*/
-#define DEFAULT_JOBS_PER_THREAD 10    /* default jobs per thread used by TPAttrInit */
-#define DEFAULT_STARVATION_TIME	500   /* default starvation time used by TPAttrInit */
-#define DEFAULT_IDLE_TIME 10 * 1000   /* default idle time used by TPAttrInit */
-#define DEFAULT_FREE_ROUTINE NULL     /* default free routine used TPJobInit */
-#define DEFAULT_MAX_JOBS_TOTAL 100    /* default max jobs used TPAttrInit */
+#define DEFAULT_PRIORITY MED_PRIORITY //default priority used by TPJobInit
+#define DEFAULT_MIN_THREADS 1	      //default minimum used by TPAttrInit
+#define DEFAULT_MAX_THREADS 10	      //default max used by TPAttrInit	
+#define DEFAULT_JOBS_PER_THREAD 10    //default jobs per thread used by TPAttrInit
+#define DEFAULT_STARVATION_TIME	500   //default starvation time used by TPAttrInit
+#define DEFAULT_IDLE_TIME 10 * 1000   //default idle time used by TPAttrInit
+#define DEFAULT_FREE_ROUTINE NULL     //default free routine used TPJobInit 
 
-/* Statistics */
-/* always include stats because code change is minimal */
-#define STATS 1
+#define STATS 1 //always include stats because code change is minimal
+
+
+//Statistics 
+#ifdef STATS
+#define STATSONLY(x) x
+#else
+#define STATSONLY(x)
+#endif
 
 #ifdef _DEBUG
-	#define DEBUG 1
+#define DEBUG 1
+#endif
+
+//DEBUGGING
+#ifdef DEBUG
+#define DBGONLY(x) x
+#else
+#define DBGONLY(x)
 #endif
 
 #include "LinkedList.h"
-
-#ifdef WIN32
-    #include <time.h>
-    #include <winsock2.h>
-    struct timezone 
-    {
-        int  tz_minuteswest; /* minutes W of Greenwich */
-        int  tz_dsttime;     /* type of dst correction */
-    };
-    int gettimeofday(struct timeval *tv, struct timezone *tz);
-#else /* WIN32 */
-    #include <sys/time.h> /* for gettimeofday() */
-#endif
-
+#include <sys/timeb.h>
 #include "FreeList.h"
 
 #include "ithread.h"
 #include <errno.h>
-
-#define EXPORT
-
+#include <sys/timeb.h>
+#define EXPORT 
 typedef int PolicyType;
 #define DEFAULT_POLICY SCHED_OTHER
-#define DEFAULT_SCHED_PARAM 0 /* default priority */
+#define DEFAULT_SCHED_PARAM 0 //default priority
 
 /****************************************************************************
  * Name: free_routine
@@ -116,33 +108,29 @@ typedef void (*free_routine)(void *arg);
  * Name: ThreadPoolAttr
  *
  *  Description:
- *     Attributes for thread pool. Used to set and change parameters of
+ *     Attributes for thread pool. Used to set and change parameters of 
  *     thread pool
  *****************************************************************************/
 typedef struct THREADPOOLATTR
 {
-	/* minThreads, ThreadPool will always maintain at least this many threads */
-	int minThreads;
+  int minThreads; //minThreads, ThreadPool will always maintain at least
+                  //this many threads
+  
+  int maxThreads; //maxThreads, ThreadPool will never have more than this
+                  //number of threads
+  
+  int maxIdleTime;   //maxIdleTime (in milliseconds) 
+                     // this is the maximum time a thread will remain idle
+                     // before dying
 
-	/* maxThreads, ThreadPool will never have more than this number of threads */
-	int maxThreads;
+  int jobsPerThread; //jobs per thread to maintain
+					  
+  int starvationTime;   //the time a low priority or med priority
+	                    //job waits before getting bumped
+                        //up a priority (in milliseconds)
+  
+  PolicyType schedPolicy; //scheduling policy to use
 
-	/* maxIdleTime (in milliseconds) this is the maximum time a thread will
-	 * remain idle before dying */
-	int maxIdleTime;
-
-	/* jobs per thread to maintain */
-	int jobsPerThread;
-
-	/* maximum number of jobs that can be queued totally. */
-	int maxJobsTotal;
-
-	/* the time a low priority or med priority job waits before getting bumped
-	 * up a priority (in milliseconds) */
-	int starvationTime;
-
-	/* scheduling policy to use */
-	PolicyType schedPolicy;
 } ThreadPoolAttr;
 
 /****************************************************************************
@@ -153,12 +141,12 @@ typedef struct THREADPOOLATTR
  *****************************************************************************/
 typedef struct THREADPOOLJOB
 {
-	start_routine func;
-	void *arg;
-	free_routine free_func;
-	struct timeval requestTime;
-	int priority;
-	int jobId;
+  start_routine func; //function
+  void *arg;          //arg
+  free_routine free_func; //free function
+  struct timeb requestTime; //time of request
+  int priority;       //priority of request
+  int jobId;         //id 
 } ThreadPoolJob;
 
 /****************************************************************************
@@ -168,28 +156,32 @@ typedef struct THREADPOOLJOB
  *     Structure to hold statistics
  *****************************************************************************/
 
+STATSONLY(
+
 typedef struct TPOOLSTATS
 {
-	double totalTimeHQ;
-	int totalJobsHQ;
-	double avgWaitHQ;
-	double totalTimeMQ;
-	int totalJobsMQ;
-	double avgWaitMQ;
-	double totalTimeLQ;
-	int totalJobsLQ;
-	double avgWaitLQ;
-	double totalWorkTime;
-	double totalIdleTime;
-	int workerThreads;
-	int idleThreads;
-	int persistentThreads;
-	int totalThreads;
-	int maxThreads;
-	int currentJobsHQ;
-	int currentJobsLQ;
-	int currentJobsMQ;
-} ThreadPoolStats;
+  double totalTimeHQ; //total time spent by all jobs in high priority Q
+  int totalJobsHQ;    //total jobs in HQ run so far
+  double avgWaitHQ;   //average wait in HQ 
+  double totalTimeMQ; //total time spent by all jobs in med priority Q
+  int totalJobsMQ;    //total jobs in MQ run so far
+  double avgWaitMQ;   //average wait in MQ
+  double totalTimeLQ; //total time spent by all jobs in low priority Q
+  int totalJobsLQ;    //total jobs in LQ run so far
+  double avgWaitLQ;	//average wait in LQ	
+  double totalWorkTime; //total time spent working for all threads
+  double totalIdleTime; //total time spent idle for all threads
+  int workerThreads; //number of current workerThreads
+  int idleThreads;   //number of current idle threads
+  int persistentThreads; //number of persistent threads
+  int totalThreads; //total number of current threads
+  int maxThreads; //max threads so far	
+  int currentJobsHQ; // current jobs in Q
+  int currentJobsLQ; //current jobs in Q
+  int currentJobsMQ; //current jobs in Q
+}ThreadPoolStats;
+
+)
 
 
 /****************************************************************************
@@ -214,24 +206,25 @@ typedef struct TPOOLSTATS
 
 typedef struct THREADPOOL
 {
-	ithread_mutex_t mutex; /* mutex to protect job qs */
-	ithread_cond_t condition; /* condition variable to signal Q */
-	ithread_cond_t start_and_shutdown; /* condition variable for start 
-					and stop */
-	int lastJobId; /* ids for jobs */
-	int shutdown;  /* whether or not we are shutting down */
-	int totalThreads;      /* total number of threads */
-	int persistentThreads; /* number of persistent threads */
-	FreeList jobFreeList;  /* free list of jobs */
-	LinkedList lowJobQ;    /* low priority job Q */
-	LinkedList medJobQ;    /* med priority job Q */
-	LinkedList highJobQ;   /* high priority job Q */
-	ThreadPoolJob *persistentJob; /* persistent job */
-
-	ThreadPoolAttr attr; /* thread pool attributes */
-
-	/* statistics */
-	ThreadPoolStats stats;
+  ithread_mutex_t mutex; //mutex to protect job qs
+  ithread_cond_t condition; //condition variable to signal Q
+  ithread_cond_t start_and_shutdown; //condition variable for start 
+                                     //and stop     
+  int lastJobId; //ids for jobs 
+  int shutdown;   //whether or not we are shutting down
+  int totalThreads;       //total number of threads	
+  int persistentThreads; //number of persistent threads
+  FreeList jobFreeList; //free list of jobs
+  LinkedList lowJobQ;    //low priority job Q
+  LinkedList medJobQ;    //med priority job Q
+  LinkedList highJobQ;   //high priority job Q
+  ThreadPoolJob *persistentJob; //persistent job
+ 
+  ThreadPoolAttr attr; //thread pool attributes
+  
+  //statistics 
+  STATSONLY(ThreadPoolStats stats;)
+ 
 } ThreadPool;
 
 
@@ -272,7 +265,8 @@ typedef struct THREADPOOL
  *      INVALID_POLICY if schedPolicy can't be set
  *      EMAXTHREADS if minimum threads is greater than maximum threads
  *****************************************************************************/
-int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr);
+int ThreadPoolInit(ThreadPool *tp,
+  ThreadPoolAttr *attr);
 
 /****************************************************************************
  * Function: ThreadPoolAddPersistent
@@ -294,7 +288,9 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr);
  *      EOUTOFMEM not enough memory to add job.
  *      EMAXTHREADS not enough threads to add persistent job.
  *****************************************************************************/
-int ThreadPoolAddPersistent(ThreadPool*tp, ThreadPoolJob *job, int *jobId);
+int ThreadPoolAddPersistent (ThreadPool*tp,
+  ThreadPoolJob *job,
+  int *jobId);
 
 /****************************************************************************
  * Function: ThreadPoolGetAttr
@@ -309,7 +305,8 @@ int ThreadPoolAddPersistent(ThreadPool*tp, ThreadPoolJob *job, int *jobId);
  *      0 on success, nonzero on failure
  *      Always returns 0.
  *****************************************************************************/
-int ThreadPoolGetAttr(ThreadPool *tp, ThreadPoolAttr *out);
+int ThreadPoolGetAttr(ThreadPool *tp,
+  ThreadPoolAttr *out);
 /****************************************************************************
  * Function: ThreadPoolSetAttr
  *
@@ -323,7 +320,8 @@ int ThreadPoolGetAttr(ThreadPool *tp, ThreadPoolAttr *out);
  *      0 on success, nonzero on failure
  *      Returns INVALID_POLICY if policy can not be set.
  *****************************************************************************/
-int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr);
+int ThreadPoolSetAttr(ThreadPool *tp,
+  ThreadPoolAttr *attr);
 
 /****************************************************************************
  * Function: ThreadPoolAdd
@@ -342,7 +340,9 @@ int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr);
  *      0 on success, nonzero on failure
  *      EOUTOFMEM if not enough memory to add job.
  *****************************************************************************/
-int ThreadPoolAdd (ThreadPool*tp, ThreadPoolJob *job, int *jobId);
+int ThreadPoolAdd (ThreadPool*tp,
+  ThreadPoolJob *job,
+  int *jobId);
 
 /****************************************************************************
  * Function: ThreadPoolRemove
@@ -359,7 +359,8 @@ int ThreadPoolAdd (ThreadPool*tp, ThreadPoolJob *job, int *jobId);
  *      0 on success, nonzero on failure.
  *      INVALID_JOB_ID if job not found. 
  *****************************************************************************/
-int ThreadPoolRemove(ThreadPool *tp, int jobId, ThreadPoolJob *out);
+int ThreadPoolRemove(ThreadPool *tp,
+  int jobId, ThreadPoolJob *out);
 
 
 
@@ -421,6 +422,7 @@ int TPJobSetPriority(ThreadPoolJob *job, ThreadPriority priority);
  *      Always returns 0.
  *****************************************************************************/
 int TPJobSetFreeFunction(ThreadPoolJob *job, free_routine func);
+
 
 /****************************************************************************
  * Function: TPAttrInit
@@ -514,19 +516,6 @@ int TPAttrSetSchedPolicy(ThreadPoolAttr *attr, PolicyType schedPolicy);
 
 
 /****************************************************************************
- * Function: TPAttrSetMaxJobsTotal
- *
- *  Description:
- *      Sets the maximum number jobs that can be qeued totally.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      maxJobsTotal - maximum number of jobs
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
-int TPAttrSetMaxJobsTotal(ThreadPoolAttr *attr, int maxJobsTotal);
-
-/****************************************************************************
  * Function: ThreadPoolGetStats
  *
  *  Description:
@@ -539,19 +528,12 @@ int TPAttrSetMaxJobsTotal(ThreadPoolAttr *attr, int maxJobsTotal);
  *  Returns:
  *      Always returns 0.
  *****************************************************************************/
-#ifdef STATS
-	EXPORT int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats);
+STATSONLY( EXPORT int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats););
 
-	EXPORT void ThreadPoolPrintStats(ThreadPoolStats *stats);
-#else
-	static UPNP_INLINE int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats) {}
-
-	static UPNP_INLINE void ThreadPoolPrintStats(ThreadPoolStats *stats) {}
-#endif
+STATSONLY(EXPORT void ThreadPoolPrintStats(ThreadPoolStats *stats););
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ThreadPool */
-
+#endif //ThreadPool

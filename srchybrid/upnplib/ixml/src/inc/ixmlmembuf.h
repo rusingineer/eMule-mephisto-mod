@@ -38,7 +38,9 @@
 #define MINVAL( a, b ) ( (a) < (b) ? (a) : (b) )
 #define MAXVAL( a, b ) ( (a) > (b) ? (a) : (b) )
 
-#define MEMBUF_DEF_SIZE_INC 20
+#define	XINLINE inline
+
+#define MEMBUF_DEF_SIZE_INC		20
 
 
 typedef struct // ixml_membuf 

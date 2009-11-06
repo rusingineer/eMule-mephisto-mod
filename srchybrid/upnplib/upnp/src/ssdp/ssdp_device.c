@@ -1,43 +1,39 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2000-2003 Intel Corporation
+// Copyright (c) 2000-2003 Intel Corporation 
 // All rights reserved. 
 //
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without 
+// modification, are permitted provided that the following conditions are met: 
 //
-// * Redistributions of source code must retain the above copyright notice,
-// this list of conditions and the following disclaimer.
-// * Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation
-// and/or other materials provided with the distribution.
-// * Neither name of Intel Corporation nor the names of its contributors
-// may be used to endorse or promote products derived from this software
+// * Redistributions of source code must retain the above copyright notice, 
+// this list of conditions and the following disclaimer. 
+// * Redistributions in binary form must reproduce the above copyright notice, 
+// this list of conditions and the following disclaimer in the documentation 
+// and/or other materials provided with the distribution. 
+// * Neither name of Intel Corporation nor the names of its contributors 
+// may be used to endorse or promote products derived from this software 
 // without specific prior written permission.
 // 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
 // OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#include "config.h"
-
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SSDP == 0
-
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
-
+#include "config.h"
 #include "ssdplib.h"
 #include "upnpapi.h"
 #include "ThreadPool.h"
@@ -45,24 +41,23 @@
 #include "httpreadwrite.h"
 #include "statcodes.h"
 #include "unixutil.h"
+#ifdef _WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#endif
 
-#ifdef WIN32
-	#include <ws2tcpip.h>
-	#include <winsock2.h>
-#endif /* WIN32 */
-
-#define MSGTYPE_SHUTDOWN	0
+#define MSGTYPE_SHUTDOWN		0
 #define MSGTYPE_ADVERTISEMENT	1
-#define MSGTYPE_REPLY		2
+#define MSGTYPE_REPLY			2
 
 /************************************************************************
-* Function : advertiseAndReplyThread
+* Function : advertiseAndReplyThread									
+*																	
+* Parameters:														
+*		IN void *data: Structure containing the search request
 *
-* Parameters:
-*	IN void *data: Structure containing the search request
-*
-* Description:
-*	This function is a wrapper function to reply the search request
+* Description:														
+*	This function is a wrapper function to reply the search request 
 *	coming from the control point.
 *
 * Returns: void *
@@ -85,13 +80,13 @@ advertiseAndReplyThread( IN void *data )
 }
 
 /************************************************************************
-* Function : ssdp_handle_device_request
+* Function : ssdp_handle_device_request									
+*																	
+* Parameters:														
+*		IN http_message_t* hmsg: SSDP search request from the control point
+*		IN struct sockaddr_in* dest_addr: The address info of control point
 *
-* Parameters:
-*	IN http_message_t* hmsg: SSDP search request from the control point
-*	IN struct sockaddr_in* dest_addr: The address info of control point
-*
-* Description:
+* Description:														
 *	This function handles the search request. It do the sanity checks of
 *	the request and then schedules a thread to send a random time reply (
 *	random within maximum time given by the control point to reply).
@@ -99,7 +94,6 @@ advertiseAndReplyThread( IN void *data )
 * Returns: void *
 *	1 if successful else appropriate error
 ***************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
 void
 ssdp_handle_device_request( IN http_message_t * hmsg,
                             IN struct sockaddr_in *dest_addr )
@@ -140,30 +134,30 @@ ssdp_handle_device_request( IN http_message_t * hmsg,
         return;                 // bad ST header
     }
 
-    HandleLock();
+    HandleLock(  );
     // device info
     if( GetDeviceHandleInfo( &handle, &dev_info ) != HND_DEVICE ) {
-        HandleUnlock();
+        HandleUnlock(  );
         return;                 // no info found
     }
     maxAge = dev_info->MaxAge;
-    HandleUnlock();
+    HandleUnlock(  );
 
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-        "ssdp_handle_device_request with Cmd %d SEARCH\n",
-        event.Cmd );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-        "MAX-AGE     =  %d\n", maxAge );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-        "MX     =  %d\n", event.Mx );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-        "DeviceType   =  %s\n", event.DeviceType );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-        "DeviceUuid   =  %s\n", event.UDN );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-        "ServiceType =  %s\n", event.ServiceType );
+    DBGONLY( UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+                         "ssdp_handle_device_request with Cmd %d SEARCH\n",
+                         event.Cmd );
+             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+                         "MAX-AGE     =  %d\n", maxAge );
+             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+                         "MX     =  %d\n", event.Mx );
+             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+                         "DeviceType   =  %s\n", event.DeviceType );
+             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+                         "DeviceUuid   =  %s\n", event.UDN );
+             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+                         "ServiceType =  %s\n", event.ServiceType ); )
 
-    threadArg =
+        threadArg =
         ( SsdpSearchReply * ) malloc( sizeof( SsdpSearchReply ) );
 
     if( threadArg == NULL ) {
@@ -190,23 +184,22 @@ ssdp_handle_device_request( IN http_message_t * hmsg,
         mx = 1;
     }
 
-    replyTime = rand() % mx;
+    replyTime = rand(  ) % mx;
 
     TimerThreadSchedule( &gTimerThread, replyTime, REL_SEC, &job,
                          SHORT_TERM, NULL );
 }
-#endif
 
 /************************************************************************
-* Function : NewRequestHandler
-*
-* Parameters:
+* Function : NewRequestHandler									
+*																	
+* Parameters:														
 *		IN struct sockaddr_in * DestAddr: Ip address, to send the reply.
 *		IN int NumPacket: Number of packet to be sent.
 *		IN char **RqPacket:Number of packet to be sent.
 *
-* Description:
-*	This function works as a request handler which passes the HTTP
+* Description:														
+*	This function works as a request handler which passes the HTTP 
 *	request string to multicast channel then
 *
 * Returns: void *
@@ -217,50 +210,39 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
                    IN int NumPacket,
                    IN char **RqPacket )
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
-    int ReplySock;
     int socklen = sizeof( struct sockaddr_in );
-    int NumCopy;
-    int Index;
+	SOCKET ReplySock;
+    int NumCopy,
+      Index;
     unsigned long replyAddr = inet_addr( LOCAL_HOST );
-    int ttl = 4; // a/c to UPNP Spec
+    int ttl = 4;                //a/c to UPNP Spec
 
     ReplySock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( ReplySock == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            "SSDP_LIB: New Request Handler:"
-            "Error in socket(): %s\n", errorBuffer );
+    if( ReplySock == UPNP_INVALID_SOCKET ) {
+        DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                             "SSDP_LIB: New Request Handler:"
+                             "Error in socket operation !!!\n" ) );
 
         return UPNP_E_OUTOF_SOCKET;
     }
 
     setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
-        (char *)&replyAddr, sizeof (replyAddr) );
+                ( char * )&replyAddr, sizeof( replyAddr ) );
     setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
-        (char *)&ttl, sizeof (int) );
+                ( char * )&ttl, sizeof( int ) );
 
     for( Index = 0; Index < NumPacket; Index++ ) {
         int rc;
-        // The reason to keep this loop is purely historical/documentation,
-        // according to section 9.2 of HTTPU spec:
-        // 
-        // "If a multicast resource would send a response(s) to any copy of the 
-        //  request, it SHOULD send its response(s) to each copy of the request 
-        //  it receives. It MUST NOT repeat its response(s) per copy of the 
-        //  request."
-        //  
-        // http://www.upnp.org/download/draft-goland-http-udp-04.txt
-        //
-        // So, NUM_COPY has been changed from 2 to 1.
+
         NumCopy = 0;
         while( NumCopy < NUM_COPY ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                ">>> SSDP SEND >>>\n%s\n",
-                *( RqPacket + Index ) );
-            rc = sendto( ReplySock, *( RqPacket + Index ),
-                         strlen( *( RqPacket + Index ) ),
-                         0, ( struct sockaddr * )DestAddr, socklen );
+            DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                                 ">>> SSDP SEND >>>\n%s\n",
+                                 *( RqPacket + Index ) );
+                 )
+                rc = sendto( ReplySock, *( RqPacket + Index ),
+                             strlen( *( RqPacket + Index ) ),
+                             0, ( struct sockaddr * )DestAddr, socklen );
             imillisleep( SSDP_PAUSE );
             ++NumCopy;
         }
@@ -268,29 +250,28 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
 
     shutdown( ReplySock, SD_BOTH );
     UpnpCloseSocket( ReplySock );
-
     return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
-* Function : CreateServiceRequestPacket
-*
-* Parameters:
-*	IN int msg_type : type of the message ( Search Reply, Advertisement
-*		or Shutdown )
+* Function : CreateServiceRequestPacket									
+*																	
+* Parameters:														
+*	IN int msg_type : type of the message ( Search Reply, Advertisement 
+*												or Shutdown )
 *	IN char * nt : ssdp type
 *	IN char * usn : unique service name ( go in the HTTP Header)
 *	IN char * location :Location URL.
 *	IN int  duration :Service duration in sec.
 *	OUT char** packet :Output buffer filled with HTTP statement.
 *
-* Description:
-*	This function creates a HTTP request packet.  Depending
+* Description:														
+*	This function creates a HTTP request packet.  Depending 
 *	on the input parameter it either creates a service advertisement
-*	request or service shutdown request etc.
+*   request or service shutdown request etc.
 *
 * Returns: void
-*
+*	
 ***************************************************************************/
 void
 CreateServicePacket( IN int msg_type,
@@ -313,16 +294,12 @@ CreateServicePacket( IN int msg_type,
     *packet = NULL;
 
     if( msg_type == MSGTYPE_REPLY ) {
-        ret_code = http_MakeMessage(
-            &buf, 1, 1,
-            "R" "sdc" "D" "sc" "ssc" "S" "Xc" "ssc" "sscc",
-            HTTP_OK,
-            "CACHE-CONTROL: max-age=", duration,
-	    "EXT:",
-            "LOCATION: ", location,
-            X_USER_AGENT,
-            "ST: ", nt,
-            "USN: ", usn);
+        ret_code = http_MakeMessage( &buf, 1, 1,
+                                     "R" "sdc" "D" "s" "ssc" "S" "ssc"
+                                     "ssc" "c", HTTP_OK,
+                                     "Cache-Control: max-age=", duration,
+                                     "Ext:\r\n", "Location: ", location,
+                                     "ST: ", nt, "USN: ", usn );
         if( ret_code != 0 ) {
             return;
         }
@@ -337,18 +314,14 @@ CreateServicePacket( IN int msg_type,
 
         // NOTE: The CACHE-CONTROL and LOCATION headers are not present in
         //  a shutdown msg, but are present here for MS WinMe interop.
-        
-        ret_code = http_MakeMessage(
-            &buf, 1, 1,
-            "Q" "sssdc" "sdc" "ssc" "ssc" "ssc" "S" "Xc" "sscc",
-            HTTPMETHOD_NOTIFY, "*", (size_t)1,
-            "HOST: ", SSDP_IP, ":", SSDP_PORT,
-            "CACHE-CONTROL: max-age=", duration,
-            "LOCATION: ", location,
-            "NT: ", nt,
-            "NTS: ", nts,
-            X_USER_AGENT,
-            "USN: ", usn );
+
+        ret_code = http_MakeMessage( &buf, 1, 1,
+                                     "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
+                                     "S" "ssc" "c", HTTPMETHOD_NOTIFY, "*",
+                                     1, "Host: ", SSDP_IP, ":", SSDP_PORT,
+                                     "Cache-Control: max-age=", duration,
+                                     "Location: ", location, "NT: ", nt,
+                                     "NTS: ", nts, "USN: ", usn );
         if( ret_code != 0 ) {
             return;
         }
@@ -365,9 +338,9 @@ CreateServicePacket( IN int msg_type,
 }
 
 /************************************************************************
-* Function : DeviceAdvertisement
-*
-* Parameters:
+* Function : DeviceAdvertisement									
+*																	
+* Parameters:														
 *	IN char * DevType : type of the device
 *	IN int RootDev: flag to indicate if the device is root device
 *	IN char * nt : ssdp type
@@ -375,7 +348,7 @@ CreateServicePacket( IN int msg_type,
 *	IN char * location :Location URL.
 *	IN int  duration :Service duration in sec.
 *
-* Description:
+* Description:														
 *	This function creates the device advertisement request based on 
 *	the input parameter, and send it to the multicast channel.
 *
@@ -396,10 +369,11 @@ DeviceAdvertisement( IN char *DevType,
     char *msgs[3];
     int ret_code;
 
-    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-        "In function SendDeviceAdvertisemenrt\n" );
+    DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                         "In function SendDeviceAdvertisemenrt\n" );
+         )
 
-    DestAddr.sin_family = AF_INET;
+        DestAddr.sin_family = AF_INET;
     DestAddr.sin_addr.s_addr = inet_addr( SSDP_IP );
     DestAddr.sin_port = htons( SSDP_PORT );
 
@@ -451,9 +425,9 @@ DeviceAdvertisement( IN char *DevType,
 }
 
 /************************************************************************
-* Function : SendReply
-*
-* Parameters:
+* Function : SendReply									
+*																	
+* Parameters:	
 *	IN struct sockaddr_in * DestAddr:destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
@@ -462,7 +436,7 @@ DeviceAdvertisement( IN char *DevType,
 *	IN int  Duration :Life time of this device.
 *	IN int ByType:
 *
-* Description:
+* Description:														
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client addesss given in its input parameter DestAddr.
 *
@@ -528,16 +502,17 @@ SendReply( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : DeviceReply
-*
-* Parameters:
+* Function : DeviceReply									
+*																	
+* Parameters:	
 *	IN struct sockaddr_in * DestAddr:destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char * Udn: Device UDN
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-* Description:
+
+* Description:														
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client address given in its input parameter DestAddr.
 *
@@ -606,16 +581,18 @@ DeviceReply( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : ServiceAdvertisement
-*
-* Parameters:
+* Function : ServiceAdvertisement									
+*																	
+* Parameters:	
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-* Description:
-*	This function creates the advertisement packet based
+
+* Description:														
+*	This function creates the advertisement packet based 
 *	on the input parameter, and send it to the multicast channel.
+
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
@@ -652,17 +629,19 @@ ServiceAdvertisement( IN char *Udn,
 }
 
 /************************************************************************
-* Function : ServiceReply
-*
-* Parameters:
+* Function : ServiceReply									
+*																	
+* Parameters:	
 *	IN struct sockaddr_in *DestAddr:
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-* Description:
+
+* Description:														
 *	This function creates the advertisement packet based 
 *	on the input parameter, and send it to the multicast channel.
+
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
@@ -695,14 +674,15 @@ ServiceReply( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : ServiceShutdown
-*
-* Parameters:
+* Function : ServiceShutdown									
+*																	
+* Parameters:	
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Service duration in sec.
-* Description:
+
+* Description:														
 *	This function creates a HTTP service shutdown request packet 
 *	and sent it to the multicast channel through RequestHandler.
 *
@@ -740,16 +720,16 @@ ServiceShutdown( IN char *Udn,
 }
 
 /************************************************************************
-* Function : DeviceShutdown
-*
-* Parameters:
+* Function : DeviceShutdown									
+*																	
+* Parameters:	
 *	IN char *DevType: Device Type.
 *	IN int RootDev:1 means root device.
 *	IN char * Udn: Device UDN
 *	IN char * Location: Location URL
 *	IN int  Duration :Device duration in sec.
 *
-* Description:
+* Description:														
 *	This function creates a HTTP device shutdown request packet 
 *	and sent it to the multicast channel through RequestHandler.
 *
@@ -784,11 +764,11 @@ DeviceShutdown( IN char *DevType,
                              Mil_Usn, Location, Duration, &msgs[0] );
     }
 
-    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-        "In function DeviceShutdown\n" );
-    // both root and sub-devices need to send these two messages
-    CreateServicePacket( MSGTYPE_SHUTDOWN, Udn, Udn,
-                         Location, Duration, &msgs[1] );
+    DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                         "In function DeviceShutdown\n" ); )
+        // both root and sub-devices need to send these two messages
+        CreateServicePacket( MSGTYPE_SHUTDOWN, Udn, Udn,
+                             Location, Duration, &msgs[1] );
 
     sprintf( Mil_Usn, "%s::%s", Udn, DevType );
     CreateServicePacket( MSGTYPE_SHUTDOWN, DevType, Mil_Usn,
@@ -822,4 +802,3 @@ DeviceShutdown( IN char *DevType,
 
 #endif // EXCLUDE_SSDP
 #endif // INCLUDE_DEVICE_APIS
-

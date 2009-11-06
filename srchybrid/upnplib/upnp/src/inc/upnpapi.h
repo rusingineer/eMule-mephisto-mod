@@ -36,7 +36,11 @@
 
 #include "upnp.h"
 #include "client_table.h"
+
 //#include "../ssdp/ssdplib.h"
+
+
+
 
 #define MAX_INTERFACES 256
 
@@ -53,10 +57,10 @@
 #define DEFAULT_SOAP_CONTENT_LENGTH 16000
 #define MAX_SOAP_CONTENT_LENGTH 32000
 
-extern size_t g_maxContentLength;
+extern int g_maxContentLength;
 
 // 30-second timeout
-#define UPNP_TIMEOUT	30
+#define UPNP_TIMEOUT (30 + MINIMUM_DELAY)
 
 typedef enum {HND_INVALID=-1,HND_CLIENT,HND_DEVICE} Upnp_Handle_Type;
 
@@ -67,53 +71,35 @@ struct Handle_Info
     Upnp_FunPtr  Callback; // Callback function pointer.
     char * Cookie;
 
-    // Device Only
-#ifdef INCLUDE_DEVICE_APIS
-    char  DescURL[LINE_SIZE];   // URL for the use of SSDP
-    char  DescXML[LINE_SIZE];   // XML file path for device 
-                                //description
+    //DEVICEONLY(char  DescURL[LINE_SIZE];)   // URL for the use of SSDP
+    char  DescURL[LINE_SIZE];               // URL for the use of SSDP
+    DEVICEONLY(char  DescXML[LINE_SIZE];)   // XML file path for device 
+                                            //description
 
-    int MaxAge;                 // Advertisement timeout
-    IXML_Document *DescDocument;// Description parsed in 
-                                //terms of DOM document 
-    IXML_NodeList *DeviceList;  // List of devices in the 
-                                //description document
-    IXML_NodeList *ServiceList; // List of services in the 
-                                // description document
-    service_table ServiceTable; //table holding subscriptions and 
+    //DEVICEONLY(int MaxAge;)                 // Advertisement timeout
+    int MaxAge;                             // Advertisement timeout
+    DEVICEONLY(IXML_Document *DescDocument;)     // Description parsed in 
+                                            //terms of DOM document 
+    DEVICEONLY(IXML_NodeList *DeviceList;)       // List of devices in the 
+                                            //description document
+    DEVICEONLY(IXML_NodeList *ServiceList;)      // List of services in the 
+                                            // description document
+    DEVICEONLY(service_table ServiceTable;) //table holding subscriptions and 
                                 //URL information
-    int MaxSubscriptions;
-    int MaxSubscriptionTimeOut;
-#endif
+    DEVICEONLY(int MaxSubscriptions;)
+    DEVICEONLY(int MaxSubscriptionTimeOut;)
      
-    // Client only
-#ifdef INCLUDE_CLIENT_APIS
-    client_subscription *ClientSubList; //client subscription list
-    LinkedList SsdpSearchList; // active ssdp searches   
-#endif
+       //Client only
+    CLIENTONLY(client_subscription * ClientSubList;) //client subscription list
+    CLIENTONLY(LinkedList SsdpSearchList;) // active ssdp searches   
     int   aliasInstalled;       // 0 = not installed; otherwise installed
-};
+} ;
 
-extern ithread_rwlock_t GlobalHndRWLock;
+extern ithread_mutex_t GlobalHndMutex;
 Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 
 
-#define HandleLock() HandleWriteLock()
-
-#define HandleWriteLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock"); \
-	ithread_rwlock_wrlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Write lock acquired");
-
-#define HandleReadLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock"); \
-	ithread_rwlock_rdlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Read lock acquired");
-
-#define HandleUnlock() \
-	UpnpPrintf(UPNP_INFO, API,__FILE__, __LINE__, "Trying Unlock"); \
-	ithread_rwlock_unlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlocked rwlock");
-
+#define HandleLock()  DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Trying Lock")); ithread_mutex_lock(&GlobalHndMutex); DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"LOCK"));
+#define HandleUnlock() DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Trying Unlock")); ithread_mutex_unlock(&GlobalHndMutex); DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Unlock"));
 Upnp_Handle_Type GetClientHandleInfo(int *client_handle_out, 
                                      struct Handle_Info **HndInfo);
 Upnp_Handle_Type GetDeviceHandleInfo(int *device_handle_out, 
@@ -127,7 +113,7 @@ extern unsigned short LOCAL_PORT;
 extern TimerThread gTimerThread;
 extern ThreadPool gRecvThreadPool;
 extern ThreadPool gSendThreadPool;
-extern ThreadPool gMiniServerThreadPool;
+
 
 typedef enum {
     SUBSCRIBE,
@@ -146,13 +132,13 @@ struct  UpnpNonblockParam
     UpnpFunName  FunName;
     int   Handle;
     int   TimeOut;
-    char  VarName[NAME_SIZE];
-    char  NewVal[NAME_SIZE];
-    char  DevType[NAME_SIZE];
-    char  DevId[NAME_SIZE];
-    char  ServiceType[NAME_SIZE];
-    char  ServiceVer[NAME_SIZE];
-    char  Url[NAME_SIZE];
+    char  VarName[UPNP_NAME_SIZE];
+    char  NewVal[UPNP_NAME_SIZE];
+    char  DevType[UPNP_NAME_SIZE];
+    char  DevId[UPNP_NAME_SIZE];
+    char  ServiceType[UPNP_NAME_SIZE];
+    char  ServiceVer[UPNP_NAME_SIZE];
+    char  Url[UPNP_NAME_SIZE];
     Upnp_SID   SubsId;
     char  *Cookie;
     Upnp_FunPtr Fun;
@@ -179,6 +165,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 void AutoAdvertise(void *input); 
 int getlocalhostname(char *out);
 
+virtualDirList *pVirtualDirList;
 extern WebServerState bWebServerState;
 
 #endif

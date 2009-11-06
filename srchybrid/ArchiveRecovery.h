@@ -113,12 +113,7 @@ struct RAR_BlockFile
 	uint32	FTIME;
 	BYTE	UNP_VER;
 	BYTE	METHOD;
-	// ==> UPnP support [MoNKi] - leuk_he
-	/*
 	uint16	NAME_SIZE;
-	*/
-	uint16	NAME_SIZE_var; // UPnP support [MoNKi] - leuk_he
-	// <== UPnP support [MoNKi] - leuk_he
 	uint32	ATTR;
 	uint32	HIGH_PACK_SIZE;
 	uint32	HIGH_UNP_SIZE;

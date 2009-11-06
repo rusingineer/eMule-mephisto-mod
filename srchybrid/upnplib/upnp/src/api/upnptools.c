@@ -29,14 +29,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#include "config.h"
 #if EXCLUDE_DOM == 0
 #include <stdarg.h>
+#include "config.h"
 #include "upnptools.h"
 #include "uri.h"
 #define HEADER_LENGTH 2000
 
-// Structure to maintain a error code and string associated with the 
+//Structure to maintain a error code and string associated with the 
 // error code
 struct ErrorString {
     int rc;                     /* error code */
@@ -44,7 +44,7 @@ struct ErrorString {
 
 };
 
-// Initializing the array of error structures. 
+//Intializing the array of error structures. 
 struct ErrorString ErrorMessages[] = { {UPNP_E_SUCCESS, "UPNP_E_SUCCESS"},
 {UPNP_E_INVALID_HANDLE, "UPNP_E_INVALID_HANDLE"},
 {UPNP_E_INVALID_PARAM, "UPNP_E_INVALID_PARAM"},
@@ -63,7 +63,6 @@ struct ErrorString ErrorMessages[] = { {UPNP_E_SUCCESS, "UPNP_E_SUCCESS"},
 {UPNP_E_INVALID_ACTION, "UPNP_E_INVALID_ACTION"},
 {UPNP_E_FINISH, "UPNP_E_FINISH"},
 {UPNP_E_INIT_FAILED, "UPNP_E_INIT_FAILED"},
-{UPNP_E_BAD_HTTPMSG, "UPNP_E_BAD_HTTPMSG"},
 {UPNP_E_NETWORK_ERROR, "UPNP_E_NETWORK_ERROR"},
 {UPNP_E_SOCKET_WRITE, "UPNP_E_SOCKET_WRITE"},
 {UPNP_E_SOCKET_READ, "UPNP_E_SOCKET_READ"},
@@ -76,18 +75,17 @@ struct ErrorString ErrorMessages[] = { {UPNP_E_SUCCESS, "UPNP_E_SUCCESS"},
 {UPNP_E_UNSUBSCRIBE_UNACCEPTED, "UPNP_E_UNSUBSCRIBE_UNACCEPTED"},
 {UPNP_E_NOTIFY_UNACCEPTED, "UPNP_E_NOTIFY_UNACCEPTED"},
 {UPNP_E_INTERNAL_ERROR, "UPNP_E_INTERNAL_ERROR"},
-{UPNP_E_INVALID_ARGUMENT, "UPNP_E_INVALID_ARGUMENT"},
-{UPNP_E_OUTOF_BOUNDS, "UPNP_E_OUTOF_BOUNDS"}
+{UPNP_E_INVALID_ARGUMENT, "UPNP_E_INVALID_ARGUMENT"}
 };
 
 /************************************************************************
-* Function : UpnpGetErrorMessage
-*
-* Parameters:
+* Function : UpnpGetErrorMessage											
+*																	
+* Parameters:														
 *	IN int rc: error code
-*
-* Description:
-*	This functions returns the error string mapped to the error code
+*																	
+* Description:														
+*	This functions returns the error string mapped to the error code 
 * Returns: const char *
 *	return either the right string or "Unknown Error"
 ***************************************************************************/
@@ -108,21 +106,21 @@ UpnpGetErrorMessage( IN int rc )
 }
 
 /************************************************************************
-* Function : UpnpResolveURL
-*
-* Parameters:
+* Function : UpnpResolveURL											
+*																	
+* Parameters:														
 *	IN char * BaseURL: Base URL string
 *	IN char * RelURL: relative URL string
 *	OUT char * AbsURL: Absolute URL string
-* Description:
-*	This functions concatinates the base URL and relative URL to generate
+* Description:														
+*	This functions concatinates the base URL and relative URL to generate 
 *	the absolute URL
 * Returns: int
 *	return either UPNP_E_SUCCESS or appropriate error
 ***************************************************************************/
 int
-UpnpResolveURL( IN const char *BaseURL,
-                IN const char *RelURL,
+UpnpResolveURL( IN char *BaseURL,
+                IN char *RelURL,
                 OUT char *AbsURL )
 {
     // There is some unnecessary allocation and
@@ -137,7 +135,7 @@ UpnpResolveURL( IN const char *BaseURL,
 
     tempRel = NULL;
 
-    tempRel = resolve_rel_url((char*) BaseURL, (char*) RelURL );
+    tempRel = resolve_rel_url( BaseURL, RelURL );
 
     if( tempRel ) {
         strcpy( AbsURL, tempRel );
@@ -151,19 +149,19 @@ UpnpResolveURL( IN const char *BaseURL,
 }
 
 /************************************************************************
-* Function : addToAction
-*
-* Parameters:
-*	IN int response: flag to tell if the ActionDoc is for response
-*		or request
+* Function : addToAction											
+*																	
+* Parameters:														
+*	IN int response: flag to tell if the ActionDoc is for response 
+*					or request
 *	INOUT IXML_Document **ActionDoc: request or response document
 *	IN char *ActionName: Name of the action request or response
 *	IN char *ServType: Service type
 *	IN char * ArgName: Name of the argument
 *	IN char * ArgValue: Value of the argument
 *
-* Description:
-*	This function adds the argument in the action request or response.
+* Description:		
+*	This function adds the argument in the action request or response. 
 * This function creates the action request or response if it is a first
 * argument else it will add the argument in the document
 *
@@ -173,10 +171,10 @@ UpnpResolveURL( IN const char *BaseURL,
 static int
 addToAction( IN int response,
              INOUT IXML_Document ** ActionDoc,
-             IN const char *ActionName,
-             IN const char *ServType,
-             IN const char *ArgName,
-             IN const char *ArgValue )
+             IN char *ActionName,
+             IN char *ServType,
+             IN char *ArgName,
+             IN char *ArgValue )
 {
     char *ActBuff = NULL;
     IXML_Node *node = NULL;
@@ -196,12 +194,11 @@ addToAction( IN int response,
 
         if( response ) {
             sprintf( ActBuff,
-                "<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
-                ActionName, ServType, ActionName );
+                     "<u:%sResponse xmlns:u=\"%s\"></u:%sResponse>",
+                     ActionName, ServType, ActionName );
         } else {
-            sprintf( ActBuff,
-                "<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
-                ActionName, ServType, ActionName );
+            sprintf( ActBuff, "<u:%s xmlns:u=\"%s\"></u:%s>",
+                     ActionName, ServType, ActionName );
         }
 
         rc = ixmlParseBufferEx( ActBuff, ActionDoc );
@@ -230,34 +227,34 @@ addToAction( IN int response,
 }
 
 /************************************************************************
-* Function : makeAction
-*
-* Parameters:
-*	IN int response: flag to tell if the ActionDoc is for response
-*		or request
+* Function : makeAction											
+*																	
+* Parameters:														
+*	IN int response: flag to tell if the ActionDoc is for response 
+*					or request
 *	IN char * ActionName: Name of the action request or response
 *	IN char * ServType: Service type
 *	IN int NumArg :Number of arguments in the action request or response
 *	IN char * Arg : pointer to the first argument
 *	IN va_list ArgList: Argument list
 *
-* Description:
+* Description:		
 *	This function creates the action request or response from the argument
 * list.
 * Returns: IXML_Document *
-*	returns action request or response document if successful
+*	returns action request or response document if successful 
 *	else returns NULL
 ***************************************************************************/
 static IXML_Document *
 makeAction( IN int response,
-            IN const char *ActionName,
-            IN const char *ServType,
+            IN char *ActionName,
+            IN char *ServType,
             IN int NumArg,
-            IN const char *Arg,
+            IN char *Arg,
             IN va_list ArgList )
 {
-    const char *ArgName;
-    const char *ArgValue;
+    char *ArgName,
+     *ArgValue;
     char *ActBuff;
     int Idx = 0;
     IXML_Document *ActionDoc;
@@ -275,13 +272,11 @@ makeAction( IN int response,
     }
 
     if( response ) {
-        sprintf( ActBuff,
-            "<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
-            ActionName, ServType, ActionName );
+        sprintf( ActBuff, "<u:%sResponse xmlns:u=\"%s\"></u:%sResponse>",
+                 ActionName, ServType, ActionName );
     } else {
-        sprintf( ActBuff,
-            "<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
-            ActionName, ServType, ActionName );
+        sprintf( ActBuff, "<u:%s xmlns:u=\"%s\"></u:%s>",
+                 ActionName, ServType, ActionName );
     }
 
     if( ixmlParseBufferEx( ActBuff, &ActionDoc ) != IXML_SUCCESS ) {
@@ -298,8 +293,8 @@ makeAction( IN int response,
     if( NumArg > 0 ) {
         //va_start(ArgList, Arg);
         ArgName = Arg;
-        for ( ; ; ) {
-            ArgValue = va_arg( ArgList, const char * );
+        while( Idx++ != NumArg ) {
+            ArgValue = va_arg( ArgList, char * );
 
             if( ArgName != NULL ) {
                 node = ixmlNode_getFirstChild( ( IXML_Node * ) ActionDoc );
@@ -313,11 +308,7 @@ makeAction( IN int response,
                 ixmlNode_appendChild( node, ( IXML_Node * ) Ele );
             }
 
-            if (++Idx < NumArg) {
-                ArgName = va_arg( ArgList, const char * );
-            } else {
-                break;
-            }
+            ArgName = va_arg( ArgList, char * );
         }
         //va_end(ArgList);
     }
@@ -326,9 +317,9 @@ makeAction( IN int response,
 }
 
 /************************************************************************
-* Function : UpnpMakeAction
-*
-* Parameters:
+* Function : UpnpMakeAction											
+*																	
+* Parameters:														
 *	IN char * ActionName: Name of the action request or response
 *	IN char * ServType: Service type
 *	IN int NumArg :Number of arguments in the action request or response
@@ -336,7 +327,7 @@ makeAction( IN int response,
 *	IN ... : variable argument list
 *	IN va_list ArgList: Argument list
 *
-* Description:
+* Description:		
 *	This function creates the action request from the argument
 * list. Its a wrapper function that calls makeAction function to create
 * the action request.
@@ -346,26 +337,31 @@ makeAction( IN int response,
 *	else returns NULL
 ***************************************************************************/
 IXML_Document *
-UpnpMakeAction( const char *ActionName,
-                const char *ServType,
+UpnpMakeAction( char *ActionName,
+                char *ServType,
                 int NumArg,
-                const char *Arg,
+                char *Arg,
                 ... )
 {
-    va_list ArgList;
+    va_list ArgList = NULL;
     IXML_Document *out = NULL;
 
-    va_start( ArgList, Arg );
+    if( NumArg > 0 ) {
+        va_start( ArgList, Arg );
+    }
+
     out = makeAction( 0, ActionName, ServType, NumArg, Arg, ArgList );
-    va_end( ArgList );
+    if( NumArg > 0 ) {
+        va_end( ArgList );
+    }
 
     return out;
 }
 
 /************************************************************************
-* Function : UpnpMakeActionResponse
-*
-* Parameters:
+* Function : UpnpMakeActionResponse											
+*																	
+* Parameters:														
 *	IN char * ActionName: Name of the action request or response
 *	IN char * ServType: Service type
 *	IN int NumArg :Number of arguments in the action request or response
@@ -373,87 +369,92 @@ UpnpMakeAction( const char *ActionName,
 *	IN ... : variable argument list
 *	IN va_list ArgList: Argument list
 *
-* Description:
+* Description:		
 *	This function creates the action response from the argument
 * list. Its a wrapper function that calls makeAction function to create
 * the action response.
 *
 * Returns: IXML_Document *
-*	returns action response document if successful
+*	returns action response document if successful 
 *	else returns NULL
 ***************************************************************************/
 IXML_Document *
-UpnpMakeActionResponse( const char *ActionName,
-                        const char *ServType,
+UpnpMakeActionResponse( char *ActionName,
+                        char *ServType,
                         int NumArg,
-                        const char *Arg,
+                        char *Arg,
                         ... )
 {
     va_list ArgList;
     IXML_Document *out = NULL;
 
-    va_start( ArgList, Arg );
+    if( NumArg > 0 ) {
+        va_start( ArgList, Arg );
+    }
+
     out = makeAction( 1, ActionName, ServType, NumArg, Arg, ArgList );
-    va_end( ArgList );
+    if( NumArg > 0 ) {
+        va_end( ArgList );
+    }
 
     return out;
 }
 
 /************************************************************************
-* Function : UpnpAddToActionResponse
-*
+* Function : UpnpAddToActionResponse									
+*																	
 * Parameters:
-*	INOUT IXML_Document **ActionResponse: action response document
+*	INOUT IXML_Document **ActionResponse: action response document	
 *	IN char * ActionName: Name of the action request or response
 *	IN char * ServType: Service type
 *	IN int ArgName :Name of argument to be added in the action response
 *	IN char * ArgValue : value of the argument
 *
-* Description:
-*	This function adds the argument in the action response. Its a wrapper
-* function that calls addToAction function to add the argument in the
+* Description:		
+*	This function adds the argument in the action response. Its a wrapper 
+* function that calls addToAction function to add the argument in the 
 * action response.
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful
+*	returns UPNP_E_SUCCESS if successful 
 *	else returns appropriate error
 ***************************************************************************/
 int
 UpnpAddToActionResponse( INOUT IXML_Document ** ActionResponse,
-                         IN const char *ActionName,
-                         IN const char *ServType,
-                         IN const char *ArgName,
-                         IN const char *ArgValue )
+                         IN char *ActionName,
+                         IN char *ServType,
+                         IN char *ArgName,
+                         IN char *ArgValue )
 {
     return addToAction( 1, ActionResponse, ActionName, ServType, ArgName,
                         ArgValue );
 }
 
 /************************************************************************
-* Function : UpnpAddToAction
-*
+* Function : UpnpAddToAction									
+*																	
 * Parameters:
-*	INOUT IXML_Document **ActionDoc: action request document
+*	INOUT IXML_Document **ActionDoc: action request document	
 *	IN char * ActionName: Name of the action request or response
 *	IN char * ServType: Service type
 *	IN int ArgName :Name of argument to be added in the action response
 *	IN char * ArgValue : value of the argument
 *
-* Description:
-*	This function adds the argument in the action request. Its a wrapper
-* function that calls addToAction function to add the argument in the
+* Description:		
+*	This function adds the argument in the action request. Its a wrapper 
+* function that calls addToAction function to add the argument in the 
 * action request.
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful
+*	returns UPNP_E_SUCCESS if successful 
 *	else returns appropriate error
 ***************************************************************************/
 int
 UpnpAddToAction( IXML_Document ** ActionDoc,
-                 const char *ActionName,
-                 const char *ServType,
-                 const char *ArgName,
-                 const char *ArgValue )
+                 char *ActionName,
+                 char *ServType,
+                 char *ArgName,
+                 char *ArgValue )
 {
 
     return addToAction( 0, ActionDoc, ActionName, ServType, ArgName,
@@ -461,23 +462,23 @@ UpnpAddToAction( IXML_Document ** ActionDoc,
 }
 
 /************************************************************************
-* Function : UpnpAddToPropertySet
-*
-* Parameters:
+* Function : UpnpAddToPropertySet											
+*																	
+* Parameters:														
 *	INOUT IXML_Document **PropSet: propertyset document
 *	IN char *ArgName: Name of the argument
 *	IN char *ArgValue: value of the argument
 *
-* Description:
-*	This function adds the argument in the propertyset node
+* Description:		
+*	This function adds the argument in the propertyset node 
 *
 * Returns: int
 *	returns UPNP_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
 int
 UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
-                      IN const char *ArgName,
-                      IN const char *ArgValue )
+                      IN char *ArgName,
+                      IN char *ArgValue )
 {
 
     char BlankDoc[] = "<e:propertyset xmlns:e=\"urn:schemas"
@@ -516,14 +517,14 @@ UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
 }
 
 /************************************************************************
-* Function : UpnpCreatePropertySet
-*
-* Parameters:
+* Function : UpnpCreatePropertySet											
+*																	
+* Parameters:														
 *	IN int NumArg: Number of argument that will go in the propertyset node
 *	IN char * Args: argument strings
 *
-* Description:
-*	This function creates a propertyset node and put all the input
+* Description:		
+*	This function creates a propertyset node and put all the input 
 *	parameters in the node as elements
 *
 * Returns: IXML_Document *
@@ -531,14 +532,14 @@ UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
 ***************************************************************************/
 IXML_Document *
 UpnpCreatePropertySet( IN int NumArg,
-                       IN const char *Arg,
+                       IN char *Arg,
                        ... )
 {
     va_list ArgList;
     int Idx = 0;
     char BlankDoc[] = "<e:propertyset xmlns:e=\"urn:schemas-"
         "upnp-org:event-1-0\"></e:propertyset>";
-    const char *ArgName,
+    char *ArgName,
      *ArgValue;
     IXML_Node *node;
     IXML_Element *Ele;
@@ -558,7 +559,7 @@ UpnpCreatePropertySet( IN int NumArg,
     ArgName = Arg;
 
     while( Idx++ != NumArg ) {
-        ArgValue = va_arg( ArgList, const char * );
+        ArgValue = va_arg( ArgList, char * );
 
         if( ArgName != NULL /*&& ArgValue != NULL */  ) {
             node = ixmlNode_getFirstChild( ( IXML_Node * ) PropSet );
@@ -574,12 +575,11 @@ UpnpCreatePropertySet( IN int NumArg,
             ixmlNode_appendChild( node, ( IXML_Node * ) Ele1 );
         }
 
-        ArgName = va_arg( ArgList, const char * );
+        ArgName = va_arg( ArgList, char * );
 
     }
     va_end( ArgList );
     return PropSet;
 }
 
-#endif // EXCLUDE_DOM == 0
-
+#endif

@@ -34,15 +34,10 @@
 * messages and functions to manipulate those buffers					*
 ************************************************************************/
 
-#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include "util.h"
 #include "statcodes.h"
-
-#ifdef WIN32
- #include "unixutil.h"
-#endif
 
 #define NUM_1XX_CODES   2
 static const char *Http1xxCodes[NUM_1XX_CODES];
@@ -118,7 +113,7 @@ static xboolean gInitialized = FALSE;
 * Returns:																
 *	 void																
 ************************************************************************/
-static UPNP_INLINE void
+static XINLINE void
 init_table( IN const char *encoded_str,
             OUT const char *table[],
             IN int tbl_size )
@@ -144,7 +139,7 @@ init_table( IN const char *encoded_str,
 * Returns:																
 *	 void																
 ************************************************************************/
-static UPNP_INLINE void
+static XINLINE void
 init_tables( void )
 {
     init_table( Http1xxStr, Http1xxCodes, NUM_1XX_CODES );
@@ -176,7 +171,7 @@ http_get_code_text( int statusCode )
     int table_num;
 
     if( !gInitialized ) {
-        init_tables();
+        init_tables(  );
     }
 
     if( statusCode < 100 && statusCode >= 600 ) {

@@ -32,11 +32,9 @@
 #include <string.h>
 #include "ixmlparser.h"
 
-#ifdef WIN32
- #define strncasecmp strnicmp
+#ifdef _WIN32
+#define strncasecmp strnicmp
 #endif
-
-static char g_error_char = '\0';
 
 static const char LESSTHAN = '<';
 static const char GREATERTHAN = '>';
@@ -232,29 +230,14 @@ static BOOL Parser_ElementPrefixDefined( Parser * myParser,
                                          IXML_Node * newNode,
                                          char **nsURI );
 static int Parser_setElementNamespace( IXML_Element * newElement,
-                                       const char *nsURI );
+                                       char *nsURI );
 static int Parser_parseDocument( IXML_Document ** retDoc,
                                  Parser * domParser );
 static BOOL Parser_hasDefaultNamespace( Parser * xmlParser,
                                         IXML_Node * newNode,
                                         char **nsURI );
-static int Parser_getChar( IN const char *src,
+static int Parser_getChar( IN char *src,
                            INOUT int *cLen );
-
-/*==============================================================================*
-*   safe_strdup
-*       strdup that handles NULL input.
-*   
-*===============================================================================*/
-static char *
-safe_strdup(const char *s) 
-{
-    assert(s != NULL);
-    if (s == NULL) {
-        return strdup("");
-    }
-    return strdup(s);
-}
 
 /*==============================================================================*
 *   Parser_isCharInTable
@@ -327,9 +310,9 @@ Parser_isNameChar( IN int c,
 *
 *===============================================================================*/
 BOOL
-Parser_isValidXmlName( IN const DOMString name )
+Parser_isValidXmlName( IN DOMString name )
 {
-    const char *pstr = NULL;
+    char *pstr = NULL;
     int i = 0,
       nameLen = 0;
 
@@ -340,7 +323,7 @@ Parser_isValidXmlName( IN const DOMString name )
     pstr = name;
     if( Parser_isNameChar( *pstr, FALSE ) == TRUE ) {
         for( i = 1; i < nameLen; i++ ) {
-            if( Parser_isNameChar( *( pstr + i ), TRUE ) == FALSE ) {   //illegal char
+            if( Parser_isNameChar( *( pstr + 1 ), TRUE ) == FALSE ) {   //illegal char
                 return FALSE;
             }
         }
@@ -348,24 +331,6 @@ Parser_isValidXmlName( IN const DOMString name )
 
     return TRUE;
 }
-
-/*==============================================================================*
-*   Parser_setErrorChar:	
-*       If 'c' is 0 (default), the parser is strict about XML encoding :
-*       invalid UTF-8 sequences or "&" entities are rejected, and the parsing 
-*       aborts.
-*       If 'c' is not 0, the parser is relaxed : invalid UTF-8 characters
-*       are replaced by this character, and invalid "&" entities are left
-*       untranslated. The parsing is then allowed to continue.
-*       External function.
-*   
-*===============================================================================*/
-void
-Parser_setErrorChar( IN char c )
-{
-     g_error_char = c;
-}
-
 
 /*==============================================================================*
 *   Parser_intToUTF8:	
@@ -434,11 +399,11 @@ Parser_intToUTF8( IN int c,
 *          
 *===============================================================================*/
 static int
-Parser_UTF8ToInt( IN const char *ss,
+Parser_UTF8ToInt( IN char *ss,
                   OUT int *len )
 {
 
-    const unsigned char *s = ( const unsigned char * )ss;
+    unsigned char *s = ( unsigned char * )ss;
     int c = *s;
 
     if( c <= 127 ) {            // if c<=127, c is just the character.
@@ -466,13 +431,8 @@ Parser_UTF8ToInt( IN const char *ss,
                  ( ( s[2] & 0x3f ) << 18 ) | ( ( s[3] & 0x3f ) << 12 ) |
                  ( ( s[4] & 0x3f ) << 6 ) | ( s[5] & 0x3f ) );
     } else {                    // none of above, error
-        if (g_error_char) {
-            *len = 1;
-            return g_error_char;
-        } else {
-            *len = 0;
-            return -1;
-        }
+        *len = 0;
+        return -1;
     }
 }
 
@@ -483,7 +443,7 @@ Parser_UTF8ToInt( IN const char *ss,
 *			
 *===============================================================================*/
 static Parser *
-Parser_init()
+Parser_init(  )
 {
     Parser *newParser = NULL;
 
@@ -501,22 +461,17 @@ Parser_init()
 }
 
 /*================================================================
- * Parser_isValidEndElement
- *	check if a new node->nodeName matches top of element stack.
- *	Internal to parser only.
- *=================================================================*/
+*   Parser_isValidEndElement
+*       check if a new node->nodeName matches top of element stack.
+*       Internal to parser only.
+*
+*=================================================================*/
 static int
-Parser_isValidEndElement(
-	IN Parser * xmlParser,
-	IN IXML_Node * newNode )
+Parser_isValidEndElement( IN Parser * xmlParser,
+                          IN IXML_Node * newNode )
 {
-    assert( xmlParser );
-    assert( xmlParser->pCurElement );
-    assert( xmlParser->pCurElement->element );
-    assert( newNode );
-    assert( newNode->nodeName );
-
-    return strcmp( xmlParser->pCurElement->element, newNode->nodeName ) == 0;
+    return ( strcmp( xmlParser->pCurElement->element, newNode->nodeName )
+             == 0 );
 }
 
 /*===============================================================
@@ -545,14 +500,14 @@ Parser_pushElement( IN Parser * xmlParser,
         memset( pNewStackElement, 0, sizeof( IXML_ElementStack ) );
         // the element member includes both prefix and name 
 
-        pNewStackElement->element = safe_strdup( newElement->nodeName );
+        pNewStackElement->element = strdup( newElement->nodeName );
         if( pNewStackElement->element == NULL ) {
             free( pNewStackElement );
             return IXML_INSUFFICIENT_MEMORY;
         }
 
         if( newElement->prefix != 0 ) {
-            pNewStackElement->prefix = safe_strdup( newElement->prefix );
+            pNewStackElement->prefix = strdup( newElement->prefix );
             if( pNewStackElement->prefix == NULL ) {
                 Parser_freeElementStackItem( pNewStackElement );
                 free( pNewStackElement );
@@ -562,7 +517,7 @@ Parser_pushElement( IN Parser * xmlParser,
 
         if( newElement->namespaceURI != 0 ) {
             pNewStackElement->namespaceUri =
-                safe_strdup( newElement->namespaceURI );
+                strdup( newElement->namespaceURI );
             if( pNewStackElement->namespaceUri == NULL ) {
                 Parser_freeElementStackItem( pNewStackElement );
                 free( pNewStackElement );
@@ -622,7 +577,7 @@ Parser_popElement( IN Parser * xmlParser )
 *=================================================================*/
 static int
 Parser_readFileOrBuffer( IN Parser * xmlParser,
-                         IN const char *xmlFileName,
+                         IN char *xmlFileName,
                          IN BOOL file )
 {
     int fileSize = 0;
@@ -654,7 +609,7 @@ Parser_readFileOrBuffer( IN Parser * xmlParser,
             fclose( xmlFilePtr );
         }
     } else {
-        xmlParser->dataBuffer = safe_strdup( xmlFileName );
+        xmlParser->dataBuffer = strdup( xmlFileName );
         if( xmlParser->dataBuffer == NULL ) {
             return IXML_INSUFFICIENT_MEMORY;
         }
@@ -671,13 +626,13 @@ Parser_readFileOrBuffer( IN Parser * xmlParser,
 *=================================================================*/
 int
 Parser_LoadDocument( OUT IXML_Document ** retDoc,
-                     IN const char *xmlFileName,
+                     IN char *xmlFileName,
                      IN BOOL file )
 {
     int rc = IXML_SUCCESS;
     Parser *xmlParser = NULL;
 
-    xmlParser = Parser_init();
+    xmlParser = Parser_init(  );
     if( xmlParser == NULL ) {
         return IXML_INSUFFICIENT_MEMORY;
     }
@@ -926,8 +881,6 @@ Parser_parseDocument( OUT IXML_Document ** retDoc,
     int rc = IXML_SUCCESS;
     IXML_CDATASection *cdataSecNode = NULL;
 
-    // It is important that the node gets initialized here, otherwise things
-    // can go wrong on the error handler.
     ixmlNode_init( &newNode );
 
     rc = ixmlDocument_createDocumentEx( &gRootDoc );
@@ -943,9 +896,7 @@ Parser_parseDocument( OUT IXML_Document ** retDoc,
     }
 
     while( bETag == FALSE ) {
-        // clear the newNode contents. Redundant on the first iteration,
-	// but nonetheless, necessary due to the possible calls to
-	// ErrorHandler above. Currently, this is just a memset to zero.
+        // clear the newNode contents
         ixmlNode_init( &newNode );
 
         if( Parser_getNextNode( xmlParser, &newNode, &bETag ) ==
@@ -1039,7 +990,7 @@ Parser_parseDocument( OUT IXML_Document ** retDoc,
     Parser_free( xmlParser );
     return rc;
 
-ErrorHandler:
+  ErrorHandler:
     Parser_freeNodeContent( &newNode );
     ixmlDocument_free( gRootDoc );
     Parser_free( xmlParser );
@@ -1141,10 +1092,10 @@ Parser_skipWhiteSpaces( IN Parser * xmlParser )
 *
 *===============================================================================*/
 static int
-Parser_getChar( IN const char *src,
+Parser_getChar( IN char *src,
                 INOUT int *cLen )
 {
-    const char *pnum;
+    char *pnum;
     int sum;
     char c;
     int i;
@@ -1163,7 +1114,7 @@ Parser_getChar( IN const char *src,
 
         i = Parser_UTF8ToInt( src, cLen );
         if( !Parser_isXmlChar( i ) ) {
-            return ( g_error_char ? g_error_char : -1 );
+            return -1;
         }
         return i;
     } else if( strncasecmp( src, QUOT, strlen( QUOT ) ) == 0 ) {
@@ -1198,7 +1149,7 @@ Parser_getChar( IN const char *src,
         }
 
         if( ( pnum == src ) || *pnum != ';' || !Parser_isXmlChar( sum ) ) {
-            goto fail_entity;
+            return -1;
         }
 
         *cLen = pnum - src + 1;
@@ -1214,18 +1165,13 @@ Parser_getChar( IN const char *src,
         }
 
         if( ( pnum == src ) || *pnum != ';' || !Parser_isXmlChar( sum ) ) {
-            goto fail_entity;
+            return -1;
         }
 
         *cLen = pnum - src + 1;
         return sum;
     }
 
-fail_entity:
-    if (g_error_char) {
-        *cLen = 1;
-        return '&';
-    }
     return -1;
 }
 
@@ -1237,13 +1183,13 @@ fail_entity:
 *===============================================================================*/
 static int
 Parser_copyToken( IN Parser * xmlParser,
-                  IN const char *src,
+                  IN char *src,
                   IN int len )
 {
     int i,
       c,
       cl;
-    const char *psrc,
+    char *psrc,
      *pend;
     utf8char uch;
 
@@ -1587,7 +1533,7 @@ Parser_getNextToken( IN Parser * xmlParser )
 *===============================================================================*/
 static char *
 Parser_getNameSpace( IN Parser * xmlParser,
-                     IN const char *prefix )
+                     IN char *prefix )
 {
     IXML_ElementStack *pCur;
     IXML_NamespaceURI *pNsUri;
@@ -1621,7 +1567,7 @@ Parser_addNamespace( IN Parser * xmlParser )
 {
     IXML_Node *pNode;
     IXML_ElementStack *pCur;
-    const char *namespaceUri;
+    char *namespaceUri;
 
     pNode = xmlParser->pNeedPrefixNode;
     pCur = xmlParser->pCurElement;
@@ -1634,7 +1580,7 @@ Parser_addNamespace( IN Parser * xmlParser )
             // it would be wrong that pNode->namespace != NULL.
             assert( pNode->namespaceURI == NULL );
 
-            pNode->namespaceURI = safe_strdup( pCur->namespaceUri );
+            pNode->namespaceURI = strdup( pCur->namespaceUri );
             if( pNode->namespaceURI == NULL ) {
                 return IXML_INSUFFICIENT_MEMORY;
             }
@@ -1650,7 +1596,7 @@ Parser_addNamespace( IN Parser * xmlParser )
 
         namespaceUri = Parser_getNameSpace( xmlParser, pCur->prefix );
         if( namespaceUri != NULL ) {
-            pNode->namespaceURI = safe_strdup( namespaceUri );
+            pNode->namespaceURI = strdup( namespaceUri );
             if( pNode->namespaceURI == NULL ) {
                 return IXML_INSUFFICIENT_MEMORY;
             }
@@ -1685,7 +1631,7 @@ Parser_setNodePrefixAndLocalName( IN IXML_Node * node )
     pStrPrefix = strchr( node->nodeName, ':' );
     if( pStrPrefix == NULL ) {
         node->prefix = NULL;
-        node->localName = safe_strdup( node->nodeName );
+        node->localName = strdup( node->nodeName );
         if( node->localName == NULL ) {
             return IXML_INSUFFICIENT_MEMORY;
         }
@@ -1702,7 +1648,7 @@ Parser_setNodePrefixAndLocalName( IN IXML_Node * node )
         memset( node->prefix, 0, nPrefix + 1 );
         strncpy( node->prefix, node->nodeName, nPrefix );
 
-        node->localName = safe_strdup( pLocalName );
+        node->localName = strdup( pLocalName );
         if( node->localName == NULL ) {
             free( node->prefix );
             node->prefix = NULL;    //no need to free really, main loop will frees it
@@ -1740,13 +1686,11 @@ Parser_xmlNamespace( IN Parser * xmlParser,
         if( pCur->namespaceUri != NULL ) {
             free( pCur->namespaceUri );
         }
-///here it goes to segfault on "" when not copying
-	if(newNode->nodeValue){
-         pCur->namespaceUri = safe_strdup( newNode->nodeValue );
-         if( pCur->namespaceUri == NULL ) {
-             return IXML_INSUFFICIENT_MEMORY;
-         }
-    }
+
+        pCur->namespaceUri = strdup( newNode->nodeValue );
+        if( pCur->namespaceUri == NULL ) {
+            return IXML_INSUFFICIENT_MEMORY;
+        }
 
     } else if( strncmp( newNode->nodeName, "xmlns:", strlen( "xmlns:" ) ) == 0 ) {  // namespace definition
         rc = Parser_setNodePrefixAndLocalName( newNode );
@@ -1762,7 +1706,7 @@ Parser_xmlNamespace( IN Parser * xmlParser,
 
         if( ( pCur->prefix != NULL )
             && ( strcmp( pCur->prefix, newNode->localName ) == 0 ) ) {
-            pCur->namespaceUri = safe_strdup( newNode->nodeValue );
+            pCur->namespaceUri = strdup( newNode->nodeValue );
             if( pCur->namespaceUri == NULL ) {
                 return IXML_INSUFFICIENT_MEMORY;
             }
@@ -1789,13 +1733,13 @@ Parser_xmlNamespace( IN Parser * xmlParser,
                 }
                 memset( pNewNs, 0, sizeof( IXML_NamespaceURI ) );
 
-                pNewNs->prefix = safe_strdup( newNode->localName );
+                pNewNs->prefix = strdup( newNode->localName );
                 if( pNewNs->prefix == NULL ) {
                     free( pNewNs );
                     return IXML_INSUFFICIENT_MEMORY;
                 }
 
-                pNewNs->nsURI = safe_strdup( newNode->nodeValue );
+                pNewNs->nsURI = strdup( newNode->nodeValue );
                 if( pNewNs->nsURI == NULL ) {
                     Parser_freeNsURI( pNewNs );
                     free( pNewNs );
@@ -1813,7 +1757,7 @@ Parser_xmlNamespace( IN Parser * xmlParser,
                     free( pNs->nsURI );
                 }
 
-                pNs->nsURI = safe_strdup( newNode->nodeValue );
+                pNs->nsURI = strdup( newNode->nodeValue );
                 if( pNs->nsURI == NULL ) {
                     return IXML_INSUFFICIENT_MEMORY;
                 }
@@ -1850,7 +1794,7 @@ Parser_processSTag( IN Parser * xmlParser,
 
     pCurToken = ( xmlParser->tokenBuf ).buf;
     if( pCurToken != NULL ) {
-        node->nodeName = safe_strdup( pCurToken );
+        node->nodeName = strdup( pCurToken );
         if( node->nodeName == NULL ) {
             return IXML_INSUFFICIENT_MEMORY;
         }
@@ -1984,7 +1928,7 @@ Parser_processCDSect( IN char **pSrc,
 
     pCDataStart = *pSrc + strlen( CDSTART );
     pEnd = pCDataStart;
-    while( ( Parser_isXmlChar( *pEnd ) == TRUE ) && ( *pEnd != '\0' ) ) {
+    while( ( Parser_isXmlChar( *pEnd ) == TRUE ) && ( *pEnd != '0' ) ) {
         if( strncmp( pEnd, CDEND, strlen( CDEND ) ) == 0 ) {
             break;
         } else {
@@ -1992,7 +1936,7 @@ Parser_processCDSect( IN char **pSrc,
         }
     }
 
-    if( ( pEnd - pCDataStart > 0 ) && ( *pEnd != '\0' ) ) {
+    if( ( pEnd - pCDataStart > 0 ) && ( *pEnd != '0' ) ) {
         tokenLength = pEnd - pCDataStart;
         node->nodeValue = ( char * )malloc( tokenLength + 1 );
         if( node->nodeValue == NULL ) {
@@ -2001,7 +1945,7 @@ Parser_processCDSect( IN char **pSrc,
         strncpy( node->nodeValue, pCDataStart, tokenLength );
         node->nodeValue[tokenLength] = '\0';
 
-        node->nodeName = safe_strdup( CDATANODENAME );
+        node->nodeName = strdup( CDATANODENAME );
         if( node->nodeName == NULL ) {
             // no need to free node->nodeValue at all, bacause node contents
             // will be freed by the main loop.
@@ -2026,13 +1970,13 @@ Parser_processCDSect( IN char **pSrc,
 *===============================================================================*/
 static int
 Parser_setElementNamespace( IN IXML_Element * newElement,
-                            IN const char *nsURI )
+                            IN char *nsURI )
 {
     if( newElement != NULL ) {
         if( newElement->n.namespaceURI != NULL ) {
             return IXML_SYNTAX_ERR;
         } else {
-            ( newElement->n ).namespaceURI = safe_strdup( nsURI );
+            ( newElement->n ).namespaceURI = strdup( nsURI );
             if( ( newElement->n ).namespaceURI == NULL ) {
                 return IXML_INSUFFICIENT_MEMORY;
             }
@@ -2131,7 +2075,7 @@ Parser_processContent( IN Parser * xmlParser,
 
         pCurToken = ( xmlParser->tokenBuf ).buf;
         if( pCurToken != NULL ) {
-            node->nodeValue = safe_strdup( pCurToken );
+            node->nodeValue = strdup( pCurToken );
             if( node->nodeValue == NULL ) {
                 return IXML_INSUFFICIENT_MEMORY;
             }
@@ -2139,7 +2083,7 @@ Parser_processContent( IN Parser * xmlParser,
             return IXML_SYNTAX_ERR;
         }
 
-        node->nodeName = safe_strdup( TEXTNODENAME );
+        node->nodeName = strdup( TEXTNODENAME );
         if( node->nodeName == NULL ) {
             return IXML_SYNTAX_ERR;
         }
@@ -2176,7 +2120,7 @@ Parser_processETag( IN Parser * xmlParser,
     if( pCurToken == NULL ) {
         return IXML_SYNTAX_ERR;
     }
-    node->nodeName = safe_strdup( pCurToken );
+    node->nodeName = strdup( pCurToken );
     if( node->nodeName == NULL ) {
         return IXML_INSUFFICIENT_MEMORY;
     }
@@ -2344,7 +2288,7 @@ Parser_processAttribute( IN Parser * xmlParser,
         return IXML_SYNTAX_ERR;
     }
     // copy in the attribute name
-    node->nodeName = safe_strdup( pCurToken );
+    node->nodeName = strdup( pCurToken );
     if( node->nodeName == NULL ) {
         return IXML_INSUFFICIENT_MEMORY;
     }
@@ -2397,16 +2341,12 @@ Parser_processAttribute( IN Parser * xmlParser,
 
     pCurToken = ( xmlParser->tokenBuf ).buf;
     if( pCurToken != NULL ) {   // attribute has value, like a="c"
-        node->nodeValue = safe_strdup( pCurToken );
+        node->nodeValue = strdup( pCurToken );
         if( node->nodeValue == NULL ) {
             return IXML_INSUFFICIENT_MEMORY;
         }
-    }else{
-       // if attribute doesn't have value, like a=""
-        ///somewhere on other places is this copied
-       node->nodeValue = malloc(sizeof(char));
-       *(node->nodeValue) = '\0';
     }
+    // if attribute doesn't have value, like a="", fine
     node->nodeType = eATTRIBUTE_NODE;
 
     // check whether this is a new namespace definition
@@ -2480,7 +2420,7 @@ Parser_getNextNode( IN Parser * xmlParser,
                 goto ErrorHandler;
             }
 
-            node->nodeName = safe_strdup( lastElement );
+            node->nodeName = strdup( lastElement );
             if( node->nodeName == NULL ) {
                 return IXML_INSUFFICIENT_MEMORY;
             }
@@ -2488,8 +2428,7 @@ Parser_getNextNode( IN Parser * xmlParser,
             *bETag = TRUE;
 
             return IXML_SUCCESS;
-        } else if( (xmlParser->state == eATTRIBUTE) && 
-                   (xmlParser->pCurElement != NULL) ) {
+        } else if( xmlParser->state == eATTRIBUTE ) {
             if( Parser_processAttribute( xmlParser, node ) !=
                 IXML_SUCCESS ) {
                 return IXML_SYNTAX_ERR;
@@ -2506,4 +2445,3 @@ Parser_getNextNode( IN Parser * xmlParser,
     return IXML_SYNTAX_ERR;
 
 }
-

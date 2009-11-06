@@ -34,7 +34,7 @@
 				OptimizeForProcessor="0"
 				OptimizeForWindowsApplication="FALSE"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\ixml\src\inc&quot;;&quot;$(ProjectDir)\..\upnp\src\inc&quot;;&quot;$(ProjectDir)\..\upnp\inc&quot;;&quot;$(ProjectDir)\..\threadutil\inc&quot;;&quot;$(ProjectDir)\..\ixml\inc&quot;;..\..\pthreads\pthreads\inc"
-				PreprocessorDefinitions="UPNP_STATIC_LIB;INCLUDE_CLIENT_APIS;_WIN32;WIN32;PTW32_STATIC_LIB;UPNP_USE_MSVCPP"
+				PreprocessorDefinitions="UPNP_STATIC_LIB;INCLUDE_CLIENT_APIS;_WIN32;WIN32;PTW32_STATIC_LIB"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"
@@ -92,7 +92,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\ixml\src\inc&quot;;&quot;$(ProjectDir)\..\upnp\src\inc&quot;;&quot;$(ProjectDir)\..\upnp\inc&quot;;&quot;$(ProjectDir)\..\threadutil\inc&quot;;&quot;$(ProjectDir)\..\ixml\inc&quot;;&quot;$(ProjectDir)\..\..\pthreads\pthreads\inc&quot;"
-				PreprocessorDefinitions="UPNP_STATIC_LIB;INCLUDE_CLIENT_APIS;_WIN32;WIN32;_DEBUG;DEBUG;PTW32_STATIC_LIB;UPNP_USE_MSVCPP"
+				PreprocessorDefinitions="UPNP_STATIC_LIB;INCLUDE_CLIENT_APIS;_WIN32;WIN32;_DEBUG;PTW32_STATIC_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				PrecompiledHeaderFile=".\Debug/upnpLib.pch"
@@ -360,6 +360,25 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\threadutil\src\iasnprintf.c">
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="2"
+							AdditionalIncludeDirectories=""/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="0"
+							AdditionalIncludeDirectories=""
+							BasicRuntimeChecks="3"
+							BrowseInformation="1"/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\threadutil\src\LinkedList.c">
 					<FileConfiguration
 						Name="Release|Win32">
@@ -424,7 +443,7 @@
 					Name="api"
 					Filter=".c">
 					<File
-						RelativePath="..\upnp\src\api\upnpapi.c">
+						RelativePath="..\upnp\src\api\config.c">
 						<FileConfiguration
 							Name="Release|Win32">
 							<Tool
@@ -443,8 +462,23 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\upnp\src\api\upnpdebug.c"
-						>
+						RelativePath="..\upnp\src\api\upnpapi.c">
+						<FileConfiguration
+							Name="Release|Win32">
+							<Tool
+								Name="VCCLCompilerTool"
+								Optimization="2"
+								AdditionalIncludeDirectories=""/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32">
+							<Tool
+								Name="VCCLCompilerTool"
+								Optimization="0"
+								AdditionalIncludeDirectories=""
+								BasicRuntimeChecks="3"
+								BrowseInformation="1"/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\upnp\src\api\upnptools.c">
@@ -1021,14 +1055,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\build\inc\autoconfig.h"
-				>
-			</File>
-			<File
 				RelativePath="..\upnp\src\inc\client_table.h">
 			</File>
 			<File
-				RelativePath="..\build\inc\config.h">
+				RelativePath="..\upnp\inc\config.h">
 			</File>
 			<File
 				RelativePath="..\upnp\src\inc\gena.h">
@@ -1074,6 +1104,9 @@
 			</File>
 			<File
 				RelativePath="..\upnp\src\inc\parsetools.h">
+			</File>
+			<File
+				RelativePath="..\upnp\src\inc\readwrite.h">
 			</File>
 			<File
 				RelativePath="..\upnp\src\inc\server.h">

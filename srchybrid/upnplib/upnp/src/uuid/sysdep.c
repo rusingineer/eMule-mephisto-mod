@@ -17,12 +17,13 @@
  ** this software for any purpose.
  */
 
-#include "config.h"
-#ifdef WIN32
-	#include <winsock2.h>
-#else /* WIN32 */
-	#include <unistd.h>
-#endif /* WIN32 */
+#ifndef _WIN32
+#include <unistd.h>
+#else
+#include <time.h>
+#include <sys/types.h>
+#include <sys/timeb.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include "sysdep.h"
@@ -33,16 +34,17 @@
    This sample implementation generates a random node ID
  */
 void
-get_ieee_node_identifier(uuid_node_t *node)
+get_ieee_node_identifier( uuid_node_t * node )
 {
     char seed[16];
     static int inited = 0;
     static uuid_node_t saved_node;
 
-    if (!inited) {
-        get_random_info(seed);
+    if( !inited ) {
+        get_random_info( seed );
         seed[0] |= 0x80;
-        memcpy(&saved_node, seed, sizeof (uuid_node_t));
+        memcpy( &saved_node, seed, sizeof( uuid_node_t ) );
+
         inited = 1;
     };
 
@@ -56,7 +58,7 @@ get_ieee_node_identifier(uuid_node_t *node)
    less than 100ns.
  */
 
-#ifdef WIN32
+#ifdef _WINDOWS_
 
 void
 get_system_time( uuid_time_t * uuid_time )
@@ -82,49 +84,60 @@ get_system_time( uuid_time_t * uuid_time )
 
 /*-----------------------------------------------------------------------------*/
 void
-get_random_info(char seed[16])
+get_random_info( char seed[16] )
 {
-	MD5_CTX c;
-	typedef struct {
-		MEMORYSTATUS m;
-		SYSTEM_INFO s;
-		FILETIME t;
-		LARGE_INTEGER pc;
-		DWORD tc;
-		DWORD l;
-		char hostname[MAX_COMPUTERNAME_LENGTH + 1];
-	} randomness;
-	randomness r;
+    MD5_CTX c;
+    typedef struct {
+        MEMORYSTATUS m;
+        SYSTEM_INFO s;
+        FILETIME t;
+        LARGE_INTEGER pc;
+        DWORD tc;
+        DWORD l;
+        char hostname[MAX_COMPUTERNAME_LENGTH + 1];
+    } randomness;
+    randomness r;
 
-	/* Initialize memory area so that valgrind does not complain */
-	memset(&r, 0, sizeof r);
+    MD5Init( &c );
+    /*
+       memory usage stats 
+     */
+    GlobalMemoryStatus( &r.m );
+    /*
+       random system stats 
+     */
+    GetSystemInfo( &r.s );
+    /*
+       100ns resolution (nominally) time of day 
+     */
+    GetSystemTimeAsFileTime( &r.t );
+    /*
+       high resolution performance counter 
+     */
+    QueryPerformanceCounter( &r.pc );
+    /*
+       milliseconds since last boot 
+     */
+    r.tc = GetTickCount(  );
+    r.l = MAX_COMPUTERNAME_LENGTH + 1;
 
-	/* memory usage stats */
-	GlobalMemoryStatus( &r.m );
-	/* random system stats */
-	GetSystemInfo( &r.s );
-	/* 100ns resolution (nominally) time of day */
-	GetSystemTimeAsFileTime( &r.t );
-	/* high resolution performance counter */
-	QueryPerformanceCounter( &r.pc );
-	/* milliseconds since last boot */
-	r.tc = GetTickCount();
-	r.l = MAX_COMPUTERNAME_LENGTH + 1;
-
-	GetComputerName( r.hostname, &r.l );
-
-	/* MD5 it */
-	MD5Init(&c);
-	MD5Update(&c, &r, sizeof r);
-	MD5Final(seed, &c);
+    GetComputerName( r.hostname, &r.l );
+    MD5Update( &c, &r, sizeof( randomness ) );
+    MD5Final( seed, &c );
 };
-
-#else /* WIN32 */
+#else
 
 /*-----------------------------------------------------------------------------*/
 void
-get_system_time(uuid_time_t *uuid_time)
+get_system_time( uuid_time_t * uuid_time )
 {
+#ifdef _WIN32
+	struct _timeb timeStruct;
+
+	_ftime( &timeStruct);
+    *uuid_time = (uuid_time_t)(( timeStruct.time * 10000000 ) + ( timeStruct.millitm * 10000 ) +
+        I64( 0x01B21DD213814000 ));
+#else
     struct timeval tp;
 
     gettimeofday( &tp, ( struct timezone * )0 );
@@ -136,32 +149,31 @@ get_system_time(uuid_time_t *uuid_time)
      */
     *uuid_time = ( tp.tv_sec * 10000000 ) + ( tp.tv_usec * 10 ) +
         I64( 0x01B21DD213814000 );
+#endif
 };
 
 /*-----------------------------------------------------------------------------*/
 void
-get_random_info(char seed[16])
+get_random_info( char seed[16] )
 {
-	MD5_CTX c;
-	typedef struct {
-		//struct sysinfo s;
-		struct timeval t;
-		char hostname[257];
-	} randomness;
-	randomness r;
+    MD5_CTX c;
+#ifndef _WIN32
+    typedef struct {
+        struct sysinfo s;
+        struct timeval t;
+        char hostname[257];
+    } randomness;
+    randomness r;
+#endif
 
-	/* Initialize memory area so that valgrind does not complain */
-	memset(&r, 0, sizeof r);
+    MD5Init( &c );
 
-	/* Get some random stuff */
-	gettimeofday(&r.t, (struct timezone *)0);
-	gethostname(r.hostname, 256 );
-
-	/* MD5 it */
-	MD5Init(&c);
-	MD5Update(&c, &r, sizeof r);
-	MD5Final(seed, &c);
+#ifndef _WIN32
+    gettimeofday( &r.t, ( struct timezone * )0 );
+    gethostname( r.hostname, 256 );
+    MD5Update( &c, &r, sizeof( randomness ) );
+#endif
+    MD5Final( seed, &c );
 };
 
-#endif /* WIN32 */
-
+#endif

@@ -93,35 +93,37 @@ genaCallback( IN http_parser_t * parser,
     xboolean found_function = FALSE;
 
     if( request->method == HTTPMETHOD_SUBSCRIBE ) {
-#ifdef INCLUDE_DEVICE_APIS
-        found_function = TRUE;
-        if( httpmsg_find_hdr( request, HDR_NT, NULL ) == NULL ) {
-            // renew subscription
-            gena_process_subscription_renewal_request
-            ( info, request );
-	} else {
-            // subscribe
-            gena_process_subscription_request( info, request );
-	}
-        UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
-            "got subscription request\n" );
-    } else if( request->method == HTTPMETHOD_UNSUBSCRIBE ) {
-        found_function = TRUE;
-        // unsubscribe
-        gena_process_unsubscribe_request( info, request );
-#endif
-    } else if( request->method == HTTPMETHOD_NOTIFY ) {
-#ifdef INCLUDE_CLIENT_APIS
-        found_function = TRUE;
-        // notify
-        gena_process_notification_event( info, request );
-#endif
-    }
+        DEVICEONLY( found_function = TRUE;
+                    if( httpmsg_find_hdr( request, HDR_NT, NULL ) == NULL )
+                    {
+                    // renew subscription
+                    gena_process_subscription_renewal_request
+                    ( info, request );}
+                    else
+                    {
+                    // subscribe
+                    gena_process_subscription_request( info, request );}
 
-    if( !found_function ) {
+                    DBGONLY( UpnpPrintf
+                             ( UPNP_ALL, GENA, __FILE__, __LINE__,
+                               "got subscription request\n" ); )
+             )
+            }
+            else
+        if( request->method == HTTPMETHOD_UNSUBSCRIBE ) {
+            DEVICEONLY( found_function = TRUE;
+                        // unsubscribe
+                        gena_process_unsubscribe_request( info,
+                                                          request ); )
+        } else if( request->method == HTTPMETHOD_NOTIFY ) {
+            CLIENTONLY( found_function = TRUE;
+                        // notify
+                        gena_process_notification_event( info, request ); )
+        }
+
+        if( !found_function ) {
             // handle missing functions of device or ctrl pt
             error_respond( info, HTTP_NOT_IMPLEMENTED, request );
+        }
     }
-}
 #endif // EXCLUDE_GENA
-

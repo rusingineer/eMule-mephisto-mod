@@ -34,22 +34,23 @@
 * used by the Miniserver module.
 ************************************************************************/
 
-#include "config.h"
-
-#ifndef WIN32
-	#include <arpa/inet.h>
-	#include <netinet/in.h>
-	#include <sys/socket.h>
-	#include <sys/wait.h>
-	#include <unistd.h>
-	#include <sys/time.h>
-#else /* WIN32 */
-	#include <winsock2.h>
-
-	typedef int socklen_t;
-	#define EAFNOSUPPORT 97
-#endif /* WIN32 */
-
+#ifndef _WIN32
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#else
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#endif
 #include "unixutil.h"
 #include "ithread.h"
 
@@ -67,9 +68,14 @@
 #include "ThreadPool.h"
 #include "httpreadwrite.h"
 #include "statcodes.h"
+#include "upnp.h"
 #include "upnpapi.h"
 
-#define APPLICATION_LISTENING_PORT 49152
+#ifdef _WIN32
+#define EADDRINUSE WSAEADDRINUSE
+#endif
+
+#define APPLICATION_LISTENING_PORT 0 //Old 49152, New 0 for random port
 
 struct mserv_request_t {
     int connfd;                 // connection handle
@@ -89,16 +95,17 @@ static MiniServerCallback gGenaCallback = NULL;
 static MiniServerState gMServState = MSERV_IDLE;
 
 /************************************************************************
- * Function: SetHTTPGetCallback
- *
- * Parameters :
- * 	MiniServerCallback callback - HTTP Callback to be invoked 
- *
- * Description:
- * 	Set HTTP Get Callback
- *
- * Return: void
- ************************************************************************/
+*	Function :	SetHTTPGetCallback
+*
+*	Parameters :
+*		MiniServerCallback callback ; - HTTP Callback to be invoked 
+*
+*	Description :	Set HTTP Get Callback
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
 void
 SetHTTPGetCallback( MiniServerCallback callback )
 {
@@ -106,35 +113,35 @@ SetHTTPGetCallback( MiniServerCallback callback )
 }
 
 /************************************************************************
- * Function: SetSoapCallback
- *
- * Parameters:
- *	MiniServerCallback callback - SOAP Callback to be invoked 
- *
- * Description:
- * 	Set SOAP Callback
- *
- * Return: void
- ************************************************************************/
-#ifdef INCLUDE_DEVICE_APIS
+*	Function :	SetSoapCallback
+*
+*	Parameters :
+*		MiniServerCallback callback ; - SOAP Callback to be invoked 
+*
+*	Description :	Set SOAP Callback
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
 void
 SetSoapCallback( MiniServerCallback callback )
 {
     gSoapCallback = callback;
 }
-#endif /* INCLUDE_DEVICE_APIS */
 
 /************************************************************************
- * Function: SetGenaCallback
- *
- * Parameters:
- *	MiniServerCallback callback - GENA Callback to be invoked
- *
- * Description:
- * 	Set GENA Callback
- *
- * Return: void
- ************************************************************************/
+*	Function :	SetGenaCallback
+*
+*	Parameters :
+*		MiniServerCallback callback ; - GENA Callback to be invoked
+*
+*	Description :	Set GENA Callback
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
 void
 SetGenaCallback( MiniServerCallback callback )
 {
@@ -142,19 +149,21 @@ SetGenaCallback( MiniServerCallback callback )
 }
 
 /************************************************************************
- * Function :	dispatch_request
- *
- * Parameters :
- *	IN SOCKINFO *info	- Socket Information object.
- *	http_parser_t* hparser	- HTTP parser object.
- *
- * Description :
- *	Based on the type pf message, appropriate callback is issued
- *
- * Return: int
- *	0 - On Success
- *	HTTP_INTERNAL_SERVER_ERROR - Callback is NULL
- ************************************************************************/
+*	Function :	dispatch_request
+*
+*	Parameters :
+*		IN SOCKINFO *info ;		 Socket Information object.
+*		http_parser_t* hparser ; HTTP parser object.
+*
+*	Description :	Based on the type pf message, appropriate callback 
+*		is issued
+*
+*	Return : int ;
+*		0 - On Success
+*		HTTP_INTERNAL_SERVER_ERROR - Callback is NULL
+*
+*	Note :
+************************************************************************/
 static int
 dispatch_request( IN SOCKINFO * info,
                   http_parser_t * hparser )
@@ -172,9 +181,11 @@ dispatch_request( IN SOCKINFO * info,
         case HTTPMETHOD_NOTIFY:
         case HTTPMETHOD_SUBSCRIBE:
         case HTTPMETHOD_UNSUBSCRIBE:
-            UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                "miniserver %d: got GENA msg\n", info->socket );
-            callback = gGenaCallback;
+            DBGONLY( UpnpPrintf
+                     ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                       "miniserver %d: got GENA msg\n", info->socket );
+                 )
+                callback = gGenaCallback;
             break;
 
             //HTTP server call
@@ -198,20 +209,22 @@ dispatch_request( IN SOCKINFO * info,
 }
 
 /************************************************************************
- * Function: handle_error
- *
- * Parameters:
- * 	IN SOCKINFO *info	- Socket Inforamtion Object
- * 	int http_error_code	- HTTP Error Code
- * 	int major		- Major Version Number
- * 	int minor		- Minor Version Number
- *
- * Description:
- * 	Send Error Message
- *
- * Return: void
- ************************************************************************/
-static UPNP_INLINE void
+*	Function :	handle_error
+*
+*	Parameters :
+*		
+*		IN SOCKINFO *info ;		Socket Inforamtion Object
+*		int http_error_code ;	HTTP Error Code
+*		int major ;				Major Version Number
+*		int minor ;				Minor Version Number
+*
+*	Description :	Send Error Message
+*
+*	Return : void;
+*
+*	Note :
+************************************************************************/
+static XINLINE void
 handle_error( IN SOCKINFO * info,
               int http_error_code,
               int major,
@@ -221,17 +234,18 @@ handle_error( IN SOCKINFO * info,
 }
 
 /************************************************************************
- * Function: free_handle_request_arg
- *
- * Parameters:
- *	void *args ; Request Message to be freed
- *
- * Description:
- * 	Free memory assigned for handling request and unitialize socket
- * 	functionality
- *
- * Return: void
- ************************************************************************/
+*	Function :	free_handle_request_arg
+*
+*	Parameters :
+*		void *args ; Request Message to be freed
+*
+*	Description :	Free memory assigned for handling request and unitial-
+*	-ize socket functionality
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
 static void
 free_handle_request_arg( void *args )
 {
@@ -243,16 +257,17 @@ free_handle_request_arg( void *args )
 }
 
 /************************************************************************
- * Function: handle_request
- *
- * Parameters:
- *	void *args - Request Message to be handled
- *
- * Description:
- * 	Receive the request and dispatch it for handling
- *
- * Return: void
- ************************************************************************/
+*	Function :	handle_request
+*
+*	Parameters :
+*		void *args ;	Request Message to be handled
+*
+*	Description :	Receive the request and dispatch it for handling
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
 static void
 handle_request( void *args )
 {
@@ -267,10 +282,12 @@ handle_request( void *args )
     struct mserv_request_t *request = ( struct mserv_request_t * )args;
     int connfd = request->connfd;
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-        "miniserver %d: READING\n", connfd );
-    //parser_request_init( &parser ); ////LEAK_FIX_MK
-    hmsg = &parser.msg;
+    DBGONLY( UpnpPrintf
+             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+               "miniserver %d: READING\n", connfd );
+         )
+        //parser_request_init( &parser ); ////LEAK_FIX_MK
+        hmsg = &parser.msg;
 
     if( sock_init_with_ip( &info, connfd, request->foreign_ip_addr,
                            request->foreign_ip_port ) != UPNP_E_SUCCESS ) {
@@ -285,10 +302,12 @@ handle_request( void *args )
         goto error_handler;
     }
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-        "miniserver %d: PROCESSING...\n", connfd );
-    // dispatch
-    http_error_code = dispatch_request( &info, &parser );
+    DBGONLY( UpnpPrintf
+             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+               "miniserver %d: PROCESSING...\n", connfd );
+         )
+        // dispatch
+        http_error_code = dispatch_request( &info, &parser );
     if( http_error_code != 0 ) {
         goto error_handler;
     }
@@ -304,28 +323,32 @@ handle_request( void *args )
         handle_error( &info, http_error_code, major, minor );
     }
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-        "miniserver %d: COMPLETE\n", connfd );
-    sock_destroy( &info, SD_BOTH ); //should shutdown completely
+    DBGONLY( UpnpPrintf
+             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+               "miniserver %d: COMPLETE\n", connfd );
+         )
+        sock_destroy( &info, SD_BOTH ); //should shutdown completely
 
     httpmsg_destroy( hmsg );
     free( request );
 }
 
 /************************************************************************
- * Function: schedule_request_job
- *
- * Parameters:
- *	IN int connfd - Socket Descriptor on which connection is accepted
- *	IN struct sockaddr_in* clientAddr - Clients Address information
- *
- * Description:
- * 	Initilize the thread pool to handle a request.
- *	Sets priority for the job and adds the job to the thread pool
- *
- * Return: void
- ************************************************************************/
-static UPNP_INLINE void
+*	Function :	schedule_request_job
+*
+*	Parameters :
+*		IN int connfd ;	Socket Descriptor on which connection is accepted
+*		IN struct sockaddr_in* clientAddr ;	Clients Address information
+*
+*	Description :	Initilize the thread pool to handle a request.
+*		Sets priority for the job and adds the job to the thread pool
+*
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
+static XINLINE void
 schedule_request_job( IN int connfd,
                       IN struct sockaddr_in *clientAddr )
 {
@@ -336,9 +359,11 @@ schedule_request_job( IN int connfd,
         ( struct mserv_request_t * )
         malloc( sizeof( struct mserv_request_t ) );
     if( request == NULL ) {
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv %d: out of memory\n", connfd );
-        shutdown( request->connfd, SD_BOTH );
+        DBGONLY( UpnpPrintf
+                 ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                   "mserv %d: out of memory\n", connfd );
+             )
+            shutdown( request->connfd, SD_BOTH );
         UpnpCloseSocket( connfd );
         return;
     }
@@ -351,9 +376,11 @@ schedule_request_job( IN int connfd,
     TPJobSetFreeFunction( &job, free_handle_request_arg );
     TPJobSetPriority( &job, MED_PRIORITY );
 
-    if( ThreadPoolAdd( &gMiniServerThreadPool, &job, NULL ) != 0 ) {
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv %d: cannot schedule request\n", connfd );
+    if( ThreadPoolAdd( &gRecvThreadPool, &job, NULL ) != 0 ) {
+        DBGONLY( UpnpPrintf
+                 ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                   "mserv %d: cannot schedule request\n", connfd );
+             )
             free( request );
         shutdown( connfd, SD_BOTH );
         UpnpCloseSocket( connfd );
@@ -363,111 +390,130 @@ schedule_request_job( IN int connfd,
 }
 
 /************************************************************************
- * Function: RunMiniServer
- *
- * Parameters:
- *	MiniServerSockArray *miniSock - Socket Array
- *
- * Description:
- * 	Function runs the miniserver. The MiniServer accepts a 
- *	new request and schedules a thread to handle the new request.
- *	Checks for socket state and invokes appropriate read and shutdown 
- *	actions for the Miniserver and SSDP sockets 
- *
- * Return: void
- ************************************************************************/
+*	Function :	RunMiniServer
+*
+*	Parameters :
+*		MiniServerSockArray *miniSock ;	Socket Array
+*
+*	Description :	Function runs the miniserver. The MiniServer accepts a 
+*		new request and schedules a thread to handle the new request.
+*		Checks for socket state and invokes appropriate read and shutdown 
+*		actions for the Miniserver and SSDP sockets 
+*
+*	Return :	void
+*
+*	Note :
+************************************************************************/
 static void
-RunMiniServer( MiniServerSockArray *miniSock )
+RunMiniServer( MiniServerSockArray * miniSock )
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
     struct sockaddr_in clientAddr;
-    socklen_t clientLen;
-    SOCKET connectHnd;
-    SOCKET miniServSock = miniSock->miniServerSock;
-    SOCKET miniServStopSock =  miniSock->miniServerStopSock;
-    SOCKET ssdpSock = miniSock->ssdpSock;
-#ifdef INCLUDE_CLIENT_APIS
-    SOCKET ssdpReqSock = miniSock->ssdpReqSock;
-#endif
+    int clientLen;
+    SOCKET miniServSock,
+      connectHnd;
+    SOCKET miniServStopSock;
+    SOCKET ssdpSock;
+
+    CLIENTONLY( SOCKET ssdpReqSock;
+         )
 
     fd_set expSet;
     fd_set rdSet;
     unsigned int maxMiniSock;
     int byteReceived;
     char requestBuf[256];
-    int ret = 0;
 
-    maxMiniSock = max( miniServSock, miniServStopSock) ;
-    maxMiniSock = max( maxMiniSock, (SOCKET)(ssdpSock) );
-#ifdef INCLUDE_CLIENT_APIS
-    maxMiniSock = max( maxMiniSock, (SOCKET)(ssdpReqSock) );
-#endif
-    ++maxMiniSock;
+    miniServSock = miniSock->miniServerSock;
+    miniServStopSock = miniSock->miniServerStopSock;
+
+    ssdpSock = miniSock->ssdpSock;
+
+    CLIENTONLY( ssdpReqSock = miniSock->ssdpReqSock;
+         );
 
     gMServState = MSERV_RUNNING;
+    maxMiniSock = max( miniServSock, miniServStopSock );
+    maxMiniSock = max( maxMiniSock, ( SOCKET ) ( ssdpSock ) );
+
+    CLIENTONLY( maxMiniSock =
+                max( maxMiniSock, ( SOCKET ) ( ssdpReqSock ) ) );
+
+    ++maxMiniSock;
+
     while( TRUE ) {
         FD_ZERO( &rdSet );
         FD_ZERO( &expSet );
 
         FD_SET( miniServStopSock, &expSet );
+
         FD_SET( miniServSock, &rdSet );
         FD_SET( miniServStopSock, &rdSet );
         FD_SET( ssdpSock, &rdSet );
-#ifdef INCLUDE_CLIENT_APIS
-        FD_SET( ssdpReqSock, &rdSet );
-#endif
+        CLIENTONLY( FD_SET( ssdpReqSock, &rdSet ) );
 
-        ret = select( maxMiniSock, &rdSet, NULL, &expSet, NULL );
-        if ( ret == -1 ) {
-            strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-            UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-                "Error in select(): %s\n", errorBuffer );
-	    /* Avoid 100% CPU in case of repeated error in select() */
-	    isleep( 1 );
-            continue;
+        if( select( maxMiniSock, &rdSet, NULL, &expSet, NULL ) ==
+            UPNP_SOCKETERROR ) {
+            DBGONLY( UpnpPrintf
+                     ( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+                       "Error in select call !!!\n" );
+                 )
+                continue;
         } else {
+
             if( FD_ISSET( miniServSock, &rdSet ) ) {
                 clientLen = sizeof( struct sockaddr_in );
                 connectHnd = accept( miniServSock,
-                    ( struct sockaddr * )&clientAddr, &clientLen );
-                if( connectHnd == -1 ) {
-                    strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                        "miniserver: Error in accept(): %s\n", errorBuffer );
-                    continue;
+                                     ( struct sockaddr * )&clientAddr,
+                                     &clientLen );
+                if( connectHnd == UPNP_INVALID_SOCKET ) {
+                    DBGONLY( UpnpPrintf
+                             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                               "miniserver: Error"
+                               " in accepting connection\n" );
+                         )
+                        continue;
                 }
                 schedule_request_job( connectHnd, &clientAddr );
             }
-#ifdef INCLUDE_CLIENT_APIS
-            // ssdp
-            if( FD_ISSET( ssdpReqSock, &rdSet ) ) {
-                readFromSSDPSocket( ssdpReqSock );
-            }
-#endif
-            if( FD_ISSET( ssdpSock, &rdSet ) ) {
+            //ssdp
+            CLIENTONLY( if( FD_ISSET( ssdpReqSock, &rdSet ) ) {
+
+                        readFromSSDPSocket( ssdpReqSock );}
+             )
+
+                if( FD_ISSET( ssdpSock, &rdSet ) ) {
                     readFromSSDPSocket( ssdpSock );
-            }
+                }
+
             if( FD_ISSET( miniServStopSock, &rdSet ) ) {
+
                 clientLen = sizeof( struct sockaddr_in );
-                memset( (char *)&clientAddr, 0, sizeof (struct sockaddr_in) );
+                memset( ( char * )&clientAddr, 0,
+                        sizeof( struct sockaddr_in ) );
                 byteReceived =
                     recvfrom( miniServStopSock, requestBuf, 25, 0,
                               ( struct sockaddr * )&clientAddr,
                               &clientLen );
                 if( byteReceived > 0 ) {
                     requestBuf[byteReceived] = '\0';
-                    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                        "Received response: %s From host %s \n",
-                        requestBuf, inet_ntoa( clientAddr.sin_addr ) );
-                    UpnpPrintf( UPNP_PACKET, MSERV, __FILE__, __LINE__,
-                        "Received multicast packet: \n %s\n",
-                        requestBuf );
-                    if( NULL != strstr( requestBuf, "ShutDown" ) ) {
+                    DBGONLY( UpnpPrintf
+                             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                               "Received response !!!  %s From host %s \n",
+                               requestBuf,
+                               inet_ntoa( clientAddr.sin_addr ) );
+                         )
+                        DBGONLY( UpnpPrintf
+                                 ( UPNP_PACKET, MSERV, __FILE__, __LINE__,
+                                   "Received multicast packet: \n %s\n",
+                                   requestBuf );
+                         )
+
+                        if( NULL != strstr( requestBuf, "ShutDown" ) )
                         break;
-		    }
                 }
             }
         }
+
     }
 
     shutdown( miniServSock, SD_BOTH );
@@ -476,91 +522,92 @@ RunMiniServer( MiniServerSockArray *miniSock )
     UpnpCloseSocket( miniServStopSock );
     shutdown( ssdpSock, SD_BOTH );
     UpnpCloseSocket( ssdpSock );
-#ifdef INCLUDE_CLIENT_APIS
-    shutdown( ssdpReqSock, SD_BOTH );
-    UpnpCloseSocket( ssdpReqSock );
-#endif
+    CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+    CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
 
     free( miniSock );
+
     gMServState = MSERV_IDLE;
 
     return;
+
 }
 
 /************************************************************************
- * Function: get_port
- *
- * Parameters:
- *	int sockfd - Socket Descriptor 
- *
- * Description:
- * 	Returns port to which socket, sockfd, is bound.
- *
- * Return: int
- *	-1 on error; check errno
- *	 > 0 means port number
- ************************************************************************/
+*	Function :	get_port
+*
+*	Parameters :
+*		int sockfd ; Socket Descriptor 
+*
+*	Description :	Returns port to which socket, sockfd, is bound.
+*
+*	Return :	int, 
+*		-1 on error; check errno
+*		 > 0 means port number
+*
+*	Note :
+************************************************************************/
 static int
 get_port( int sockfd )
 {
     struct sockaddr_in sockinfo;
-    socklen_t len;
+    int len;
     int code;
     int port;
 
     len = sizeof( struct sockaddr_in );
     code = getsockname( sockfd, ( struct sockaddr * )&sockinfo, &len );
-    if( code == -1 ) {
+    if( code == UPNP_SOCKETERROR ) {
         return -1;
     }
 
     port = ntohs( sockinfo.sin_port );
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-        "sockfd = %d, .... port = %d\n", sockfd, port );
+    DBGONLY( UpnpPrintf
+             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
+               "sockfd = %d, .... port = %d\n", sockfd, port );
+         )
 
-    return port;
+        return port;
 }
 
 /************************************************************************
- * Function: get_miniserver_sockets
- *
- * Parameters:
- *	MiniServerSockArray *out   - Socket Array
- *	unsigned short listen_port - port on which the server is
- *		listening for incoming connections	
- *
- * Description:
- * 	Creates a STREAM socket, binds to INADDR_ANY and listens for
- * 	incoming connecttions. Returns the actual port which the sockets
- * 	sub-system returned. 
- *
- *	Also creates a DGRAM socket, binds to the loop back address and 
- *	returns the port allocated by the socket sub-system.
- *
- * Return: int 
- *	UPNP_E_OUTOF_SOCKET - Failed to create a socket
- *	UPNP_E_SOCKET_BIND - Bind() failed
- *	UPNP_E_LISTEN	- Listen() failed	
- *	UPNP_E_INTERNAL_ERROR - Port returned by the socket layer is < 0
- *	UPNP_E_SUCCESS	- Success
- ************************************************************************/
+*	Function :	get_miniserver_sockets
+*
+*	Parameters :
+*		MiniServerSockArray *out ;	Socket Array
+*		unsigned short listen_port ; port on which the server is listening 
+*									for incoming connections	
+*
+*	Description :	Creates a STREAM socket, binds to INADDR_ANY and 
+*		listens for incoming connecttions. Returns the actual port which 
+*		the sockets sub-system returned. 
+*		Also creates a DGRAM socket, binds to the loop back address and 
+*		returns the port allocated by the socket sub-system.
+*
+*	Return :	int : 
+*		UPNP_E_OUTOF_SOCKET - Failed to create a socket
+*		UPNP_E_SOCKET_BIND - Bind() failed
+*		UPNP_E_LISTEN	- Listen() failed	
+*		UPNP_E_INTERNAL_ERROR - Port returned by the socket layer is < 0
+*		UPNP_E_SUCCESS	- Success
+*		
+*	Note :
+************************************************************************/
 int
 get_miniserver_sockets( MiniServerSockArray * out,
                         unsigned short listen_port )
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
     struct sockaddr_in serverAddr;
-    int listenfd;
+    SOCKET listenfd;
     int success;
     unsigned short actual_port;
     int reuseaddr_on = 0;
     int sockError = UPNP_E_SUCCESS;
     int errCode = 0;
-    int miniServerStopSock;
-    int ret = 0;
-
+    SOCKET miniServerStopSock;
+    
     listenfd = socket( AF_INET, SOCK_STREAM, 0 );
-    if ( listenfd == -1 ) {
+    if( listenfd == UPNP_INVALID_SOCKET || listenfd == 0) {
         return UPNP_E_OUTOF_SOCKET; // error creating socket
     }
     // As per the IANA specifications for the use of ports by applications
@@ -577,86 +624,91 @@ get_miniserver_sockets( MiniServerSockArray * out,
     // Keeping the re-use address code as an optional behaviour that can be 
     // turned on if necessary. 
     // TURN ON the reuseaddr_on option to use the option.
-    if ( reuseaddr_on ) {
-        // THIS IS ALLOWS US TO BIND AGAIN IMMEDIATELY
-        // AFTER OUR SERVER HAS BEEN CLOSED
-        // THIS MAY CAUSE TCP TO BECOME LESS RELIABLE
-        // HOWEVER IT HAS BEEN SUGESTED FOR TCP SERVERS
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv start: resuseaddr set\n" );
-        sockError = setsockopt( listenfd, SOL_SOCKET, SO_REUSEADDR,
-            (const char *)&reuseaddr_on, sizeof (int) );
-        if ( sockError == -1 ) {
+    if( reuseaddr_on ) {
+        //THIS IS ALLOWS US TO BIND AGAIN IMMEDIATELY
+        //AFTER OUR SERVER HAS BEEN CLOSED
+        //THIS MAY CAUSE TCP TO BECOME LESS RELIABLE
+        //HOWEVER IT HAS BEEN SUGESTED FOR TCP SERVERS
+
+        DBGONLY( UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                             "mserv start: resuseaddr set\n" );
+             )
+
+            sockError = setsockopt( listenfd,
+                                    SOL_SOCKET,
+                                    SO_REUSEADDR,
+                                    ( const char * )&reuseaddr_on,
+                                    sizeof( int )
+             );
+        if( sockError == UPNP_SOCKETERROR ) {
             shutdown( listenfd, SD_BOTH );
             UpnpCloseSocket( listenfd );
-
             return UPNP_E_SOCKET_BIND;
         }
 
-        sockError = bind( listenfd, (struct sockaddr *)&serverAddr,
-            sizeof (struct sockaddr_in) );
+        sockError = bind( listenfd,
+                          ( struct sockaddr * )&serverAddr,
+                          sizeof( struct sockaddr_in )
+             );
     } else {
         do {
             serverAddr.sin_port = htons( listen_port++ );
-            sockError = bind( listenfd, (struct sockaddr *)&serverAddr,
-                sizeof (struct sockaddr_in) );
-            if ( sockError == -1 ) {
-#ifdef WIN32
-                errCode = WSAGetLastError();
-#else
-                errCode = errno; 
-#endif
-                if( errno == EADDRINUSE ) {
+            sockError = bind( listenfd,
+                              ( struct sockaddr * )&serverAddr,
+                              sizeof( struct sockaddr_in )
+                );
+			// MORPH START windows...
+            if( sockError == UPNP_SOCKETERROR ) {
+                #ifdef WIN32
+				errCode = WSAGetLastError();
+                #else
+				errCode = errno; 
+                #endif
+                if( errCode == EADDRINUSE )
+			 // MORPH END
                     errCode = 1;
-                }
             } else
                 errCode = 0;
 
-        } while ( errCode != 0 );
+        } while( errCode != 0 );
     }
 
-    if ( sockError == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv start: Error in bind(): %s\n", errorBuffer );
-        shutdown( listenfd, SD_BOTH );
+    if( sockError == UPNP_SOCKETERROR ) {
+        DBGONLY( perror( "mserv start: bind failed" );
+             )
+            shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
-
         return UPNP_E_SOCKET_BIND;  // bind failed
     }
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-        "mserv start: bind success\n" );
+    DBGONLY( UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                         "mserv start: bind success\n" );
+         )
 
-    success = listen( listenfd, SOMAXCONN );
-    if ( success == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv start: Error in listen(): %s\n", errorBuffer );
+        success = listen( listenfd, SOMAXCONN );
+    if( success == UPNP_SOCKETERROR ) {
         shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
-
-        return UPNP_E_LISTEN;
+        return UPNP_E_LISTEN;   // listen failed
     }
 
     actual_port = get_port( listenfd );
     if( actual_port <= 0 ) {
         shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
-
         return UPNP_E_INTERNAL_ERROR;
     }
 
     out->miniServerPort = actual_port;
 
-    miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( miniServerStopSock == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
-            "Error in socket(): %s\n", errorBuffer );
-        shutdown( listenfd, SD_BOTH );
+    if( ( miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) ==
+        UPNP_INVALID_SOCKET ) {
+        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
+                             MSERV, __FILE__, __LINE__,
+                             "Error in socket operation !!!\n" );
+             )
+            shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
-
         return UPNP_E_OUTOF_SOCKET;
     }
 
@@ -664,61 +716,65 @@ get_miniserver_sockets( MiniServerSockArray * out,
     memset( ( char * )&serverAddr, 0, sizeof( struct sockaddr_in ) );
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = inet_addr( "127.0.0.1" );
-    ret = bind( miniServerStopSock, (struct sockaddr *)&serverAddr,
-        sizeof (serverAddr) );
-    if ( ret == -1 ) {
-        UpnpPrintf( UPNP_CRITICAL,
-            MSERV, __FILE__, __LINE__,
-            "Error in binding localhost!!!\n" );
-        shutdown( listenfd, SD_BOTH );
+
+    if( bind( miniServerStopSock, ( struct sockaddr * )&serverAddr,
+              sizeof( serverAddr ) ) == UPNP_SOCKETERROR ) {
+
+        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
+                             MSERV, __FILE__, __LINE__,
+                             "Error in binding localhost!!!\n" );
+             )
+            shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
         shutdown( miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniServerStopSock );
-
         return UPNP_E_SOCKET_BIND;
     }
 
     miniStopSockPort = get_port( miniServerStopSock );
-    if ( miniStopSockPort <= 0 ) {
+    if( miniStopSockPort <= 0 ) {
         shutdown( miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniServerStopSock );
         shutdown( listenfd, SD_BOTH );
+        UpnpCloseSocket( miniServerStopSock );
         UpnpCloseSocket( listenfd );
-
         return UPNP_E_INTERNAL_ERROR;
     }
 
     out->stopPort = miniStopSockPort;
+
     out->miniServerSock = listenfd;
     out->miniServerStopSock = miniServerStopSock;
 
     return UPNP_E_SUCCESS;
+
 }
 
 /************************************************************************
- * Function: StartMiniServer
- *
- * Parameters :
- *	unsigned short listen_port - Port on which the server listens for 
- *		incoming connections
- *
- * Description:
- * 	Initialize the sockets functionality for the 
- *	Miniserver. Initialize a thread pool job to run the MiniServer
- *	and the job to the thread pool. If listen port is 0, port is 
- *	dynamically picked
- *
- *	Use timer mechanism to start the MiniServer, failure to meet the 
- *	allowed delay aborts the attempt to launch the MiniServer.
- *
- * Return: int
- *	Actual port socket is bound to - On Success
- *	A negative number UPNP_E_XXX - On Error
- ************************************************************************/
+*	Function :	StartMiniServer
+*
+*	Parameters :
+*		unsigned short listen_port ; Port on which the server listens for 
+*									incoming connections
+*
+*	Description :	Initialize the sockets functionality for the 
+*		Miniserver. Initialize a thread pool job to run the MiniServer
+*		and the job to the thread pool. If listen port is 0, port is 
+*		dynamically picked
+*
+*		Use timer mechanism to start the MiniServer, failure to meet the 
+*		allowed delay aborts the attempt to launch the MiniServer.
+*
+*	Return : int ;
+*		Actual port socket is bound to - On Success: 
+*		A negative number UPNP_E_XXX - On Error   			
+*	Note :
+************************************************************************/
 int
 StartMiniServer( unsigned short listen_port )
 {
+
     int success;
+
     int count;
     int max_count = 10000;
 
@@ -729,66 +785,71 @@ StartMiniServer( unsigned short listen_port )
         return UPNP_E_INTERNAL_ERROR;   // miniserver running
     }
 
-    miniSocket = (MiniServerSockArray *) malloc( sizeof (MiniServerSockArray) );
-    if( miniSocket == NULL ) {
+    miniSocket =
+        ( MiniServerSockArray * ) malloc( sizeof( MiniServerSockArray ) );
+    if( miniSocket == NULL )
         return UPNP_E_OUTOF_MEMORY;
-    }
 
-    success = get_miniserver_sockets( miniSocket, listen_port );
-    if( success != UPNP_E_SUCCESS ) {
+    if( ( success = get_miniserver_sockets( miniSocket, listen_port ) )
+        != UPNP_E_SUCCESS ) {
         free( miniSocket );
         return success;
     }
 
-    success = get_ssdp_sockets( miniSocket );
-    if( success != UPNP_E_SUCCESS ) {
+    if( ( success = get_ssdp_sockets( miniSocket ) ) != UPNP_E_SUCCESS ) {
+
+        free( miniSocket );
         shutdown( miniSocket->miniServerSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
-        free( miniSocket );
-
         return success;
     }
 
-    TPJobInit( &job, (start_routine)RunMiniServer, (void *)miniSocket );
+    TPJobInit( &job, ( start_routine ) RunMiniServer,
+               ( void * )miniSocket );
     TPJobSetPriority( &job, MED_PRIORITY );
+
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
-    success = ThreadPoolAddPersistent( &gMiniServerThreadPool, &job, NULL );
-    if ( success < 0 ) {
+    success = ThreadPoolAddPersistent( &gRecvThreadPool, &job, NULL );
+
+    if( success < 0 ) {
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerStopSock );
         shutdown( miniSocket->ssdpSock, SD_BOTH );
+        CLIENTONLY( shutdown( miniSocket->ssdpReqSock, SD_BOTH ) );
+        UpnpCloseSocket( miniSocket->miniServerSock );
+        UpnpCloseSocket( miniSocket->miniServerStopSock );
         UpnpCloseSocket( miniSocket->ssdpSock );
-#ifdef INCLUDE_CLIENT_APIS
-        shutdown( miniSocket->ssdpReqSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->ssdpReqSock );
-#endif
+
+        CLIENTONLY( UpnpCloseSocket( miniSocket->ssdpReqSock ) );
 
         return UPNP_E_OUTOF_MEMORY;
     }
     // wait for miniserver to start
     count = 0;
-    while ( gMServState != MSERV_RUNNING && count < max_count ) {
+    while( gMServState != MSERV_RUNNING && count < max_count ) {
+#ifndef _WIN32
         usleep( 50 * 1000 );    // 0.05s
+#else
+        SleepEx( 50, TRUE );
+#endif
         count++;
     }
 
     // taking too long to start that thread
-    if ( count >= max_count ) {
+    if( count >= max_count ) {
+
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerStopSock );
         shutdown( miniSocket->ssdpSock, SD_BOTH );
+        CLIENTONLY( shutdown( miniSocket->ssdpReqSock, SD_BOTH ) );
+
+        UpnpCloseSocket( miniSocket->miniServerSock );
+        UpnpCloseSocket( miniSocket->miniServerStopSock );
         UpnpCloseSocket( miniSocket->ssdpSock );
-#ifdef INCLUDE_CLIENT_APIS
-        shutdown( miniSocket->ssdpReqSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->ssdpReqSock );
-#endif
+        CLIENTONLY( UpnpCloseSocket( miniSocket->ssdpReqSock ) );
 
         return UPNP_E_INTERNAL_ERROR;
     }
@@ -797,56 +858,63 @@ StartMiniServer( unsigned short listen_port )
 }
 
 /************************************************************************
- * Function: StopMiniServer
- *
- * Parameters:
- *	void
- *
- * Description:
- * 	Stop and Shutdown the MiniServer and free socket 
- *	resources.
- *
- * Return: int
- *		Always returns 0 
- ************************************************************************/
+*	Function :	StopMiniServer
+*
+*	Parameters :
+*		void ;	
+*
+*	Description :	Stop and Shutdown the MiniServer and free socket 
+*		resources.
+*
+*	Return : int ;
+*		Always returns 0 
+*
+*	Note :
+************************************************************************/
 int
-StopMiniServer()
+StopMiniServer( void )
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
+
     int socklen = sizeof( struct sockaddr_in );
-    int sock;
+    SOCKET sock;
     struct sockaddr_in ssdpAddr;
     char buf[256] = "ShutDown";
     int bufLen = strlen( buf );
 
-    if( gMServState == MSERV_RUNNING ) {
+    if( gMServState == MSERV_RUNNING )
         gMServState = MSERV_STOPPING;
-    } else {
+    else
         return 0;
-    }
 
     sock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( sock == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            "SSDP_SERVER: StopSSDPServer: Error in socket() %s\n", errorBuffer );
-        return 0;
+    if( sock == UPNP_INVALID_SOCKET ) {
+        DBGONLY( UpnpPrintf
+                 ( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                   "SSDP_SERVER:StopSSDPServer: Error in socket operation !!!\n" );
+             )
+            return 0;
     }
 
     while( gMServState != MSERV_IDLE ) {
         ssdpAddr.sin_family = AF_INET;
         ssdpAddr.sin_addr.s_addr = inet_addr( "127.0.0.1" );
         ssdpAddr.sin_port = htons( miniStopSockPort );
-        sendto( sock, buf, bufLen, 0, (struct sockaddr *)&ssdpAddr, socklen );
-        usleep( 1000 );
-        if( gMServState == MSERV_IDLE ) {
+        sendto( sock, buf, bufLen, 0, ( struct sockaddr * )&ssdpAddr,
+                socklen );
+#ifndef _WIN32
+        usleep( 1000 );    // 0.05s
+#else
+        SleepEx( 1, TRUE );
+#endif
+        if( gMServState == MSERV_IDLE )
             break;
-	}
+#ifndef _WIN32
         isleep( 1 );
+#else
+        SleepEx( 1000, TRUE );
+#endif
     }
     shutdown( sock, SD_BOTH );
     UpnpCloseSocket( sock );
-
     return 0;
 }
-

@@ -34,13 +34,15 @@
 *	buffers, allocation, re-allocation, and modification of the memory 
 ************************************************************************/
 
-#include "config.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <membuffer.h>
 #include "upnp.h"
-#include "unixutil.h"
+
+#ifdef _WIN32
+#define strncasecmp strnicmp
+#endif
 
 /************************************************************************
 *								 string									*
@@ -171,7 +173,7 @@ memptr_cmp_nocase( IN memptr * m,
 *
 *	Note :
 ************************************************************************/
-static UPNP_INLINE void
+static XINLINE void
 membuffer_initialize( INOUT membuffer * m )
 {
     m->buf = NULL;
@@ -331,10 +333,9 @@ membuffer_assign( INOUT membuffer * m,
         return return_code;
     }
     // copy
-    if( buf_len ) {
-        memcpy( m->buf, buf, buf_len );
-        m->buf[buf_len] = 0;        // null-terminate
-    }
+    memcpy( m->buf, buf, buf_len );
+    m->buf[buf_len] = 0;        // null-terminate
+
     m->length = buf_len;
 
     return 0;

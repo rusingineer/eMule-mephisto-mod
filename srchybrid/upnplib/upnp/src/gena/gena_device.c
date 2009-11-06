@@ -7,7 +7,7 @@
 // modification, are permitted provided that the following conditions are met: 
 //
 // * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
+// this list of conditions and the following disclaimer.
 // * Redistributions in binary form must reproduce the above copyright notice, 
 // this list of conditions and the following disclaimer in the documentation 
 // and/or other materials provided with the distribution. 
@@ -41,7 +41,6 @@
 #include "statcodes.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
-#include "ssdplib.h"
 
 #include "unixutil.h"
 
@@ -62,19 +61,19 @@ genaUnregisterDevice( IN UpnpDevice_Handle device_handle )
 {
     struct Handle_Info *handle_info;
 
-    HandleLock();
+    HandleLock(  );
     if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
 
-        UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
-            "genaUnregisterDevice : BAD Handle : %d\n",
-            device_handle );
+        DBGONLY( UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
+                             "genaUnregisterDevice : BAD Handle : %d\n",
+                             device_handle ) );
 
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_HANDLE;
     }
 
     freeServiceTable( &handle_info->ServiceTable );
-    HandleUnlock();
+    HandleUnlock(  );
 
     return UPNP_E_SUCCESS;
 }
@@ -188,7 +187,7 @@ free_notify_struct( IN notify_thread_struct * input )
 *
 *	Note : called by genaNotify
 ****************************************************************************/
-static UPNP_INLINE int
+static XINLINE int
 notify_send_and_recv( IN uri_type * destination_url,
                       IN membuffer * mid_msg,
                       IN char *propertySet,
@@ -203,12 +202,12 @@ notify_send_and_recv( IN uri_type * destination_url,
     SOCKINFO info;
 
     // connect
-    UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
-        "gena notify to: %.*s\n",
-        (int)destination_url->hostport.text.size,
-        destination_url->hostport.text.buff );
+    DBGONLY( UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
+                         "gena notify to: %.*s\n",
+                         destination_url->hostport.text.size,
+                         destination_url->hostport.text.buff ); )
 
-    conn_fd = http_Connect( destination_url, &url );
+        conn_fd = http_Connect( destination_url, &url );
     if( conn_fd < 0 ) {
         return conn_fd;         // return UPNP error
     }
@@ -219,11 +218,9 @@ notify_send_and_recv( IN uri_type * destination_url,
     }
     // make start line and HOST header
     membuffer_init( &start_msg );
-    if (http_MakeMessage(
-        &start_msg, 1, 1,
-        "q" "s",
-        HTTPMETHOD_NOTIFY, &url,
-        mid_msg->buf ) != 0 ) {
+    if( http_MakeMessage( &start_msg, 1, 1,
+                          "q" "s",
+                          HTTPMETHOD_NOTIFY, &url, mid_msg->buf ) != 0 ) {
         membuffer_destroy( &start_msg );
         sock_destroy( &info, SD_BOTH );
         return UPNP_E_OUTOF_MEMORY;
@@ -298,12 +295,11 @@ genaNotify( IN char *headers,
 
     // make 'end' msg (the part that won't vary with the destination)
     endmsg.size_inc = 30;
-    if( http_MakeMessage(
-        &mid_msg, 1, 1,
-        "s" "ssc" "sdcc",
-        headers,
-        "SID: ", sub->sid,
-        "SEQ: ", sub->ToSendEventKey ) != 0 ) {
+    if( http_MakeMessage( &mid_msg, 1, 1,
+                          "s" "ssc" "sdcc",
+                          headers,
+                          "SID: ", sub->sid,
+                          "SEQ: ", sub->ToSendEventKey ) != 0 ) {
         membuffer_destroy( &mid_msg );
         return UPNP_E_OUTOF_MEMORY;
     }
@@ -365,12 +361,12 @@ genaNotifyThread( IN void *input )
     struct Handle_Info *handle_info;
     ThreadPoolJob job;
 
-    HandleReadLock();
+    HandleLock(  );
     //validate context
 
     if( GetHandleInfo( in->device_handle, &handle_info ) != HND_DEVICE ) {
         free_notify_struct( in );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
 
@@ -380,7 +376,7 @@ genaNotifyThread( IN void *input )
         || ( ( sub = GetSubscriptionSID( in->sid, service ) ) == NULL )
         || ( ( copy_subscription( sub, &sub_copy ) != HTTP_SUCCESS ) ) ) {
         free_notify_struct( in );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     //If the event is out of order push it back to the job queue
@@ -392,22 +388,22 @@ genaNotifyThread( IN void *input )
         ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
         freeSubscription( &sub_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
 
-    HandleUnlock();
+    HandleUnlock(  );
 
     //send the notify
     return_code = genaNotify( in->headers, in->propertySet, &sub_copy );
 
     freeSubscription( &sub_copy );
 
-    HandleLock();
+    HandleLock(  );
 
     if( GetHandleInfo( in->device_handle, &handle_info ) != HND_DEVICE ) {
         free_notify_struct( in );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     //validate context
@@ -416,7 +412,7 @@ genaNotifyThread( IN void *input )
         || ( !service->active )
         || ( ( sub = GetSubscriptionSID( in->sid, service ) ) == NULL ) ) {
         free_notify_struct( in );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
 
@@ -430,7 +426,7 @@ genaNotifyThread( IN void *input )
     }
 
     free_notify_struct( in );
-    HandleUnlock();
+    HandleUnlock(  );
 }
 
 /****************************************************************************
@@ -477,8 +473,8 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
 
     notify_thread_struct *thread_struct = NULL;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENA BEGIN INITIAL NOTIFY " );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "GENA BEGIN INITIAL NOTIFY " ) );
 
     reference_count = ( int * )malloc( sizeof( int ) );
 
@@ -504,13 +500,13 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
     strcpy( UDN_copy, UDN );
     strcpy( servId_copy, servId );
 
-    HandleLock();
+    HandleLock(  );
 
     if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_HANDLE;
     }
 
@@ -519,25 +515,26 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_SERVICE;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s ",
-        UDN, servId );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %d ",
+                         UDN, servId ) );
 
     if( ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ||
         ( sub->active ) ) {
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_SID;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s ", sid );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s ",
+                         sid ) );
 
     sub->active = 1;
 
@@ -548,16 +545,16 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return return_code;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENERATED PROPERY SET IN INIT NOTIFY: \n'%s'\n",
-        propertySet );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "GENERATED PROPERY SET IN INIT NOTIFY: \n'%s'\n",
+                         propertySet ) );
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+    headers_size = strlen( "Content-Type text/xml\r\n" ) +
+        strlen( "Content-Length: \r\n" ) + MAX_CONTENT_LENGTH +
         strlen( "NT: upnp:event\r\n" ) +
         strlen( "NTS: upnp:propchange\r\n" ) + 1;
 
@@ -568,12 +565,12 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         free( UDN_copy );
         free( servId_copy );
         free( reference_count );
-        HandleUnlock();
+        HandleUnlock(  );
         return UPNP_E_OUTOF_MEMORY;
     }
 
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%"PRIzu"\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+    sprintf( headers, "Content-Type: text/xml\r\nContent-Length: "
+             "%d\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
              strlen( propertySet ) + 1 );
 
     //schedule thread for initial notification
@@ -620,7 +617,7 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         free( headers );
     }
 
-    HandleUnlock();
+    HandleUnlock(  );
 
     return return_code;
 }
@@ -667,8 +664,8 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
 
     notify_thread_struct *thread_struct = NULL;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENA BEGIN INITIAL NOTIFY EXT" );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "GENA BEGIN INITIAL NOTIFY EXT" ) );
     reference_count = ( int * )malloc( sizeof( int ) );
 
     if( reference_count == NULL ) {
@@ -693,13 +690,13 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
     strcpy( UDN_copy, UDN );
     strcpy( servId_copy, servId );
 
-    HandleLock();
+    HandleLock(  );
 
     if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_HANDLE;
     }
 
@@ -708,41 +705,42 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_SERVICE;
     }
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SERVICE IN INIT NOTFY EXT: UDN %s, ServID: %s\n",
-        UDN, servId );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "FOUND SERVICE IN INIT NOTFY EXT: UDN %s, ServID: %d\n",
+                         UDN, servId ) );
 
     if( ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ||
         ( sub->active ) ) {
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return GENA_E_BAD_SID;
     }
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SUBSCRIPTION IN INIT NOTIFY EXT: SID %s", sid );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "FOUND SUBSCRIPTION IN INIT NOTIFY EXT: SID %s",
+                         sid ) );
 
     sub->active = 1;
 
-    propertySet = ixmlPrintNode( ( IXML_Node * ) PropSet );
+    propertySet = ixmlPrintDocument( PropSet );
     if( propertySet == NULL ) {
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
-        HandleUnlock();
+        HandleUnlock(  );
         return UPNP_E_INVALID_PARAM;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENERATED PROPERY SET IN INIT EXT NOTIFY: %s",
-        propertySet );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "GENERATED PROPERY SET IN INIT EXT NOTIFY: %s",
+                         propertySet ) );
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+    headers_size = strlen( "Content-Type text/xml\r\n" ) +
+        strlen( "Content-Length: \r\n" ) + MAX_CONTENT_LENGTH +
         strlen( "NT: upnp:event\r\n" ) +
         strlen( "NTS: upnp:propchange\r\n" ) + 1;
 
@@ -752,13 +750,13 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         free( servId_copy );
         free( reference_count );
         ixmlFreeDOMString( propertySet );
-        HandleUnlock();
+        HandleUnlock(  );
         return UPNP_E_OUTOF_MEMORY;
     }
 
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             (long) strlen( propertySet ) + 1 );
+    sprintf( headers, "Content-Type: text/xml\r\nContent-Length: "
+             "%d\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             strlen( propertySet ) + 1 );
 
     //schedule thread for initial notification
 
@@ -802,7 +800,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         free( thread_struct );
         free( headers );
     }
-    HandleUnlock();
+    HandleUnlock(  );
 
     return return_code;
 }
@@ -870,7 +868,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
     strcpy( UDN_copy, UDN );
     strcpy( servId_copy, servId );
 
-    propertySet = ixmlPrintNode( ( IXML_Node * ) PropSet );
+    propertySet = ixmlPrintDocument( PropSet );
     if( propertySet == NULL ) {
         free( UDN_copy );
         free( servId_copy );
@@ -878,8 +876,8 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
         return UPNP_E_INVALID_PARAM;
     }
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+    headers_size = strlen( "Content-Type text/xml\r\n" ) +
+        strlen( "Content-Length: \r\n" ) + MAX_CONTENT_LENGTH +
         strlen( "NT: upnp:event\r\n" ) +
         strlen( "NTS: upnp:propchange\r\n" ) + 1;
 
@@ -893,11 +891,11 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
     }
     //changed to add null terminator at end of content
     //content length = (length in bytes of property set) + null char
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             (long) strlen( propertySet ) + 1 );
+    sprintf( headers, "Content-Type: text/xml\r\nContent-Length: "
+             "%d\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             strlen( propertySet ) + 1 );
 
-    HandleLock();
+    HandleLock(  );
 
     if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE )
         return_code = GENA_E_BAD_HANDLE;
@@ -957,7 +955,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
         free( servId_copy );
     }
 
-    HandleUnlock();
+    HandleUnlock(  );
 
     return return_code;
 }
@@ -1040,8 +1038,8 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
         return return_code;
     }
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+    headers_size = strlen( "Content-Type text/xml\r\n" ) +
+        strlen( "Content-Length: \r\n" ) + MAX_CONTENT_LENGTH +
         strlen( "NT: upnp:event\r\n" ) +
         strlen( "NTS: upnp:propchange\r\n" ) + 1;
 
@@ -1055,11 +1053,11 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
     }
     //changed to add null terminator at end of content
     //content length = (length in bytes of property set) + null char
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: %ld\r\nNT:"
+    sprintf( headers, "Content-Type: text/xml\r\nContent-Length: %d\r\nNT:"
              " upnp:event\r\nNTS: upnp:propchange\r\n",
-             (long) strlen( propertySet ) + 1 );
+             strlen( propertySet ) + 1 );
 
-    HandleLock();
+    HandleLock(  );
 
     if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
         return_code = GENA_E_BAD_HANDLE;
@@ -1121,7 +1119,7 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
         free( UDN_copy );
         free( servId_copy );
     }
-    HandleUnlock();
+    HandleUnlock(  );
 
     return return_code;
 }
@@ -1166,14 +1164,10 @@ respond_ok( IN SOCKINFO * info,
 
     membuffer_init( &response );
     response.size_inc = 30;
-    if( http_MakeMessage(
-        &response, major, minor,
-        "R" "D" "S" "N" "Xc" "ssc" "scc",
-        HTTP_OK,
-        (off_t)0,
-        X_USER_AGENT,
-        "SID: ", sub->sid,
-        timeout_str ) != 0 ) {
+    if( http_MakeMessage( &response, major, minor,
+                          "R" "D" "S" "ssc" "sc" "c",
+                          HTTP_OK,
+                          "SID: ", sub->sid, timeout_str ) != 0 ) {
         membuffer_destroy( &response );
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
         return UPNP_E_OUTOF_MEMORY;
@@ -1315,13 +1309,13 @@ gena_process_subscription_request( IN SOCKINFO * info,
     memptr callback_hdr;
     memptr timeout_hdr;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "Subscription Request Received:\n" );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "Subscription Request Received:\n" ) );
 
     if( httpmsg_find_hdr( request, HDR_NT, &nt_hdr ) == NULL ) {
         error_respond( info, HTTP_BAD_REQUEST, request );
         return;
-    }
+    }  
 
     // check NT header
     //Windows Millenium Interoperability:
@@ -1345,17 +1339,18 @@ gena_process_subscription_request( IN SOCKINFO * info,
         return;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "SubscriptionRequest for event URL path: %s\n",
-        event_url_path );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "SubscriptionRequest for event URL path: %s\n",
+                         event_url_path );
+         )
 
-    HandleLock();
+        HandleLock(  );
 
     // CURRENTLY, ONLY ONE DEVICE
     if( GetDeviceHandleInfo( &device_handle, &handle_info ) != HND_DEVICE ) {
         free( event_url_path );
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     service = FindServiceEventURLPath( &handle_info->ServiceTable,
@@ -1364,28 +1359,28 @@ gena_process_subscription_request( IN SOCKINFO * info,
 
     if( service == NULL || !service->active ) {
         error_respond( info, HTTP_NOT_FOUND, request );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "Subscription Request: Number of Subscriptions already %d\n "
-        "Max Subscriptions allowed: %d\n",
-        service->TotalSubscriptions,
-        handle_info->MaxSubscriptions );
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "Subscription Request: Number of Subscriptions already %d\n "
+                         "Max Subscriptions allowed: %d\n",
+                         service->TotalSubscriptions,
+                         handle_info->MaxSubscriptions ) );
 
     // too many subscriptions
     if( handle_info->MaxSubscriptions != -1 &&
         service->TotalSubscriptions >= handle_info->MaxSubscriptions ) {
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     // generate new subscription
     sub = ( subscription * ) malloc( sizeof( subscription ) );
     if( sub == NULL ) {
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     sub->eventKey = 0;
@@ -1402,13 +1397,13 @@ gena_process_subscription_request( IN SOCKINFO * info,
                                          &sub->DeliveryURLs ) ) == 0 ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         freeSubscriptionList( sub );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     if( return_code == UPNP_E_OUTOF_MEMORY ) {
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
         freeSubscriptionList( sub );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     // set the timeout
@@ -1444,7 +1439,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
     // respond OK
     if( respond_ok( info, time_out, sub, request ) != UPNP_E_SUCCESS ) {
         freeSubscriptionList( sub );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     //add to subscription list
@@ -1461,7 +1456,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
     callback_fun = handle_info->Callback;
     cookie = handle_info->Cookie;
 
-    HandleUnlock();
+    HandleUnlock(  );
 
     //make call back with request struct
     //in the future should find a way of mainting
@@ -1524,7 +1519,7 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
         return;
     }
 
-    HandleLock();
+    HandleLock(  );
 
     // CURRENTLY, ONLY SUPPORT ONE DEVICE
     if( GetDeviceHandleInfo( &device_handle, &handle_info ) != HND_DEVICE ) {
@@ -1541,21 +1536,22 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
         !service->active ||
         ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "Renew request: Number of subscriptions already: %d\n "
-        "Max Subscriptions allowed:%d\n",
-        service->TotalSubscriptions,
-        handle_info->MaxSubscriptions );
-    // too many subscriptions
-    if( handle_info->MaxSubscriptions != -1 &&
+    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                         "Renew request: Number of subscriptions already: %d\n "
+                         "Max Subscriptions allowed:%d\n",
+                         service->TotalSubscriptions,
+                         handle_info->MaxSubscriptions );
+         )
+        // too many subscriptions
+        if( handle_info->MaxSubscriptions != -1 &&
             service->TotalSubscriptions > handle_info->MaxSubscriptions ) {
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
         RemoveSubscriptionSID( sub->sid, service );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     // set the timeout
@@ -1594,7 +1590,7 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
         RemoveSubscriptionSID( sub->sid, service );
     }
 
-    HandleUnlock();
+    HandleUnlock(  );
 }
 
 /****************************************************************************
@@ -1647,13 +1643,13 @@ gena_process_unsubscribe_request( IN SOCKINFO * info,
         return;
     }
 
-    HandleLock();
+    HandleLock(  );
 
     // CURRENTLY, ONLY SUPPORT ONE DEVICE
     if( GetDeviceHandleInfo( &device_handle, &handle_info ) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         membuffer_destroy( &event_url_path );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
     service = FindServiceEventURLPath( &handle_info->ServiceTable,
@@ -1666,14 +1662,14 @@ gena_process_unsubscribe_request( IN SOCKINFO * info,
         //CheckSubscriptionSID(sid, service) == NULL )
     {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        HandleUnlock();
+        HandleUnlock(  );
         return;
     }
 
     RemoveSubscriptionSID( sid, service );
     error_respond( info, HTTP_OK, request );    // success
 
-    HandleUnlock();
+    HandleUnlock(  );
 }
 
 #endif // INCLUDE_DEVICE_APIS

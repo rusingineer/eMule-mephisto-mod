@@ -993,6 +993,8 @@ bool	CPreferences::m_bSplitWindow; // Advanced Transfer Window Layout [Stulle] -
 
 bool	CPreferences::m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
 
+bool	CPreferences::m_bIonixWebsrv; // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+
 bool	CPreferences::m_bCloseEasteregg; // Diabolic Easteregg [Stulle] - Mephisto
 
 // ==> Mephisto Upload - Mephisto
@@ -2999,6 +3001,8 @@ void CPreferences::SavePreferences()
 
 	ini.WriteBool(_T("DateFileNameLog"), m_bDateFileNameLog); // Date File Name Log [AndCycle] - Stulle
 
+	ini.WriteBool(_T("UseIonixWebsrv"), m_bIonixWebsrv); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+
 	// ==> Mephisto Upload - Mephisto
 	ini.WriteInt(_T("MinSlotsNew"), m_uMinSlots);
 	ini.WriteInt(_T("NoNewSlotTimer"), m_uNoNewSlotTimer);
@@ -4287,7 +4291,9 @@ void CPreferences::LoadPreferences()
 	m_bSplitWindow = ini.GetBool(_T("SplitWindow"), true);
 	// <== Advanced Transfer Window Layout [Stulle] - Stulle
 
-	m_bDateFileNameLog=ini.GetBool(_T("DateFileNameLog"), true); // Date File Name Log [AndCycle] - Stulle
+	m_bDateFileNameLog = ini.GetBool(_T("DateFileNameLog"), true); // Date File Name Log [AndCycle] - Stulle
+
+	m_bIonixWebsrv = ini.GetBool(_T("UseIonixWebsrv"), false); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 	m_bCloseEasteregg=false; // Diabolic Easteregg [Stulle] - Mephisto
 

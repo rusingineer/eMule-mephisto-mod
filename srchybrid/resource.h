@@ -3366,6 +3366,24 @@
 // <== Feedback personalization [Stulle] - Stulle
 #define IDS_STATIC_ICON                 61450 // Static Tray Icon - MyTh88
 #define IDS_DATEFILENAMELOG             61460 // Date File Name Log [AndCycle] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+#define IDS_ADVADMIN_GROUP              61500
+#define IDS_ADVADMIN_ACC                61501
+#define IDS_ADVADMIN_DELETE             61502
+#define IDS_ADVADMIN_NEW                61503
+#define IDS_ADVADMIN_KAD                61504
+#define IDS_ADVADMIN_TRANSFER           61505
+#define IDS_ADVADMIN_SEARCH             61506
+#define IDS_ADVADMIN_SERVER             61507
+#define IDS_ADVADMIN_SHARED             61508
+#define IDS_ADVADMIN_STATS              61509
+#define IDS_ADVADMIN_PREFS              61510
+#define IDS_ADVADMIN_PASS               61511
+#define IDS_ADVADMIN_USER               61512
+#define IDS_ADVADMIN_CAT                61513
+#define IDS_WS_COOKIE_LOGGEDIN          61514
+#define IDS_WS_COOKIE_LASTUSER          61515
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000
 #define IDS_EASTEREGG                   62001

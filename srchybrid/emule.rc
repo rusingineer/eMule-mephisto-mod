@@ -6280,6 +6280,24 @@ BEGIN
     // <== Feedback personalization [Stulle] - Stulle
     IDS_STATIC_ICON         "Always display Tray Icon" // Static Tray Icon - MyTh88
     IDS_DATEFILENAMELOG     "Date as part of File Name of log file." // Date File Name Log [AndCycle] - Stulle
+    // ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+    IDS_ADVADMIN_GROUP      "Advance Webserver Config"
+    IDS_ADVADMIN_ACC        "Account:"
+    IDS_ADVADMIN_DELETE     "Delete Account"
+    IDS_ADVADMIN_NEW        "New Account"
+    IDS_ADVADMIN_KAD        "Access - Kad?"
+    IDS_ADVADMIN_TRANSFER   "Access - Transfer?"
+    IDS_ADVADMIN_SEARCH     "Access - Search?"
+    IDS_ADVADMIN_SERVER     "Access - Server?"
+    IDS_ADVADMIN_SHARED     "Access - Shared?"
+    IDS_ADVADMIN_STATS      "Access - Stats?"
+    IDS_ADVADMIN_PREFS      "Access - Prefs?"
+    IDS_ADVADMIN_PASS       "Password:"
+    IDS_ADVADMIN_USER       "Username:"
+    IDS_ADVADMIN_CAT        "Categories (sep. by |):"
+    IDS_WS_COOKIE_LOGGEDIN  "Remain Logged In:"
+	IDS_WS_COOKIE_LASTUSER  "Memorize Last User:"
+    // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

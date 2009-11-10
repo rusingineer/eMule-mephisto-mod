@@ -1541,10 +1541,10 @@ BEGIN
     LTEXT           "Account:",IDC_STATIC_ADVADMIN_ACC,15,50,74,8, NOT WS_VISIBLE
     LTEXT           "Categorys (sep. by |):",IDC_STATIC_ADVADMIN_CATS,15,146,
                     74,9, NOT WS_VISIBLE
-    LTEXT           "User:",IDC_STATIC_ADVADMIN_USER,15,66,39,10,0,
-                    WS_EX_RIGHT | NOT WS_VISIBLE
-    CTEXT           "Password:",IDC_STATIC_ADVADMIN_PASS,119,67,51,10,0,
-                    WS_EX_RIGHT | NOT WS_VISIBLE
+    RTEXT           "User:",IDC_STATIC_ADVADMIN_USER,15,66,39,10,NOT WS_VISIBLE,
+                    WS_EX_RIGHT
+    RTEXT           "Password:",IDC_STATIC_ADVADMIN_PASS,119,67,51,10,NOT WS_VISIBLE,
+                    WS_EX_RIGHT
     LTEXT           "User Level:",IDC_STATIC_ADVADMIN_USERLEVEL,15,129,74,9, NOT WS_VISIBLE
     LTEXT           "Note",IDC_ADVADMIN_NOTE,8,190,217,21, NOT WS_VISIBLE
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle

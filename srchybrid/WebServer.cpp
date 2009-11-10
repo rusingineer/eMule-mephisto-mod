@@ -5665,9 +5665,6 @@ void CWebServer::ProcessFileReq(ThreadData Data) {
 	}
 	else {
 		Data.pSocket->SendReply( "HTTP/1.1 404 File not found\r\n" );
-	// ==> some extra debug logging [leuk_he] - Stulle
-	theApp.QueueDebugLogLine(false,false, _T("Webserver: 404: %s, file not found"),filename);
-	// <== some extra debug logging [leuk_he] - Stulle
 	}
 }
 

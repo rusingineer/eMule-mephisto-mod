@@ -4,7 +4,6 @@
 <-- ################################################################# -->
 <-- ##                BASED ON MODIFIED VERSION BY eMule+          ## -->
 <-- ##                BASED ON TEMPLATE BY Chicane                 ## -->
-<-- ## Added tMPL_FAILEDLOGIN--> and noindex nofollow
 <-- ################################################################# -->
 
 <--TMPL_VERSION-->
@@ -12,8 +11,10 @@
 <--TMPL_VERSION_END-->
 
 <--TMPL_MULTIUSERVERSION-->
-0
+1
 <--TMPL_MULTIUSERVERSION_END-->
+
+
 
 
 
@@ -25,9 +26,14 @@
 <html>
 <meta http-equiv="content-type" content="text/html; charset=[CharSet]">
 <head>
-<META NAME="ROBOTS" CONTENT="NOINDEX,NOFOLLOW">
 <link rel="SHORTCUT ICON" href="favicon.ico">
 <title>[eMuleAppName] [version] - [WebControl]</title>
+<script type="text/javascript">
+var ablauf = new Date();
+var SevenDays = ablauf.getTime() + (7 * 24 * 60 * 60 * 1000);
+ablauf.setTime(SevenDays);
+[setCookie]
+</script>
 <style type="text/css">
 body
 {
@@ -55,11 +61,11 @@ var eMulePics = new Array ("add_server.gif", "arrow_down.gif", "arrow_up.gif", "
 "filetype_cdimage.gif", "filetype_document.gif", "filetype_video.gif", "filetype_audio.gif", "filetype_other.gif", "filetype_picture.gif",
 "green.gif", "greenpercent.gif", "h_emule.gif", "h_kad.gif", "h_graph.gif", "h_log.gif", "h_preferences.gif", "h_search.gif", "h_server.gif",
 "h_shared.gif", "h_statistic.gif", "h_transfer.gif", "high.gif", "is_banned.gif", "is_credit.gif", "is_friend.gif",
-"is_halfnone.gif", "is_none.gif", "is_release.gif", "is_static.gif", "l_add.gif", 
+"is_halfnone.gif", "is_none.gif", "is_release.gif", "is_static.gif", "l_add.gif",
 "l_calendar.gif", "l_cancel.gif", "l_catarrow.gif", "l_clear.gif", "l_clock.gif", "l_close.gif", "l_con.gif", "l_connect.gif",
 "l_downarrow.gif", "l_ed2klink.gif", "l_filedonkey.gif", "l_filesearch.gif", "l_forum.gif",
 "l_friend.gif", "l_getflc.gif", "l_hasherror.gif", "l_homepage.gif", "l_info.gif", "l_logout.gif", "l_none.gif",
-"l_options.gif", "l_pause.gif", "l_remove.gif", "l_rename.gif", "l_resume.gif", "l_search.gif", "l_server.gif", "l_shared.gif", 
+"l_options.gif", "l_pause.gif", "l_remove.gif", "l_rename.gif", "l_resume.gif", "l_search.gif", "l_server.gif", "l_shared.gif",
 "l_reboot.gif", "l_showcat.gif", "l_shutdown.gif", "l_sources_0.gif", "l_sources_10.gif", "l_sources_25.gif", "l_sources_5.gif",
 "l_sources_50.gif", "l_static.gif", "l_stop.gif", "l_timer.gif", "l_timer_off.gif", "l_version.gif", "l_uparrow.gif", "l_users.gif",
 "login_bottom.gif", "login_downmain.gif", "login_lefttop.gif", "login_righttop.gif", "login_top.gif", "login_topdown.gif",
@@ -145,13 +151,34 @@ function preload_images()
                     </td>
                     <td background="./login_downmain.gif" align="center">
                       <form action="" method="POST" name="login">
-                        <font face=Tahoma style="font-size:10pt;">
-                          &nbsp;<br />
-                          [EnterPassword]<br /><br />
-                          <input type="password" name=p maxlength=12 size=37 style="border-width: 1px; border-color: black; border-style:none;" value="">
-                          <input type="hidden" name=w value="password">
-                          <br /><br /><input type="submit" value="[LoginNow]"><br />
-                        </font>
+                <!-- [iONiX] - Aireoreion: Advanced Webinterface //-->
+                <table border=0 cellspacing=4>
+                  <tr>
+                    <td colspan=2>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;">[Username]  </font></td>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;"><input type="text" name=u maxlength=12 size=30 style="border-width: 1px; border-color: black; border-style:none;" value="[UsernameValue]"></font>
+                    <input type="hidden" name=w value="password"></td>
+                  </tr>
+                  <tr>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;">[Password]  </font></td>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;"><input type="password" name=p maxlength=12 size=30 style="border-width: 1px; border-color: black; border-style:none;" value=""></font>
+                    <input type="hidden" name=v value="username"></td>
+                  </tr>
+                  <tr>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;">[RemainLoggedIn] </font></td>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;"><input type="checkbox" name=RemainLoggedIn style="border-width: 1px; border-color: black; border-style:none;"></font></td>
+                  </tr>
+                  <tr>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;">[MemLastUser] </font></td>
+                    <td align="left"><font face=Tahoma style="font-size:10pt;"><input type="checkbox" [MemLastUserChecked] name=MemLastUser style="border-width: 1px; border-color: black; border-style:none;"></font></td>
+                  </tr>
+                  <tr>
+                    <td align="center" colspan=2><input type="submit" value="[LoginNow]"></td>
+                  </tr>
+                  </table>
+                <!-- [iONiX] - Aireoreion: Advanced Webinterface //-->
                     </td>
                     <td width="5" background="./login_righttop.gif">
                       <img src="./transparent.gif" alt="" border="0" />
@@ -175,108 +202,6 @@ function preload_images()
 <--TMPL_LOGIN_END-->
 
 
-<-- ################################################################# -->
-<-- ############################ FAILEDLOGIN ######################## -->
-<-- ################################################################# -->
-
-<--TMPL_FAILEDLOGIN-->
-<html>
-  <meta http-equiv="content-type" content="text/html; charset=[CharSet]">
-  <head>
-    <META NAME="ROBOTS" CONTENT="NOINDEX,NOFOLLOW">
-    <title>
-       log failed [eMuleAppName] [version] - [WebControl]
-    </title>
-  </head>
-  <body background="main_bg1.gif" text=white link=white vlink=white alink=white onload="javascript:document.login.p.focus();">
-    <table align=center border=0 cellpadding=4 cellspacing=0 width="100%" height="100%">
-      <tr>
-        <td align=center valign=middle>
-
-          <table align=center border=0 cellpadding=0 cellspacing=0 width="407">
-            <tr>
-              <td style="height: 12px" background="./login_top.gif" height="12">
-              </td>
-            </tr>
-            <tr>
-              <td height="250">
-
-                <table align=center border=0 cellpadding=0 cellspacing=0 width="100%" height="100%">
-                  <tr>
-                    <td width="4" background="./login_lefttop.gif">
-                      <img src="./blank1x1.gif" alt="" border="0" />
-                    </td>
-                    <td background="./login_topdown.gif" align="center">
-
-                      <table align=center border=0 cellpadding=0 cellspacing=0 width="100%" height="100%">
-                        <tr>
-                          <td align="center">
-                            <a href="http://www.emule-project.net" target="_blank"><img src="logo.jpg" border="0"></a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="center" height="50">
-                            <font face=Tahoma style="font-size:10pt;"><b>[WebControl]</b> | [Login]</font>
-                          </td>
-                        </tr>
-                      </table>
-    
-                    </td>
-                    <td width="5" background="./login_righttop.gif">
-                      <img src="./blank1x1.gif" alt="" border="0" />
-                    </td>
-                  </tr>
-                </table>
-                
-              </td>
-            </tr>
-            <tr>
-              <td style="height: 3px" background="./login_topseperator.gif" height="3">
-              </td>
-            </tr>
-            <tr>
-              <td height="130">
-
-                <table align=center border=0 cellpadding=0 cellspacing=0 width="100%" height="100%">
-                  <tr>
-                    <td width="4" background="./login_lefttop.gif">
-                      <img src="./blank1x1.gif" alt="" border="0" />
-                    </td>
-                    <td background="./login_downmain.gif" align="center">
-                      <form action="" method="POST" name="login">
-                        <font face=Tahoma style="font-size:8pt;">
-                          &nbsp;<br />
-                          <b>[BanMessage]</b><br /><br />
-                          <input type="password" name=p maxlength=12 size=37 style="border-width: 1px; border-color: black; border-style:none;" value="" disabled>
-                          <input type="hidden" name=w value="password" style="border-width: 1px; border-color: black; border-style:solid;">
-                          <br /><br /><input type=submit value="[LoginNow]" disabled><br />
-                        </font>
-                    </td>
-                    <td width="5" background="./login_righttop.gif">
-                      <img src="./blank1x1.gif" alt="" border="0" />
-                    </td>
-                  </tr>
-                </table>
-                
-              </td>
-            </tr>
-            <tr>
-              <td style="height: 12px" background="./login_bottom.gif" height="12">
-              </td>
-            </tr>
-          </table>
-
-        </td>
-      </tr>
-    </table>
-    </form>
-  </body>
-</html>
-<--TMPL_FAILEDLOGIN_END-->
-
-
-
-
 
 
 <-- ################################################################# -->
@@ -294,6 +219,12 @@ function preload_images()
 <meta http-equiv="content-type" content="text/html; charset=[CharSet]">
 <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
 <title>[eMuleAppName] [version] - [WebControl]</title>
+<script type="text/javascript">
+var ablauf = new Date();
+var SevenDays = ablauf.getTime() + (7 * 24 * 60 * 60 * 1000);
+ablauf.setTime(SevenDays);
+[setCookie]
+</script>
 [StyleSheet]
 
 
@@ -355,11 +286,11 @@ function downmenu(event,admin,finfo,ed2k,downstate,isgetflc,fname,session,fileha
 					code += '<a href="?ses=' + session + '&w=transfer&op=getflc&file=' + filehash + '"><div class="menuitems"><img class="menuimages" src="l_getflc.gif"><img class="menuchecked" src="checked_no.gif">[GetFLC]&nbsp;</div></a>'
 			}
 		}
-		
+
 		if (cmts=="yes") {
 			code += '<a href="?ses=' + session + '&w=commentlist&filehash=' + filehash+'" target="_blank"><div class="menuitems"><img class="menuimages" src="l_comments.gif"><img class="menuchecked" src="checked_no.gif">[FileComments]&nbsp;</div></a>'
 		}
-			
+
 		code += '<a href="javascript:alert(iteminfo);"><div class="menuitems"><img class="menuimages" src="l_info.gif"><img class="menuchecked" src="checked_no.gif">[FileDetails]&nbsp;</div></a>'
 		code += '<a href="javascript:ToClipboard(ed2kinfo);"><div class="menuitems"><img class="menuimages" src="l_ed2klink.gif"><img class="menuchecked" src="checked_no.gif">[Ed2klink]&nbsp;</div></a>'
 	}
@@ -842,12 +773,12 @@ else
   			[Options]
   		</a>
   	</td>
-  	
+
   <td width="20">&nbsp;</td>
-	
+
 	<td width="9%" align="center" valign="top"><br />
 	<a href="javascript:void(0)" onMouseover="adminmenu(event,'[admin]')" onMouseout="delayhidemenu()"><img src="l_options.gif" align="middle"><br />[WebOptions]</a></td>
-	
+
 	<td>&nbsp;</td>
 	<td width="100" nowrap>
   		<img src="l_info.gif" align="middle"><a href="?ses=[Session]&amp;w=myinfo">&nbsp;&nbsp;[MyInfo]</a><br />
@@ -861,7 +792,7 @@ else
 <table border="0" cellpadding="2" cellspacing="0" width="100%" height="64">
 <tr>
 <td background="main_topbardarker.gif">
-  
+
   <table class="tabs_four" border="0" cellpadding="0" cellspacing="0" width="100%">
    <tr><td rowspan="2">&nbsp;</td>
    <td nowrap height="25"><b>[Connection]:</b></td></tr>
@@ -886,7 +817,7 @@ else
       //-->
 </script></td>
     <td></td>
-    
+
     <td width="17" align="right">
     <script language = "javascript">
 	<!--
@@ -935,7 +866,7 @@ else
 	requires: dw_event.js and dw_viewport.js
 
 	This code is from Dynamic Web Coding at http://www.dyn-web.com/
-	Copyright 2003 by Sharon Paine 
+	Copyright 2003 by Sharon Paine
 	See Terms of Use at http://www.dyn-web.com/bus/terms.html
 	regarding conditions under which you may use this code.
 	This notice must be retained in the code as is!
@@ -963,17 +894,17 @@ var Tooltip = {
   },
 
   show: function(e, msg) {
-    if (this.t1) clearTimeout(this.t1);	
-  	if (this.t2) clearTimeout(this.t2); 
+    if (this.t1) clearTimeout(this.t1);
+  	if (this.t2) clearTimeout(this.t2);
     this.tip = document.getElementById( this.tipID );
-  	// set up mousemove 
-  	if (this.followMouse) 
+  	// set up mousemove
+  	if (this.followMouse)
       dw_event.add( document, "mousemove", this.trackMouse, true );
     this.writeTip("");  // for mac ie
     this.writeTip(msg);
     viewport.getAll();
     this.positionTip(e);
-  	this.t1 = setTimeout("document.getElementById('" + Tooltip.tipID + "').style.visibility = 'visible'",200);	
+  	this.t1 = setTimeout("document.getElementById('" + Tooltip.tipID + "').style.visibility = 'visible'",200);
     },
 
     writeTip: function(msg) {
@@ -996,18 +927,18 @@ var Tooltip = {
     },
 
     hide: function() {
-      if (this.t1) clearTimeout(this.t1);	
-    	if (this.t2) clearTimeout(this.t2); 
+      if (this.t1) clearTimeout(this.t1);
+    	if (this.t2) clearTimeout(this.t2);
       this.t2 = setTimeout("document.getElementById('" + this.tipID + "').style.visibility = 'hidden'",200);
     	// release mousemove
-    	if (this.followMouse) 
+    	if (this.followMouse)
     		dw_event.remove( document, "mousemove", this.trackMouse, true );
       this.tip = null;
     },
 
     trackMouse: function(e) {
     	e = dw_event.DOMit(e);
-     	Tooltip.positionTip(e);	
+     	Tooltip.positionTip(e);
     }
 }
 
@@ -1021,15 +952,15 @@ var dw_event = {
     cap = cap || false;
     if (obj.addEventListener) obj.addEventListener(etype, fp, cap);
     else if (obj.attachEvent) obj.attachEvent("on" + etype, fp);
-  }, 
+  },
 
   remove: function(obj, etype, fp, cap) {
     cap = cap || false;
     if (obj.removeEventListener) obj.removeEventListener(etype, fp, cap);
     else if (obj.detachEvent) obj.detachEvent("on" + etype, fp);
-  }, 
+  },
 
-  DOMit: function(e) { 
+  DOMit: function(e) {
     e = e? e: window.event;
     e.tgt = e.srcElement? e.srcElement: e.target;
 
@@ -1046,18 +977,18 @@ viewport = {
   getWinWidth: function () {
     this.width = 0;
     if (window.innerWidth) this.width = window.innerWidth - 18;
-    else if (document.documentElement && document.documentElement.clientWidth) 
+    else if (document.documentElement && document.documentElement.clientWidth)
   		this.width = document.documentElement.clientWidth;
-    else if (document.body && document.body.clientWidth) 
+    else if (document.body && document.body.clientWidth)
   		this.width = document.body.clientWidth;
   },
 
   getWinHeight: function () {
     this.height = 0;
     if (window.innerHeight) this.height = window.innerHeight - 18;
-  	else if (document.documentElement && document.documentElement.clientHeight) 
+  	else if (document.documentElement && document.documentElement.clientHeight)
   		this.height = document.documentElement.clientHeight;
-  	else if (document.body && document.body.clientHeight) 
+  	else if (document.body && document.body.clientHeight)
   		this.height = document.body.clientHeight;
   },
 
@@ -1066,8 +997,8 @@ viewport = {
   	if (typeof window.pageXOffset == "number") this.scrollX = window.pageXOffset;
   	else if (document.documentElement && document.documentElement.scrollLeft)
   		this.scrollX = document.documentElement.scrollLeft;
-  	else if (document.body && document.body.scrollLeft) 
-  		this.scrollX = document.body.scrollLeft; 
+  	else if (document.body && document.body.scrollLeft)
+  		this.scrollX = document.body.scrollLeft;
   	else if (window.scrollX) this.scrollX = window.scrollX;
   },
 
@@ -1076,8 +1007,8 @@ viewport = {
     if (typeof window.pageYOffset == "number") this.scrollY = window.pageYOffset;
     else if (document.documentElement && document.documentElement.scrollTop)
   		this.scrollY = document.documentElement.scrollTop;
-  	else if (document.body && document.body.scrollTop) 
-  		this.scrollY = document.body.scrollTop; 
+  	else if (document.body && document.body.scrollTop)
+  		this.scrollY = document.body.scrollTop;
   	else if (window.scrollY) this.scrollY = window.scrollY;
   },
 
@@ -1092,7 +1023,7 @@ viewport = {
 <script language=javascript type=text/javascript>
 /*************************************************************************
 	This code is from Dynamic Web Coding at http://www.dyn-web.com/
-	Copyright 2003 by Sharon Paine 
+	Copyright 2003 by Sharon Paine
 	See Terms of Use at http://www.dyn-web.com/bus/terms.html
 	regarding conditions under which you may use this code.
 	This notice must be retained in the code as is!
@@ -1454,7 +1385,7 @@ border: 2px #003C6E solid;
 div#tipDiv
 {
 position:absolute; visibility:hidden; left:0; top:0; z-index:10000;
-background-color:#005784; border:1px solid #000000; 
+background-color:#005784; border:1px solid #000000;
 width:400; padding:4px;
 font-family: Tahoma, Verdana, Arial;
 color:#FFFFFF; font-size:8pt; line-height:1.2;
@@ -2570,7 +2501,7 @@ traceGraph(ulstring,"stats_con.gif",[MaxConnections]);
 	 </tr>
 	 <tr><td class="tabs" bgcolor="#005784">[BS_PORT]:</td>
 	  <td class="tabs" bgcolor="#005784"><input name="port" type="text" size="6"></td></tr>
-	  
+
 	  <tr>
 	  <td class="tabs" bgcolor="#005784">
 	  <input type="hidden" name="ses" value="[Session]">
@@ -2598,7 +2529,7 @@ traceGraph(ulstring,"stats_con.gif",[MaxConnections]);
 	<td bgcolor="#2184B5">
 	<font face=Tahoma style="font-size:9pt;"><b>[STATUS]</b></font>
 	</td>
-	
+
 	<td align=left valign=middle bgcolor="#2184B5">
 	<font face=Tahoma style="font-size:9pt;">
 	<b>[KADSTATUS]<br></b>
@@ -2619,7 +2550,7 @@ traceGraph(ulstring,"stats_con.gif",[MaxConnections]);
 	<tr>
 	<td valign=left class="search-main" colspan="3"><b>[KADSTAT]</b><br></td>
 	</tr>
-	
+
 	<tr>
 	 <td bgcolor="#2184B5">
 	 <font face=Tahoma style="font-size:8pt;">
@@ -2630,7 +2561,7 @@ traceGraph(ulstring,"stats_con.gif",[MaxConnections]);
 	 <font face=Tahoma style="font-size:8pt;">
 		[KADSTATSDATA]
 	 </font>
-	 </td>	 
+	 </td>
 	</tr>
 	</table>
 
@@ -2668,7 +2599,7 @@ traceGraph(ulstring,"stats_con.gif",[MaxConnections]);
 <td align=left valign=middle bgcolor="#005784" width="10%"><font face=Tahoma style="font-size:8pt;"><b>[RATING]</b></font></td>
 </tr>
 
-	[COMMENTLINES]	
+	[COMMENTLINES]
 
 	</table>
   </center>

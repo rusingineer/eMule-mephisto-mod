@@ -1419,6 +1419,8 @@ BEGIN
 END
 // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
 
+// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+/*
 IDD_PPG_WEBSRV DIALOGEX 0, 0, 231, 237
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Web Server"
@@ -1462,6 +1464,92 @@ BEGIN
     CONTROL         "Include port into UPnP setup",IDC_WSUPNP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,11,33,205,8
 END
+*/
+IDD_PPG_WEBSRV DIALOGEX 0, 0, 231, 257
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Web Server"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_TAB_WEBSERVER,"SysTabControl32",0x0,0,0,229,250
+    CONTROL         "Check1",IDC_WSENABLED,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,24,107,8
+    CONTROL         "Gzip",IDC_WS_GZIP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    14,35,194,8
+    EDITTEXT        IDC_WSPORT,88,54,26,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_TMPLPATH,88,70,118,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_TMPLBROWSE,208,70,13,12
+    PUSHBUTTON      "Reload",IDC_WSRELOADTMPL,160,85,61,12
+    EDITTEXT        IDC_WSTIMEOUT,88,96,26,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_WSPASS,88,122,120,13,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "Allow exit, reboot and shutdown",IDC_WS_ALLOWHILEVFUNC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,136,194,8
+    CONTROL         "Check1",IDC_WSENABLEDLOW,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,163,100,11
+    EDITTEXT        IDC_WSPASSLOW,88,174,120,13,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "Enable MobileMule",IDC_MMENABLED,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,14,205,100,11
+    EDITTEXT        IDC_MMPASSWORDFIELD,61,217,60,13,ES_PASSWORD | 
+                    ES_AUTOHSCROLL
+    EDITTEXT        IDC_MMPORT_FIELD,178,217,30,13,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "",IDC_GUIDELINK,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,
+                    14,232,130,10
+    GROUPBOX        "General",IDC_STATIC_GENERAL,7,14,216,98
+    LTEXT           "Port",IDC_WSPORT_LBL,14,57,70,8,0,WS_EX_RIGHT
+    LTEXT           "Template:",IDC_TEMPLATE,14,73,70,8,0,WS_EX_RIGHT
+    GROUPBOX        "Admin",IDC_STATIC_ADMIN,7,112,216,38
+    LTEXT           "Password",IDC_WSPASS_LBL,14,124,70,8,0,WS_EX_RIGHT
+    GROUPBOX        "low user",IDC_STATIC_LOWUSER,7,151,216,42
+    LTEXT           "Password",IDC_WSPASS_LBL2,14,177,70,8,0,WS_EX_RIGHT
+    GROUPBOX        "MobileMule",IDC_STATIC_MOBILEMULE,7,196,216,48
+    LTEXT           "Password",IDC_MMPASSWORD,14,219,45,8,0,WS_EX_RIGHT
+    LTEXT           "Port",IDC_MMPORT_LBL,148,220,27,8,0,WS_EX_RIGHT
+    LTEXT           "[TimeOut]",IDC_WSTIMEOUTLABEL,14,98,70,8,0,WS_EX_RIGHT
+    LTEXT           "mins",IDC_MINS,117,98,69,8
+    CONTROL         "Include port into UPnP setup",IDC_WSUPNP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,14,45,194,8
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+    CONTROL         "Check1",IDC_ADVADMINENABLED,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,13,20,195,8
+    GROUPBOX        "Advance Webserver Config",IDC_STATIC_ADVADMIN,9,32,216,
+                    155,BS_FLAT | NOT WS_VISIBLE
+    COMBOBOX        IDC_ACCOUNTSELECT,119,49,103,110,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP | NOT WS_VISIBLE
+    EDITTEXT        IDC_ADVADMIN_USER,57,63,47,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        IDC_ADVADMIN_PASS,175,65,47,12,ES_PASSWORD | 
+                    ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Access - Kad?",IDC_ADVADMIN_KAD,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,15,79,100,8
+    CONTROL         "Access - Transfer?",IDC_ADVADMIN_TRANSFER,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,15,90,100,8
+    CONTROL         "Access - Search?",IDC_ADVADMIN_SEARCH,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,15,102,100,8
+    CONTROL         "Access - Server?",IDC_ADVADMIN_SERVER,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,15,113,100,8
+    CONTROL         "Access - SharedList?",IDC_ADVADMIN_SHARED,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,123,79,100,8
+    CONTROL         "Access - Stats?",IDC_ADVADMIN_STATS,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,123,90,100,8
+    CONTROL         "Access - Prefs?",IDC_ADVADMIN_PREFS,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,123,102,100,8
+    COMBOBOX        IDC_ADVADMIN_USERLEVEL,89,126,72,110,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP | NOT WS_VISIBLE
+    EDITTEXT        IDC_ADVADMIN_CATS,89,145,120,13,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    PUSHBUTTON      "Delete Account",IDC_ADVADMIN_DELETE,31,162,59,14,
+                    WS_DISABLED | NOT WS_VISIBLE
+    PUSHBUTTON      "New Account",IDC_ADVADMIN_NEW,137,162,56,14, NOT WS_VISIBLE
+    LTEXT           "Account:",IDC_STATIC_ADVADMIN_ACC,15,50,74,8, NOT WS_VISIBLE
+    LTEXT           "Categorys (sep. by |):",IDC_STATIC_ADVADMIN_CATS,15,146,
+                    74,9, NOT WS_VISIBLE
+    LTEXT           "User:",IDC_STATIC_ADVADMIN_USER,15,66,39,10,0,
+                    WS_EX_RIGHT | NOT WS_VISIBLE
+    CTEXT           "Password:",IDC_STATIC_ADVADMIN_PASS,119,67,51,10,0,
+                    WS_EX_RIGHT | NOT WS_VISIBLE
+    LTEXT           "User Level:",IDC_STATIC_ADVADMIN_USERLEVEL,15,129,74,9, NOT WS_VISIBLE
+    LTEXT           "Note",IDC_ADVADMIN_NOTE,8,190,217,21, NOT WS_VISIBLE
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+END
+// <== Tabbed WebInterface settings panel [Stulle] - Stulle
 
 IDD_PPG_SCHEDULER DIALOGEX 0, 0, 231, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
@@ -6297,7 +6385,18 @@ BEGIN
     IDS_ADVADMIN_CAT        "Categories (sep. by |):"
     IDS_WS_COOKIE_LOGGEDIN  "Remain Logged In:"
 	IDS_WS_COOKIE_LASTUSER  "Memorize Last User:"
+    IDS_ADVADMIN_NOTE       "Note: You have to use the multi user Webtemplates, else you cannot activate\n\n"
+    IDS_ADVADMIN_USERLEVEL  "User level:"
+    IDS_ADVADMIN_OPERATOR   "Operator"
+    IDS_ADVADMIN_ADMIN      "Admin"
+    IDS_ADVADMIN_HIADMIN    "Hi-Admin"
+    IDS_ADVADMINENABLED     "Enable multi user Webinterface right management"
+    IDS_ADVADMIN_GUEST      "Guest"
     // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+    // ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+    IDS_TAB_WEB_SERVER       "Web Server"
+    IDS_TAB_MULTI_USER       "Multi User"
+    // <== Tabbed WebInterface settings panel [Stulle] - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

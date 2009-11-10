@@ -13,6 +13,8 @@ public:
 
 	void Localize(void);
 
+
+
 protected:
 	BOOL m_bModified;
 	bool bCreated;
@@ -40,4 +42,31 @@ protected:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnDataChange()				{SetModified(); SetTmplButtonState(); }
 	afx_msg void OnDestroy();
+	// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+private:
+	enum eTab	{NONE, WEBSERVER,MULTIWEBSERVER};
+	CTabCtrl	m_tabCtr;
+	eTab		m_currentTab;
+	CImageList	m_imageList;
+	void		SetTab(eTab tab);
+public:
+	afx_msg void OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
+	void	InitTab(bool firstinit, int Page = 0);
+	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
+
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+protected:
+	virtual BOOL OnSetActive();
+	afx_msg void OnSettingsChange();
+	afx_msg void OnEnableChange(); //lh 
+	afx_msg void OnSettingsChangeBox()			{ SetBoxes(); OnSettingsChange(); }
+	afx_msg void OnBnClickedNew();
+	afx_msg void OnBnClickedDel();
+	afx_msg void UpdateSelection();
+	CComboBox	m_cbAccountSelector;
+	CComboBox	m_cbUserlevel;
+	void	SetBoxes();
+	void	FillComboBox();
+	void	FillUserlevelBox();
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 };

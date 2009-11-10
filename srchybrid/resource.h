@@ -3383,7 +3383,41 @@
 #define IDS_ADVADMIN_CAT                61513
 #define IDS_WS_COOKIE_LOGGEDIN          61514
 #define IDS_WS_COOKIE_LASTUSER          61515
+#define IDS_ADVADMIN_NOTE               61516
+#define IDS_ADVADMIN_USERLEVEL          61517
+#define IDS_ADVADMIN_OPERATOR           61518
+#define IDS_ADVADMIN_ADMIN              61519
+#define IDS_ADVADMIN_HIADMIN            61520
+#define IDS_ADVADMINENABLED             61521
+#define IDS_ADVADMIN_GUEST              61522
+#define IDC_ADVADMINENABLED             61523
+#define IDC_STATIC_ADVADMIN             61524
+#define IDC_ACCOUNTSELECT               61525
+#define IDC_ADVADMIN_USER               61526
+#define IDC_ADVADMIN_PASS               61527
+#define IDC_ADVADMIN_KAD                61528
+#define IDC_ADVADMIN_TRANSFER           61529
+#define IDC_ADVADMIN_SEARCH             61530
+#define IDC_ADVADMIN_SERVER             61531
+#define IDC_ADVADMIN_SHARED             61532
+#define IDC_ADVADMIN_STATS              61533
+#define IDC_ADVADMIN_PREFS              61534
+#define IDC_ADVADMIN_USERLEVEL          61535
+#define IDC_ADVADMIN_CATS               61536
+#define IDC_ADVADMIN_DELETE             61537
+#define IDC_ADVADMIN_NEW                61538
+#define IDC_STATIC_ADVADMIN_ACC         61539
+#define IDC_STATIC_ADVADMIN_CATS        61540
+#define IDC_STATIC_ADVADMIN_USER        61541
+#define IDC_STATIC_ADVADMIN_PASS        61542
+#define IDC_STATIC_ADVADMIN_USERLEVEL   61543
+#define IDC_ADVADMIN_NOTE               61544
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+#define IDC_TAB_WEBSERVER               61550
+#define IDS_TAB_WEB_SERVER              61551
+#define IDS_TAB_MULTI_USER              61552
+// <== Tabbed WebInterface settings panel [Stulle] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000
 #define IDS_EASTEREGG                   62001

@@ -125,7 +125,7 @@ namespace Kademlia
 		        RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(DWORD), (DWORD *)&info);
 		        */
 		        RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(DWORD), (ULONG_PTR*) &info);
-		        // <== m0000h
+		        // <== Make code VS 2005 and VS 2008 ready [MorphXT] - Stulle
 		    } __except (EXCEPTION_CONTINUE_EXECUTION)
 	    { }
 	    delete [] pcharBuffer;

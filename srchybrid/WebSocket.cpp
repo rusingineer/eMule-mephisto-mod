@@ -34,6 +34,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, DWORD dwHeaderLen, char* pData
 	CStringA sHeader(pHeader, dwHeaderLen);
 	CStringA sData(pData, dwDataLen);
 	CStringA sURL;
+	CStringA sCookie; // Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 	bool filereq=false;
 
 	if(sHeader.Left(3) == "GET")
@@ -41,6 +42,13 @@ void CWebSocket::OnRequestReceived(char* pHeader, DWORD dwHeaderLen, char* pData
 
 	else if(sHeader.Left(4) == "POST")
 		sURL = "?" + sData.Trim();	// '?' to imitate GET syntax for ParseURL
+
+	// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
+	int pos = sHeader.Find("Cookie:");
+	if(pos != -1) //found
+	sCookie = sHeader.Mid(pos+7);
+	sCookie.Trim();
+	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 
 	if(sURL.Find(" ") > -1)
 		sURL = sURL.Mid(sURL.Find(" ")+1, sURL.GetLength());
@@ -61,6 +69,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, DWORD dwHeaderLen, char* pData
 	Data.pThis = m_pParent;
 	Data.inadr = inad;
 	Data.pSocket = this;
+	Data.sCookie = sCookie; // Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 
 	if (!filereq)
 		m_pParent->ProcessURL(Data);

@@ -402,7 +402,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		
 		bool isUseGzip = thePrefs.GetWebUseGzip();
 		bool justAddLink,login=false;
-		bool banned = false; // MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+		bool banned = false; // New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 
 		CString Out;
 		CString OutE;	// List Entry Templates
@@ -414,7 +414,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		srand ( time(NULL) );
 
 
-		// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+		// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 		/*
 		uint32 myip= inet_addr(CT2CA(ipstr(Data.inadr)));
 		DWORD now=::GetTickCount();
@@ -448,7 +448,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 				banned = true;
 			}
 		}
-		// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+		// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 
 
 
@@ -478,7 +478,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		*/
 		if ( (_ParseURL(Data.sURL, _T("w")) == _T("password")
 			&& (_ParseURL(Data.sURL, _T("v")) == _T("username")
-			|| !thePrefs.UseIonixWebsrv()))	|| login	) // MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+			|| !thePrefs.UseIonixWebsrv()))	|| login	) // New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 		{
 			// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 			//CString pass = MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash();
@@ -492,7 +492,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 			// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
-			// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+			// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 			bool bWrongLogin = false;
 			if ( ! banned) {
 		        if (_ParseURL(Data.sURL, _T("c")) != _T("")) {
@@ -539,7 +539,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 				}
 				else
 				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-			// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+			// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 				if(MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSPass())
 				{
 				        if (!justAddLink) 
@@ -568,11 +568,11 @@ void CWebServer::ProcessURL(ThreadData Data)
 					AddLogLine(true,GetResString(IDS_WEB_ADMINLOGIN)+_T(" (%s)"),ip);
 					login=true;
 
-					// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+					// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 					// reset tries
 					if(ipWatched)
 						ipWatched->tries=0;
-					// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+					// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 				}
 				else if(thePrefs.GetWSIsLowUserEnabled() && thePrefs.GetWSLowPass()!=_T("") && MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSLowPass())
 				{
@@ -591,15 +591,15 @@ void CWebServer::ProcessURL(ThreadData Data)
 
 					AddLogLine(true,GetResString(IDS_WEB_GUESTLOGIN)+_T(" (%s)"),ip);
 					login=true;
-					// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+					// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 					// reset tries
 					if(ipWatched)
 						ipWatched->tries=0;
 				}
 				else if(!thePrefs.UseIonixWebsrv())
 					bWrongLogin = true;
-					// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
-			// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+					// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
+			// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 			/*
 			} else {
 				LogWarning(LOG_STATUSBAR,GetResString(IDS_WEB_BADLOGINATTEMPT)+_T(" (%s)"),ip);
@@ -854,7 +854,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		{
 			isUseGzip = false;
 
-			// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+			// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 			uint32 ip= inet_addr(CT2CA(ipstr(Data.inadr)));
 			uint32 faults=0;
 
@@ -878,7 +878,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 				*/
 			}
 			else
-			// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+			// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 			if(justAddLink)
 				Out += _GetRemoteLinkAddedFailed(Data);
 			else
@@ -5890,7 +5890,7 @@ CString CWebServer::_ParseCookie(const CString& Cookie, const CString& name)
 }
 // <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 
-// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 BadLogin * CWebServer::RegisterFailedLogin(ThreadData Data){
 	CWebServer *pThis = (CWebServer *)Data.pThis;
 	if (pThis == NULL) return NULL;
@@ -5949,7 +5949,7 @@ BadLogin * CWebServer::FindBadLoginByIp(ThreadData Data,CString ip){
 	}
 	return NULL;
 }
-// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 
 // ==> Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
 CString CWebServer::_GetFailedLoginScreen(ThreadData Data)

@@ -12,10 +12,10 @@
 #define SHORT_LENGTH_MAX		60	// Max size for strings maximum
 #define SHORT_LENGTH			40	// Max size for strings
 #define SHORT_LENGTH_MIN		30	// Max size for strings minimum
-// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 #define BAN_TIME_SECS			900	// 15 minutes ban time 
 #define LOGIN_TRIES_LIMIT		4	// Max number of tries to login before ban
-// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 
 typedef struct
 {
@@ -48,10 +48,10 @@ typedef struct
 } Session;
 
 struct BadLogin {
-	// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+	// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 	CString ip;
 	uint32	tries;
-	// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+	// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 	uint32	datalen;
 	DWORD	timestamp;
 };
@@ -431,11 +431,11 @@ private:
 	static CString  GetClientSummary(CUpDownClient* client);
 	static CString	_GetMyInfo(ThreadData Data);
 	static CString	GetClientversionImage(CUpDownClient* client);
-	// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+	// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 	static BadLogin * RegisterFailedLogin(ThreadData Data);
 	static void		UpdateFailedLoginsList(ThreadData Data);
 	static BadLogin * FindBadLoginByIp(ThreadData Data,CString ip);
-	// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+	// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 
 
 // Common data

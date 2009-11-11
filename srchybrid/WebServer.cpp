@@ -229,6 +229,7 @@ void CWebServer::ReloadTemplates()
 			m_Templates.sStats = _LoadTemplate(sAll,_T("TMPL_STATS"));
 			m_Templates.sPreferences = _LoadTemplate(sAll,_T("TMPL_PREFERENCES"));
 			m_Templates.sLogin = _LoadTemplate(sAll,_T("TMPL_LOGIN"));
+			m_Templates.sFailedLogin = _LoadTemplate(sAll,_T("TMPL_FAILEDLOGIN")); // Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
 			m_Templates.sAddServerBox = _LoadTemplate(sAll,_T("TMPL_ADDSERVERBOX"));
 			m_Templates.sSearch = _LoadTemplate(sAll,_T("TMPL_SEARCH"));
 			m_Templates.iProgressbarWidth = (uint16)_tstoi(_LoadTemplate(sAll,_T("PROGRESSBARWIDTH")));
@@ -401,7 +402,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		
 		bool isUseGzip = thePrefs.GetWebUseGzip();
 		bool justAddLink,login=false;
-		bool banned =false; // MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+		bool banned = false; // MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
 
 		CString Out;
 		CString OutE;	// List Entry Templates
@@ -437,6 +438,16 @@ void CWebServer::ProcessURL(ThreadData Data)
 			return;
 		}
 		*/
+		CString ip=ipstr(Data.inadr);
+		UpdateFailedLoginsList(Data);
+
+		BadLogin * ipWatched;
+
+		if((ipWatched = FindBadLoginByIp(Data,ip))!= NULL){
+			if(ipWatched->tries > LOGIN_TRIES_LIMIT){
+				banned = true;
+			}
+		}
 		// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
 
 
@@ -463,6 +474,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		if (_ParseURL(Data.sURL, _T("w")) == _T("password"))
 		{
 			CString test=MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash();
+			CString ip=ipstr(Data.inadr);
 		*/
 		if ( (_ParseURL(Data.sURL, _T("w")) == _T("password")
 			&& (_ParseURL(Data.sURL, _T("v")) == _T("username")
@@ -479,29 +491,16 @@ void CWebServer::ProcessURL(ThreadData Data)
 			}
 			// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-			CString ip=ipstr(Data.inadr);
 
 			// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
-			UpdateFailedLoginsList(Data);
-
-			BadLogin * ipWatched;
-
-			if((ipWatched = FindBadLoginByIp(Data,ip))!= NULL){
-				if(ipWatched->tries > LOGIN_TRIES_LIMIT){
-					banned = true;
-				}
-			}
-
-			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 			bool bWrongLogin = false;
-
 			if ( ! banned) {
-			        if (_ParseURL(Data.sURL, _T("c")) != _T("")) {
-			            // just sent password to add link remotely. Don't start a session.
-			            justAddLink = true;
-			        }
+		        if (_ParseURL(Data.sURL, _T("c")) != _T("")) {
+		            // just sent password to add link remotely. Don't start a session.
+		            justAddLink = true;
+		        }
 
-				bool bWrongLogin = false;
+				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 				if(thePrefs.UseIonixWebsrv())
 				{
 					// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
@@ -539,7 +538,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 						bWrongLogin = true;
 				}
 				else
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 			// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
 				if(MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSPass())
 				{
@@ -597,6 +596,8 @@ void CWebServer::ProcessURL(ThreadData Data)
 					if(ipWatched)
 						ipWatched->tries=0;
 				}
+				else if(!thePrefs.UseIonixWebsrv())
+					bWrongLogin = true;
 					// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
 			// ==> MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
 			/*
@@ -625,26 +626,11 @@ void CWebServer::ProcessURL(ThreadData Data)
 				}
 			*/
 			}
-			else
+			if(bWrongLogin || banned)
 			{
-				bWrongLogin = true;
-				ipWatched = RegisterFailedLogin(Data);
-				//Check again to see if its now banned
-				if(ipWatched->tries > LOGIN_TRIES_LIMIT){
-					banned = true;
-				}   ;
-
-				// morph end TODO
-
 				if(bWrongLogin)
-				{
-					LogWarning(LOG_STATUSBAR,GetResString(IDS_WEB_BADLOGINATTEMPT)+_T(" (%s)"),ip);
-					//TODO: maybe remove?
-					// TODO need to change this. BadLogin newban={inet_addr(CT2CA(ipstr(Data.inadr)) ), ::GetTickCount()};	// save failed attempt (ip,time)
-					// TODO pThis->m_Params.badlogins.Add(newban);
-					login=false;
-				}
-				// <== MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+					ipWatched = RegisterFailedLogin(Data);
+				login=false;
 				isUseGzip = false; // [Julien]
 			}
 		}
@@ -874,7 +860,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 
 			// check for bans
 			for(int i = 0; i < pThis->m_Params.badlogins.GetSize();i++)
-				if ( pThis->m_Params.badlogins[i].datalen==ip ) faults++;
+				if ( pThis->m_Params.badlogins[i].datalen==ip ) faults = pThis->m_Params.badlogins[i].tries;
 
 			if (faults>4) {
 				// ==> Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
@@ -5910,13 +5896,14 @@ BadLogin * CWebServer::RegisterFailedLogin(ThreadData Data){
 	if (pThis == NULL) return NULL;
 	
 	CString ip=ipstr(Data.inadr);
+	uint32 myip= inet_addr(CT2CA(ipstr(Data.inadr)));
 
 	LogWarning(LOG_STATUSBAR,GetResString(IDS_WEB_BADLOGINATTEMPT)+_T(" (%s)"),ip);
 
 	BadLogin * ipWatched = FindBadLoginByIp(Data,ip);
 
 	if(ipWatched == NULL){
-		BadLogin newIpToWatch = {ip, 0, 0}; // Creates new entry
+		BadLogin newIpToWatch = {ip, 0, myip}; // Creates new entry
 
 		int index = pThis->m_Params.badlogins.Add(newIpToWatch);
 
@@ -5967,7 +5954,6 @@ BadLogin * CWebServer::FindBadLoginByIp(ThreadData Data,CString ip){
 // ==> Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
 CString CWebServer::_GetFailedLoginScreen(ThreadData Data)
 {
-
 	CWebServer *pThis = (CWebServer *)Data.pThis;
 	if(pThis == NULL)
 		return _T("");
@@ -5977,6 +5963,52 @@ CString CWebServer::_GetFailedLoginScreen(ThreadData Data)
 	CString Out = _T("");
 
 	Out += pThis->m_Templates.sFailedLogin;
+
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	if(thePrefs.UseIonixWebsrv())
+	{
+		// ==> ModID [itsonlyme/SiRoB] - Stulle
+		/*
+		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong);
+		*/
+		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" [") + theApp.m_strModLongVersion + _T("]"));
+		// <== ModID [itsonlyme/SiRoB] - Stulle
+		Out.Replace(_T("[Login]"), _GetPlainResString(IDS_WEB_LOGIN));
+		Out.Replace(_T("[BanMessage]"), _T("You have been banned for 15 min due to failed login attempts!"));
+		Out.Replace(_T("[LoginNow]"), _GetPlainResString(IDS_WEB_LOGIN_NOW));
+		Out.Replace(_T("[WebControl]"), _GetPlainResString(IDS_WEB_CONTROL));
+
+		// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
+		Out.Replace(_T("[MemLastUserChecked]"), (_ParseCookie(Data.sCookie, _T("c_username"))?_T("checked=\"checked\""):_T("")));
+		Out.Replace(_T("[RemainLoggedIn]"), GetResString(IDS_WS_COOKIE_LOGGEDIN));
+		Out.Replace(_T("[MemLastUser]"), GetResString(IDS_WS_COOKIE_LASTUSER));
+		// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		Out.Replace(_T("[Username]"), GetResString(IDS_ADVADMIN_USER));
+		Out.Replace(_T("[Password]"), GetResString(IDS_ADVADMIN_PASS));
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		Out.Replace(_T("[CharSet]"), HTTPENCODING );
+		Out.Replace(_T("[eMuleAppName]"), _T("eMule") );
+		// Xman // Maella -Support for tag ET_MOD_VERSION 0x55
+		/*
+		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong );
+		*/
+		// ==> ModID [itsonlyme/SiRoB] - Stulle
+		/*
+		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" ") + MOD_VERSION);
+		*/
+		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" [") + theApp.m_strModLongVersion + _T("]"));
+		// <== ModID [itsonlyme/SiRoB] - Stulle
+		//Xman end
+		Out.Replace(_T("[Login]"), _GetPlainResString(IDS_WEB_LOGIN));
+		Out.Replace(_T("[BanMessage]"), _T("You have been banned for 15 min due to failed login attempts!"));
+		Out.Replace(_T("[EnterPassword]"), _GetPlainResString(IDS_WEB_ENTER_PASSWORD));
+		Out.Replace(_T("[LoginNow]"), _GetPlainResString(IDS_WEB_LOGIN_NOW));
+		Out.Replace(_T("[WebControl]"), _GetPlainResString(IDS_WEB_CONTROL));
+
+		return Out;
+	}
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 	Out.Replace(_T("[CharSet]"), HTTPENCODING);
 	Out.Replace(_T("[eMulePlus]"), _T("eMule"));

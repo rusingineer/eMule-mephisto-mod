@@ -285,7 +285,10 @@ BOOL CPPgWebServer::OnApply()
 		}
 		// <== UPnP support [MoNKi] - leuk_he
 
-		theApp.webserver->SaveWebServConf(); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		theApp.webserver->SaveWebServConf();
+		OnEnableChange();
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 		theApp.emuledlg->serverwnd->UpdateMyInfo();
 		SetModified(FALSE);

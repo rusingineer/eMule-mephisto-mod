@@ -297,7 +297,7 @@ typedef struct
 	CString sStats;
 	CString sPreferences;
 	CString	sLogin;
-	CString sFailedLogin; // MorphXT's failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker] - Stulle
+	CString sFailedLogin; // Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
 	CString	sAddServerBox;
 	CString	sSearch;
 	CString	sProgressbarImgs;

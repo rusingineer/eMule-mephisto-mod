@@ -297,7 +297,7 @@ typedef struct
 	CString sStats;
 	CString sPreferences;
 	CString	sLogin;
-	CString sFailedLogin; // Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+	CString sFailedLogin; // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 	CString	sAddServerBox;
 	CString	sSearch;
 	CString	sProgressbarImgs;
@@ -374,7 +374,7 @@ private:
 	*/
 	static CString	_GetLoginScreen(ThreadData, bool bLogout = false);
 	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
-	static CString  _GetFailedLoginScreen(ThreadData); //Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+	static CString  _GetFailedLoginScreen(ThreadData); //Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 	static CString	_GetConnectedServer(ThreadData);
 	static CString 	_GetAddServerBox(ThreadData Data);
 	static CString	_GetCommentlist(ThreadData Data);

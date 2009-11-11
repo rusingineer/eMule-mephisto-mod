@@ -229,7 +229,7 @@ void CWebServer::ReloadTemplates()
 			m_Templates.sStats = _LoadTemplate(sAll,_T("TMPL_STATS"));
 			m_Templates.sPreferences = _LoadTemplate(sAll,_T("TMPL_PREFERENCES"));
 			m_Templates.sLogin = _LoadTemplate(sAll,_T("TMPL_LOGIN"));
-			m_Templates.sFailedLogin = _LoadTemplate(sAll,_T("TMPL_FAILEDLOGIN")); // Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+			m_Templates.sFailedLogin = _LoadTemplate(sAll,_T("TMPL_FAILEDLOGIN")); // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 			m_Templates.sAddServerBox = _LoadTemplate(sAll,_T("TMPL_ADDSERVERBOX"));
 			m_Templates.sSearch = _LoadTemplate(sAll,_T("TMPL_SEARCH"));
 			m_Templates.iProgressbarWidth = (uint16)_tstoi(_LoadTemplate(sAll,_T("PROGRESSBARWIDTH")));
@@ -863,12 +863,12 @@ void CWebServer::ProcessURL(ThreadData Data)
 				if ( pThis->m_Params.badlogins[i].datalen==ip ) faults = pThis->m_Params.badlogins[i].tries;
 
 			if (faults>4) {
-				// ==> Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+				// ==> Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 				/*
 				Out += _GetPlainResString(IDS_ACCESSDENIED);
 				*/
 				Out += _GetFailedLoginScreen(Data);
-				// <== Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+				// <== Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 
 				// set 15 mins ban by using the badlist
 				/* TODO NEED TO CHANGE THIS!
@@ -5951,7 +5951,7 @@ BadLogin * CWebServer::FindBadLoginByIp(ThreadData Data,CString ip){
 }
 // <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 
-// ==> Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+// ==> Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 CString CWebServer::_GetFailedLoginScreen(ThreadData Data)
 {
 	CWebServer *pThis = (CWebServer *)Data.pThis;
@@ -6026,4 +6026,4 @@ CString CWebServer::_GetFailedLoginScreen(ThreadData Data)
 
 	return Out;
 }
-// <== Failed login screen for WebInterface [SiRoB/CommanderGer] - Stulle
+// <== Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle

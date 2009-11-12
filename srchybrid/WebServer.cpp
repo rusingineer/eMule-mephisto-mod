@@ -4936,12 +4936,7 @@ bool CWebServer::_IsLoggedIn(ThreadData Data, long lSession)
 	if(pThis == NULL)
 		return false;
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-	/*
 	_RemoveTimeOuts(Data);
-	*/
-	_RemoveTimeOuts(Data,lSession);
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 	// find our session
 	// i should have used CMap there, but i like CArray more ;-)
@@ -4958,12 +4953,7 @@ bool CWebServer::_IsLoggedIn(ThreadData Data, long lSession)
 	return false;
 }
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-/*
 void CWebServer::_RemoveTimeOuts(ThreadData Data)
-*/
-void CWebServer::_RemoveTimeOuts(ThreadData Data, long /*lSession*/)
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 {
 	// remove expired sessions
 	CWebServer *pThis = (CWebServer *)Data.pThis;
@@ -5755,12 +5745,7 @@ void CWebServer::_SetLastUserCat(ThreadData Data, long lSession,int cat){
 	if(pThis == NULL)
 		return;
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-	/*
 	_RemoveTimeOuts(Data);
-	*/
-	_RemoveTimeOuts(Data,lSession);
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 	// find our session
 	for(int i = 0; i < pThis->m_Params.Sessions.GetSize(); i++)
@@ -5781,12 +5766,7 @@ int CWebServer::_GetLastUserCat(ThreadData Data, long lSession)
 	if(pThis == NULL)
 		return 0;
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-	/*
 	_RemoveTimeOuts(Data);
-	*/
-	_RemoveTimeOuts(Data,lSession);
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 	// find our session
 	for(int i = 0; i < pThis->m_Params.Sessions.GetSize(); i++)

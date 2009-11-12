@@ -396,12 +396,7 @@ private:
 	static CString	_ParseCookie(const CString& Cookie, const CString& Cookiename); // Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 	static void		_ConnectToServer(CString sIP, int nPort);
 	static bool		_IsLoggedIn(ThreadData Data, long lSession);
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-	/*
 	static void		_RemoveTimeOuts(ThreadData Data);
-	*/
-	static void		_RemoveTimeOuts(ThreadData Data, long lSession);
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 	static bool		_RemoveSession(ThreadData Data, long lSession);
 	static CString	_SpecialChars(CString str, bool noquote = true);
 	static CString	_GetPlainResString(UINT nID, bool noquote = true);

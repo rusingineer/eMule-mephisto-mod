@@ -563,6 +563,37 @@ function downpriomenu(event,admin,session,filehash,priority,downstate)
 	}
 }
 
+function powersharemenu(event,admin,session,filehash,newmode)
+{
+	var code = new Array()
+
+	if(admin == "admin" && newmode != "Incomplete")
+	{
+		if(newmode == "Default")
+			code = '<a href="?ses=' + session + '&w=shared&ps=def&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked.gif">[PsDefault]&nbsp;</div></a>'
+		else
+			code = '<a href="?ses=' + session + '&w=shared&ps=def&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked_no.gif">[PsDefault]&nbsp;</div></a>'
+		if(newmode == "Off")
+			code += '<a href="?ses=' + session + '&w=shared&ps=off&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked.gif">[PsOff]&nbsp;</div></a>'
+		else
+			code += '<a href="?ses=' + session + '&w=shared&ps=off&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked_no.gif">[PsOff]&nbsp;</div></a>'
+		if(newmode == "On")
+			code += '<a href="?ses=' + session + '&w=shared&ps=on&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked.gif">[PsOn]&nbsp;</div></a>'
+		else
+			code += '<a href="?ses=' + session + '&w=shared&ps=on&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked_no.gif">[PsOn]&nbsp;</div></a>'
+		if(newmode == "Auto")
+			code += '<a href="?ses=' + session + '&w=shared&ps=auto&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked.gif">[PsAuto]&nbsp;</div></a>'
+		else
+			code += '<a href="?ses=' + session + '&w=shared&ps=auto&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked_no.gif">[PsAuto]&nbsp;</div></a>'
+		if(newmode == "Limited")
+			code += '<a href="?ses=' + session + '&w=shared&ps=ltd&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked.gif">[PsLtd]&nbsp;</div></a>'
+		else
+			code += '<a href="?ses=' + session + '&w=shared&ps=ltd&hash=' + filehash + '"><div class="menuitems"><img class="menuchecked" src="checked_no.gif">[PsLtd]&nbsp;</div></a>'
+
+		showmenu(event,code)
+	}
+}
+
 function sharedpriomenu(event,admin,session,filehash,priority)
 {
 	var code = new Array()
@@ -2203,7 +2234,7 @@ function searchange2() {
 <br />
 <table align=center border=0 cellpadding=4 cellspacing=0 width="95%">
 <tr>
- <td class="smallheader" colspan=8 style="background-color: #000000"><b><img src="l_shared.gif" align="middle">&nbsp;<a href="#" onMouseover="columnmenu(event,'shared','menu','[FilenameM]','[Filename]','[FileTransferredM]','[FileTransferred]','[FileRequestsM]','[FileRequests]','[FileAcceptsM]','[FileAccepts]','[SizeM]','[Size]','[CompletesM]','[Completes]','[PriorityM]','[Priority]','','','','','','','','','','')" onMouseout="delayhidemenu()">[SharedList]</a>&nbsp;[Message]</b></td>
+ <td class="smallheader" colspan=9 style="background-color: #000000"><b><img src="l_shared.gif" align="middle">&nbsp;<a href="#" onMouseover="columnmenu(event,'shared','menu','[FilenameM]','[Filename]','[FileTransferredM]','[FileTransferred]','[FileRequestsM]','[FileRequests]','[FileAcceptsM]','[FileAccepts]','[SizeM]','[Size]','[CompletesM]','[Completes]','[PowerShareM]','[PowerShare]','[PriorityM]','[Priority]','','','','','','','','')" onMouseout="delayhidemenu()">[SharedList]</a>&nbsp;[Message]</b></td>
 </tr>
 <tr>
  <td valign=middle class="shared-header-left"><table cellspacing="0" cellpadding="0" border="0" valign=top class="shared-header-left"><tr><td width="16" align="center"><a href="?ses=[Session]&amp;w=shared&[SortState]"><b>&times;</b></a></td><td>&nbsp;</td><td width="16" align="center"><a href="?ses=[Session]&amp;w=shared&[SortType]"><b>&times;</b></a></td><td><a href="?ses=[Session]&amp;w=shared&[SortName]"><b>[Filename][FilenameI]</b></a></td></tr></table></td>
@@ -2212,6 +2243,7 @@ function searchange2() {
  <td valign=middle class="shared-header"><a href="?ses=[Session]&amp;w=shared&[SortAccepts]"><b>[FileAccepts][FileAcceptsI]</b></a></td>
  <td valign=middle class="shared-header"><a href="?ses=[Session]&amp;w=shared&[SortSize]"><b>[Size][SizeI]</b></a></td>
  <td valign=middle class="shared-header"><a href="?ses=[Session]&amp;w=shared&[SortCompletes]"><b>[Completes][CompletesI]</b></a></td>
+ <td valign=middle class="shared-header"><a href="?ses=[Session]&amp;w=shared&[SortPowerShare]"><b>[PowerShare][PowerShareI]</b></a></td>
  <td valign=middle class="shared-header"><a href="?ses=[Session]&amp;w=shared&[SortPriority]"><b>[Priority][PriorityI]</b></a></td>
  <td valign=middle class="shared-header">&nbsp;</td>
 </tr>
@@ -2233,6 +2265,7 @@ function searchange2() {
  <td valign=top class="shared-line-[FileState]">[FileAccepts][FileAllTimeAccepts]</td>
  <td valign=top class="shared-line-[FileState]">[FileSize]</td>
  <td valign=top class="shared-line-[FileState]">[Completes]</td>
+ <td valign=top class="shared-line-[FileState]"><a href="#" onMouseover="powersharemenu(event,'[admin]','[session]','[hash]','[shared-powershare]')" onMouseout="delayhidemenu()">[PowerShare]</a></td>
  <td valign=top class="shared-line-[FileState]"><a href="#" onMouseover="sharedpriomenu(event,'[admin]','[session]','[hash]','[shared-priority]')" onMouseout="delayhidemenu()">[Priority]</a></td>
  <td valign=top class="shared-line-[FileState]" width="9"><img src="[LastChangedDataset].gif"></td>
 </tr>

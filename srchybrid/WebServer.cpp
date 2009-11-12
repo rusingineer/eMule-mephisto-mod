@@ -80,7 +80,12 @@ bool operator < (SearchFileStruct & first, SearchFileStruct & second)
 static BOOL	WSdownloadColumnHidden[8];
 static BOOL	WSuploadColumnHidden[5];
 static BOOL	WSqueueColumnHidden[4];
+// ==> PowerShare support for WebInterface [Stulle] - Stulle
+/*
 static BOOL	WSsharedColumnHidden[7];
+*/
+static BOOL	WSsharedColumnHidden[8];
+// <== PowerShare support for WebInterface [Stulle] - Stulle
 static BOOL	WSserverColumnHidden[10];
 static BOOL	WSsearchColumnHidden[4];
 
@@ -1080,6 +1085,14 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	Out.Replace(_T("[RemoveServer]"), _GetPlainResString(IDS_REMOVETHIS));
 	Out.Replace(_T("[StaticServer]"), _GetPlainResString(IDS_STATICSERVER));
 	Out.Replace(_T("[Friend]"), _GetPlainResString(IDS_PW_FRIENDS));
+
+	// ==> PowerShare support for WebInterface [Stulle] - Stulle
+	Out.Replace(_T("[PsDefault]"), _GetPlainResString(IDS_DEFAULT));
+	Out.Replace(_T("[PsOff]"), _GetPlainResString(IDS_POWERSHARE_DISABLED));
+	Out.Replace(_T("[PsOn]"), _GetPlainResString(IDS_POWERSHARE_ACTIVATED));
+	Out.Replace(_T("[PsAuto]"), _GetPlainResString(IDS_POWERSHARE_AUTO));
+	Out.Replace(_T("[PsLtd]"), _GetPlainResString(IDS_POWERSHARE_LIMITED));
+	// <== PowerShare support for WebInterface [Stulle] - Stulle
 
 	Out.Replace(_T("[PriorityVeryLow]"), _GetPlainResString(IDS_PRIOVERYLOW));
 	Out.Replace(_T("[PriorityLow]"), _GetPlainResString(IDS_PRIOLOW));
@@ -3540,6 +3553,10 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 			pThis->m_Params.SharedSort = SHARED_SORT_ALL_TIME_ACCEPTS;
 		else if (strSort == _T("completes"))
 			pThis->m_Params.SharedSort = SHARED_SORT_COMPLETES;
+		// ==> PowerShare support for WebInterface [Stulle] - Stulle
+		else if (strSort == _T("powershare"))
+			pThis->m_Params.SharedSort = SHARED_SORT_PRIORITY;
+		// <== PowerShare support for WebInterface [Stulle] - Stulle
 		else if (strSort == _T("priority"))
 			pThis->m_Params.SharedSort = SHARED_SORT_PRIORITY;
 
@@ -3548,6 +3565,37 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 	}
 	if (!strTmp.IsEmpty())
 		pThis->m_Params.bSharedSortReverse = (strTmp == _T("true"));
+
+	// ==> PowerShare support for WebInterface [Stulle] - Stulle
+	if(!_ParseURL(Data.sURL, _T("hash")).IsEmpty() && !_ParseURL(Data.sURL, _T("ps")).IsEmpty() && IsSessionAdmin(Data,sSession))
+	{
+		CKnownFile* cur_file;
+		uchar fileid[16];
+		CString hash = _ParseURL(Data.sURL, _T("hash"));
+		if (hash.GetLength()==32 && DecodeBase16(hash, hash.GetLength(), fileid, ARRSIZE(fileid)))
+		{
+			cur_file = theApp.sharedfiles->GetFileByID(fileid);
+
+			// We should not come here, just in case somebody tries to mess with the link
+			if (cur_file != 0 && cur_file->IsPartFile() == false)
+			{
+				strTmp = _ParseURL(Data.sURL, _T("ps"));
+				if (strTmp == _T("def"))
+					cur_file->SetPowerShared(-1);
+				else if (strTmp == _T("off"))
+					cur_file->SetPowerShared(0);
+				else if (strTmp == _T("on"))
+					cur_file->SetPowerShared(1);
+				else if (strTmp == _T("auto"))
+					cur_file->SetPowerShared(2);
+				else if (strTmp == _T("ltd"))
+					cur_file->SetPowerShared(3);
+
+				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_UPD_SFUPDATE, (LPARAM)cur_file);
+			}
+		}
+	}
+	// <== PowerShare support for WebInterface [Stulle] - Stulle
 
 	if(!_ParseURL(Data.sURL, _T("hash")).IsEmpty() && !_ParseURL(Data.sURL, _T("prio")).IsEmpty() && IsSessionAdmin(Data,sSession))
 	{
@@ -3637,6 +3685,13 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 		Out.Replace(_T("[SortCompletes]"), _T("sort=completes&sortreverse=") + strTmp);
 	else
 		Out.Replace(_T("[SortCompletes]"), _T("sort=completes"));
+	// ==> PowerShare support for WebInterface [Stulle] - Stulle
+	//Powershare sorting Link
+	if(pThis->m_Params.SharedSort == SHARED_SORT_POWERSHARE)
+		Out.Replace(_T("[SortPowerShare]"), _T("sort=powershare&sortreverse=") + strTmp);
+	else
+		Out.Replace(_T("[SortPriority]"), _T("sort=powershare"));
+	// <== PowerShare support for WebInterface [Stulle] - Stulle
 	//Priority sorting Link
 	if(pThis->m_Params.SharedSort == SHARED_SORT_PRIORITY)
 		Out.Replace(_T("[SortPriority]"), _T("sort=priority&sortreverse=") + strTmp);
@@ -3798,8 +3853,28 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 	}
 	Out.Replace(_T("[CompletesM]"), strTmp);
 
-	_GetPlainResString(&strTmp, IDS_PRIORITY);
+	// ==> PowerShare support for WebInterface [Stulle] - Stulle
+	_GetPlainResString(&strTmp, IDS_POWERSHARE_COLUMN_LABEL);
 	if (!WSsharedColumnHidden[6])
+	{
+		Out.Replace(_T("[PowerShareI]"), (pThis->m_Params.SharedSort == SHARED_SORT_POWERSHARE) ? pcSortIcon : _T(""));
+		Out.Replace(_T("[PowerShare]"), strTmp);
+	}
+	else
+	{
+		Out.Replace(_T("[PowerShareI]"), _T(""));
+		Out.Replace(_T("[PowerShare]"),  _T(""));
+	}
+	Out.Replace(_T("[PowerShareM]"), strTmp);
+	// <== PowerShare support for WebInterface [Stulle] - Stulle
+
+	_GetPlainResString(&strTmp, IDS_PRIORITY);
+	// ==> PowerShare support for WebInterface [Stulle] - Stulle
+	/*
+	if (!WSsharedColumnHidden[6])
+	*/
+	if (!WSsharedColumnHidden[7])
+	// <== PowerShare support for WebInterface [Stulle] - Stulle
 	{
 		Out.Replace(_T("[PriorityI]"), (pThis->m_Params.SharedSort == SHARED_SORT_PRIORITY) ? pcSortIcon : _T(""));
 		Out.Replace(_T("[Priority]"), strTmp);
@@ -3862,6 +3937,58 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 			dFile.sFileCompletes.Format(_T("%u"), cur_file->m_nCompleteSourcesCountLo);
 		else
 			dFile.sFileCompletes.Format(_T("%u - %u"), cur_file->m_nCompleteSourcesCountLo, cur_file->m_nCompleteSourcesCountHi);
+
+		// ==> PowerShare support for WebInterface [Stulle] - Stulle
+		CString strPowerShared;
+		switch(cur_file->GetPowerSharedMode())
+		{
+			case -1:
+			{
+				CString strDefMode;
+				switch (thePrefs.GetPowerShareMode())
+				{
+					case 0:
+						strDefMode.Format(_T(" (%s)"),GetResString(IDS_POWERSHARE_DISABLED));
+						break;
+					case 1:
+						strDefMode.Format(_T(" (%s)"),GetResString(IDS_POWERSHARE_ACTIVATED));
+						break;
+					case 2:
+						strDefMode.Format(_T(" (%s)"),GetResString(IDS_POWERSHARE_AUTO));
+						break;
+					case 3:
+						strDefMode.Format(_T(" (%s)"),GetResString(IDS_POWERSHARE_LIMITED));
+						break;
+					default:
+						strDefMode = _T(" (?)");
+						break;
+				}
+				strPowerShared = GetResString(IDS_DEFAULT) + strDefMode;
+				break;
+			}
+			case 0:
+				strPowerShared = GetResString(IDS_POWERSHARE_DISABLED_LABEL);
+				break;
+			case 1:
+				strPowerShared = GetResString(IDS_POWERSHARE_ACTIVATED_LABEL);
+				break;
+			case 2:
+				strPowerShared = GetResString(IDS_POWERSHARE_AUTO_LABEL);
+				break;
+			case 3:
+				strPowerShared = GetResString(IDS_POWERSHARE_LIMITED);
+				break;
+			default:
+				strPowerShared = _T("?");
+		}
+		if(!cur_file->GetPowerShared() && // it's not powershared
+			!cur_file->IsPartFile() && // and not a partfile
+			(cur_file->GetPowerSharedMode() > 0 || // although it should be shared by force
+				(cur_file->GetPowerSharedMode() == -1 && thePrefs.GetPowerShareMode() > 0))) // or by default
+			strPowerShared.AppendFormat(_T(" (%s)"), GetResString(IDS_POWERSHARE_DENIED_LABEL));
+		dFile.sFilePowerShared = strPowerShared;
+		dFile.nFilePowerShared = cur_file->GetPowerSharedMode();
+		// <== PowerShare support for WebInterface [Stulle] - Stulle
 
 		if (cur_file->IsAutoUpPriority())
 		{
@@ -3942,6 +4069,41 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 			case SHARED_SORT_COMPLETES:
 				bSwap = SharedArray[i].dblFileCompletes < SharedArray[i+1].dblFileCompletes;
 				break;
+			// ==> PowerShare support for WebInterface [Stulle] - Stulle
+			case SHARED_SORT_POWERSHARE:
+			{
+				int iFirst, iSecond;
+				if(SharedArray[i].nFilePowerShared == -1)
+					iFirst = thePrefs.GetPowerShareMode();
+				else
+					iFirst = SharedArray[i].nFilePowerShared;
+				if(SharedArray[i+1].nFilePowerShared == -1)
+					iSecond = thePrefs.GetPowerShareMode();
+				else
+					iSecond = SharedArray[i+1].nFilePowerShared;
+
+				if(iFirst == 0) // first item not PS
+				{
+					if(iSecond > 0) // second item PS
+						bSwap = true;
+					else // both not PS
+						bSwap = false;
+				}
+				else // first ps
+				{
+					if(iSecond > 0) // second item PS
+					{
+						if(iFirst > iSecond) // the smaller ones come first
+							bSwap = true;
+						else
+							bSwap = false;
+					}
+					else // second not PS
+						bSwap = false;
+				}
+				break;
+			}
+			// <== PowerShare support for WebInterface [Stulle] - Stulle
 			case SHARED_SORT_PRIORITY:
 				//Very low priority is define equal to 4 ! Must adapte sorting code
 				if(SharedArray[i].nFilePriority == 4)
@@ -3990,7 +4152,34 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 		CString session;			//session
 		CString hash;				//hash
 		CString fname;				//filename
+		CString powershare;			//powershare // PowerShare support for WebInterface [Stulle] - Stulle
 		CString sharedpriority;		//priority
+
+		// ==> PowerShare support for WebInterface [Stulle] - Stulle
+		if(SharedArray[i].bIsPartFile)
+			powershare = _T("Incomplete");
+		else
+		switch(SharedArray[i].nFilePowerShared)
+		{
+			case -1:
+				powershare = _T("Default");
+				break;
+			case 0:
+				powershare = _T("Off");
+				break;
+			case 1:
+				powershare = _T("On");
+				break;
+			case 2:
+				powershare = _T("Auto");
+				break;
+			case 3:
+				powershare = _T("Limited");
+				break;
+			default:
+				powershare = _T("?");
+		}
+		// <== PowerShare support for WebInterface [Stulle] - Stulle
 
 		switch(SharedArray[i].nFilePriority)
 		{
@@ -4047,6 +4236,7 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 		HTTPProcessData.Replace(_T("[ed2k]"), ed2k);
 		HTTPProcessData.Replace(_T("[fname]"), fname);
 		HTTPProcessData.Replace(_T("[session]"), session);
+		HTTPProcessData.Replace(_T("[shared-powershare]"), powershare); // PowerShare support for WebInterface [Stulle] - Stulle
 		HTTPProcessData.Replace(_T("[shared-priority]"), sharedpriority); //DonGato: priority change
 
 		HTTPProcessData.Replace(_T("[FileName]"), _SpecialChars(SharedArray[i].sFileName));
@@ -4114,6 +4304,12 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 		else
 			HTTPProcessData.Replace(_T("[Completes]"), _T(""));
 		if (!WSsharedColumnHidden[6])
+		// ==> PowerShare support for WebInterface [Stulle] - Stulle
+			HTTPProcessData.Replace(_T("[PowerShare]"), SharedArray[i].sFilePowerShared);
+		else
+			HTTPProcessData.Replace(_T("[PowerShare]"), _T(""));
+		if (!WSsharedColumnHidden[7])
+		// <== PowerShare support for WebInterface [Stulle] - Stulle
 			HTTPProcessData.Replace(_T("[Priority]"), SharedArray[i].sFilePriority);
 		else
 			HTTPProcessData.Replace(_T("[Priority]"), _T(""));

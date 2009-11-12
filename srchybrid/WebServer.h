@@ -98,6 +98,10 @@ typedef struct
 	uint32	nFileAllTimeAccepts;
 	CString sFileCompletes;
 	double	dblFileCompletes;
+	// ==> PowerShare support for WebInterface [Stulle] - Stulle
+	int		nFilePowerShared;
+	CString sFilePowerShared;
+	// <== PowerShare support for WebInterface [Stulle] - Stulle
 	byte	nFilePriority;
 	CString sFilePriority;
 	bool	bFileAutoPriority;
@@ -183,6 +187,7 @@ typedef enum
 	SHARED_SORT_ACCEPTS,
 	SHARED_SORT_ALL_TIME_ACCEPTS,
 	SHARED_SORT_COMPLETES,
+	SHARED_SORT_POWERSHARE, // PowerShare support for WebInterface [Stulle] - Stulle
 	SHARED_SORT_PRIORITY
 } SharedSort;
 

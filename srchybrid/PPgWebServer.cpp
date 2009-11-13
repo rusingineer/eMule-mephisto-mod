@@ -287,7 +287,6 @@ BOOL CPPgWebServer::OnApply()
 
 		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 		theApp.webserver->SaveWebServConf();
-		OnEnableChange();
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 
 		theApp.emuledlg->serverwnd->UpdateMyInfo();

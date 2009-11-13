@@ -6397,6 +6397,7 @@ BEGIN
     IDS_TAB_WEB_SERVER       "Web Server"
     IDS_TAB_MULTI_USER       "Multi User"
     // <== Tabbed WebInterface settings panel [Stulle] - Stulle
+    IDS_WS_FAILED_LOGIN      "You have been banned for 15 min due to failed login attempts!" // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

@@ -4845,13 +4845,21 @@ CString CWebServer::_GetLoginScreen(ThreadData Data, bool bLogout)
 	if(bLogout)
 		Out.Replace(_T("[setCookie]"), 	_T("document.cookie = \"c_pass=undef; expires=Monday, 01-Jan-1996 00:00:00 GMT\"; document.cookie = \"c_user=undef; expires=Monday, 01-Jan-1996 00:00:00 GMT\";"));
 	Out.Replace(_T("[UsernameValue]"), _ParseCookie(Data.sCookie, _T("c_username")));
-	Out.Replace(_T("[MemLastUserChecked]"), (_ParseCookie(Data.sCookie, _T("c_username"))?_T("checked=\"checked\""):_T("")));
+	if( _ParseCookie(Data.sCookie, _T("c_username")) == _T("") )
+		Out.Replace(_T("[MemLastUserChecked]"), _T(""));
+	else
+		Out.Replace(_T("[MemLastUserChecked]"), _T("checked=\"checked\""));
 	Out.Replace(_T("[RemainLoggedIn]"), GetResString(IDS_WS_COOKIE_LOGGEDIN));
 	Out.Replace(_T("[MemLastUser]"), GetResString(IDS_WS_COOKIE_LASTUSER));
 	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 	Out.Replace(_T("[Username]"), GetResString(IDS_ADVADMIN_USER));
 	Out.Replace(_T("[Password]"), GetResString(IDS_ADVADMIN_PASS));
+	if( _ParseCookie(Data.sCookie, _T("c_username")) == _T("") )
+		Out.Replace(_T("[InputFocus]"), _T("document.login.u.focus()"));
+	else
+		Out.Replace(_T("[InputFocus]"), _T("document.login.p.focus()"));
+//	Out.Replace(_T("[InputFocus]"), (_ParseCookie(Data.sCookie, _T("c_username"))?_T("document.login.p.focus()"):_T("document.login.u.focus()")));
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
 	Out.Replace(_T("[CharSet]"), HTTPENCODING );
 	Out.Replace(_T("[eMuleAppName]"), _T("eMule") );
@@ -4871,9 +4879,13 @@ CString CWebServer::_GetLoginScreen(ThreadData Data, bool bLogout)
 	Out.Replace(_T("[LoginNow]"), _GetPlainResString(IDS_WEB_LOGIN_NOW));
 	Out.Replace(_T("[WebControl]"), _GetPlainResString(IDS_WEB_CONTROL));
 
+	// ==> Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+	/*
 	if(pThis->m_nIntruderDetect >= 1)
 		Out.Replace(_T("[FailedLogin]"), _T("<p class=\"failed\">") + _GetPlainResString(IDS_WEB_BADLOGINATTEMPT) + _T("</p>"));
 	else
+	*/
+	// <== Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
 		Out.Replace(_T("[FailedLogin]"), _T("&nbsp;") );
 
 	return Out;
@@ -6140,63 +6152,30 @@ CString CWebServer::_GetFailedLoginScreen(ThreadData Data)
 
 	Out += pThis->m_Templates.sFailedLogin;
 
+	// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
+	Out.Replace(_T("[RemainLoggedIn]"), GetResString(IDS_WS_COOKIE_LOGGEDIN));
+	Out.Replace(_T("[MemLastUser]"), GetResString(IDS_WS_COOKIE_LASTUSER));
+	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-	if(thePrefs.UseIonixWebsrv())
-	{
-		// ==> ModID [itsonlyme/SiRoB] - Stulle
-		/*
-		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong);
-		*/
-		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" [") + theApp.m_strModLongVersion + _T("]"));
-		// <== ModID [itsonlyme/SiRoB] - Stulle
-		Out.Replace(_T("[Login]"), _GetPlainResString(IDS_WEB_LOGIN));
-		Out.Replace(_T("[BanMessage]"), _T("You have been banned for 15 min due to failed login attempts!"));
-		Out.Replace(_T("[LoginNow]"), _GetPlainResString(IDS_WEB_LOGIN_NOW));
-		Out.Replace(_T("[WebControl]"), _GetPlainResString(IDS_WEB_CONTROL));
-
-		// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
-		Out.Replace(_T("[MemLastUserChecked]"), (_ParseCookie(Data.sCookie, _T("c_username"))?_T("checked=\"checked\""):_T("")));
-		Out.Replace(_T("[RemainLoggedIn]"), GetResString(IDS_WS_COOKIE_LOGGEDIN));
-		Out.Replace(_T("[MemLastUser]"), GetResString(IDS_WS_COOKIE_LASTUSER));
-		// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-		Out.Replace(_T("[Username]"), GetResString(IDS_ADVADMIN_USER));
-		Out.Replace(_T("[Password]"), GetResString(IDS_ADVADMIN_PASS));
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-		Out.Replace(_T("[CharSet]"), HTTPENCODING );
-		Out.Replace(_T("[eMuleAppName]"), _T("eMule") );
-		// Xman // Maella -Support for tag ET_MOD_VERSION 0x55
-		/*
-		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong );
-		*/
-		// ==> ModID [itsonlyme/SiRoB] - Stulle
-		/*
-		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" ") + MOD_VERSION);
-		*/
-		Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" [") + theApp.m_strModLongVersion + _T("]"));
-		// <== ModID [itsonlyme/SiRoB] - Stulle
-		//Xman end
-		Out.Replace(_T("[Login]"), _GetPlainResString(IDS_WEB_LOGIN));
-		Out.Replace(_T("[BanMessage]"), _T("You have been banned for 15 min due to failed login attempts!"));
-		Out.Replace(_T("[EnterPassword]"), _GetPlainResString(IDS_WEB_ENTER_PASSWORD));
-		Out.Replace(_T("[LoginNow]"), _GetPlainResString(IDS_WEB_LOGIN_NOW));
-		Out.Replace(_T("[WebControl]"), _GetPlainResString(IDS_WEB_CONTROL));
-
-		return Out;
-	}
+	Out.Replace(_T("[Username]"), GetResString(IDS_ADVADMIN_USER));
+	Out.Replace(_T("[Password]"), GetResString(IDS_ADVADMIN_PASS));
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
-
-	Out.Replace(_T("[CharSet]"), HTTPENCODING);
-	Out.Replace(_T("[eMulePlus]"), _T("eMule"));
-	Out.Replace(_T("[eMuleAppName]"), _T("eMule"));
+	Out.Replace(_T("[CharSet]"), HTTPENCODING );
+	Out.Replace(_T("[eMuleAppName]"), _T("eMule") );
+	// Xman // Maella -Support for tag ET_MOD_VERSION 0x55
+	/*
+	Out.Replace(_T("[version]"), theApp.m_strCurVersionLong );
+	*/
 	// ==> ModID [itsonlyme/SiRoB] - Stulle
 	/*
-	Out.Replace(_T("[version]"), theApp.m_strCurVersionLong);
+	Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" ") + MOD_VERSION);
 	*/
 	Out.Replace(_T("[version]"), theApp.m_strCurVersionLong + _T(" [") + theApp.m_strModLongVersion + _T("]"));
 	// <== ModID [itsonlyme/SiRoB] - Stulle
+	//Xman end
 	Out.Replace(_T("[Login]"), _GetPlainResString(IDS_WEB_LOGIN));
-	Out.Replace(_T("[BanMessage]"), _T("You have been banned for 15 min due to failed login attempts!"));
+	Out.Replace(_T("[BanMessage]"), _GetPlainResString(IDS_WS_FAILED_LOGIN));
+	Out.Replace(_T("[EnterPassword]"), _GetPlainResString(IDS_WEB_ENTER_PASSWORD));
 	Out.Replace(_T("[LoginNow]"), _GetPlainResString(IDS_WEB_LOGIN_NOW));
 	Out.Replace(_T("[WebControl]"), _GetPlainResString(IDS_WEB_CONTROL));
 

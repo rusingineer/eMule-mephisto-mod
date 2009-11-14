@@ -379,6 +379,8 @@ public:
 	void EndDirectoryWatcher();
 	void DirectoryWatcherExternalReload();
 	// <== Automatic shared files updater [MoNKi] - Stulle
+
+	void RebindUPnP(); // UPnP support [MoNKi] - leuk_he
 };
 
 extern CemuleApp theApp;

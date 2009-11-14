@@ -460,6 +460,7 @@ bool CServerSocket::ProcessPacket(const BYTE* packet, uint32 size, uint8 opcode)
 						theApp.emuledlg->RefreshUPnP(false); // refresh the UPnP mappings once
 						// official UPNP
 						*/
+						theApp.RebindUPnP();
 						// <== UPnP support [MoNKi] - leuk_he
 					}
 				}

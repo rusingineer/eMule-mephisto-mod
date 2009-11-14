@@ -4975,6 +4975,7 @@ LRESULT  CemuleDlg::OnPowerBroadcast(WPARAM wParam, LPARAM lParam)
 				/*
 				RefreshUPnP(true);
 				*/
+				theApp.RebindUPnP();
 				// <== UPnP support [MoNKi] - leuk_he
 				PostMessage(WM_SYSCOMMAND , MP_CONNECT, 0); // tell to connect.. a sec later...
 			}

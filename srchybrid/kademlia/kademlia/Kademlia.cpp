@@ -211,6 +211,7 @@ void CKademlia::Process()
 		/*
 		theApp.emuledlg->RefreshUPnP();
 		*/
+		theApp.RebindUPnP();
 		// <== UPnP support [MoNKi] - leuk_he
 		m_tNextUPnPCheck = 0; // will be reset on firewallcheck
 	}

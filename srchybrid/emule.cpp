@@ -3310,3 +3310,36 @@ void CemuleApp::DirectoryWatcherExternalReload(){
 	}
 }
 // <== Automatic shared files updater [MoNKi] - Stulle
+
+// ==> UPnP support [MoNKi] - leuk_he
+void CemuleApp::RebindUPnP()
+{
+	if(!thePrefs.IsUPnPNat())
+		return;
+	clientudp->Rebind();
+	listensocket->Rebind();
+
+	if(theApp.m_UPnP_IGDControlPoint->IsUpnpAcceptsPorts())
+	{
+		if(thePrefs.GetUPnPNatWeb())
+		{
+			// Remove Web Interface UPnP
+			m_UPnP_IGDControlPoint->DeletePortMapping(thePrefs.GetWSPort(), CUPnP_IGDControlPoint::UNAT_TCP, _T("Web Interface"));
+
+			// Readd Web Interface UPnP
+			m_UPnP_IGDControlPoint->AddPortMapping(thePrefs.GetWSPort(), CUPnP_IGDControlPoint::UNAT_TCP, _T("Web Interface"));
+		}
+
+		//TODO: Wap interface needs an own setting and should be rebound, too
+		/*
+		{
+			// Remove Wap Interface UPnP
+			theApp.m_UPnP_IGDControlPoint->DeletePortMapping(thePrefs.GetWapPort(), CUPnP_IGDControlPoint::UNAT_TCP, _T("Wap Interface"));
+
+			// Readd Wap Interface UPnP
+			theApp.m_UPnP_IGDControlPoint->AddPortMapping(thePrefs.GetWapPort(), CUPnP_IGDControlPoint::UNAT_TCP, _T("Wap Interface"));
+		}
+		*/
+	}
+}
+// <== UPnP support [MoNKi] - leuk_he

@@ -54,11 +54,13 @@ public:
 	void	InitTab(bool firstinit, int Page = 0);
 	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+	afx_msg void OnEnableChange(); //lh 
 protected:
 	virtual BOOL OnSetActive();
+	afx_msg void OnMultiPWChange();
+	afx_msg void OnMultiCatsChange();
 	afx_msg void OnSettingsChange();
-	afx_msg void OnEnableChange(); //lh 
 	afx_msg void OnSettingsChangeBox()			{ SetBoxes(); OnSettingsChange(); }
 	afx_msg void OnBnClickedNew();
 	afx_msg void OnBnClickedDel();
@@ -68,5 +70,5 @@ protected:
 	void	SetBoxes();
 	void	FillComboBox();
 	void	FillUserlevelBox();
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 };

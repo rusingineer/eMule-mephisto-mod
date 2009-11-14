@@ -40,10 +40,11 @@
 // Maella -Accurate measure of bandwidth: eDonkey data + control, network adapter-
 #include "BandWidthControl.h"
 #include "Scheduler.h" // Don't reset Connection Settings for Webserver/CML/MM [Stulle] - Stulle
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+#include "PreferencesDlg.h"
 #include "PPgWebserver.h"
 CRBMap<uint32, WebServDef>	CWebServer::AdvLogins; //unlimited logs
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -126,7 +127,7 @@ CWebServer::CWebServer(void)
 	m_Params.QueueSort =	(QueueSort)ini.GetInt(_T("QueueSort"),QU_SORT_FILENAME);
 	m_Params.ServerSort =	(ServerSort)ini.GetInt(_T("ServerSort"),SERVER_SORT_NAME);
 	m_Params.SharedSort =	(SharedSort)ini.GetInt(_T("SharedSort"),SHARED_SORT_NAME);
-	LoadWebServConf(); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	LoadWebServConf(); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 }
 
 CWebServer::~CWebServer(void)
@@ -257,12 +258,27 @@ void CWebServer::ReloadTemplates()
 			m_Templates.sProgressbarImgsPercent.Replace(_T("[PROGRESSGIFINTERNAL]"),_T("%i"));
 			m_Templates.sProgressbarImgs.Replace(_T("[PROGRESSGIFNAME]"),_T("%s"));
 			m_Templates.sProgressbarImgs.Replace(_T("[PROGRESSGIFINTERNAL]"),_T("%i"));
-   			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+   			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			CString sMultiVersion = _LoadTemplate(sAll,_T("TMPL_MULTIUSERVERSION"));
 			iMultiUserversion= _tstol(sMultiVersion );
 			if(iMultiUserversion==0)
-				thePrefs.m_bIonixWebsrv=0;
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			{
+				if(thePrefs.m_bIonixWebsrv &&
+					theApp.emuledlg && 
+					theApp.emuledlg->preferenceswnd && 
+					theApp.emuledlg->preferenceswnd->m_wndWebServer)
+					theApp.emuledlg->preferenceswnd->m_wndWebServer.CheckDlgButton(IDC_ADVADMINENABLED,0);
+				thePrefs.m_bIonixWebsrv = false;
+			}
+			else if(!thePrefs.m_bIonixWebsrv &&
+				theApp.emuledlg && 
+				theApp.emuledlg->preferenceswnd && 
+				theApp.emuledlg->preferenceswnd->m_wndWebServer)
+			{
+				theApp.emuledlg->preferenceswnd->m_wndWebServer.CheckDlgButton(IDC_ADVADMINENABLED,1);
+				theApp.emuledlg->preferenceswnd->m_wndWebServer.OnEnableChange();
+			}
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		}
 	}
 	else if(m_bServerWorking)
@@ -474,7 +490,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		}
 		// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		if (_ParseURL(Data.sURL, _T("w")) == _T("password"))
 		{
@@ -495,7 +511,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 					user = _ParseURL(Data.sURL, _T("u"));
 			}
 			// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 			// ==> New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 			bool bWrongLogin = false;
@@ -505,7 +521,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 		            justAddLink = true;
 		        }
 
-				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 				if(thePrefs.UseIonixWebsrv())
 				{
 					// ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
@@ -543,7 +559,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 						bWrongLogin = true;
 				}
 				else
-				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 				if(MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSPass())
 				{
@@ -551,12 +567,12 @@ void CWebServer::ProcessURL(ThreadData Data)
 				        {
 				                // user wants to login
 						Session ses;
-						// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+						// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 						/*
 						ses.admin=true;
 						*/
 						ses.admin=thePrefs.GetWebAdminAllowedHiLevFunc()?3:2;
-						// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+						// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 						ses.startTime = CTime::GetCurrentTime();
 						ses.lSession = lSession = GetRandomUInt32();
 						// ==> Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
@@ -582,12 +598,12 @@ void CWebServer::ProcessURL(ThreadData Data)
 				else if(thePrefs.GetWSIsLowUserEnabled() && thePrefs.GetWSLowPass()!=_T("") && MD5Sum(_ParseURL(Data.sURL, _T("p"))).GetHash() == thePrefs.GetWSLowPass())
 				{
 					Session ses;
-					// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+					// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 					/*
 					ses.admin=false;
 					*/
 					ses.admin=0;
-					// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+					// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 					ses.startTime = CTime::GetCurrentTime();
 					ses.lSession = lSession = GetRandomUInt32();
 					pThis->m_Params.Sessions.Add(ses);
@@ -653,12 +669,12 @@ void CWebServer::ProcessURL(ThreadData Data)
 
 		if(_IsLoggedIn(Data, lSession))
 		{
-			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			/*
 			if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession) && thePrefs.GetWebAdminAllowedHiLevFunc() )
 			*/
 			if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession,3) )
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
 				theApp.m_app_state = APP_STATE_SHUTTINGDOWN;
 				_RemoveSession(Data, lSession);
@@ -672,12 +688,12 @@ void CWebServer::ProcessURL(ThreadData Data)
 				CoUninitialize();
 				return;
 			}
-			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			/*
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("shutdown") && IsSessionAdmin(Data,sSession))
 			*/
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("shutdown") && IsSessionAdmin(Data,sSession,3) )
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
 				_RemoveSession(Data, lSession);
 				// send answer ...
@@ -690,12 +706,12 @@ void CWebServer::ProcessURL(ThreadData Data)
 				return;
 
 			}
-			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			/*
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession))
 			*/
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession,3) )
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
 				_RemoveSession(Data, lSession);
 
@@ -775,7 +791,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 
 			Out += _GetHeader(Data, lSession);
 			CString sPage = _ParseURL(Data.sURL, _T("w"));
-			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			Session Rights = GetSessionByID(Data, lSession);
 			if (thePrefs.UseIonixWebsrv() &&  (
 				(sPage == _T("server") && !Rights.RightsToServers)
@@ -789,7 +805,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 				sPage = _T("accessrefused");
 			else //WiZaRd
 			{
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 				if (sPage == _T("server"))
 					Out += _GetServerList(Data);
 				else if (sPage == _T("shared"))
@@ -817,7 +833,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 					isUseGzip = false;
 					Out += _GetPreferences(Data);
 				}
-			} // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			} // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			Out += _GetFooter(Data);
 
 			if (sPage.IsEmpty())
@@ -981,11 +997,11 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 //	Auto-refresh code
 	CString sRefresh, strDummyNumber, strCat;
 	CString sPage = _ParseURL(Data.sURL, _T("w"));
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	bool bAdmin = IsSessionAdmin(Data,sSession);
 	*/
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	strCat=_T("&cat=") +_ParseURL(Data.sURL, _T("cat"));
 
@@ -1018,11 +1034,11 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	Out.Replace(_T("[setCookie]"), sCookie);
 	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	Out.Replace(_T("[admin]"), (bAdmin && thePrefs.GetWebAdminAllowedHiLevFunc() ) ? _T("admin") : _T(""));
 	*/
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	Out.Replace(_T("[Session]"), sSession);
 	Out.Replace(_T("[RefreshVal]"), sRefresh);
 	Out.Replace(_T("[wCommand]"), _ParseURL(Data.sURL, _T("w")) + strCat + _T("&dummy=") + strDummyNumber);
@@ -1303,7 +1319,7 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	Out.Replace(_T("[Down]"), _GetPlainResString(IDS_PW_CON_DOWNLBL));
 
 	if (thePrefs.GetCatCount()>1) 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		InsertCatBox(Out,0,pThis->m_Templates.sCatArrow,false,false,sSession,_T(""),true);
 		*/
@@ -1311,7 +1327,7 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 		Session Rights = GetSessionByID(Data, lSession); 
 		InsertCatBox(Out,0,pThis->m_Templates.sCatArrow,false,false,sSession,_T(""),true,Rights);		
 	}
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	else 
 		Out.Replace(_T("[CATBOXED2K]"),_T(""));
 
@@ -1927,7 +1943,7 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 	CString sSession = _ParseURL(Data.sURL, _T("ses"));
 	long lSession = _tstol(_ParseURL(Data.sURL, _T("ses")));
 	bool bAdmin = IsSessionAdmin(Data,sSession);
-	Session Rights = GetSessionByID(Data, lSession); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	Session Rights = GetSessionByID(Data, lSession); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 
 	// cat
@@ -1944,12 +1960,12 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 	CString Out;
 
 	if (thePrefs.GetCatCount()>1) 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		InsertCatBox(Out,cat,_T(""),true,true,sSession,_T(""));
 		*/
 		InsertCatBox(Out,cat,_T(""),true,true,sSession,_T(""),false,Rights);
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	else 
 		Out.Replace(_T("[CATBOX]"),_T(""));
 
@@ -2224,12 +2240,12 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 	Out.Replace(_T("[DownloadFooter]"), pThis->m_Templates.sTransferDownFooter);
 	Out.Replace(_T("[UploadHeader]"), pThis->m_Templates.sTransferUpHeader);
 	Out.Replace(_T("[UploadFooter]"), pThis->m_Templates.sTransferUpFooter);
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	InsertCatBox(Out,cat,pThis->m_Templates.sCatArrow,true,true,sSession,_T(""));
 	*/
 	InsertCatBox(Out,cat,pThis->m_Templates.sCatArrow,true,true,sSession,_T(""),false,Rights);
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	strTmp = (pThis->m_Params.bDownloadSortReverse) ? _T("&sortreverse=false") : _T("&sortreverse=true");
 
@@ -2483,12 +2499,12 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 	Out.Replace(_T("[TotalDown]"), _GetPlainResString(IDS_INFLST_USER_TOTALDOWNLOAD));
 	Out.Replace(_T("[TotalUp]"), _GetPlainResString(IDS_INFLST_USER_TOTALUPLOAD));
 	Out.Replace(_T("[admin]"), (bAdmin) ? _T("admin") : _T(""));
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	InsertCatBox(Out,cat,_T(""),true,true,sSession,_T(""));
 	*/
 	InsertCatBox(Out,cat,_T(""),true,true,sSession,_T(""),false,Rights);
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	CArray<DownloadFiles> FilesArray;
 	CArray<CPartFile*,CPartFile*> partlist;
@@ -2502,7 +2518,7 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 
 		if (pPartFile)
 		{
-			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			if(thePrefs.UseIonixWebsrv())
 			{
 			bool Allowed=false;
@@ -2523,7 +2539,7 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 			if (!Allowed && Rights.RightsToCategories.GetLength()>=2)
 				continue;
 			}
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			if (cat<0) {
 				switch (cat) {
 					case -1 : if (pPartFile->GetCategory()!=0) continue; break;
@@ -2757,7 +2773,7 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 			dUser.sUserName = _SpecialChars(cun.Left(SHORT_LENGTH_MIN-3)) + _T("...");
 		
 		CKnownFile* file = theApp.sharedfiles->GetFileByID(cur_client->GetUploadFileID() );
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		if (file)
 		*/
@@ -2784,7 +2800,7 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 			}
 		}
 		if (file && bAllowed)
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			dUser.sFileName = _SpecialChars(file->GetFileName());
 		else
 			dUser.sFileName = _GetPlainResString(IDS_REQ_UNKNOWNFILE);
@@ -2969,10 +2985,10 @@ CString CWebServer::_CreateTransferList(CString Out, CWebServer *pThis, ThreadDa
 #endif
 	}
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	long lSession = _tstol(_ParseURL(Data->sURL, _T("ses")));
 	Session Rights = GetSessionByID(*Data, lSession);  
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	for(int i = 0; i < FilesArray->GetCount(); i++)
 	{
 		HTTPProcessData = OutE;
@@ -3187,12 +3203,12 @@ CString CWebServer::_CreateTransferList(CString Out, CWebServer *pThis, ThreadDa
 			HTTPProcessData.Replace(_T("[Category]"), _T(""));
 
 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		InsertCatBox(HTTPProcessData,0,_T(""),false,false,session,dwnlf.sFileHash);
 		*/
 		InsertCatBox(HTTPProcessData,0,_T(""),false,false,session,dwnlf.sFileHash,false,Rights);
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 		sDownList += HTTPProcessData;
 	}
@@ -4824,12 +4840,12 @@ CString CWebServer::_GetPreferences(ThreadData Data)
 	return Out;
 }
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 /*
 CString CWebServer::_GetLoginScreen(ThreadData Data)
 */
 CString CWebServer::_GetLoginScreen(ThreadData Data, bool bLogout)
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 {
 	CWebServer *pThis = (CWebServer *)Data.pThis;
 	if(pThis == NULL)
@@ -4852,7 +4868,7 @@ CString CWebServer::_GetLoginScreen(ThreadData Data, bool bLogout)
 	Out.Replace(_T("[RemainLoggedIn]"), GetResString(IDS_WS_COOKIE_LOGGEDIN));
 	Out.Replace(_T("[MemLastUser]"), GetResString(IDS_WS_COOKIE_LASTUSER));
 	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	Out.Replace(_T("[Username]"), GetResString(IDS_ADVADMIN_USER));
 	Out.Replace(_T("[Password]"), GetResString(IDS_ADVADMIN_PASS));
 	if( _ParseCookie(Data.sCookie, _T("c_username")) == _T("") )
@@ -4860,7 +4876,7 @@ CString CWebServer::_GetLoginScreen(ThreadData Data, bool bLogout)
 	else
 		Out.Replace(_T("[InputFocus]"), _T("document.login.p.focus()"));
 //	Out.Replace(_T("[InputFocus]"), (_ParseCookie(Data.sCookie, _T("c_username"))?_T("document.login.p.focus()"):_T("document.login.u.focus()")));
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	Out.Replace(_T("[CharSet]"), HTTPENCODING );
 	Out.Replace(_T("[eMuleAppName]"), _T("eMule") );
 	// Xman // Maella -Support for tag ET_MOD_VERSION 0x55
@@ -5008,18 +5024,18 @@ Session CWebServer::GetSessionByID(ThreadData Data,long sessionID)
 	}
 
 	Session ses;
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	ses.admin=false;
 	*/
 	ses.admin=0;
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	ses.startTime = 0;
 
 	return ses;
 }
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 /*
 bool CWebServer::IsSessionAdmin(ThreadData Data, const CString &strSsessionID)
 */
@@ -5029,7 +5045,7 @@ bool CWebServer::IsSessionAdmin(ThreadData Data, const CString &strSsessionID)
 // HiAdmin == false -> Operator
 // HiAdmin == true -> Admin
 bool CWebServer::IsSessionAdmin(ThreadData Data, const CString &strSsessionID, const uint8 bMinAdminLvl)
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 {
 	long sessionID = _tstol(strSsessionID);
 	CWebServer *pThis = (CWebServer *)Data.pThis;
@@ -5038,12 +5054,12 @@ bool CWebServer::IsSessionAdmin(ThreadData Data, const CString &strSsessionID, c
 		for(int i = 0; i < pThis->m_Params.Sessions.GetSize(); i++)
 		{
 			if(pThis->m_Params.Sessions[i].lSession == sessionID && sessionID != 0)
-				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 				/*
 				return pThis->m_Params.Sessions[i].admin;
 				*/
 				return pThis->m_Params.Sessions[i].admin >= bMinAdminLvl;
-				// <== m 000h
+				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		}
 	}
 	
@@ -5304,10 +5320,10 @@ CString	CWebServer::_GetSearch(ThreadData Data)
 
 	SearchFileStruct structFile;
 
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	long lSession = _tstol(_ParseURL(Data.sURL, _T("ses")));
 	Session Rights = GetSessionByID(Data, lSession); 
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	for (uint16 i = 0; i < SearchFileArray.GetCount(); ++i)
 	{
 		structFile = SearchFileArray.GetAt(i);
@@ -5372,12 +5388,12 @@ CString	CWebServer::_GetSearch(ThreadData Data)
 
 
 	if (thePrefs.GetCatCount()>1) 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		InsertCatBox(Out,0,pThis->m_Templates.sCatArrow,false,false,sSession,_T(""));
 		*/
 		InsertCatBox(Out,0,pThis->m_Templates.sCatArrow,false,false,sSession,_T(""),false, Rights);
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	else Out.Replace(_T("[CATBOX]"),_T(""));
 	
 	Out.Replace(_T("[SEARCHINFOMSG]"),_T(""));
@@ -5510,12 +5526,12 @@ int CWebServer::UpdateSessionCount()
 
 }
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 /*
 void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool jump,bool extraCats,CString sSession,CString sFileHash, bool ed2kbox)
 */
 void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool jump,bool extraCats,CString sSession,CString sFileHash, bool ed2kbox, const Session& Rights)
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 {
 	
 
@@ -5530,7 +5546,7 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 
 	for (int i = 0; i < thePrefs.GetCatCount(); i++)
 	{
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		if(thePrefs.UseIonixWebsrv())
 		{
 			bool Allowed=false;
@@ -5552,7 +5568,7 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 			if (!Allowed && Rights.RightsToCategories.GetLength()>=2)
 				continue;
 		}
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		CString strCategory = thePrefs.GetCategory(i)->strTitle;
 		strCategory.Replace(_T("'"),_T("\'"));
 		tempBuf.AppendFormat( _T("<option%s value=\"%i\">%s</option>\n"), (i == preselect) ? _T(" selected") : _T(""), i, strCategory);
@@ -5577,7 +5593,7 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 
 	for (int i = 0; i < thePrefs.GetCatCount(); i++)
 	{
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		if(thePrefs.UseIonixWebsrv())
 		{
 			bool Allowed=false;
@@ -5600,7 +5616,7 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 			if (!Allowed && Rights.RightsToCategories.GetLength()>=2)
 				continue;
 		}
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		if (i==preselect)
 		{
 			tempBuff3 = _T("checked.gif");
@@ -5642,7 +5658,7 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 	{
 		uchar FileHash[16];
 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		if(thePrefs.UseIonixWebsrv())
 		{
 			bool Allowed=false;
@@ -5665,7 +5681,7 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 			if (!Allowed && Rights.RightsToCategories.GetLength()>=2)
 				continue;
 		}
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		CPartFile *found_file = NULL;
 		if (!sFileHash.IsEmpty())
 			found_file=theApp.downloadqueue->GetFileByID(_GetFileHash(sFileHash, FileHash));
@@ -5962,7 +5978,7 @@ CString CWebServer::_GetCommentlist(ThreadData Data)
 	return Out;
 }
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 bool CWebServer::GetWebServLogin(const CString& user, const CString& pass, WebServDef& Def)
 {
 	for (POSITION pos = AdvLogins.GetHeadPosition(); pos; AdvLogins.GetNext(pos))
@@ -5983,6 +5999,7 @@ void CWebServer::SaveWebServConf()
 	
 	CString fullpath(thePrefs.GetMuleDirectory(EMULE_CONFIGDIR));
 	fullpath += L"Webserver.ini";
+	(void)_tremove(fullpath);
 	CIni ini(fullpath, L"Users");
 	int userno=1;
 
@@ -6001,7 +6018,7 @@ void CWebServer::SaveWebServConf()
 		ini.WriteBool(L"RightsToStats",AdvLogins.GetValueAt(pos).RightsToStats,User)   ;
 		ini.WriteBool(L"RightsToTransfered",AdvLogins.GetValueAt(pos).RightsToTransfered,User);
 		userno++;
-		}
+	}
 }
 void CWebServer::LoadWebServConf()
 {
@@ -6055,7 +6072,7 @@ void CWebServer::LoadWebServConf()
 		AdvLogins.RemoveAll();
 	}
 }
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 // ==> Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 CString CWebServer::_ParseCookie(const CString& Cookie, const CString& name)
@@ -6156,10 +6173,10 @@ CString CWebServer::_GetFailedLoginScreen(ThreadData Data)
 	Out.Replace(_T("[RemainLoggedIn]"), GetResString(IDS_WS_COOKIE_LOGGEDIN));
 	Out.Replace(_T("[MemLastUser]"), GetResString(IDS_WS_COOKIE_LASTUSER));
 	// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	Out.Replace(_T("[Username]"), GetResString(IDS_ADVADMIN_USER));
 	Out.Replace(_T("[Password]"), GetResString(IDS_ADVADMIN_PASS));
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	Out.Replace(_T("[CharSet]"), HTTPENCODING );
 	Out.Replace(_T("[eMuleAppName]"), _T("eMule") );
 	// Xman // Maella -Support for tag ET_MOD_VERSION 0x55

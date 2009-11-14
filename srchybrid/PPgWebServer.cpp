@@ -31,10 +31,10 @@
 #include "UPnPImpl.h"
 */
 // <== UPnP support [MoNKi] - leuk_he
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 #include "PreferencesDlg.h"
 #include "MD5Sum.h"
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -69,7 +69,7 @@ BEGIN_MESSAGE_MAP(CPPgWebServer, CPropertyPage)
 	// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_WEBSERVER, OnTcnSelchangeTab)
 	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	ON_CBN_SELCHANGE(IDC_ACCOUNTSELECT, UpdateSelection)
 	ON_BN_CLICKED(IDC_ADVADMINENABLED,   OnEnableChange)
 	ON_BN_CLICKED(IDC_ADVADMIN_KAD, OnSettingsChange)
@@ -82,10 +82,10 @@ BEGIN_MESSAGE_MAP(CPPgWebServer, CPropertyPage)
 	ON_CBN_SELCHANGE(IDC_ADVADMIN_USERLEVEL, OnSettingsChange)	
 	ON_BN_CLICKED(IDC_ADVADMIN_DELETE, OnBnClickedDel)
 	ON_BN_CLICKED(IDC_ADVADMIN_NEW, OnBnClickedNew)	
-	ON_EN_CHANGE(IDC_ADVADMIN_PASS, OnSettingsChange)
-	ON_EN_CHANGE(IDC_ADVADMIN_CATS, OnSettingsChange)
+	ON_EN_CHANGE(IDC_ADVADMIN_PASS, OnMultiPWChange)
+	ON_EN_CHANGE(IDC_ADVADMIN_CATS, OnMultiCatsChange)
 //	ON_EN_CHANGE(IDC_ADVADMIN_USER, OnSettingsChange)
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 END_MESSAGE_MAP()
 
 CPPgWebServer::CPPgWebServer()
@@ -110,10 +110,10 @@ void CPPgWebServer::DoDataExchange(CDataExchange* pDX)
 	// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
 	DDX_Control(pDX, IDC_TAB_WEBSERVER , m_tabCtr);
 	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	DDX_Control(pDX, IDC_ACCOUNTSELECT, m_cbAccountSelector); 
 	DDX_Control(pDX, IDC_ADVADMIN_USERLEVEL, m_cbUserlevel); 
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 }
 
 BOOL CPPgWebServer::OnInitDialog()
@@ -133,11 +133,11 @@ BOOL CPPgWebServer::OnInitDialog()
 	m_tabCtr.SetCurSel(NONE);
 	SetTab(WEBSERVER);
 	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	FillComboBox();
 	FillUserlevelBox();
 	m_cbAccountSelector.SetCurSel(0); // new account
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	LoadSettings();
 	Localize();
@@ -200,7 +200,7 @@ void CPPgWebServer::LoadSettings(void)
 	GetDlgItem(IDC_WSUPNP)->EnableWindow(thePrefs.IsUPnPEnabled() && thePrefs.GetWSIsEnabled());
 	CheckDlgButton(IDC_WSUPNP, (thePrefs.IsUPnPEnabled() && thePrefs.m_bWebUseUPnP) ? TRUE : FALSE);
 	
-	CheckDlgButton(IDC_ADVADMINENABLED, thePrefs.UseIonixWebsrv()); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	CheckDlgButton(IDC_ADVADMINENABLED, thePrefs.UseIonixWebsrv()); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	OnEnChangeMMEnabled();
 
@@ -285,9 +285,9 @@ BOOL CPPgWebServer::OnApply()
 		}
 		// <== UPnP support [MoNKi] - leuk_he
 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		theApp.webserver->SaveWebServConf();
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 		theApp.emuledlg->serverwnd->UpdateMyInfo();
 		SetModified(FALSE);
@@ -328,7 +328,7 @@ void CPPgWebServer::Localize(void)
 
 		GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->SetWindowText(GetResString(IDS_WEB_ALLOWHILEVFUNC));
 
-		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		GetDlgItem(IDC_ADVADMINENABLED)->SetWindowText(GetResString(IDS_ADVADMINENABLED));
 		GetDlgItem(IDC_ADVADMIN_NOTE)->SetWindowText(GetResString(IDS_ADVADMIN_NOTE));
 		GetDlgItem(IDC_STATIC_ADVADMIN)->SetWindowText(GetResString(IDS_ADVADMIN_GROUP));
@@ -346,7 +346,7 @@ void CPPgWebServer::Localize(void)
 		GetDlgItem(IDC_STATIC_ADVADMIN_PASS)->SetWindowText(GetResString(IDS_ADVADMIN_PASS));
 		GetDlgItem(IDC_STATIC_ADVADMIN_USER)->SetWindowText(GetResString(IDS_ADVADMIN_USER));
 		GetDlgItem(IDC_STATIC_ADVADMIN_CATS)->SetWindowText(GetResString(IDS_ADVADMIN_CAT));
-		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	}
 }
 
@@ -697,42 +697,25 @@ void CPPgWebServer::SetTab(eTab tab){
 }
 // <== Tabbed WebInterface settings panel [Stulle] - Stulle
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 BOOL CPPgWebServer::OnSetActive()
 {
-	/*
-	if (IsDlgButtonChecked(IDC_ADVADMINENABLED)!=0)
-	{
-		GetDlgItem(IDC_WSPASS)->EnableWindow(FALSE);	
-		GetDlgItem(IDC_WSENABLEDLOW)->EnableWindow(FALSE);	
-//		GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->EnableWindow(FALSE);	
-		GetDlgItem(IDC_WSPASSLOW)->EnableWindow(FALSE);	
-	}
-	else
-	{
-		GetDlgItem(IDC_WSPASS)->EnableWindow(TRUE);	
-		GetDlgItem(IDC_WSENABLEDLOW)->EnableWindow(TRUE);	
-//		GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->EnableWindow(TRUE);	
-		GetDlgItem(IDC_WSPASSLOW)->EnableWindow(TRUE);	
-	}
-	*/
-
 	if (IsWindow(m_hWnd))
 	     SetBoxes();
 
 	return TRUE;
 }
 
-void CPPgWebServer::OnEnableChange()
+afx_msg void CPPgWebServer::OnEnableChange()
 {
 	thePrefs.m_bIonixWebsrv = (IsDlgButtonChecked(IDC_ADVADMINENABLED)!=0);
 
-    SetBoxes();
+	SetBoxes();
 	if (!thePrefs.m_bIonixWebsrv) {
-	       		FillComboBox();
-	            FillUserlevelBox();
+		FillComboBox();
+		FillUserlevelBox();
 	}
-    SetModified();
+	SetModified();
 }
 
 afx_msg void CPPgWebServer::SetBoxes()
@@ -841,8 +824,34 @@ void CPPgWebServer::FillUserlevelBox()
 }
 
 
-#define SET_TCHAR_TO_STRING(t, s) {_stprintf(t, _T("%s"), s);}
+afx_msg void CPPgWebServer::OnMultiPWChange()
+{
+	int accountsel  = m_cbAccountSelector.GetCurSel();
+	WebServDef tmp;
+	if(accountsel  == -1 || !theApp.webserver->AdvLogins.Lookup(accountsel , tmp))
+		return;
 
+	CString buffer;
+	GetDlgItem(IDC_ADVADMIN_PASS)->GetWindowText(buffer);
+	if(buffer != HIDDEN_PASSWORD && MD5Sum(buffer).GetHash() != tmp.Pass)
+		OnSettingsChange();
+}
+
+afx_msg void CPPgWebServer::OnMultiCatsChange()
+{
+	int accountsel  = m_cbAccountSelector.GetCurSel();
+	WebServDef tmp;
+	if(accountsel  == -1 || !theApp.webserver->AdvLogins.Lookup(accountsel , tmp))
+		return;
+
+	CString buffer;
+
+	GetDlgItem(IDC_ADVADMIN_CATS)->GetWindowText(buffer);
+	if(buffer != HIDDEN_PASSWORD && buffer != tmp.RightsToCategories)
+		OnSettingsChange();
+}
+
+#define SET_TCHAR_TO_STRING(t, s) {_stprintf(t, _T("%s"), s);}
 
 void CPPgWebServer::OnSettingsChange()
 {
@@ -963,7 +972,5 @@ void CPPgWebServer::OnBnClickedDel()
 	FillComboBox();
 	m_cbAccountSelector.SetCurSel(0); //set to the empty field
 	UpdateSelection();
-
-	
 }
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle

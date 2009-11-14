@@ -3366,7 +3366,7 @@
 // <== Feedback personalization [Stulle] - Stulle
 #define IDS_STATIC_ICON                 61450 // Static Tray Icon - MyTh88
 #define IDS_DATEFILENAMELOG             61460 // Date File Name Log [AndCycle] - Stulle
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 #define IDS_ADVADMIN_GROUP              61500
 #define IDS_ADVADMIN_ACC                61501
 #define IDS_ADVADMIN_DELETE             61502
@@ -3412,7 +3412,7 @@
 #define IDC_STATIC_ADVADMIN_PASS        61542
 #define IDC_STATIC_ADVADMIN_USERLEVEL   61543
 #define IDC_ADVADMIN_NOTE               61544
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 // ==> Tabbed WebInterface settings panel [Stulle] - Stulle
 #define IDC_TAB_WEBSERVER               61550
 #define IDS_TAB_WEB_SERVER              61551

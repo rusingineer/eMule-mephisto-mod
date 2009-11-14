@@ -28,7 +28,7 @@ typedef struct
 {
 	CTime	startTime;
 	long	lSession;
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	bool	admin;
 	int		lastcat;
@@ -43,7 +43,7 @@ typedef struct
 	bool RightsToSharedList;
 	bool RightsToStats;
 	bool RightsToTransfered;
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 } Session;
 
@@ -322,7 +322,7 @@ typedef struct
 	CString sCommentListLine;
 } WebTemplates;
 
-// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 struct WebServDef{
 	TCHAR	Pass[256];
 	TCHAR	User[256];
@@ -337,7 +337,7 @@ struct WebServDef{
 	bool RightsToStats;
 	bool RightsToTransfered;
 };
-// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 class CWebServer 
 {
@@ -404,20 +404,20 @@ private:
 	static int		_GzipCompress(Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen, int level);
 	CString			_LoadTemplate(CString sAll, CString sTemplateName);
 	static Session	GetSessionByID(ThreadData Data,long sessionID);
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	static bool		IsSessionAdmin(ThreadData Data, const CString &strSsessionID);
 	*/
 	static bool		IsSessionAdmin(ThreadData Data, const CString &strSsessionID, const uint8 bMinAdminLvl = 1); // 0 is user
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	static CString	GetPermissionDenied();
 	static CString	_GetDownloadGraph(ThreadData Data,CString filehash);
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	/*
 	static void		InsertCatBox(CString &Out,int preselect,CString boxlabel, bool jump,bool extraCats,CString sSession,CString sFileHash,bool ed2kbox=false);
 	*/
 	static void		InsertCatBox(CString &Out,int preselect,CString boxlabel, bool jump,bool extraCats,CString sSession,CString sFileHash,bool ed2kbox, const Session& Rights); 
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	static CString	GetSubCatLabel(int iCat);
 	static CString  _GetRemoteLinkAddedOk(ThreadData Data);
 	static CString  _GetRemoteLinkAddedFailed(ThreadData Data);
@@ -449,12 +449,12 @@ private:
 	uint32			m_nStartTempDisabledTime;
 	bool			GetIsTempDisabled() { return m_bIsTempDisabled; }
 	ULONG			m_ulCurIP;
-	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 public:
 	int iMultiUserversion;
 	static	bool	GetWebServLogin(const CString& user, const CString& pass, WebServDef& Def);
 	static	void	SaveWebServConf();
 	static	void	LoadWebServConf();
 	static	CRBMap<uint32, WebServDef>	AdvLogins; //unlimited logs
-	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he] - Stulle
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 };

@@ -3472,6 +3472,14 @@
 #define IDS_SERVICE_INSTALL_FAIL        61616
 #define IDS_SERVICE_INSTALL_TITLE       61617
 // <== Adjustable NT Service Strings - Stulle
+// ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
+#define IDD_ASKEXIT                     61620
+#define IDC_EXITQUESTION                61621
+#define IDNOMINIMIZE                    61622
+#define IDYESSERVICE                    61623
+#define IDS_YESSERVICE                  61624
+#define IDS_NOMINIMIZE                  61625
+// <== Extended Prompt on Exit dialog [leuk_he] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000
 #define IDS_EASTEREGG                   62001

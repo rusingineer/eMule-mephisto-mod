@@ -255,6 +255,9 @@ del $(IntDir)\emule.obj
 				RelativePath="ArchiveRecovery.cpp">
 			</File>
 			<File
+				RelativePath=".\AskExitDlg.cpp">
+			</File>
+			<File
 				RelativePath="AsyncProxySocketLayer.cpp">
 			</File>
 			<File
@@ -770,6 +773,9 @@ del $(IntDir)\emule.obj
 			</File>
 			<File
 				RelativePath="ArchiveRecovery.h">
+			</File>
+			<File
+				RelativePath=".\AskExitDlg.h">
 			</File>
 			<File
 				RelativePath="AsyncProxySocketLayer.h">

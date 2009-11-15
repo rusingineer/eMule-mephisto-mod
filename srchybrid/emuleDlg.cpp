@@ -133,6 +133,7 @@
 
 #include "HttpDownloadDlg.h" // Advanced Updates [MorphXT/Stulle] - Stulle
 #include "NTservice.h" // Run eMule as NT Service [leuk_he] - Stulle
+#include "AskExitDlg.h" // Extended Prompt on Exit dialog [leuk_he] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -2502,7 +2503,13 @@ bool CemuleDlg::CanClose()
 {
 	if (theApp.m_app_state == APP_STATE_RUNNING && thePrefs.IsConfirmExitEnabled())
 	{
+		// ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
+		/*
 		if (AfxMessageBox(GetResString(IDS_MAIN_EXIT), MB_YESNO | MB_DEFBUTTON2) == IDNO)
+		*/
+		CAskExitDlg ExitDlg;
+		if (ExitDlg.DoModal()!= IDYES)
+		// <== Extended Prompt on Exit dialog [leuk_he] - Stulle
 			return false;
 	}
 	return true;

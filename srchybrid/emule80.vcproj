@@ -363,6 +363,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AskExitDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="AsyncProxySocketLayer.cpp"
 				>
 			</File>
@@ -1021,6 +1025,10 @@
 			</File>
 			<File
 				RelativePath="ArchiveRecovery.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AskExitDlg.h"
 				>
 			</File>
 			<File

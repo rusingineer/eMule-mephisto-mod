@@ -381,6 +381,14 @@ public:
 	// <== Automatic shared files updater [MoNKi] - Stulle
 
 	void RebindUPnP(); // UPnP support [MoNKi] - leuk_he
+
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+#define  SVC_NO_OPT 0
+#define	 SVC_LIST_OPT 4
+#define  SVC_SVR_OPT 6
+#define SVC_FULL_OPT 10
+	bool	IsRunningAsService(int OptimizeLevel = SVC_NO_OPT );// MORPH leuk_he:run as ntservice v1..
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 };
 
 extern CemuleApp theApp;

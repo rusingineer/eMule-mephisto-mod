@@ -65,7 +65,16 @@ CServerListCtrl::CServerListCtrl()
 	*/
 	SetGeneralPurposeFind(true, false);
 	//Xman end
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	/*
 	m_tooltip = new CToolTipCtrlX;
+	*/
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+		m_tooltip = new CToolTipCtrlX;
+	else
+		m_tooltip = NULL;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 	SetSkinKey(L"ServersLv");
 }
 
@@ -74,13 +83,19 @@ bool CServerListCtrl::Init()
 	SetPrefsKey(_T("ServerListCtrl"));
 	SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
-	CToolTipCtrl* tooltip = GetToolTips();
-	if (tooltip) {
-		m_tooltip->SubclassWindow(*tooltip);
-		tooltip->ModifyStyle(0, TTS_NOPREFIX);
-		tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
-		//tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
-	}
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+	{
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		CToolTipCtrl* tooltip = GetToolTips();
+		if (tooltip) {
+			m_tooltip->SubclassWindow(*tooltip);
+			tooltip->ModifyStyle(0, TTS_NOPREFIX);
+			tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
+			//tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
+		}
+	} // Run eMule as NT Service [leuk_he] - Stulle
 
 	InsertColumn(0, GetResString(IDS_SL_SERVERNAME),LVCFMT_LEFT, 150);
 	InsertColumn(1, GetResString(IDS_IP),			LVCFMT_LEFT, 140);
@@ -113,7 +128,11 @@ bool CServerListCtrl::Init()
 
 CServerListCtrl::~CServerListCtrl()
 {
-	delete m_tooltip;
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		delete m_tooltip;
 }
 
 void CServerListCtrl::OnSysColorChange()
@@ -279,6 +298,12 @@ bool CServerListCtrl::AddServer(const CServer* pServer, bool bAddToList, bool bR
 	bool bAddTail = !bRandom || ((GetRandomUInt16() % (1 + theApp.serverlist->GetServerCount())) != 0);
 	if (!theApp.serverlist->AddServer(pServer, bAddTail))
 		return false;
+
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_SVR_OPT))
+		return true;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (bAddToList)
 	{
 		InsertItem(LVIF_TEXT | LVIF_PARAM, bAddTail ? GetItemCount() : 0, pServer->GetListName(), 0, 0, 0, (LPARAM)pServer);
@@ -290,6 +315,11 @@ bool CServerListCtrl::AddServer(const CServer* pServer, bool bAddToList, bool bR
 
 void CServerListCtrl::RefreshServer(const CServer* server)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_SVR_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!server || !theApp.emuledlg->IsRunning())
 		return;
 

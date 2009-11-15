@@ -201,7 +201,16 @@ CSearchListCtrl::CSearchListCtrl()
 	searchlist = NULL;
 	m_nResultsID = 0;
 	SetGeneralPurposeFind(true);
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	/*
 	m_tooltip = new CToolTipCtrlX;
+	*/
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+		m_tooltip = new CToolTipCtrlX;
+	else
+		m_tooltip = NULL;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 	m_eFileSizeFormat = (EFileSizeFormat)theApp.GetProfileInt(_T("eMule"), _T("SearchResultsFileSizeFormat"), fsizeDefault);
 	SetSkinKey(L"SearchResultsLv");
 }
@@ -250,14 +259,20 @@ void CSearchListCtrl::Init(CSearchList* in_searchlist)
 	ASSERT( (GetStyle() & LVS_SINGLESEL) == 0 );
 	SetStyle();
 
-	CToolTipCtrl* tooltip = GetToolTips();
-	if (tooltip){
-		m_tooltip->SetFileIconToolTip(true);
-		m_tooltip->SubclassWindow(*tooltip);
-		tooltip->ModifyStyle(0, TTS_NOPREFIX);
-		tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
-		//tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
-	}
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+	{
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		CToolTipCtrl* tooltip = GetToolTips();
+		if (tooltip){
+			m_tooltip->SetFileIconToolTip(true);
+			m_tooltip->SubclassWindow(*tooltip);
+			tooltip->ModifyStyle(0, TTS_NOPREFIX);
+			tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
+			//tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
+		}
+	} // Run eMule as NT Service [leuk_he] - Stulle
 	searchlist = in_searchlist;
 
 	InsertColumn(0, GetResString(IDS_DL_FILENAME),	LVCFMT_LEFT,  DFLT_FILENAME_COL_WIDTH);
@@ -319,7 +334,11 @@ CSearchListCtrl::~CSearchListCtrl()
 		delete pValue;
 	}
 	m_mapSortSelectionStates.RemoveAll();
-	delete m_tooltip;
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		delete m_tooltip;
 }
 
 void CSearchListCtrl::Localize()
@@ -356,6 +375,11 @@ void CSearchListCtrl::Localize()
 
 void CSearchListCtrl::AddResult(const CSearchFile* toshow)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	bool bFilterActive = !theApp.emuledlg->searchwnd->m_pwndResults->m_astrFilter.IsEmpty();
 	bool bItemFiltered = bFilterActive ? IsFilteredItem(toshow) : false;
 
@@ -457,6 +481,11 @@ void CSearchListCtrl::UpdateSources(const CSearchFile* toupdate)
 
 void CSearchListCtrl::UpdateSearch(CSearchFile* toupdate)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!toupdate || !theApp.emuledlg->IsRunning())
 		return;
 	//MORPH START - SiRoB, Don't Refresh item if not needed

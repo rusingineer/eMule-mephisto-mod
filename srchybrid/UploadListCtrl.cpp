@@ -61,14 +61,27 @@ END_MESSAGE_MAP()
 CUploadListCtrl::CUploadListCtrl()
 	: CListCtrlItemWalk(this)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	/*
 	m_tooltip = new CToolTipCtrlX;
+	*/
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+		m_tooltip = new CToolTipCtrlX;
+	else
+		m_tooltip = NULL;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 	SetGeneralPurposeFind(true);
 	SetSkinKey(L"UploadsLv");
 }
 
 CUploadListCtrl::~CUploadListCtrl()
 {
-	delete m_tooltip;
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		delete m_tooltip;
 }
 
 void CUploadListCtrl::Init()
@@ -76,13 +89,19 @@ void CUploadListCtrl::Init()
 	SetPrefsKey(_T("UploadListCtrl"));
 	SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
-	CToolTipCtrl* tooltip = GetToolTips();
-	if (tooltip) {
-		m_tooltip->SubclassWindow(tooltip->m_hWnd);
-		tooltip->ModifyStyle(0, TTS_NOPREFIX);
-		tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
-		tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
-	}
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workaround running MFC as service
+	if (!theApp.IsRunningAsService())
+	{
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		CToolTipCtrl* tooltip = GetToolTips();
+		if (tooltip) {
+			m_tooltip->SubclassWindow(tooltip->m_hWnd);
+			tooltip->ModifyStyle(0, TTS_NOPREFIX);
+			tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
+			tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
+		}
+	} // Run eMule as NT Service [leuk_he] - Stulle
 
 	InsertColumn(0, GetResString(IDS_QL_USERNAME),	LVCFMT_LEFT,  DFLT_CLIENTNAME_COL_WIDTH);
 	InsertColumn(1, GetResString(IDS_FILE),			LVCFMT_LEFT,  DFLT_FILENAME_COL_WIDTH);
@@ -1060,6 +1079,11 @@ BOOL CUploadListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 
 void CUploadListCtrl::AddClient(const CUpDownClient *client)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!theApp.emuledlg->IsRunning())
 		return;
 
@@ -1086,6 +1110,11 @@ void CUploadListCtrl::RemoveClient(const CUpDownClient *client)
 
 void CUploadListCtrl::RefreshClient(const CUpDownClient *client)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!theApp.emuledlg->IsRunning())
 		return;
 

@@ -20,6 +20,7 @@
 #include "emule.h"
 #include "log.h"
 #include "VisualStylesXP.h"
+#include "NTService.h" // Run eMule as NT Service [leuk_he] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -92,6 +93,14 @@ void CToolTipCtrlX::ResetSystemMetrics()
 	m_rcScreen.right = GetSystemMetrics(SM_CXSCREEN);
 	m_rcScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
 	m_iScreenWidth4 = m_rcScreen.Width() / 4;
+
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (RunningAsService()) {
+		DWORD dwProcessId;
+		DWORD dwThreadId= GetWindowThreadProcessId(m_hWnd,&dwProcessId);
+		EnumThreadWindows(dwThreadId, EnumProc,(LPARAM) dwThreadId);
+	}
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 }
 
 void CToolTipCtrlX::OnNmThemeChanged(NMHDR* /*pNMHDR*/, LRESULT* pResult)

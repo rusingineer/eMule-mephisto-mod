@@ -888,6 +888,11 @@ void CHistoryListCtrl::ClearHistory() {
 
 void CHistoryListCtrl::UpdateFile(const CKnownFile* file)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!file || !theApp.emuledlg->IsRunning())
 		return;
 	int iItem = FindFile(file);

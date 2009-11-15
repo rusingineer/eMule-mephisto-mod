@@ -490,6 +490,16 @@ void CWebServer::ProcessURL(ThreadData Data)
 		}
 		// <== Multiuser WebInterface Cookie settings [Aireoreion] - Stulle
 
+		// ==> Run eMule as NT Service [leuk_he] - Stulle
+		if(!login && _ParseURL(Data.sURL, _T("w")) == _T("nologin")
+			&& (ipstr(Data.inadr) == "127.0.0.1" ) &&
+			  (!_ParseURL(Data.sURL, _T("commandData")).IsEmpty()))
+		{
+			  login=true;
+		      justAddLink=true;
+		}
+		// <== Run eMule as NT Service [leuk_he] - Stulle
+
 		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		/*
 		if (_ParseURL(Data.sURL, _T("w")) == _T("password"))
@@ -869,7 +879,8 @@ void CWebServer::ProcessURL(ThreadData Data)
 		}
 		else if(justAddLink && login)
 		{
-				Out += _GetRemoteLinkAddedOk(Data);
+			isUseGzip = false; // Run eMule as NT Service [leuk_he] - Stulle
+			Out += _GetRemoteLinkAddedOk(Data);
 		}
 		else
 		{
@@ -5742,8 +5753,19 @@ CString CWebServer::_GetRemoteLinkAddedOk(ThreadData Data)
     int cat=_tstoi(_ParseURL(Data.sURL,_T("cat")));
 	CString HTTPTemp = _ParseURL(Data.sURL, _T("c"));
 
-	const TCHAR* buf=HTTPTemp;
-	theApp.emuledlg->SendMessage(WEB_ADDDOWNLOADS, (WPARAM)buf, cat);
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	int  dwData =_tstol(_ParseURL(Data.sURL, _T("commandData")));
+	if (dwData) { // data from user session
+		theApp.sendstruct.cbData = (HTTPTemp.GetLength() + 1)*sizeof(TCHAR);
+		theApp.sendstruct.dwData = dwData ; 
+		theApp.sendstruct.lpData = const_cast<LPTSTR>((LPCTSTR)HTTPTemp); 
+		theApp.emuledlg->SendMessage(WEB_COPYDATA, (WPARAM)0, (LPARAM)(PCOPYDATASTRUCT)&theApp.sendstruct);
+	}
+	else { // normal add link processing
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		const TCHAR* buf=HTTPTemp;
+		theApp.emuledlg->SendMessage(WEB_ADDDOWNLOADS, (WPARAM)buf, cat);
+	} // Run eMule as NT Service [leuk_he] - Stulle
 
     Out += _T("<status result=\"OK\">");
     Out += _T("<description>") + GetResString(IDS_WEB_REMOTE_LINK_ADDED) + _T("</description>");

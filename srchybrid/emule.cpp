@@ -94,6 +94,7 @@ CEvent* CemuleApp::m_directoryWatcherCloseEvent;
 CEvent* CemuleApp::m_directoryWatcherReloadEvent;
 CCriticalSection CemuleApp::m_directoryWatcherCS;
 // <== Automatic shared files updater [MoNKi] - Stulle
+#include "NTService.h" // Run eMule as NT Service [leuk_he] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -793,7 +794,11 @@ BOOL CemuleApp::InitInstance()
 	}
 	Log(_T("Starting eMule v%s"), m_strCurVersionLong);
 
-	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// use service control handler instead
+	if (!RunningAsService())
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+		SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 
 	CemuleDlg dlg;
 	emuledlg = &dlg;
@@ -979,6 +984,11 @@ BOOL CemuleApp::InitInstance()
 
 	emuledlg = NULL;
 
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (NtserviceStartwhenclose)
+		NtServiceStart(); // how to handle errors...? 
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	ClearDebugLogQueue(true);
 	ClearLogQueue(true);
 
@@ -1036,11 +1046,18 @@ int eMuleAllocHook(int mode, void* pUserData, size_t nSize, int nBlockUse, long 
 bool CemuleApp::ProcessCommandline()
 {
 	bool bIgnoreRunningInstances = (GetProfileInt(_T("eMule"), _T("IgnoreInstances"), 0) != 0);
+	bool bExitParam=false; // Run eMule as NT Service [leuk_he] - Stulle
 
 	for (int i = 1; i < __argc; i++){
 		LPCTSTR pszParam = __targv[i];
 		if (pszParam[0] == _T('-') || pszParam[0] == _T('/')){
 			pszParam++;
+			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			// Stullemon: is it really neccessary to move the } above this line?
+			if (_tcscmp(pszParam, _T("install"))==0)  {CmdInstallService();bExitParam = true; }
+			if (_tcscmp(pszParam, _T("uninstall"))==0){CmdRemoveService();bExitParam = true; }
+			if (_tcscmp(pszParam, _T("AsAService"))==0){OnStartAsService();} // NTservice entry point registation.
+			// <== Run eMule as NT Service [leuk_he] - Stulle
 #ifdef _DEBUG
 			if (_tcsicmp(pszParam, _T("assertfile")) == 0)
 				_CrtSetReportHook(CrtDebugReportCB);
@@ -1082,6 +1099,10 @@ bool CemuleApp::ProcessCommandline()
 				delete command;
       			return true;
 			}
+			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			else if (IsServiceRunningMutexActive()) 
+				PassLinkToWebService(sendstruct.dwData,*command);
+			// <== Run eMule as NT Service [leuk_he] - Stulle
     		else
       			pstrPendingLink = command;
 		}
@@ -1094,6 +1115,10 @@ bool CemuleApp::ProcessCommandline()
       			delete command;
 				return true;
 			}
+			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			else if (IsServiceRunningMutexActive()) 
+				PassLinkToWebService(sendstruct.dwData,*command);
+			// <== Run eMule as NT Service [leuk_he] - Stulle
     		else
       			pstrPendingLink = command;
 		}
@@ -1106,14 +1131,35 @@ bool CemuleApp::ProcessCommandline()
       			delete command;
 				return true;
 			}
+			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			/*
 			// Don't start if we were invoked with 'exit' command.
 			if (command->CompareNoCase(_T("exit")) == 0) {
+			*/
+			else if (IsServiceRunningMutexActive()) 
+				PassLinkToWebService(sendstruct.dwData,*command);
+
+			// Don't start if we were invoked with 'exit' command.
+			if (  (command->CompareNoCase(_T("exit")) == 0)||
+				(command->CompareNoCase(_T("uninstall")) == 0))
+			{
+			// <== Run eMule as NT Service [leuk_he] - Stulle
 				delete command;
 				return true;
 			}
 			delete command;
 		}
     }
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	else if (maininst == NULL && bAlreadyRunning== true && IsServiceRunningMutexActive() ){ // should be service....
+		if (InterfaceToService()== false)	{ // stop service or start browser to 127.0.0.1....
+			m_hMutexOneInstance = ::CreateMutex(NULL, FALSE, strMutextName);  // gui..so create mutex to prevent 2nd startup. 
+			return bAlreadyRunning = ( ::GetLastError() == ERROR_ALREADY_EXISTS ||::GetLastError() == ERROR_ACCESS_DENIED);
+		}
+		else
+			return true; // let browser do GUI 
+	}
+	// <== Run eMule as NT Service [leuk_he] - Stulle
     return (maininst || bAlreadyRunning);
 }
 
@@ -3314,7 +3360,7 @@ void CemuleApp::DirectoryWatcherExternalReload(){
 // ==> UPnP support [MoNKi] - leuk_he
 void CemuleApp::RebindUPnP()
 {
-	if(!thePrefs.IsUPnPNat())
+	if(!thePrefs.IsUPnPEnabled())
 		return;
 	clientudp->Rebind();
 	listensocket->Rebind();
@@ -3343,3 +3389,13 @@ void CemuleApp::RebindUPnP()
 	}
 }
 // <== UPnP support [MoNKi] - leuk_he
+
+// ==> Run eMule as NT Service [leuk_he] - Stulle
+bool CemuleApp::IsRunningAsService(int OptimizeLevel )
+{
+	if (OptimizeLevel < 5)	// 5: all optmization except server list : need an option for preferneces. 
+		return RunningAsService();
+	else
+		return false;  // disable optimizations
+}
+// <== Run eMule as NT Service [leuk_he] - Stulle

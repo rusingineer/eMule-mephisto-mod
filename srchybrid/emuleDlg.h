@@ -240,8 +240,10 @@ protected:
 	*/
 	// <== UPnP support [MoNKi] - leuk_he
 
+public: // Run eMule as NT Service [leuk_he] - Stulle
 	void StartConnection();
 	void CloseConnection();
+protected: // Run eMule as NT Service [leuk_he] - Stulle
 	void MinimizeWindow();
 	void PostStartupMinimized();
 	void UpdateTrayIcon(int iPercent);
@@ -365,6 +367,9 @@ protected:
 	// Advanced Updates [MorphXT/Stulle] - Stulle
 	afx_msg LRESULT OnDLPAutoVerCheckResponse(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnIPFilterAutoVerCheckResponse(WPARAM wParam, LPARAM lParam);
+
+	// Run eMule as NT Service [leuk_he] - Stulle
+	afx_msg LRESULT  OnServiceStatus(WPARAM wParam, LPARAM lParam);
 
 	// Peercache DNS
 	afx_msg LRESULT OnPeerCacheResponse(WPARAM wParam, LPARAM lParam);

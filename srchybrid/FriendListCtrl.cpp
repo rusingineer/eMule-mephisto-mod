@@ -142,6 +142,11 @@ void CFriendListCtrl::UpdateFriend(int iItem, const CFriend* pFriend)
 
 void CFriendListCtrl::AddFriend(const CFriend* pFriend)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	//Xman CodeFix
 	if (!theApp.emuledlg->IsRunning())
 		return;

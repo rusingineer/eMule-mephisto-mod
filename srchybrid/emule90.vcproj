@@ -601,6 +601,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NTService.cpp"
+				>
+			</File>
+			<File
 				RelativePath="OtherFunctions.cpp"
 				>
 			</File>
@@ -1222,6 +1226,10 @@
 			</File>
 			<File
 				RelativePath=".\ModVersion.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NTService.h"
 				>
 			</File>
 			<File

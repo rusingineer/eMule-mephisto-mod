@@ -22,6 +22,7 @@
 #include "SearchResultsWnd.h"
 #include "OtherFunctions.h"
 #include "HelpIDs.h"
+#include "NTService.h" // Run eMule as NT Service [leuk_he] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -106,6 +107,16 @@ int CSearchDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void CSearchDlg::OnClose()
 {
 	SaveBarState(SEARCH_PARAMS_PROFILE);
+
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// workarround a mfc bug
+	if (RunningAsService()) {
+		DWORD dwProcessId;
+		DWORD dwThreadId= GetWindowThreadProcessId(m_hWnd,&dwProcessId);
+		EnumThreadWindows(dwThreadId, EnumProc,(LPARAM) dwThreadId);
+	}
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	CFrameWnd::OnClose();
 }
 

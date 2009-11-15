@@ -780,6 +780,11 @@ BOOL CClientListCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 
 void CClientListCtrl::AddClient(const CUpDownClient *client)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!theApp.emuledlg->IsRunning())
 		return;
 	if (thePrefs.IsKnownClientListDisabled())
@@ -807,6 +812,11 @@ void CClientListCtrl::RemoveClient(const CUpDownClient *client)
 
 void CClientListCtrl::RefreshClient(const CUpDownClient *client)
 {
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if (theApp.IsRunningAsService(SVC_LIST_OPT))
+		return;
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
 	if (!theApp.emuledlg->IsRunning())
 		return;
 

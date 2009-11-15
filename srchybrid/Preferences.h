@@ -1166,17 +1166,24 @@ public:
 	static CString		UpdateURLIP2Country;
 	// <== Advanced Updates [MorphXT/Stulle] - Stulle
 
-	static bool	m_bFineCS; // Modified FineCS [CiccioBastardo/Stulle] - Stulle
+	static bool		m_bFineCS; // Modified FineCS [CiccioBastardo/Stulle] - Stulle
 
-	static bool m_bTrayComplete; // Completed in Tray [Stulle] - Stulle
+	static bool		m_bTrayComplete; // Completed in Tray [Stulle] - Stulle
 
-	static bool m_bColorFeedback; // Feedback personalization [Stulle] - Stulle
+	static bool		m_bColorFeedback; // Feedback personalization [Stulle] - Stulle
 
 	static bool		m_bSplitWindow; // Advanced Transfer Window Layout [Stulle] - Stulle
 
 	static bool		m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
 
-	static	bool	m_bIonixWebsrv; // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+	static bool		m_bIonixWebsrv; // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+	static int		m_iServiceStartupMode; // Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Adjustable NT Service Strings - Stulle
+	static CString	m_strServiceName;
+	static CString	m_strServiceDispName;
+	static CString	m_strServiceDescr;
+	// <== Adjustable NT Service Strings - Stulle
 
 	static bool		m_bCloseEasteregg; // Diabolic Easteregg [Stulle] - Mephisto
 
@@ -2043,7 +2050,13 @@ public:
 	static	ELogFileFormat GetLogFileFormat()			{return m_iLogFileFormat;}
 
 	// WebServer
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	/*
 	static	uint16	GetWSPort()							{return m_nWebPort;}
+	*/
+	// may be required before init! 
+	static	uint16	GetWSPort();
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 	static	bool	GetWSUseUPnP()						{return m_bWebUseUPnP && GetWSIsEnabled();}
 	static	void	SetWSPort(uint16 uPort)				{m_nWebPort=uPort;}
 	static	const CString& GetWSPass()					{return m_strWebPassword;}
@@ -2612,13 +2625,13 @@ public:
 	static bool			IsIPFilterViaDynDNS(CString strURL = NULL);
 	// <== Advanced Updates [MorphXT/Stulle] - Stulle
 
-	static void			SetBindAddr(CStringW bindip); // Advanced Options [Official/MorphXT] - Stulle
+	static void		SetBindAddr(CStringW bindip); // Advanced Options [Official/MorphXT] - Stulle
 
-	static	bool	FineCS()			{return m_bFineCS;} // Modified FineCS [CiccioBastardo/Stulle] - Stulle
+	static bool		FineCS()			{return m_bFineCS;} // Modified FineCS [CiccioBastardo/Stulle] - Stulle
 
-	static	bool	GetTrayComplete()		{ return m_bTrayComplete; } // Completed in Tray [Stulle] - Stulle
+	static bool		GetTrayComplete()		{ return m_bTrayComplete; } // Completed in Tray [Stulle] - Stulle
 
-	static	bool	GetColorFeedback()		{ return m_bColorFeedback; } // Feedback personalization [Stulle] - Stulle
+	static bool		GetColorFeedback()		{ return m_bColorFeedback; } // Feedback personalization [Stulle] - Stulle
 
 	// ==> Advanced Transfer Window Layout [Stulle] - Stulle
 	static	bool	GetSplitWindow()		{ return m_bSplitWindow; }
@@ -2628,6 +2641,16 @@ public:
 	static	bool	DateFileNameLog()		{ return m_bDateFileNameLog;} // Date File Name Log [AndCycle] - Stulle
 
 	static	bool	UseIonixWebsrv()		{ return m_bIonixWebsrv; } // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+	static int      GetServiceStartupMode(); // Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Adjustable NT Service Strings [Stulle] - Stulle
+	static	CString	GetServiceName()				{ return m_strServiceName; }
+	static	void	SetServiceName(CString in)		{ m_strServiceName = in; }
+	static	CString	GetServiceDispName()			{ return m_strServiceDispName; }
+	static	void	SetServiceDispName(CString in)	{ m_strServiceDispName = in; }
+	static	CString	GetServiceDescr()				{ return m_strServiceDescr; }
+	static	void	SetServiceDescr(CString in)		{ m_strServiceDescr = in; }
+	// <== Adjustable NT Service Strings [Stulle] - Stulle
 
 	// ==> Mephisto Upload - Mephisto
 	static uint8	GetMinSlots()			{return m_uMinSlots;}

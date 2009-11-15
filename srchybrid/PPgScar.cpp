@@ -1587,9 +1587,8 @@ BOOL CPPgScar::OnInitDialog()
 	InitControl();
 
 	// Set default tab
-	m_currentTab = NONE;
-	m_tabCtr.SetCurSel(0);
-	SetTab(SCAR);//Tab x defecto Conexion
+	m_currentTab = SCAR;
+	SetTab(theApp.emuledlg->preferenceswnd->m_ScarTab);
 	// <== Tabbed Preferences [TPT] - Stulle
 
 	// ==> Design Settings [eWombat/Stulle] - Stulle
@@ -3169,6 +3168,8 @@ void CPPgScar::InitTab()
 	m_tabCtr.InsertItem(TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM, ADVANCED, GetResString(IDS_LD_ADVANCEDOPT), iTemp++, (LPARAM)ADVANCED);
 	m_tabCtr.InsertItem(TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM, UPDATE, GetResString(IDS_SV_UPDATE), iTemp++, (LPARAM)UPDATE);
 	m_tabCtr.InsertItem(TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM, SUPPORT, GetResString(IDS_SUPPORT), iTemp++, (LPARAM)SUPPORT);
+
+	m_tabCtr.SetCurSel(theApp.emuledlg->preferenceswnd->m_ScarTab);
 }
 
 
@@ -3188,25 +3189,27 @@ void CPPgScar::InitControl()
 	const int right = rect1.right - 6;
 
 	// ScarAngel
+	// Note: The objects of this tab need to be shown so the tab is always initialised correctly
+	// when the Preferences Dialog is opend anew.
 	m_strWarning.CreateEx(0, _T("STATIC"), _T(""), 
-							WS_CHILD /*| WS_VISIBLE*/, 
+							WS_CHILD | WS_VISIBLE, 
 							CRect(left, top, right, top+39), this, IDC_WARNING);
 	m_strWarning.SetFont(GetFont());	
 
 	m_ctrlTreeOptions.MoveWindow(CRect(left, top+49, right, bottom-39),TRUE);
 
 	m_strPushSmall.CreateEx(0, _T("STATIC"), _T("Push Small Files"), 
-							WS_CHILD /*| WS_VISIBLE*/, 
+							WS_CHILD | WS_VISIBLE, 
 							CRect(left, bottom-34, left+92, bottom-16), this, IDC_PUSHSMALL_LABEL);
 	m_strPushSmall.SetFont(GetFont());	
 
 	m_iPushSmallLabel.CreateEx(0, _T("STATIC"), _T("MB"), 
-							WS_CHILD /*| WS_VISIBLE*/, 
+							WS_CHILD | WS_VISIBLE, 
 							CRect(right-50, bottom-34, right, bottom-16), this, IDC_PUSHSMALL);
 	m_iPushSmallLabel.SetFont(GetFont());	
 
 	m_ctlPushSmallSize.CreateEx(WS_EX_STATICEDGE,
-							  WS_CHILD /*| WS_VISIBLE*/ | WS_TABSTOP | WS_BORDER |
+							  WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER |
 							  /*TBS_TOOLTIPS | */TBS_BOTH/* | TBS_VERT*/ | TBS_NOTICKS | WS_TABSTOP,
 							  CRect(left, bottom-16, right, bottom), this, IDC_PUSHSMALL_SLIDER);
 	m_ctlPushSmallSize.SetFont(GetFont());
@@ -3681,6 +3684,7 @@ void CPPgScar::SetTab(eTab tab){
 		}
 
 		// Show new controls
+		theApp.emuledlg->preferenceswnd->m_ScarTab = tab;
 		m_currentTab = tab;
 		switch(m_currentTab){
 			case SCAR:

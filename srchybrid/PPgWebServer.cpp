@@ -35,6 +35,7 @@
 #include "PreferencesDlg.h"
 #include "MD5Sum.h"
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+#include "NTService.h" // Run eMule as NT Service [leuk_he] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -86,6 +87,20 @@ BEGIN_MESSAGE_MAP(CPPgWebServer, CPropertyPage)
 	ON_EN_CHANGE(IDC_ADVADMIN_CATS, OnMultiCatsChange)
 //	ON_EN_CHANGE(IDC_ADVADMIN_USER, OnSettingsChange)
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	ON_BN_CLICKED(IDC_SVC_INSTALLSERVICE, OnBnClickedInstall)	
+	ON_BN_CLICKED(IDC_SVC_SERVERUNINSTALL, OnBnClickedUnInstall)	
+	ON_BN_CLICKED(IDC_SVC_STARTWITHSYSTEM, OnBnStartSystem)	
+	ON_BN_CLICKED(IDC_SVC_MANUALSTART, OnBnManualStart)	
+	ON_BN_CLICKED(IDC_SVC_SETTINGS ,   OnBnAllSettings)	
+	ON_BN_CLICKED(IDC_SVC_RUNBROWSER , OnBnRunBRowser)	
+	ON_BN_CLICKED(IDC_SVC_REPLACESERVICE , OnBnReplaceStart)	
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Adjustable NT Service Strings - Stulle
+	ON_EN_CHANGE(IDC_SERVICE_NAME, OnDataChange)
+	ON_EN_CHANGE(IDC_SERVICE_DISP_NAME, OnDataChange)
+	ON_EN_CHANGE(IDC_SERVICE_DESCR, OnDataChange)
+	// <== Adjustable NT Service Strings - Stulle
 END_MESSAGE_MAP()
 
 CPPgWebServer::CPPgWebServer()
@@ -127,12 +142,6 @@ BOOL CPPgWebServer::OnInitDialog()
 	((CEdit*)GetDlgItem(IDC_WSPASS))->SetLimitText(12);
 	((CEdit*)GetDlgItem(IDC_WSPORT))->SetLimitText(6);
 
-	// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
-	InitTab(true);
-	m_currentTab = NONE;
-	m_tabCtr.SetCurSel(NONE);
-	SetTab(WEBSERVER);
-	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
 	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	FillComboBox();
 	FillUserlevelBox();
@@ -157,6 +166,13 @@ BOOL CPPgWebServer::OnInitDialog()
 		m_wndMobileLink.AppendText(_T("Link: "));
 		m_wndMobileLink.AppendHyperLink(GetResString(IDS_MMGUIDELINK),0,CString(_T("http://mobil.emule-project.net")),0,0);
 	}
+
+	// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+	m_currentTab = WEBSERVER;
+	InitTab(true, theApp.emuledlg->preferenceswnd->m_WebServerTab);
+	SetTab(theApp.emuledlg->preferenceswnd->m_WebServerTab);
+	// <== Tabbed WebInterface settings panel [Stulle] - Stulle
+
 	return TRUE;
 }
 
@@ -201,6 +217,22 @@ void CPPgWebServer::LoadSettings(void)
 	CheckDlgButton(IDC_WSUPNP, (thePrefs.IsUPnPEnabled() && thePrefs.m_bWebUseUPnP) ? TRUE : FALSE);
 	
 	CheckDlgButton(IDC_ADVADMINENABLED, thePrefs.UseIonixWebsrv()); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	if(thePrefs.GetServiceStartupMode()==2) {
+			CheckDlgButton(IDC_SVC_RUNBROWSER   ,BST_UNCHECKED );
+			CheckDlgButton(IDC_SVC_REPLACESERVICE, BST_CHECKED);
+	} else {
+			CheckDlgButton(IDC_SVC_RUNBROWSER   ,BST_CHECKED );
+            CheckDlgButton(IDC_SVC_REPLACESERVICE, BST_UNCHECKED);
+	}
+	// <== Run eMule as NT Service [leuk_he] - Stulle
+
+	// ==> Adjustable NT Service Strings - Stulle
+	GetDlgItem(IDC_SERVICE_NAME)->SetWindowText(thePrefs.GetServiceName());
+	GetDlgItem(IDC_SERVICE_DISP_NAME)->SetWindowText(thePrefs.GetServiceDispName());
+	GetDlgItem(IDC_SERVICE_DESCR)->SetWindowText(thePrefs.GetServiceDescr());
+	// <== Adjustable NT Service Strings - Stulle
 
 	OnEnChangeMMEnabled();
 
@@ -289,6 +321,86 @@ BOOL CPPgWebServer::OnApply()
 		theApp.webserver->SaveWebServConf();
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
+		// ==> Run eMule as NT Service [leuk_he] - Stulle
+		int b_installed;
+		int  i_startupmode;
+		int rights;
+		// Startup with system, store in service.
+		NTServiceGet(b_installed,i_startupmode,	rights);
+
+		// ==> Adjustable NT Service Strings - Stulle
+		CString strServiceName, strServiceDispName, strServiceDescr;
+		GetDlgItem(IDC_SERVICE_NAME)->GetWindowText(strServiceName);
+		GetDlgItem(IDC_SERVICE_DISP_NAME)->GetWindowText(strServiceDispName);
+		GetDlgItem(IDC_SERVICE_DESCR)->GetWindowText(strServiceDescr);
+
+		int iChangedStr = 0; // nothing changed
+		if(CompareLocaleStringNoCase(thePrefs.GetServiceName(),strServiceName))
+			iChangedStr = 1; // name under which we install changed, this is important!
+		else if(CompareLocaleStringNoCase(thePrefs.GetServiceDispName(),strServiceDispName) || CompareLocaleStringNoCase(thePrefs.GetServiceDescr(),strServiceDescr))
+			iChangedStr = 2; // only visual strings changed, not so important...
+
+		if(iChangedStr>0)
+		{
+			if(b_installed == 0)
+			{
+				thePrefs.SetServiceName(strServiceName);
+				thePrefs.SetServiceDispName(strServiceDispName);
+				thePrefs.SetServiceDescr(strServiceDescr);
+			}
+			else
+			{
+				int iResult = IDCANCEL;
+				if(iChangedStr == 1)
+					iResult = MessageBox(GetResString(IDS_SERVICE_NAME_CHANGED),GetResString(IDS_SERVICE_STR_CHANGED),MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);
+				else if(iChangedStr == 2)
+					iResult = MessageBox(GetResString(IDS_SERVICE_DISP_CHANGED),GetResString(IDS_SERVICE_STR_CHANGED),MB_YESNOCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);
+
+				if((iChangedStr == 1 && iResult == IDYES) || (iChangedStr == 2 && iResult != IDCANCEL))
+				{
+					if(iChangedStr == 2 && iResult == IDNO)
+					{
+						thePrefs.SetServiceName(strServiceName);
+						thePrefs.SetServiceDispName(strServiceDispName);
+						thePrefs.SetServiceDescr(strServiceDescr);
+					}
+					else if(CmdRemoveService()==0)
+					{
+						thePrefs.SetServiceName(strServiceName);
+						thePrefs.SetServiceDispName(strServiceDispName);
+						thePrefs.SetServiceDescr(strServiceDescr);
+						if(CmdInstallService(i_startupmode == 1) != 0)
+							MessageBox(GetResString(IDS_SERVICE_INSTALL_FAIL), GetResString(IDS_SERVICE_INSTALL_TITLE), MB_OK|MB_ICONWARNING);
+					}
+					else
+					{
+						MessageBox(GetResString(IDS_SERVICE_UNINSTALL_FAIL),GetResString(IDS_SERVICE_UNINSTALL_TITLE),MB_OK|MB_ICONWARNING);
+						GetDlgItem(IDC_SERVICE_NAME)->SetWindowText(thePrefs.GetServiceName());
+						GetDlgItem(IDC_SERVICE_DISP_NAME)->SetWindowText(thePrefs.GetServiceDispName());
+						GetDlgItem(IDC_SERVICE_DESCR)->SetWindowText(thePrefs.GetServiceDescr());
+					}
+				}
+				else
+				{
+					GetDlgItem(IDC_SERVICE_NAME)->SetWindowText(thePrefs.GetServiceName());
+					GetDlgItem(IDC_SERVICE_DISP_NAME)->SetWindowText(thePrefs.GetServiceDispName());
+					GetDlgItem(IDC_SERVICE_DESCR)->SetWindowText(thePrefs.GetServiceDescr());
+				}
+			}
+		}
+		// <== Adjustable NT Service Strings - Stulle
+
+		if (b_installed==1 && 
+				(i_startupmode ==0 && (IsDlgButtonChecked(IDC_SVC_STARTWITHSYSTEM)==BST_CHECKED))||
+				(i_startupmode ==1 && (IsDlgButtonChecked(IDC_SVC_MANUALSTART)==BST_CHECKED)))
+			NTServiceSetStartupMode(IsDlgButtonChecked(IDC_SVC_STARTWITHSYSTEM)==BST_CHECKED);
+	   // TODO: Apply setting 
+		if ( IsDlgButtonChecked(IDC_SVC_RUNBROWSER)==BST_CHECKED)
+		   thePrefs.m_iServiceStartupMode=1;
+		else 
+		   thePrefs.m_iServiceStartupMode=2;
+		// <== Run eMule as NT Service [leuk_he] - Stulle
+
 		theApp.emuledlg->serverwnd->UpdateMyInfo();
 		SetModified(FALSE);
 		SetTmplButtonState();
@@ -347,6 +459,26 @@ void CPPgWebServer::Localize(void)
 		GetDlgItem(IDC_STATIC_ADVADMIN_USER)->SetWindowText(GetResString(IDS_ADVADMIN_USER));
 		GetDlgItem(IDC_STATIC_ADVADMIN_CATS)->SetWindowText(GetResString(IDS_ADVADMIN_CAT));
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+		// ==> Run eMule as NT Service [leuk_he] - Stulle
+		GetDlgItem(IDC_SVC_INSTALLSERVICE)->SetWindowText(GetResString(IDS_SVC_INSTALLSERVICE));
+		GetDlgItem(IDC_SVC_SERVERUNINSTALL)->SetWindowText(GetResString(IDS_SVC_SERVERUNINSTALL));
+		GetDlgItem(IDC_SVC_STARTWITHSYSTEM)->SetWindowText(GetResString(IDS_SVC_STARTWITHSYSTEM));
+		GetDlgItem(IDC_SVC_MANUALSTART)->SetWindowText(GetResString(IDS_SVC_MANUALSTART));
+		GetDlgItem(IDC_SVC_SETTINGS)->SetWindowText(GetResString(IDS_SVC_SETTINGS));
+		GetDlgItem(IDC_SVC_RUNBROWSER)->SetWindowText(GetResString(IDS_SVC_RUNBROWSER));
+		GetDlgItem(IDC_SVC_REPLACESERVICE )->SetWindowText(GetResString(IDS_SVC_REPLACESERVICE));
+		GetDlgItem(IDC_SVC_ONSTARTBOX)->SetWindowText(GetResString(IDS_SVC_ONSTARTBOX));
+		GetDlgItem(IDC_SVC_STARTUPBOX)->SetWindowText(GetResString(IDS_SVC_STARTUPBOX));
+		GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->SetWindowText(GetResString(IDS_SVC_CURRENT_STATUS_LABEL));
+		// <== Run eMule as NT Service [leuk_he] - Stulle
+
+		// ==> Adjustable NT Service Strings [Stulle] - Stulle
+		GetDlgItem(IDC_SERVICE_STR_GROUP)->SetWindowText(GetResString(IDS_SERVICE_STR_GROUP));
+		GetDlgItem(IDC_SERVICE_NAME_LABEL)->SetWindowText(GetResString(IDS_SERVICE_NAME));
+		GetDlgItem(IDC_SERVICE_DISP_NAME_LABEL)->SetWindowText(GetResString(IDS_SERVICE_DISP_NAME));
+		GetDlgItem(IDC_SERVICE_DESCR_LABEL)->SetWindowText(GetResString(IDS_SERVICE_DESCR));
+		// <== Adjustable NT Service Strings [Stulle] - Stulle
 	}
 }
 
@@ -443,6 +575,7 @@ void CPPgWebServer::InitTab(bool firstinit, int Page)
 		m_tabCtr.SetImageList(&m_imageList);
 		m_tabCtr.InsertItem(TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM, WEBSERVER, GetResString(IDS_TAB_WEB_SERVER), 0, (LPARAM)WEBSERVER); 
 		m_tabCtr.InsertItem(TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM, MULTIWEBSERVER, GetResString(IDS_TAB_MULTI_USER), 0, (LPARAM)MULTIWEBSERVER); 
+		m_tabCtr.InsertItem(TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM, NTSERVICE, GetResString(IDS_TAB_NT_SERVICE), 0, (LPARAM)NTSERVICE); 
 	}
 
 	if (m_tabCtr.GetSafeHwnd() != NULL)
@@ -450,9 +583,6 @@ void CPPgWebServer::InitTab(bool firstinit, int Page)
 }
 void CPPgWebServer::OnTcnSelchangeTab(NMHDR * /* pNMHDR */, LRESULT *pResult)
 {
-//	int cur_sel = m_tabCtr.GetCurSel();
-//	theApp.emuledlg->preferenceswnd->SwitchTab(cur_sel);
-
 	// Retrieve tab to display
 	TCITEM tabCtrlItem; 
 	tabCtrlItem.mask = TCIF_PARAM;
@@ -524,9 +654,13 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_MINS)->EnableWindow(FALSE);
 				GetDlgItem(IDC_WSUPNP)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_WSUPNP)->EnableWindow(FALSE);
-				m_wndMobileLink.ShowWindow(SW_HIDE);
-				m_wndMobileLink.EnableWindow(FALSE);
+				if(m_wndMobileLink.GetSafeHwnd())
+				{
+					m_wndMobileLink.ShowWindow(SW_HIDE);
+					m_wndMobileLink.EnableWindow(FALSE);
+				}
 				break;
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			case MULTIWEBSERVER:
 				GetDlgItem(IDC_ADVADMINENABLED)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_ADVADMINENABLED)->EnableWindow(FALSE);
@@ -573,11 +707,55 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_ADVADMIN_NOTE)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_ADVADMIN_NOTE)->EnableWindow(FALSE);
 				break;
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			case NTSERVICE:
+				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_CURRENT_STATUS)->ShowWindow(SW_HIDE);
+				//GetDlgItem(IDC_SVC_CURRENT_STATUS)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_INSTALLSERVICE)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_INSTALLSERVICE)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_SERVERUNINSTALL)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_SERVERUNINSTALL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_STARTUPBOX)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_STARTUPBOX)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_STARTWITHSYSTEM)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_STARTWITHSYSTEM)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_MANUALSTART)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_MANUALSTART)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_SETTINGS)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_SETTINGS)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_ONSTARTBOX)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_ONSTARTBOX)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_RUNBROWSER)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_RUNBROWSER)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SVC_REPLACESERVICE)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SVC_REPLACESERVICE)->EnableWindow(FALSE);
+				// ==> Adjustable NT Service Strings [Stulle] - Stulle
+				GetDlgItem(IDC_SERVICE_STR_GROUP)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_STR_GROUP)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_NAME_LABEL)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_NAME_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_NAME)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_NAME)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_DISP_NAME_LABEL)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_DISP_NAME_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_DISP_NAME)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_DISP_NAME)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_DESCR_LABEL)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_DESCR_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_DESCR)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_DESCR)->EnableWindow(FALSE);
+				// <== Adjustable NT Service Strings [Stulle] - Stulle
+				break;
+			// <== Run eMule as NT Service [leuk_he] - Stulle
 			default:
 				break;
 		}
 
 		// Show new controls
+		theApp.emuledlg->preferenceswnd->m_WebServerTab = tab;
 		m_currentTab = tab;
 		switch(m_currentTab){
 			case WEBSERVER:
@@ -643,6 +821,7 @@ void CPPgWebServer::SetTab(eTab tab){
 					m_wndMobileLink.EnableWindow(TRUE);
 				}
 				break;
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			case MULTIWEBSERVER:
 				GetDlgItem(IDC_ADVADMINENABLED)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_ADVADMINENABLED)->EnableWindow(TRUE);
@@ -690,6 +869,50 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_ADVADMIN_NOTE)->EnableWindow(TRUE);
 				SetBoxes();
 				break;
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			case NTSERVICE:
+				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_CURRENT_STATUS)->ShowWindow(SW_SHOW);
+				//GetDlgItem(IDC_SVC_CURRENT_STATUS)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_INSTALLSERVICE)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_INSTALLSERVICE)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_SERVERUNINSTALL)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_SERVERUNINSTALL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_STARTUPBOX)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_STARTUPBOX)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_STARTWITHSYSTEM)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_STARTWITHSYSTEM)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_MANUALSTART)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_MANUALSTART)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_SETTINGS)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_SETTINGS)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_ONSTARTBOX)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_ONSTARTBOX)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_RUNBROWSER)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_RUNBROWSER)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SVC_REPLACESERVICE)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SVC_REPLACESERVICE)->EnableWindow(TRUE);
+				FillStatus();
+				// ==> Adjustable NT Service Strings [Stulle] - Stulle
+				GetDlgItem(IDC_SERVICE_STR_GROUP)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_STR_GROUP)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_NAME_LABEL)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_NAME_LABEL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_NAME)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_NAME)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_DISP_NAME_LABEL)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_DISP_NAME_LABEL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_DISP_NAME)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_DISP_NAME)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_DESCR_LABEL)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_DESCR_LABEL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_DESCR)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_DESCR)->EnableWindow(TRUE);
+				// <== Adjustable NT Service Strings [Stulle] - Stulle
+				break;
+			// <== Run eMule as NT Service [leuk_he] - Stulle
 			default:
 				break;
 		}
@@ -974,3 +1197,124 @@ void CPPgWebServer::OnBnClickedDel()
 	UpdateSelection();
 }
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+// ==> Run eMule as NT Service [leuk_he] - Stulle
+int  CPPgWebServer::FillStatus(){
+	int b_installed;
+	int  i_startupmode;
+	int rights;
+		NTServiceGet(b_installed,i_startupmode,	rights);
+
+		if (RunningAsService())		{ 
+			GetDlgItem( IDC_SVC_CURRENT_STATUS)->SetWindowText(GetResString(IDS_SVC_RUNNINGASSERVICE));
+			GetDlgItem( IDC_SVC_INSTALLSERVICE)->EnableWindow(false); // installing makes no sense when already running
+			GetDlgItem( IDC_SVC_SERVERUNINSTALL)->EnableWindow(false); // cannot uninstall self
+			if ( i_startupmode==1){
+				CheckDlgButton(IDC_SVC_STARTWITHSYSTEM, BST_CHECKED);
+				CheckDlgButton(IDC_SVC_MANUALSTART,     BST_UNCHECKED);
+			}
+			else {
+				CheckDlgButton(IDC_SVC_STARTWITHSYSTEM, BST_UNCHECKED);
+				CheckDlgButton(IDC_SVC_MANUALSTART,     BST_CHECKED);
+			}
+		}
+		else {//This instance is not the running process
+			if (b_installed==-1)// undetermined
+			{
+				GetDlgItem( IDC_SVC_INSTALLSERVICE)->EnableWindow(true); // probably fails but let user try
+				GetDlgItem( IDC_SVC_SERVERUNINSTALL)->EnableWindow(true); // probably fails but let user try
+				GetDlgItem( IDC_SVC_CURRENT_STATUS)->SetWindowText(GetResString(IDS_SVC_ACCESSDENIED)); 
+			}
+			else if (b_installed==0){
+				GetDlgItem( IDC_SVC_CURRENT_STATUS)->SetWindowText(GetResString(IDS_SVC_NOTINSTALLED)); 
+				GetDlgItem( IDC_SVC_INSTALLSERVICE)->EnableWindow(true); 
+				GetDlgItem( IDC_SVC_SERVERUNINSTALL)->EnableWindow(false);
+			}	else if (b_installed==1 && i_startupmode ==4 ){
+				GetDlgItem( IDC_SVC_CURRENT_STATUS)->SetWindowText(GetResString(IDS_SVC_INSTALLED_DISABLED)); 
+				GetDlgItem( IDC_SVC_INSTALLSERVICE)->EnableWindow(false); 
+				GetDlgItem( IDC_SVC_SERVERUNINSTALL)->EnableWindow(true);
+			}	else if (b_installed==1){
+				GetDlgItem( IDC_SVC_CURRENT_STATUS)->SetWindowText(GetResString(IDS_SVC_INSTALLED)); 
+				GetDlgItem( IDC_SVC_INSTALLSERVICE)->EnableWindow(false); 
+ 				GetDlgItem( IDC_SVC_SERVERUNINSTALL)->EnableWindow(true);
+			}
+			if(i_startupmode==1){
+				CheckDlgButton(IDC_SVC_STARTWITHSYSTEM, BST_CHECKED);
+				CheckDlgButton(IDC_SVC_MANUALSTART,     BST_UNCHECKED);
+			}
+			else{
+				CheckDlgButton(IDC_SVC_STARTWITHSYSTEM, BST_UNCHECKED);
+				CheckDlgButton(IDC_SVC_MANUALSTART,     BST_CHECKED);
+			}
+		}
+		return 0;
+}
+
+void CPPgWebServer::OnBnClickedInstall()
+{
+	OnApply(); // Adjustable NT Service Strings - Stulle
+	if (CmdInstallService((IsDlgButtonChecked(IDC_SVC_STARTWITHSYSTEM))==BST_CHECKED )==0)
+	{
+		FillStatus();
+		if(AfxMessageBox(GetResString(IDS_APPLY_SETTINGS),MB_YESNO) == IDYES)
+			OnBnAllSettings();
+		SetModified();
+		if (thePrefs.m_nCurrentUserDirMode == 0) // my documents and running as a service is not a good idea. but leave it to user
+			AfxMessageBox(GetResString(IDS_CHANGEUSERASSERVICE),MB_OK);
+	}
+	else
+		SetDlgItemText(IDC_SVC_CURRENT_STATUS,GetResString(IDS_SVC_INSTALLFAILED)); 
+}
+
+void CPPgWebServer::OnBnClickedUnInstall()
+{
+	if (CmdRemoveService()==0) {
+		FillStatus();
+		SetModified();
+	}
+	else
+		SetDlgItemText(IDC_SVC_CURRENT_STATUS,GetResString(IDS_SVC_UNINSTALLFAILED)); 
+
+}
+
+void CPPgWebServer::OnBnStartSystem(){
+	if(IsDlgButtonChecked(IDC_SVC_MANUALSTART)==BST_CHECKED )
+		SetModified();
+	CheckDlgButton(IDC_SVC_STARTWITHSYSTEM, BST_CHECKED);
+	CheckDlgButton(IDC_SVC_MANUALSTART,     BST_UNCHECKED);
+};	
+void CPPgWebServer::OnBnManualStart(){
+	if(IsDlgButtonChecked(IDC_SVC_STARTWITHSYSTEM)==BST_CHECKED )
+		SetModified();
+	CheckDlgButton(IDC_SVC_STARTWITHSYSTEM,BST_UNCHECKED );
+	CheckDlgButton(IDC_SVC_MANUALSTART,    BST_CHECKED);
+};	
+
+void CPPgWebServer::OnBnAllSettings(){
+	thePrefs.startupsound=false;
+	thePrefs.SetAutoConnect(true);
+	thePrefs.SetWSIsEnabled(true); 
+	RemAutoStart(); // remove from windows startup. 
+	thePrefs.m_bEnableMiniMule=false;
+	thePrefs.m_bSelCatOnAdd=false;
+	thePrefs.notifierSoundType = ntfstNoSound;
+	thePrefs.notifierOnDownloadFinished =false;
+	thePrefs.splashscreen=false;
+	thePrefs.startMinimized=true;
+	thePrefs.beepOnError=false;
+	thePrefs.bringtoforeground=false;
+//	SetModified();
+};	
+
+void CPPgWebServer::OnBnReplaceStart(){
+	CheckDlgButton(IDC_SVC_RUNBROWSER   ,BST_UNCHECKED );
+	CheckDlgButton(IDC_SVC_REPLACESERVICE, BST_CHECKED);
+	SetModified();
+};	
+
+void CPPgWebServer::OnBnRunBRowser(){
+	CheckDlgButton(IDC_SVC_RUNBROWSER   ,BST_CHECKED );
+	CheckDlgButton(IDC_SVC_REPLACESERVICE,    BST_UNCHECKED);
+	SetModified();
+};	
+// <== Run eMule as NT Service [leuk_he] - Stulle

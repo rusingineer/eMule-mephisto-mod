@@ -1548,6 +1548,46 @@ BEGIN
     LTEXT           "User Level:",IDC_STATIC_ADVADMIN_USERLEVEL,15,129,74,9, NOT WS_VISIBLE
     LTEXT           "Note",IDC_ADVADMIN_NOTE,8,190,217,21, NOT WS_VISIBLE
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+// ==> Run eMule as NT Service [leuk_he] - Stulle
+    LTEXT           "Current status:",IDC_SVC_CURRENT_STATUS_LABEL,9,20,213,
+                    9, NOT WS_VISIBLE
+    EDITTEXT        IDC_SVC_CURRENT_STATUS,9,32,213,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED | NOT WS_TABSTOP | NOT WS_VISIBLE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Install",IDC_SVC_INSTALLSERVICE,9,52,103,14, NOT WS_VISIBLE
+    PUSHBUTTON      "Unnistall",IDC_SVC_SERVERUNINSTALL,119,52,103,14, NOT WS_VISIBLE
+    GROUPBOX        "Startup",IDC_SVC_STARTUPBOX,9,72,213,37, NOT WS_VISIBLE
+    CONTROL         "Start with system startup",IDC_SVC_STARTWITHSYSTEM,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP | NOT
+                    WS_VISIBLE,14,82,203,10
+    CONTROL         "Manual start",IDC_SVC_MANUALSTART,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP | NOT WS_VISIBLE,
+                    14,94,203,10
+    PUSHBUTTON      "Set setting appropriate for service use ",IDC_SVC_SETTINGS,
+                    9,113,213,14, WS_TABSTOP | NOT WS_VISIBLE
+    GROUPBOX        "On start of eMule",IDC_SVC_ONSTARTBOX,9,133,213,37,NOT
+                    WS_VISIBLE
+    CONTROL         "Browse to webservice",IDC_SVC_RUNBROWSER,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | NOT WS_VISIBLE,14,143,203,10
+    CONTROL         "Stop service and start gui",IDC_SVC_REPLACESERVICE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | NOT WS_VISIBLE,
+                    14,155,203,10
+// ==> Adjustable NT Service Strings [Stulle] - Stulle
+    GROUPBOX        "NT Service strings (empty = default)",IDC_SERVICE_STR_GROUP,
+                    9,174,213,61,NOT WS_VISIBLE
+    LTEXT           "Name (for install):",IDC_SERVICE_NAME_LABEL,14,186,80,
+                    9, NOT WS_VISIBLE
+    EDITTEXT        IDC_SERVICE_NAME,96,184,121,14,ES_AUTOHSCROLL | 
+                    NOT WS_VISIBLE,WS_EX_CLIENTEDGE
+    LTEXT           "Displayed name:",IDC_SERVICE_DISP_NAME_LABEL,14,202,80,
+                    9, NOT WS_VISIBLE
+    EDITTEXT        IDC_SERVICE_DISP_NAME,96,200,121,14,ES_AUTOHSCROLL | 
+                    NOT WS_VISIBLE,WS_EX_CLIENTEDGE
+    LTEXT           "Displayed discription:",IDC_SERVICE_DESCR_LABEL,14,218,80,
+                    9, NOT WS_VISIBLE
+    EDITTEXT        IDC_SERVICE_DESCR,96,216,121,14,ES_AUTOHSCROLL | 
+                    NOT WS_VISIBLE,WS_EX_CLIENTEDGE
+// <== Adjustable NT Service Strings [Stulle] - Stulle
+// <== Run eMule as NT Service [leuk_he] - Stulle
 END
 // <== Tabbed WebInterface settings panel [Stulle] - Stulle
 
@@ -6394,10 +6434,45 @@ BEGIN
     IDS_ADVADMIN_GUEST      "Guest"
     // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
     // ==> Tabbed WebInterface settings panel [Stulle] - Stulle
-    IDS_TAB_WEB_SERVER       "Web Server"
-    IDS_TAB_MULTI_USER       "Multi User"
+    IDS_TAB_WEB_SERVER      "Web Server"
+    IDS_TAB_MULTI_USER      "Multi User"
+    IDS_TAB_NT_SERVICE      "NT Service"
     // <== Tabbed WebInterface settings panel [Stulle] - Stulle
-    IDS_WS_FAILED_LOGIN      "You have been banned for 15 min due to failed login attempts!" // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+    IDS_WS_FAILED_LOGIN     "You have been banned for 15 min due to failed login attempts!" // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+    // ==> Run eMule as NT Service [leuk_he] - Stulle
+    IDS_SVC_RUNNINGASSERVICE "Currently running as service."
+    IDS_SVC_ACCESSDENIED    "Access to services denied."
+    IDS_SVC_NOTINSTALLED    "Service not installed."
+    IDS_SVC_INSTALLED       "Service installed."
+    IDS_SVC_INSTALLFAILED   "Install failed, check log."
+    IDS_SVC_UNINSTALLFAILED "UnInstall failed, check log."
+    IDS_SVC_INSTALLED_DISABLED "Service disabled. (marked for deletion?)."
+    IDS_SVC_INSTALLSERVICE  "Install"
+    IDS_SVC_SERVERUNINSTALL "Uninstall"
+    IDS_SVC_STARTWITHSYSTEM "Start with system startup"
+    IDS_SVC_SETTINGS        "Set setting appropriate for service use"
+    IDS_SVC_RUNBROWSER      "Browse to webservice"
+    IDS_SVC_REPLACESERVICE  "Stop service and start gui "
+    IDS_SVC_ONSTARTBOX      "On start of eMule"
+    IDS_SVC_STARTUPBOX      "Startup"
+    IDS_SVC_MANUALSTART     "Manual start"
+    IDS_SVC_CURRENT_STATUS_LABEL "Current Status"
+    IDS_APPLY_SETTINGS      "Should the necessary settings be applied now?"
+	IDS_CHANGEUSERASSERVICE "You will have to change the user login of the service manually, or save config files in a program directory"   
+    // <== Run eMule as NT Service [leuk_he] - Stulle
+    // ==> Adjustable NT Service Strings - Stulle
+    IDS_SERVICE_STR_GROUP   "NT Service strings (empty = default)"
+    IDS_SERVICE_NAME        "Name (for install)"
+    IDS_SERVICE_DISP_NAME   "Displayed name"
+    IDS_SERVICE_DESCR       "Displayed discription"
+    IDS_SERVICE_NAME_CHANGED "You changed the name under which the NT Service is installed.\nTo enable the changes you made eMule will have to reinstall the service.\nDo you want to continue?"
+    IDS_SERVICE_STR_CHANGED "NT Service string changed"
+    IDS_SERVICE_DISP_CHANGED "You changed the display name or the description of the NT Service.\nThis is not a critical setting but to take effect the service needs to be reinstalled.\nShould the service be reinstalled? Press Cancel to reset changes."
+    IDS_SERVICE_UNINSTALL_FAIL "NT Service failed to uninstall.\nPlease check your log.\nAll changes have been reset."
+    IDS_SERVICE_UNINSTALL_TITLE "Uninstall failed"
+    IDS_SERVICE_INSTALL_FAIL "NT Service failed to install.\nPlease check your log and try to reinstall the service again in the NT Service panel."
+    IDS_SERVICE_INSTALL_TITLE "Install failed"
+    // <== Adjustable NT Service Strings - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

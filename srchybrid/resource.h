@@ -3417,8 +3417,61 @@
 #define IDC_TAB_WEBSERVER               61550
 #define IDS_TAB_WEB_SERVER              61551
 #define IDS_TAB_MULTI_USER              61552
+#define IDS_TAB_NT_SERVICE              61553
 // <== Tabbed WebInterface settings panel [Stulle] - Stulle
 #define IDS_WS_FAILED_LOGIN             61560 // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+// ==> Run eMule as NT Service [leuk_he] - Stulle
+#define IDC_SVC_CURRENT_STATUS_LABEL    61570
+#define IDC_SVC_CURRENT_STATUS          61571
+#define IDC_SVC_INSTALLSERVICE          61572
+#define IDC_SVC_SERVERUNINSTALL         61573
+#define IDC_SVC_STARTUPBOX              61574
+#define IDC_SVC_STARTWITHSYSTEM         61575
+#define IDC_SVC_MANUALSTART             61576
+#define IDC_SVC_SETTINGS                61577
+#define IDC_SVC_ONSTARTBOX              61578
+#define IDC_SVC_RUNBROWSER              61579
+#define IDC_SVC_REPLACESERVICE          61580
+#define IDS_SVC_RUNNINGASSERVICE        61581
+#define IDS_SVC_ACCESSDENIED            61582
+#define IDS_SVC_NOTINSTALLED            61583
+#define IDS_SVC_INSTALLED               61584
+#define IDS_SVC_INSTALLFAILED           61585
+#define IDS_SVC_UNINSTALLFAILED         61586
+#define IDS_SVC_INSTALLED_DISABLED      61587
+#define IDS_SVC_INSTALLSERVICE          61588
+#define IDS_SVC_SERVERUNINSTALL         61589
+#define IDS_SVC_STARTWITHSYSTEM         61590
+#define IDS_SVC_SETTINGS                61591
+#define IDS_SVC_RUNBROWSER              61592
+#define IDS_SVC_REPLACESERVICE          61593
+#define IDS_SVC_ONSTARTBOX              61594
+#define IDS_SVC_STARTUPBOX              61595
+#define IDS_SVC_MANUALSTART             61596
+#define IDS_SVC_CURRENT_STATUS_LABEL    61597
+#define IDS_APPLY_SETTINGS              61598
+#define IDS_CHANGEUSERASSERVICE         61599
+// <== Run eMule as NT Service [leuk_he] - Stulle
+// ==> Adjustable NT Service Strings - Stulle
+#define IDC_SERVICE_STR_GROUP           61600
+#define IDC_SERVICE_NAME_LABEL          61601
+#define IDC_SERVICE_NAME                61602
+#define IDC_SERVICE_DISP_NAME_LABEL     61603
+#define IDC_SERVICE_DISP_NAME           61604
+#define IDC_SERVICE_DESCR_LABEL         61605
+#define IDC_SERVICE_DESCR               61606
+#define IDS_SERVICE_STR_GROUP           61607
+#define IDS_SERVICE_NAME                61608
+#define IDS_SERVICE_DISP_NAME           61609
+#define IDS_SERVICE_DESCR               61610
+#define IDS_SERVICE_NAME_CHANGED        61611
+#define IDS_SERVICE_STR_CHANGED         61612
+#define IDS_SERVICE_DISP_CHANGED        61613
+#define IDS_SERVICE_UNINSTALL_FAIL      61614
+#define IDS_SERVICE_UNINSTALL_TITLE     61615
+#define IDS_SERVICE_INSTALL_FAIL        61616
+#define IDS_SERVICE_INSTALL_TITLE       61617
+// <== Adjustable NT Service Strings - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000
 #define IDS_EASTEREGG                   62001

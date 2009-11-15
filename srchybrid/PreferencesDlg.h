@@ -59,6 +59,9 @@ public:
 	void Localize();
 	void SetStartPage(UINT uStartPageID);
 
+	CPPgWebServer::eTab m_WebServerTab; // Tabbed WebInterface settings panel [Stulle] - Stulle
+	CPPgScar::eTab m_ScarTab; // Tabbed Preferences [TPT] - Stulle
+
 protected:
 	LPCTSTR m_pPshStartPage;
 	bool m_bSaveIniFile;

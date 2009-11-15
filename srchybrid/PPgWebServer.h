@@ -43,8 +43,9 @@ protected:
 	afx_msg void OnDataChange()				{SetModified(); SetTmplButtonState(); }
 	afx_msg void OnDestroy();
 	// ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+public:
+	enum eTab	{WEBSERVER, MULTIWEBSERVER, NTSERVICE};
 private:
-	enum eTab	{NONE, WEBSERVER,MULTIWEBSERVER};
 	CTabCtrl	m_tabCtr;
 	eTab		m_currentTab;
 	CImageList	m_imageList;
@@ -71,4 +72,16 @@ protected:
 	void	FillComboBox();
 	void	FillUserlevelBox();
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	afx_msg void OnBnClickedInstall();	
+	afx_msg void OnBnClickedUnInstall();	
+	afx_msg void OnBnStartSystem();	
+	afx_msg void OnBnManualStart();	
+	afx_msg void OnBnAllSettings();	
+	afx_msg void OnBnRunBRowser();	
+	afx_msg void OnBnReplaceStart();	
+
+	int  FillStatus();
+	// <== Run eMule as NT Service [leuk_he] - Stulle
 };

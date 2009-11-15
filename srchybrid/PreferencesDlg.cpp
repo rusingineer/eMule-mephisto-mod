@@ -115,6 +115,9 @@ CPreferencesDlg::CPreferencesDlg()
 
 	m_pPshStartPage = NULL;
 	m_bSaveIniFile = false;
+
+	m_WebServerTab = CPPgWebServer::WEBSERVER; // Tabbed WebInterface settings panel [Stulle] - Stulle
+	m_ScarTab = CPPgScar::SCAR; // Tabbed Preferences [TPT] - Stulle
 }
 
 CPreferencesDlg::~CPreferencesDlg()

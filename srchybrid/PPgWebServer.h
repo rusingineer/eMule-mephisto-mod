@@ -73,15 +73,18 @@ protected:
 	void	FillUserlevelBox();
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	afx_msg void OnBnClickedInstall();	
 	afx_msg void OnBnClickedUnInstall();	
 	afx_msg void OnBnStartSystem();	
 	afx_msg void OnBnManualStart();	
 	afx_msg void OnBnAllSettings();	
 	afx_msg void OnBnRunBRowser();	
-	afx_msg void OnBnReplaceStart();	
+	afx_msg void OnBnReplaceStart();
+	afx_msg void OnCbnSelChangeOptLvl()		{SetModified();}
+	CComboBox	m_cbOptLvl;
 
 	int  FillStatus();
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	void InitOptLvlCbn(bool bFirstInit = false);
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 };

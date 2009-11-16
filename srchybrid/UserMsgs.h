@@ -19,7 +19,7 @@ enum EUserWndMessages
 	WEB_ADDDOWNLOADS,
 	WEB_CATPRIO,
 	WEB_ADDREMOVEFRIEND,
-	WEB_COPYDATA, // Run eMule as NT Service [leuk_he] - Stulle
+	WEB_COPYDATA, // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	// VC
 	UM_VERSIONCHECK_RESPONSE,
@@ -58,7 +58,7 @@ enum EUserWndMessages
 	UM_IPFFILTERAUTOVERCHECK_RESPONSE,
 	// <== Advanced Updates [MorphXT/Stulle] - Stulle
 
-	UM_SERVERSTATUS // Run eMule as NT Service [leuk_he] - Stulle
+	UM_SERVERSTATUS // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	// UPnP
 	// ==> UPnP support [MoNKi] - leuk_he

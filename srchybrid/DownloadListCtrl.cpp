@@ -87,7 +87,7 @@ CDownloadListCtrl::CDownloadListCtrl()
 	: CDownloadListListCtrlItemWalk(this)
 {
 	m_pFontBold = NULL;
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	/*
 	m_tooltip = new CToolTipCtrlX;
 	*/
@@ -96,7 +96,7 @@ CDownloadListCtrl::CDownloadListCtrl()
 		m_tooltip = new CToolTipCtrlX;
 	else
 		m_tooltip = NULL;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	SetGeneralPurposeFind(true);
 	SetSkinKey(L"DownloadsLv");
 }
@@ -119,10 +119,10 @@ CDownloadListCtrl::~CDownloadListCtrl()
 		delete m_ListItems.begin()->second; // second = CtrlItem_Struct*
 		m_ListItems.erase(m_ListItems.begin());
 	}
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// workaround running MFC as service
 	if (!theApp.IsRunningAsService())
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		delete m_tooltip;
 }
 
@@ -134,11 +134,11 @@ void CDownloadListCtrl::Init()
 	SetStyle();
 	ASSERT( (GetStyle() & LVS_SINGLESEL) == 0 );
 	
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// workaround running MFC as service
 	if (!theApp.IsRunningAsService())
 	{
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		CToolTipCtrl* tooltip = GetToolTips();
 		if (tooltip){
 			m_tooltip->SetFileIconToolTip(true);
@@ -147,7 +147,7 @@ void CDownloadListCtrl::Init()
 			tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
 			tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
 		}
-	} // Run eMule as NT Service [leuk_he] - Stulle
+	} // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	InsertColumn(0, GetResString(IDS_DL_FILENAME),		LVCFMT_LEFT,  DFLT_FILENAME_COL_WIDTH);
 	InsertColumn(1, GetResString(IDS_DL_SIZE),			LVCFMT_RIGHT, DFLT_SIZE_COL_WIDTH);
@@ -442,12 +442,6 @@ void CDownloadListCtrl::Localize()
 
 void CDownloadListCtrl::AddFile(CPartFile* toadd)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
-	// Stullemon: is this any bad???
-	if (theApp.IsRunningAsService(SVC_LIST_OPT))
-		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
-
 	// Create new Item
     CtrlItem_Struct* newitem = new CtrlItem_Struct;
     int itemnr = GetItemCount();
@@ -469,10 +463,10 @@ void CDownloadListCtrl::AddFile(CPartFile* toadd)
 
 void CDownloadListCtrl::AddSource(CPartFile* owner, CUpDownClient* source, bool notavailable)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	// Create new Item
     CtrlItem_Struct* newitem = new CtrlItem_Struct;
@@ -594,10 +588,10 @@ bool CDownloadListCtrl::RemoveFile(const CPartFile* toremove)
 
 void CDownloadListCtrl::UpdateItem(void* toupdate)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	if (!theApp.emuledlg->IsRunning())
 		return;

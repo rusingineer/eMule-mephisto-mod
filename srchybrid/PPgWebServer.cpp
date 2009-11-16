@@ -35,7 +35,7 @@
 #include "PreferencesDlg.h"
 #include "MD5Sum.h"
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
-#include "NTService.h" // Run eMule as NT Service [leuk_he] - Stulle
+#include "NTService.h" // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -87,15 +87,16 @@ BEGIN_MESSAGE_MAP(CPPgWebServer, CPropertyPage)
 	ON_EN_CHANGE(IDC_ADVADMIN_CATS, OnMultiCatsChange)
 //	ON_EN_CHANGE(IDC_ADVADMIN_USER, OnSettingsChange)
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	ON_BN_CLICKED(IDC_SVC_INSTALLSERVICE, OnBnClickedInstall)	
 	ON_BN_CLICKED(IDC_SVC_SERVERUNINSTALL, OnBnClickedUnInstall)	
-	ON_BN_CLICKED(IDC_SVC_STARTWITHSYSTEM, OnBnStartSystem)	
+    ON_BN_CLICKED(IDC_SVC_STARTWITHSYSTEM, OnBnStartSystem)	
 	ON_BN_CLICKED(IDC_SVC_MANUALSTART, OnBnManualStart)	
 	ON_BN_CLICKED(IDC_SVC_SETTINGS ,   OnBnAllSettings)	
 	ON_BN_CLICKED(IDC_SVC_RUNBROWSER , OnBnRunBRowser)	
 	ON_BN_CLICKED(IDC_SVC_REPLACESERVICE , OnBnReplaceStart)	
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	ON_CBN_SELCHANGE(IDC_SERVICE_OPT_BOX, OnCbnSelChangeOptLvl)
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// ==> Adjustable NT Service Strings - Stulle
 	ON_EN_CHANGE(IDC_SERVICE_NAME, OnDataChange)
 	ON_EN_CHANGE(IDC_SERVICE_DISP_NAME, OnDataChange)
@@ -129,6 +130,7 @@ void CPPgWebServer::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ACCOUNTSELECT, m_cbAccountSelector); 
 	DDX_Control(pDX, IDC_ADVADMIN_USERLEVEL, m_cbUserlevel); 
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+	DDX_Control(pDX, IDC_SERVICE_OPT_BOX, m_cbOptLvl); // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 }
 
 BOOL CPPgWebServer::OnInitDialog()
@@ -147,6 +149,8 @@ BOOL CPPgWebServer::OnInitDialog()
 	FillUserlevelBox();
 	m_cbAccountSelector.SetCurSel(0); // new account
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
+	InitOptLvlCbn(true); // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	LoadSettings();
 	Localize();
@@ -218,7 +222,7 @@ void CPPgWebServer::LoadSettings(void)
 	
 	CheckDlgButton(IDC_ADVADMINENABLED, thePrefs.UseIonixWebsrv()); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if(thePrefs.GetServiceStartupMode()==2) {
 			CheckDlgButton(IDC_SVC_RUNBROWSER   ,BST_UNCHECKED );
 			CheckDlgButton(IDC_SVC_REPLACESERVICE, BST_CHECKED);
@@ -226,7 +230,7 @@ void CPPgWebServer::LoadSettings(void)
 			CheckDlgButton(IDC_SVC_RUNBROWSER   ,BST_CHECKED );
             CheckDlgButton(IDC_SVC_REPLACESERVICE, BST_UNCHECKED);
 	}
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	// ==> Adjustable NT Service Strings - Stulle
 	GetDlgItem(IDC_SERVICE_NAME)->SetWindowText(thePrefs.GetServiceName());
@@ -321,7 +325,7 @@ BOOL CPPgWebServer::OnApply()
 		theApp.webserver->SaveWebServConf();
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-		// ==> Run eMule as NT Service [leuk_he] - Stulle
+		// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		int b_installed;
 		int  i_startupmode;
 		int rights;
@@ -399,7 +403,10 @@ BOOL CPPgWebServer::OnApply()
 		   thePrefs.m_iServiceStartupMode=1;
 		else 
 		   thePrefs.m_iServiceStartupMode=2;
-		// <== Run eMule as NT Service [leuk_he] - Stulle
+
+		int iSel = m_cbOptLvl.GetCurSel();
+		thePrefs.m_iServiceOptLvl = m_cbOptLvl.GetItemData(iSel);
+		// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 		theApp.emuledlg->serverwnd->UpdateMyInfo();
 		SetModified(FALSE);
@@ -460,7 +467,7 @@ void CPPgWebServer::Localize(void)
 		GetDlgItem(IDC_STATIC_ADVADMIN_CATS)->SetWindowText(GetResString(IDS_ADVADMIN_CAT));
 		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-		// ==> Run eMule as NT Service [leuk_he] - Stulle
+		// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		GetDlgItem(IDC_SVC_INSTALLSERVICE)->SetWindowText(GetResString(IDS_SVC_INSTALLSERVICE));
 		GetDlgItem(IDC_SVC_SERVERUNINSTALL)->SetWindowText(GetResString(IDS_SVC_SERVERUNINSTALL));
 		GetDlgItem(IDC_SVC_STARTWITHSYSTEM)->SetWindowText(GetResString(IDS_SVC_STARTWITHSYSTEM));
@@ -471,7 +478,10 @@ void CPPgWebServer::Localize(void)
 		GetDlgItem(IDC_SVC_ONSTARTBOX)->SetWindowText(GetResString(IDS_SVC_ONSTARTBOX));
 		GetDlgItem(IDC_SVC_STARTUPBOX)->SetWindowText(GetResString(IDS_SVC_STARTUPBOX));
 		GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->SetWindowText(GetResString(IDS_SVC_CURRENT_STATUS_LABEL));
-		// <== Run eMule as NT Service [leuk_he] - Stulle
+		GetDlgItem(IDC_SERVICE_OPT_GROUP)->SetWindowText(GetResString(IDS_SERVICE_OPT_GROUP));
+		GetDlgItem(IDC_SERVICE_OPT_LABEL)->SetWindowText(GetResString(IDS_SERVICE_OPT_LABEL));
+		InitOptLvlCbn();
+		// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 		// ==> Adjustable NT Service Strings [Stulle] - Stulle
 		GetDlgItem(IDC_SERVICE_STR_GROUP)->SetWindowText(GetResString(IDS_SERVICE_STR_GROUP));
@@ -708,7 +718,7 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_ADVADMIN_NOTE)->EnableWindow(FALSE);
 				break;
 			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
-			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 			case NTSERVICE:
 				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->EnableWindow(FALSE);
@@ -748,8 +758,14 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_SERVICE_DESCR)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_SERVICE_DESCR)->EnableWindow(FALSE);
 				// <== Adjustable NT Service Strings [Stulle] - Stulle
+				GetDlgItem(IDC_SERVICE_OPT_GROUP)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_OPT_GROUP)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_OPT_LABEL)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_OPT_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SERVICE_OPT_BOX)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_SERVICE_OPT_BOX)->EnableWindow(FALSE);
 				break;
-			// <== Run eMule as NT Service [leuk_he] - Stulle
+			// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 			default:
 				break;
 		}
@@ -870,7 +886,7 @@ void CPPgWebServer::SetTab(eTab tab){
 				SetBoxes();
 				break;
 			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
-			// ==> Run eMule as NT Service [leuk_he] - Stulle
+			// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 			case NTSERVICE:
 				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_SVC_CURRENT_STATUS_LABEL)->EnableWindow(TRUE);
@@ -911,8 +927,14 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_SERVICE_DESCR)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_SERVICE_DESCR)->EnableWindow(TRUE);
 				// <== Adjustable NT Service Strings [Stulle] - Stulle
+				GetDlgItem(IDC_SERVICE_OPT_GROUP)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_OPT_GROUP)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_OPT_LABEL)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_OPT_LABEL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_SERVICE_OPT_BOX)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_SERVICE_OPT_BOX)->EnableWindow(TRUE);
 				break;
-			// <== Run eMule as NT Service [leuk_he] - Stulle
+			// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 			default:
 				break;
 		}
@@ -1198,7 +1220,7 @@ void CPPgWebServer::OnBnClickedDel()
 }
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-// ==> Run eMule as NT Service [leuk_he] - Stulle
+// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 int  CPPgWebServer::FillStatus(){
 	int b_installed;
 	int  i_startupmode;
@@ -1317,4 +1339,36 @@ void CPPgWebServer::OnBnRunBRowser(){
 	CheckDlgButton(IDC_SVC_REPLACESERVICE,    BST_UNCHECKED);
 	SetModified();
 };	
-// <== Run eMule as NT Service [leuk_he] - Stulle
+
+void CPPgWebServer::InitOptLvlCbn(bool bFirstInit)
+{
+	int iSel = m_cbOptLvl.GetCurSel();
+	int iItem;
+	m_cbOptLvl.ResetContent();
+	iItem = m_cbOptLvl.AddString(_T("0: ") + GetResString(IDS_SERVICE_OPT_NONE));		m_cbOptLvl.SetItemData(iItem, SVC_NO_OPT);
+	iItem = m_cbOptLvl.AddString(_T("4: ") + GetResString(IDS_SERVICE_OPT_BASIC));		m_cbOptLvl.SetItemData(iItem, SVC_LIST_OPT);
+	iItem = m_cbOptLvl.AddString(_T("6: ") + GetResString(IDS_SERVICE_OPT_LISTS));		m_cbOptLvl.SetItemData(iItem, SVC_SVR_OPT);
+	iItem = m_cbOptLvl.AddString(_T("10: ") + GetResString(IDS_SERVICE_OPT_FULL));		m_cbOptLvl.SetItemData(iItem, SVC_FULL_OPT);
+
+	if(bFirstInit)
+	{
+		switch(thePrefs.GetServiceOptLvl())
+		{
+			case SVC_NO_OPT:
+				m_cbOptLvl.SetCurSel(0);
+				break;
+			case SVC_LIST_OPT:
+				m_cbOptLvl.SetCurSel(1);
+				break;
+			case SVC_SVR_OPT:
+				m_cbOptLvl.SetCurSel(2);
+				break;
+			case SVC_FULL_OPT:
+				m_cbOptLvl.SetCurSel(3);
+				break;
+		}
+	}
+	else
+		m_cbOptLvl.SetCurSel(iSel != CB_ERR ? iSel : 0);
+}
+// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle

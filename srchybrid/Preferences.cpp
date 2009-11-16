@@ -995,7 +995,10 @@ bool	CPreferences::m_bDateFileNameLog; // Date File Name Log [AndCycle] - Stulle
 
 bool	CPreferences::m_bIonixWebsrv; // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-int		CPreferences::m_iServiceStartupMode; //  Run eMule as NT Service [leuk_he] - Stulle
+// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+int		CPreferences::m_iServiceStartupMode;
+int		CPreferences::m_iServiceOptLvl;
+// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 // ==> Adjustable NT Service Strings [Stulle] - Stulle
 CString	CPreferences::m_strServiceName;
 CString	CPreferences::m_strServiceDispName;
@@ -3010,7 +3013,10 @@ void CPreferences::SavePreferences()
 
 	ini.WriteBool(_T("UseIonixWebsrv"), m_bIonixWebsrv); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-	ini.WriteInt(_T("ServiceStartupMode"),m_iServiceStartupMode); // Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+	ini.WriteInt(_T("ServiceStartupMode"),m_iServiceStartupMode);
+	ini.WriteInt(_T("ServiceOptLvl"),m_iServiceOptLvl);
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// ==> Adjustable NT Service Strings [Stulle] - Stulle
 	ini.WriteString(L"ServiceName", m_strServiceName);
 	ini.WriteString(L"ServiceDispName", m_strServiceDispName);
@@ -4309,7 +4315,10 @@ void CPreferences::LoadPreferences()
 
 	m_bIonixWebsrv = ini.GetBool(_T("UseIonixWebsrv"), false); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-	m_iServiceStartupMode = ini.GetInt(L"ServiceStartupMode",1); // Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+	m_iServiceStartupMode = ini.GetInt(L"ServiceStartupMode",1);
+	m_iServiceOptLvl = ini.GetInt(L"ServiceOptLvl",SVC_SVR_OPT);
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// ==> Adjustable NT Service Strings [Stulle] - Stulle
 	m_strServiceName = ini.GetString(L"ServiceName",NULL);
 	m_strServiceDispName = ini.GetString(L"ServiceDispName",NULL);
@@ -6396,7 +6405,7 @@ void CPreferences::SetBindAddr(CStringW bindip)
 }
 // <== Advanced Options [Official/MorphXT] - Stulle
 
-// ==> Run eMule as NT Service [leuk_he] - Stulle
+// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 int CPreferences::GetServiceStartupMode()
 {
 	if (m_iServiceStartupMode == 0) // may be called before LoadPreferences()
@@ -6410,4 +6419,4 @@ uint16	CPreferences::GetWSPort()
 		m_nWebPort=(WORD) theApp.GetProfileInt(_T("WebServer"), _T("Port"),4711);
 	return m_nWebPort; 
 }
-// <== Run eMule as NT Service [leuk_he] - Stulle
+// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle

@@ -3420,7 +3420,7 @@
 #define IDS_TAB_NT_SERVICE              61553
 // <== Tabbed WebInterface settings panel [Stulle] - Stulle
 #define IDS_WS_FAILED_LOGIN             61560 // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
-// ==> Run eMule as NT Service [leuk_he] - Stulle
+// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 #define IDC_SVC_CURRENT_STATUS_LABEL    61570
 #define IDC_SVC_CURRENT_STATUS          61571
 #define IDC_SVC_INSTALLSERVICE          61572
@@ -3451,34 +3451,43 @@
 #define IDS_SVC_CURRENT_STATUS_LABEL    61597
 #define IDS_APPLY_SETTINGS              61598
 #define IDS_CHANGEUSERASSERVICE         61599
-// <== Run eMule as NT Service [leuk_he] - Stulle
+#define IDC_SERVICE_OPT_GROUP           61600
+#define IDC_SERVICE_OPT_LABEL           61601
+#define IDC_SERVICE_OPT_BOX             61602
+#define IDS_SERVICE_OPT_GROUP           61603
+#define IDS_SERVICE_OPT_LABEL           61604
+#define IDS_SERVICE_OPT_NONE            61605
+#define IDS_SERVICE_OPT_BASIC           61606
+#define IDS_SERVICE_OPT_LISTS           61607
+#define IDS_SERVICE_OPT_FULL            61608
+// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 // ==> Adjustable NT Service Strings - Stulle
-#define IDC_SERVICE_STR_GROUP           61600
-#define IDC_SERVICE_NAME_LABEL          61601
-#define IDC_SERVICE_NAME                61602
-#define IDC_SERVICE_DISP_NAME_LABEL     61603
-#define IDC_SERVICE_DISP_NAME           61604
-#define IDC_SERVICE_DESCR_LABEL         61605
-#define IDC_SERVICE_DESCR               61606
-#define IDS_SERVICE_STR_GROUP           61607
-#define IDS_SERVICE_NAME                61608
-#define IDS_SERVICE_DISP_NAME           61609
-#define IDS_SERVICE_DESCR               61610
-#define IDS_SERVICE_NAME_CHANGED        61611
-#define IDS_SERVICE_STR_CHANGED         61612
-#define IDS_SERVICE_DISP_CHANGED        61613
-#define IDS_SERVICE_UNINSTALL_FAIL      61614
-#define IDS_SERVICE_UNINSTALL_TITLE     61615
-#define IDS_SERVICE_INSTALL_FAIL        61616
-#define IDS_SERVICE_INSTALL_TITLE       61617
+#define IDC_SERVICE_STR_GROUP           61610
+#define IDC_SERVICE_NAME_LABEL          61611
+#define IDC_SERVICE_NAME                61612
+#define IDC_SERVICE_DISP_NAME_LABEL     61613
+#define IDC_SERVICE_DISP_NAME           61614
+#define IDC_SERVICE_DESCR_LABEL         61615
+#define IDC_SERVICE_DESCR               61616
+#define IDS_SERVICE_STR_GROUP           61617
+#define IDS_SERVICE_NAME                61618
+#define IDS_SERVICE_DISP_NAME           61619
+#define IDS_SERVICE_DESCR               61620
+#define IDS_SERVICE_NAME_CHANGED        61621
+#define IDS_SERVICE_STR_CHANGED         61622
+#define IDS_SERVICE_DISP_CHANGED        61623
+#define IDS_SERVICE_UNINSTALL_FAIL      61624
+#define IDS_SERVICE_UNINSTALL_TITLE     61625
+#define IDS_SERVICE_INSTALL_FAIL        61626
+#define IDS_SERVICE_INSTALL_TITLE       61627
 // <== Adjustable NT Service Strings - Stulle
 // ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
-#define IDD_ASKEXIT                     61620
-#define IDC_EXITQUESTION                61621
-#define IDNOMINIMIZE                    61622
-#define IDYESSERVICE                    61623
-#define IDS_YESSERVICE                  61624
-#define IDS_NOMINIMIZE                  61625
+#define IDD_ASKEXIT                     61630
+#define IDC_EXITQUESTION                61631
+#define IDNOMINIMIZE                    61632
+#define IDYESSERVICE                    61633
+#define IDS_YESSERVICE                  61634
+#define IDS_NOMINIMIZE                  61635
 // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000

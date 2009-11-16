@@ -223,10 +223,10 @@ void CKadSearchListCtrl::UpdateSearch(int iItem, const Kademlia::CSearch *search
 
 void CKadSearchListCtrl::SearchAdd(const Kademlia::CSearch *search)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	try
 	{

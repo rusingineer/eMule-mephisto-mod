@@ -1548,46 +1548,52 @@ BEGIN
     LTEXT           "User Level:",IDC_STATIC_ADVADMIN_USERLEVEL,15,129,74,9, NOT WS_VISIBLE
     LTEXT           "Note",IDC_ADVADMIN_NOTE,8,190,217,21, NOT WS_VISIBLE
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
-// ==> Run eMule as NT Service [leuk_he] - Stulle
-    LTEXT           "Current status:",IDC_SVC_CURRENT_STATUS_LABEL,9,20,213,
+// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+    LTEXT           "Current status:",IDC_SVC_CURRENT_STATUS_LABEL,9,14,213,
                     9, NOT WS_VISIBLE
-    EDITTEXT        IDC_SVC_CURRENT_STATUS,9,32,213,14,ES_AUTOHSCROLL | 
+    EDITTEXT        IDC_SVC_CURRENT_STATUS,9,24,213,14,ES_AUTOHSCROLL | 
                     WS_DISABLED | NOT WS_TABSTOP | NOT WS_VISIBLE,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Install",IDC_SVC_INSTALLSERVICE,9,52,103,14, NOT WS_VISIBLE
-    PUSHBUTTON      "Unnistall",IDC_SVC_SERVERUNINSTALL,119,52,103,14, NOT WS_VISIBLE
-    GROUPBOX        "Startup",IDC_SVC_STARTUPBOX,9,72,213,37, NOT WS_VISIBLE
+    PUSHBUTTON      "Install",IDC_SVC_INSTALLSERVICE,9,40,103,14, NOT WS_VISIBLE
+    PUSHBUTTON      "Unnistall",IDC_SVC_SERVERUNINSTALL,119,40,103,14, NOT WS_VISIBLE
+    GROUPBOX        "Startup",IDC_SVC_STARTUPBOX,9,57,213,37, NOT WS_VISIBLE
     CONTROL         "Start with system startup",IDC_SVC_STARTWITHSYSTEM,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP | NOT
-                    WS_VISIBLE,14,82,203,10
+                    WS_VISIBLE,14,67,203,10
     CONTROL         "Manual start",IDC_SVC_MANUALSTART,"Button",
                     BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP | NOT WS_VISIBLE,
-                    14,94,203,10
+                    14,79,203,10
     PUSHBUTTON      "Set setting appropriate for service use ",IDC_SVC_SETTINGS,
-                    9,113,213,14, WS_TABSTOP | NOT WS_VISIBLE
-    GROUPBOX        "On start of eMule",IDC_SVC_ONSTARTBOX,9,133,213,37,NOT
+                    9,97,213,14, WS_TABSTOP | NOT WS_VISIBLE
+    GROUPBOX        "On start of eMule",IDC_SVC_ONSTARTBOX,9,114,213,37,NOT
                     WS_VISIBLE
     CONTROL         "Browse to webservice",IDC_SVC_RUNBROWSER,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP | NOT WS_VISIBLE,14,143,203,10
+                    BS_AUTORADIOBUTTON | WS_GROUP | NOT WS_VISIBLE,14,124,203,10
     CONTROL         "Stop service and start gui",IDC_SVC_REPLACESERVICE,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | NOT WS_VISIBLE,
-                    14,155,203,10
+                    14,136,203,10
 // ==> Adjustable NT Service Strings [Stulle] - Stulle
     GROUPBOX        "NT Service strings (empty = default)",IDC_SERVICE_STR_GROUP,
-                    9,174,213,61,NOT WS_VISIBLE
-    LTEXT           "Name (for install):",IDC_SERVICE_NAME_LABEL,14,186,80,
+                    9,154,213,61,NOT WS_VISIBLE
+    LTEXT           "Name (for install):",IDC_SERVICE_NAME_LABEL,14,166,80,
                     9, NOT WS_VISIBLE
-    EDITTEXT        IDC_SERVICE_NAME,96,184,121,14,ES_AUTOHSCROLL | 
+    EDITTEXT        IDC_SERVICE_NAME,96,164,121,14,ES_AUTOHSCROLL | 
                     NOT WS_VISIBLE,WS_EX_CLIENTEDGE
-    LTEXT           "Displayed name:",IDC_SERVICE_DISP_NAME_LABEL,14,202,80,
+    LTEXT           "Displayed name:",IDC_SERVICE_DISP_NAME_LABEL,14,182,80,
                     9, NOT WS_VISIBLE
-    EDITTEXT        IDC_SERVICE_DISP_NAME,96,200,121,14,ES_AUTOHSCROLL | 
+    EDITTEXT        IDC_SERVICE_DISP_NAME,96,180,121,14,ES_AUTOHSCROLL | 
                     NOT WS_VISIBLE,WS_EX_CLIENTEDGE
-    LTEXT           "Displayed discription:",IDC_SERVICE_DESCR_LABEL,14,218,80,
+    LTEXT           "Displayed discription:",IDC_SERVICE_DESCR_LABEL,14,198,80,
                     9, NOT WS_VISIBLE
-    EDITTEXT        IDC_SERVICE_DESCR,96,216,121,14,ES_AUTOHSCROLL | 
+    EDITTEXT        IDC_SERVICE_DESCR,96,196,121,14,ES_AUTOHSCROLL | 
                     NOT WS_VISIBLE,WS_EX_CLIENTEDGE
 // <== Adjustable NT Service Strings [Stulle] - Stulle
-// <== Run eMule as NT Service [leuk_he] - Stulle
+    GROUPBOX        "NT Service optimizations",IDC_SERVICE_OPT_GROUP,
+                    9,218,213,26,NOT WS_VISIBLE
+    LTEXT           "Optimization level:",IDC_SERVICE_OPT_LABEL,14,229,80,
+                    9, NOT WS_VISIBLE
+    COMBOBOX        IDC_SERVICE_OPT_BOX,96,227,121,110,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP | NOT WS_VISIBLE
+// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 END
 // <== Tabbed WebInterface settings panel [Stulle] - Stulle
 
@@ -6459,7 +6465,7 @@ BEGIN
     IDS_TAB_NT_SERVICE      "NT Service"
     // <== Tabbed WebInterface settings panel [Stulle] - Stulle
     IDS_WS_FAILED_LOGIN     "You have been banned for 15 min due to failed login attempts!" // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
-    // ==> Run eMule as NT Service [leuk_he] - Stulle
+    // ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
     IDS_SVC_RUNNINGASSERVICE "Currently running as service."
     IDS_SVC_ACCESSDENIED    "Access to services denied."
     IDS_SVC_NOTINSTALLED    "Service not installed."
@@ -6478,8 +6484,14 @@ BEGIN
     IDS_SVC_MANUALSTART     "Manual start"
     IDS_SVC_CURRENT_STATUS_LABEL "Current Status"
     IDS_APPLY_SETTINGS      "Should the necessary settings be applied now?"
-	IDS_CHANGEUSERASSERVICE "You will have to change the user login of the service manually, or save config files in a program directory"   
-    // <== Run eMule as NT Service [leuk_he] - Stulle
+    IDS_CHANGEUSERASSERVICE "You will have to change the user login of the service manually, or save config files in a program directory"
+    IDS_SERVICE_OPT_GROUP   "NT Service optimizations"
+    IDS_SERVICE_OPT_LABEL   "Optimization level:"
+    IDS_SERVICE_OPT_NONE    "None"
+    IDS_SERVICE_OPT_BASIC   "Basic"
+    IDS_SERVICE_OPT_LISTS   "Lists except Server"
+    IDS_SERVICE_OPT_FULL    "Full"
+    // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
     // ==> Adjustable NT Service Strings - Stulle
     IDS_SERVICE_STR_GROUP   "NT Service strings (empty = default)"
     IDS_SERVICE_NAME        "Name (for install)"

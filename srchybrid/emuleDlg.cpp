@@ -132,7 +132,7 @@
 //zz_fly end
 
 #include "HttpDownloadDlg.h" // Advanced Updates [MorphXT/Stulle] - Stulle
-#include "NTservice.h" // Run eMule as NT Service [leuk_he] - Stulle
+#include "NTservice.h" // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 #include "AskExitDlg.h" // Extended Prompt on Exit dialog [leuk_he] - Stulle
 
 #ifdef _DEBUG
@@ -239,7 +239,7 @@ BEGIN_MESSAGE_MAP(CemuleDlg, CTrayDialog)
 	ON_MESSAGE(UM_DLPAUTOVERCHECK_RESPONSE, OnDLPAutoVerCheckResponse)
 	ON_MESSAGE(UM_IPFFILTERAUTOVERCHECK_RESPONSE, OnIPFilterAutoVerCheckResponse)
 
-	// Run eMule as NT Service [leuk_he] - Stulle
+	// Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	ON_MESSAGE(WEB_COPYDATA, OnWMData)
 	ON_MESSAGE(UM_SERVERSTATUS, OnServiceStatus)
 
@@ -832,11 +832,11 @@ BOOL CemuleDlg::OnInitDialog()
 		//Xman end
 	}
 
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// Set nt server from RUNNING to started 
 	if (RunningAsService())
 		ServiceStartedSuccesfully();  //when started (multiple calls not a problem)
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	// ==> Invisible Mode [TPT/MoNKi] - Stulle
 	if(thePrefs.GetInvisibleMode())
@@ -1446,11 +1446,11 @@ void CemuleDlg::ShowConnectionState()
 
 	if (theApp.IsConnected())
 	{
-		// ==> Run eMule as NT Service [leuk_he] - Stulle
+		// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		// Set nt server from RUNNING to started 
 		if (RunningAsService())
 			ServiceStartedSuccesfully();  //when started (multiple calls not a problem)
-		// <== Run eMule as NT Service [leuk_he] - Stulle
+		// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		CString strPane(GetResString(IDS_MAIN_BTN_DISCONNECT));
 		TBBUTTONINFO tbi;
 		tbi.cbSize = sizeof(TBBUTTONINFO);
@@ -2776,10 +2776,10 @@ void CemuleDlg::OnClose()
 	CTrayDialog::OnCancel();
 	AddDebugLogLine(DLP_VERYLOW, _T("Closed eMule"));
 
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (RunningAsService())
 		ServiceStop();
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 }
 
 void CemuleDlg::DestroyMiniMule()
@@ -5733,12 +5733,12 @@ LRESULT CemuleDlg::OnSaveKnownDone(WPARAM /*wParam*/,LPARAM /*lParam*/)
 }
 // <== Threaded Known Files Saving [Stulle] - Stulle
 
-// ==> Run eMule as NT Service [leuk_he] - Stulle
+// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 LRESULT CemuleDlg::OnServiceStatus(WPARAM ServiceStatus, LPARAM /*lParam */)
 {
 	return ReportStatusToSCMgr(ServiceStatus, NO_ERROR, 0); // tell servicecrtrk we are alive.
 }
-// <== Run eMule as NT Service [leuk_he] - Stulle
+// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 void CemuleDlg::CloseeMule()

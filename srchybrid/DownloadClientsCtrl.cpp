@@ -864,10 +864,10 @@ BOOL CDownloadClientsCtrl::OnCommand(WPARAM wParam, LPARAM /*lParam*/)
 
 void CDownloadClientsCtrl::AddClient(const CUpDownClient *client)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	if (!theApp.emuledlg->IsRunning())
 		return;
@@ -894,10 +894,10 @@ void CDownloadClientsCtrl::RemoveClient(const CUpDownClient *client)
 
 void CDownloadClientsCtrl::RefreshClient(const CUpDownClient *client)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	if (!theApp.emuledlg->IsRunning())
 		return;

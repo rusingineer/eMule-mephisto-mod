@@ -245,7 +245,7 @@ CSharedFilesCtrl::CSharedFilesCtrl()
 	nAICHHashing = 0;
 	m_pDirectoryFilter = NULL;
 	SetGeneralPurposeFind(true);
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	/*
 	m_pToolTip = new CToolTipCtrlX;
 	*/
@@ -254,7 +254,7 @@ CSharedFilesCtrl::CSharedFilesCtrl()
 		m_pToolTip = new CToolTipCtrlX;
 	else
 		m_pToolTip = NULL;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	SetSkinKey(L"SharedFilesLv");
 	m_pHighlightedItem = NULL;
 }
@@ -263,10 +263,10 @@ CSharedFilesCtrl::~CSharedFilesCtrl()
 {
 	while (!liTempShareableFilesInDir.IsEmpty())	// delete shareble files
 		delete liTempShareableFilesInDir.RemoveHead();
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// workaround running MFC as service
 	if (!theApp.IsRunningAsService())
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		delete m_pToolTip;
 	// ==> PowerShare [ZZ/MorphXT] - Stulle
 	if (m_PowershareMenu) VERIFY( m_PowershareMenu.DestroyMenu() );
@@ -346,11 +346,11 @@ void CSharedFilesCtrl::Init()
 	SortItems(SortProc, GetSortItem() + (GetSortAscending() ? 0 : 30)  + (GetSortSecondValue() ? 100 : 0));
 	// <== PowerShare [ZZ/MorphXT] - Stulle
 
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// workaround running MFC as service
 	if (!theApp.IsRunningAsService())
 	{
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 		CToolTipCtrl* tooltip = GetToolTips();
 		if (tooltip){
 			m_pToolTip->SetFileIconToolTip(true);
@@ -359,7 +359,7 @@ void CSharedFilesCtrl::Init()
 			tooltip->SetDelayTime(TTDT_AUTOPOP, 20000);
 			tooltip->SetDelayTime(TTDT_INITIAL, thePrefs.GetToolTipDelay()*1000);
 		}
-	} // Run eMule as NT Service [leuk_he] - Stulle
+	} // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	m_ShareDropTarget.SetParent(this);
 	VERIFY( m_ShareDropTarget.Register(this) );
@@ -546,10 +546,10 @@ void CSharedFilesCtrl::Localize()
 
 void CSharedFilesCtrl::AddFile(const CShareableFile* file)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	if (!theApp.emuledlg->IsRunning())
 		return;
@@ -674,10 +674,10 @@ void CSharedFilesCtrl::UpdateFile(const CShareableFile* file, bool bUpdateFileSu
 void CSharedFilesCtrl::UpdateFile(const CShareableFile* file, bool bUpdateFileSummary, bool force)
 //Xman end
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	if (!file || !theApp.emuledlg->IsRunning())
 		return;

@@ -888,10 +888,10 @@ void CHistoryListCtrl::ClearHistory() {
 
 void CHistoryListCtrl::UpdateFile(const CKnownFile* file)
 {
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	if (theApp.IsRunningAsService(SVC_LIST_OPT))
 		return;
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	if (!file || !theApp.emuledlg->IsRunning())
 		return;

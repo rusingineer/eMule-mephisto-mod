@@ -1178,7 +1178,10 @@ public:
 
 	static bool		m_bIonixWebsrv; // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-	static int		m_iServiceStartupMode; // Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+	static int		m_iServiceStartupMode;
+	static int		m_iServiceOptLvl;
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// ==> Adjustable NT Service Strings - Stulle
 	static CString	m_strServiceName;
 	static CString	m_strServiceDispName;
@@ -1237,7 +1240,7 @@ public:
 
 	friend class CPPgScar; // ScarAngel Preferences window - Stulle
 	friend class CSivkaFileSettings; // File Settings [sivka/Stulle] - Stulle
-	friend class CPPgWebServer; // Run eMule as NT Service [leuk_he] - Stulle
+	friend class CPPgWebServer; // Run eMule as NT Service [leuk_he/Stulle] - Stulle
 
 	CPreferences();
 	~CPreferences();
@@ -2051,13 +2054,13 @@ public:
 	static	ELogFileFormat GetLogFileFormat()			{return m_iLogFileFormat;}
 
 	// WebServer
-	// ==> Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	/*
 	static	uint16	GetWSPort()							{return m_nWebPort;}
 	*/
 	// may be required before init! 
 	static	uint16	GetWSPort();
-	// <== Run eMule as NT Service [leuk_he] - Stulle
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	static	bool	GetWSUseUPnP()						{return m_bWebUseUPnP && GetWSIsEnabled();}
 	static	void	SetWSPort(uint16 uPort)				{m_nWebPort=uPort;}
 	static	const CString& GetWSPass()					{return m_strWebPassword;}
@@ -2643,7 +2646,10 @@ public:
 
 	static	bool	UseIonixWebsrv()		{ return m_bIonixWebsrv; } // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
-	static int      GetServiceStartupMode(); // Run eMule as NT Service [leuk_he] - Stulle
+	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+	static int      GetServiceStartupMode();
+	static int		GetServiceOptLvl()		{ return m_iServiceOptLvl; }
+	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// ==> Adjustable NT Service Strings [Stulle] - Stulle
 	static	CString	GetServiceName()				{ return m_strServiceName; }
 	static	void	SetServiceName(CString in)		{ m_strServiceName = in; }

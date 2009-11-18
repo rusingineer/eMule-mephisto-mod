@@ -551,6 +551,8 @@ void CWebServer::ProcessURL(ThreadData Data)
 						ses.RightsToSharedList=Def.RightsToSharedList;
 						ses.RightsToStats=Def.RightsToStats;
 						ses.RightsToPrefs=Def.RightsToPrefs;
+						ses.RightsToDownloadFiles=Def.RightsToDownloadFiles;
+						ses.username=Def.User;
 						ses.startTime = CTime::GetCurrentTime();
 						ses.lSession = lSession = rand() * 10000L + rand();
 						ses.lastcat= 0;
@@ -683,7 +685,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 			/*
 			if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession) && thePrefs.GetWebAdminAllowedHiLevFunc() )
 			*/
-			if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession,3) )
+			if (_ParseURL(Data.sURL, _T("w")) == _T("close") && IsSessionAdmin(Data,sSession,thePrefs.UseIonixWebsrv()?2:3) )
 			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
 				theApp.m_app_state = APP_STATE_SHUTTINGDOWN;
@@ -701,16 +703,32 @@ void CWebServer::ProcessURL(ThreadData Data)
 			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			/*
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("shutdown") && IsSessionAdmin(Data,sSession))
+			{
 			*/
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("shutdown") && IsSessionAdmin(Data,sSession,3) )
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
+				LPARAM lParam = 1;
+				if (thePrefs.UseIonixWebsrv())
+				{
+					//long lSession = _tstol(sSession);
+					Session Rights = GetSessionByID(Data, lSession);
+					WebServDef Def;
+					bool bGotWebServDef = GetWebServDefByName(Rights.username, Def);
+					if (bGotWebServDef && Def.RightsToAddRemove > 2)
+						lParam |= 4;
+				}
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 				_RemoveSession(Data, lSession);
 				// send answer ...
 				Out += _GetLoginScreen(Data);
 				Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
 
+				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+				/*
 				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,1);
+				*/
+				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,lParam);
+				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 				CoUninitialize();
 				return;
@@ -719,17 +737,33 @@ void CWebServer::ProcessURL(ThreadData Data)
 			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			/*
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession))
+			{
 			*/
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession,3) )
-			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
+				LPARAM lParam = 1;
+				if (thePrefs.UseIonixWebsrv())
+				{
+					//long lSession = _tstol(sSession);
+					Session Rights = GetSessionByID(Data, lSession);
+					WebServDef Def;
+					bool bGotWebServDef = GetWebServDefByName(Rights.username, Def);
+					if (bGotWebServDef && Def.RightsToAddRemove > 2)
+						lParam |= 4;
+				}
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 				_RemoveSession(Data, lSession);
 
 				// send answer ...
 				Out += _GetLoginScreen(Data);
 				Data.pSocket->SendContent(CT2CA(HTTPInit), Out);
 
+				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+				/*
 				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,2);
+				*/
+				SendMessage(theApp.emuledlg->m_hWnd,WEB_GUI_INTERACTION, WEBGUIIA_WINFUNC,lParam);
+				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 				CoUninitialize();
 				return;
@@ -750,7 +784,14 @@ void CWebServer::ProcessURL(ThreadData Data)
 				CKnownFile* kf=theApp.sharedfiles->GetFileByID(_GetFileHash(_ParseURL(Data.sURL, _T("filehash")),FileHash) );
 				
 				if (kf) {
+					// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+					/*
 					if (thePrefs.GetMaxWebUploadFileSizeMB() != 0 && kf->GetFileSize() > (uint64)thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024) {
+					*/
+					Session Rights = GetSessionByID(Data, lSession);
+					if ((!thePrefs.UseIonixWebsrv() || Rights.RightsToDownloadFiles) && 
+						thePrefs.GetMaxWebUploadFileSizeMB() != 0 && kf->GetFileSize() > (uint64)thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024) {
+					// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 						Data.pSocket->SendReply( "HTTP/1.1 403 Forbidden\r\n" );
 					
 						CoUninitialize();
@@ -1049,6 +1090,7 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	/*
 	Out.Replace(_T("[admin]"), (bAdmin && thePrefs.GetWebAdminAllowedHiLevFunc() ) ? _T("admin") : _T(""));
 	*/
+	Out.Replace(_T("[admin]"), IsSessionAdmin(Data,sSession,thePrefs.UseIonixWebsrv()?2:3) ? _T("admin") : _T("") );
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	Out.Replace(_T("[Session]"), sSession);
 	Out.Replace(_T("[RefreshVal]"), sRefresh);
@@ -2539,7 +2581,8 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 				CString Cat=Rights.RightsToCategories.Tokenize(_T("|"),curPos);
 				while (Cat!=_T(""))
 				{
-					if (Cat==thePrefs.GetCategory(pPartFile->GetCategory())->strTitle)
+					if (pPartFile->GetCategory() == 0 || // always show default category files
+						Cat==thePrefs.GetCategory(pPartFile->GetCategory())->strTitle)
 					{
 						Allowed=true;
 						break;
@@ -2801,7 +2844,8 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 				CString Cat=Rights.RightsToCategories.Tokenize(_T("|"),curPos);
 				while (Cat!=_T(""))
 				{
-					if (Cat==thePrefs.GetCategory(((CPartFile*)file)->GetCategory())->strTitle)
+					if (((CPartFile*)file)->GetCategory() == 0 || // always show default category files
+						Cat==thePrefs.GetCategory(((CPartFile*)file)->GetCategory())->strTitle)
 					{
 						bAllowed = true;
 						break;
@@ -3099,7 +3143,14 @@ CString CWebServer::_CreateTransferList(CString Out, CWebServer *pThis, ThreadDa
 		HTTPProcessData.Replace(_T("[filehash]"), filehash);
 		HTTPProcessData.Replace(_T("[down-priority]"), downpriority);
 		HTTPProcessData.Replace(_T("[FileType]"), dwnlf.sFileType);
+		// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+		/*
 		HTTPProcessData.Replace(_T("[downloadable]"), (bAdmin && (thePrefs.GetMaxWebUploadFileSizeMB()==0 ||dwnlf.m_qwFileSize<thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024))?_T("yes"):_T("no")  );
+		*/
+		bool bDownloadable = bAdmin && (thePrefs.GetMaxWebUploadFileSizeMB() == 0 || dwnlf.m_qwFileSize < thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024);
+		bDownloadable &= !thePrefs.UseIonixWebsrv() || Rights.RightsToDownloadFiles;
+		HTTPProcessData.Replace(_T("[downloadable]"), bDownloadable?_T("yes"):_T("no")  );
+		// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		
 		// comment icon
 		if (!dwnlf.iComment)
@@ -3548,6 +3599,11 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 	CString	sSession = _ParseURL(Data.sURL, _T("ses"));
 	bool	bAdmin = IsSessionAdmin(Data,sSession);
 	CString	strSort = _ParseURL(Data.sURL, _T("sort"));
+
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+	long lSession = _tstol(_ParseURL(Data.sURL, _T("ses")));
+	Session Rights = GetSessionByID(Data, lSession);
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	CString strTmp = _ParseURL(Data.sURL, _T("sortreverse"));
 
@@ -4256,6 +4312,9 @@ CString CWebServer::_GetSharedFilesList(ThreadData Data)
 				else
 					HTTPProcessData.Replace(_T("[FileIsPriority]"), _T("none"));
 				downloadable = !cur_file->IsPartFile() && (thePrefs.GetMaxWebUploadFileSizeMB() == 0 || SharedArray[i].m_qwFileSize < thePrefs.GetMaxWebUploadFileSizeMB()*1024*1024);
+				// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+				downloadable &= !thePrefs.UseIonixWebsrv() || Rights.RightsToDownloadFiles;
+				// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			}
 		}
 
@@ -5567,7 +5626,8 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 				CString Cat=Rights.RightsToCategories.Tokenize(_T("|"),curPos);
 				while (Cat!=_T(""))
 				{
-					if (Cat==thePrefs.GetCategory(i)->strTitle)
+					if (i == 0 || // always show default category
+						Cat==thePrefs.GetCategory(i)->strTitle)
 					{
 						Allowed=true;
 						break;
@@ -5615,7 +5675,8 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 				CString Cat=Rights.RightsToCategories.Tokenize(_T("|"),curPos);
 				while (Cat!=_T(""))
 				{
-					if (Cat==thePrefs.GetCategory(i)->strTitle)
+					if (i == 0 || // always show default category
+						Cat==thePrefs.GetCategory(i)->strTitle)
 					{
 						Allowed=true;
 						break;
@@ -5680,7 +5741,8 @@ void CWebServer::InsertCatBox(CString &Out,int preselect,CString boxlabel,bool j
 				CString Cat=Rights.RightsToCategories.Tokenize(_T("|"),curPos);
 				while (Cat!=_T(""))
 				{
-					if (Cat==thePrefs.GetCategory(i)->strTitle)
+					if (i == 0 || // always show default category
+						Cat==thePrefs.GetCategory(i)->strTitle)
 					{
 						Allowed=true;
 						break;
@@ -6015,6 +6077,19 @@ bool CWebServer::GetWebServLogin(const CString& user, const CString& pass, WebSe
 	return false;
 }
 
+bool CWebServer::GetWebServDefByName(const CString& user, WebServDef& Def)
+{
+	for (POSITION pos = AdvLogins.GetHeadPosition(); pos; AdvLogins.GetNext(pos))
+	{
+		if (AdvLogins.GetValueAt(pos).User == user)
+		{
+			Def = AdvLogins.GetValueAt(pos);
+			return true;
+		}
+	}
+	return false;
+}
+
 void CWebServer::SaveWebServConf()
 {
 	CString Filename;
@@ -6039,6 +6114,7 @@ void CWebServer::SaveWebServConf()
 		ini.WriteBool(L"RightsToSharedList",AdvLogins.GetValueAt(pos).RightsToSharedList,User)  ;
 		ini.WriteBool(L"RightsToStats",AdvLogins.GetValueAt(pos).RightsToStats,User)   ;
 		ini.WriteBool(L"RightsToTransfered",AdvLogins.GetValueAt(pos).RightsToTransfered,User);
+		ini.WriteBool(L"RightsToDownloadFiles",AdvLogins.GetValueAt(pos).RightsToDownloadFiles,User);
 		userno++;
 	}
 }
@@ -6080,6 +6156,7 @@ void CWebServer::LoadWebServConf()
 				tmp.RightsToSharedList=ini.GetBool(L"RightsToSharedList",false,User);
 				tmp.RightsToStats=ini.GetBool(L"RightsToStats",false,User);
 				tmp.RightsToTransfered=ini.GetBool(L"RightsToTransfered",false,User);
+				tmp.RightsToDownloadFiles=ini.GetBool(L"RightsToDownloadFiles",false,User);
 				AdvLogins.SetAt(userno, tmp);		
 				userno++;
          		User.Format(_T("User%d"),userno);

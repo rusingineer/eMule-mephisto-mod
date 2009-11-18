@@ -4809,7 +4809,19 @@ LRESULT CemuleDlg::OnWebGUIInteraction(WPARAM wParam, LPARAM lParam) {
 			serverwnd->UpdateMyInfo();
 			break;
 		case WEBGUIIA_WINFUNC:{
+			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+			// There should be no need for this as we check before sending the message.
+			/*
 			if (thePrefs.GetWebAdminAllowedHiLevFunc())
+			*/
+			bool bIsHiAdmin = false;
+			if (thePrefs.UseIonixWebsrv())
+			{
+				bIsHiAdmin = (lParam&4) ? true : false;
+				lParam &= 3;
+			}
+			if (bIsHiAdmin || thePrefs.GetWebAdminAllowedHiLevFunc())
+			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
 				try {
 					HANDLE hToken;

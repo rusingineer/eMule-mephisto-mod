@@ -1532,6 +1532,8 @@ BEGIN
                     BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,123,90,100,8
     CONTROL         "Access - Prefs?",IDC_ADVADMIN_PREFS,"Button",
                     BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,123,102,100,8
+    CONTROL         "Access - Download files?",IDC_ADVADMIN_DFILES,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP | NOT WS_VISIBLE,123,113,100,8
     COMBOBOX        IDC_ADVADMIN_USERLEVEL,89,126,72,110,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP | NOT WS_VISIBLE
     EDITTEXT        IDC_ADVADMIN_CATS,89,145,120,13,ES_AUTOHSCROLL | NOT WS_VISIBLE
@@ -1562,7 +1564,7 @@ BEGIN
     CONTROL         "Manual start",IDC_SVC_MANUALSTART,"Button",
                     BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP | NOT WS_VISIBLE,
                     14,79,203,10
-    PUSHBUTTON      "Set setting appropriate for service use ",IDC_SVC_SETTINGS,
+    PUSHBUTTON      "Set settings appropriate for service use ",IDC_SVC_SETTINGS,
                     9,97,213,14, WS_TABSTOP | NOT WS_VISIBLE
     GROUPBOX        "On start of eMule",IDC_SVC_ONSTARTBOX,9,114,213,37,NOT
                     WS_VISIBLE
@@ -6458,6 +6460,7 @@ BEGIN
     IDS_ADVADMIN_HIADMIN    "Hi-Admin"
     IDS_ADVADMINENABLED     "Enable multi user Webinterface right management"
     IDS_ADVADMIN_GUEST      "Guest"
+    IDS_ADVADMIN_DFILES     "Acces - Download files?"
     // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
     // ==> Tabbed WebInterface settings panel [Stulle] - Stulle
     IDS_TAB_WEB_SERVER      "Web Server"
@@ -6476,7 +6479,7 @@ BEGIN
     IDS_SVC_INSTALLSERVICE  "Install"
     IDS_SVC_SERVERUNINSTALL "Uninstall"
     IDS_SVC_STARTWITHSYSTEM "Start with system startup"
-    IDS_SVC_SETTINGS        "Set setting appropriate for service use"
+    IDS_SVC_SETTINGS        "Set settings appropriate for service use"
     IDS_SVC_RUNBROWSER      "Browse to webservice"
     IDS_SVC_REPLACESERVICE  "Stop service and start gui "
     IDS_SVC_ONSTARTBOX      "On start of eMule"

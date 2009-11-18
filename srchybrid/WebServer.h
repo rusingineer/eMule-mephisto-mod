@@ -43,6 +43,8 @@ typedef struct
 	bool RightsToSharedList;
 	bool RightsToStats;
 	bool RightsToTransfered;
+	bool RightsToDownloadFiles;
+	CString username;
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 } Session;
@@ -336,6 +338,7 @@ struct WebServDef{
 	bool RightsToSharedList;
 	bool RightsToStats;
 	bool RightsToTransfered;
+	bool RightsToDownloadFiles;
 };
 // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
@@ -453,6 +456,7 @@ private:
 public:
 	int iMultiUserversion;
 	static	bool	GetWebServLogin(const CString& user, const CString& pass, WebServDef& Def);
+	static	bool	GetWebServDefByName(const CString& user, WebServDef& Def);
 	static	void	SaveWebServConf();
 	static	void	LoadWebServConf();
 	static	CRBMap<uint32, WebServDef>	AdvLogins; //unlimited logs

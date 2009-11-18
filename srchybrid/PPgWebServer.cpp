@@ -496,6 +496,8 @@ void CPPgWebServer::Localize(void)
 
 void CPPgWebServer::OnEnChangeWSEnabled()
 {
+	// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+	/*
 	UINT bIsWIEnabled=IsDlgButtonChecked(IDC_WSENABLED);
 	GetDlgItem(IDC_WSPASS)->EnableWindow(bIsWIEnabled);	
 	GetDlgItem(IDC_WSPORT)->EnableWindow(bIsWIEnabled);	
@@ -507,7 +509,33 @@ void CPPgWebServer::OnEnChangeWSEnabled()
 	GetDlgItem(IDC_WSTIMEOUT)->EnableWindow(bIsWIEnabled);
 	GetDlgItem(IDC_WSPASSLOW)->EnableWindow(bIsWIEnabled && IsDlgButtonChecked(IDC_WSENABLEDLOW));
 	GetDlgItem(IDC_WSUPNP)->EnableWindow(thePrefs.IsUPnPEnabled() && bIsWIEnabled);
-	
+	*/
+	bool bSingleWSEnalbed = IsDlgButtonChecked(IDC_WSENABLED) && theApp.webserver->iMultiUserversion <= 0;
+
+	if(bSingleWSEnalbed)
+	{
+		GetDlgItem(IDC_WSPASS)->EnableWindow(TRUE);
+		GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->EnableWindow(TRUE);
+		GetDlgItem(IDC_WSPASSLOW)->EnableWindow(TRUE);
+		GetDlgItem(IDC_WSENABLEDLOW)->EnableWindow(TRUE);
+	}
+	else
+	{	
+		GetDlgItem(IDC_WSPASS)->EnableWindow(FALSE);
+		GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->EnableWindow(FALSE);
+		GetDlgItem(IDC_WSPASSLOW)->EnableWindow(FALSE);
+		GetDlgItem(IDC_WSENABLEDLOW)->EnableWindow(FALSE);
+	}
+
+	UINT bIsWIEnabled=IsDlgButtonChecked(IDC_WSENABLED);
+	GetDlgItem(IDC_WSPORT)->EnableWindow(bIsWIEnabled);	
+	GetDlgItem(IDC_TMPLPATH)->EnableWindow(bIsWIEnabled);
+	GetDlgItem(IDC_TMPLBROWSE)->EnableWindow(bIsWIEnabled);
+	GetDlgItem(IDC_WS_GZIP)->EnableWindow(bIsWIEnabled);
+	GetDlgItem(IDC_WSTIMEOUT)->EnableWindow(bIsWIEnabled);
+	GetDlgItem(IDC_WSUPNP)->EnableWindow(thePrefs.IsUPnPEnabled() && bIsWIEnabled);
+	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+
 	//GetDlgItem(IDC_WSRELOADTMPL)->EnableWindow(bIsWIEnabled);
 	SetTmplButtonState();
 
@@ -782,25 +810,16 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_WSENABLED)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_WSENABLED)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WS_GZIP)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WS_GZIP)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSPORT)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WSPORT)->EnableWindow(TRUE);
 				GetDlgItem(IDC_TMPLPATH)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_TMPLPATH)->EnableWindow(TRUE);
 				GetDlgItem(IDC_TMPLBROWSE)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_TMPLBROWSE)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSRELOADTMPL)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_WSRELOADTMPL)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSTIMEOUT)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WSTIMEOUT)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSPASS)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WSPASS)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WS_ALLOWHILEVFUNC)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSENABLEDLOW)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WSENABLEDLOW)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSPASSLOW)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WSPASSLOW)->EnableWindow(TRUE);
 				GetDlgItem(IDC_MMENABLED)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_MMENABLED)->EnableWindow(TRUE);
 				GetDlgItem(IDC_MMPASSWORDFIELD)->ShowWindow(SW_SHOW);
@@ -834,7 +853,8 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_MINS)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_MINS)->EnableWindow(TRUE);
 				GetDlgItem(IDC_WSUPNP)->ShowWindow(SW_SHOW);
-				GetDlgItem(IDC_WSUPNP)->EnableWindow(TRUE);
+				GetDlgItem(IDC_WSUPNP)->EnableWindow(thePrefs.IsUPnPEnabled() && thePrefs.GetWSIsEnabled());
+				OnEnChangeWSEnabled();
 				if(m_wndMobileLink.GetSafeHwnd())
 				{
 					m_wndMobileLink.ShowWindow(SW_SHOW);
@@ -889,7 +909,7 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_STATIC_ADVADMIN_USERLEVEL)->EnableWindow(TRUE);
 				GetDlgItem(IDC_ADVADMIN_NOTE)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_ADVADMIN_NOTE)->EnableWindow(TRUE);
-				SetBoxes();
+				SetMultiBoxes();
 				break;
 			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
@@ -951,8 +971,8 @@ void CPPgWebServer::SetTab(eTab tab){
 // ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 BOOL CPPgWebServer::OnSetActive()
 {
-	if (IsWindow(m_hWnd))
-	     SetBoxes();
+	//if (IsWindow(m_hWnd))
+	SetMultiBoxes();
 
 	return TRUE;
 }
@@ -961,7 +981,7 @@ afx_msg void CPPgWebServer::OnEnableChange()
 {
 	thePrefs.m_bIonixWebsrv = (IsDlgButtonChecked(IDC_ADVADMINENABLED)!=0);
 
-	SetBoxes();
+	SetMultiBoxes();
 	if (!thePrefs.m_bIonixWebsrv) {
 		FillComboBox();
 		FillUserlevelBox();
@@ -969,7 +989,7 @@ afx_msg void CPPgWebServer::OnEnableChange()
 	SetModified();
 }
 
-afx_msg void CPPgWebServer::SetBoxes()
+afx_msg void CPPgWebServer::SetMultiBoxes()
 {
 	bool bWSEnalbed = IsDlgButtonChecked(IDC_WSENABLED) && theApp.webserver->iMultiUserversion > 0;
 

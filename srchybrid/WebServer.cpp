@@ -267,7 +267,10 @@ void CWebServer::ReloadTemplates()
 					theApp.emuledlg && 
 					theApp.emuledlg->preferenceswnd && 
 					theApp.emuledlg->preferenceswnd->m_wndWebServer)
+				{
 					theApp.emuledlg->preferenceswnd->m_wndWebServer.CheckDlgButton(IDC_ADVADMINENABLED,0);
+					theApp.emuledlg->preferenceswnd->m_wndWebServer.OnEnChangeWSEnabled();
+				}
 				thePrefs.m_bIonixWebsrv = false;
 			}
 			else if(!thePrefs.m_bIonixWebsrv &&
@@ -277,6 +280,7 @@ void CWebServer::ReloadTemplates()
 			{
 				theApp.emuledlg->preferenceswnd->m_wndWebServer.CheckDlgButton(IDC_ADVADMINENABLED,1);
 				theApp.emuledlg->preferenceswnd->m_wndWebServer.OnEnableChange();
+				theApp.emuledlg->preferenceswnd->m_wndWebServer.OnEnChangeWSEnabled();
 			}
 			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 		}

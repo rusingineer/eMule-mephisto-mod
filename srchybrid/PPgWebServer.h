@@ -33,7 +33,9 @@ protected:
 	}
 
 	DECLARE_MESSAGE_MAP()
+public: // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	afx_msg void OnEnChangeWSEnabled();
+protected: // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 	afx_msg void OnEnChangeMMEnabled();
 	afx_msg void OnReloadTemplates();
 	afx_msg void OnBnClickedTmplbrowse();
@@ -62,13 +64,13 @@ protected:
 	afx_msg void OnMultiPWChange();
 	afx_msg void OnMultiCatsChange();
 	afx_msg void OnSettingsChange();
-	afx_msg void OnSettingsChangeBox()			{ SetBoxes(); OnSettingsChange(); }
+	//afx_msg void OnSettingsChangeBox()			{ SetMultiBoxes(); OnSettingsChange(); }
 	afx_msg void OnBnClickedNew();
 	afx_msg void OnBnClickedDel();
 	afx_msg void UpdateSelection();
 	CComboBox	m_cbAccountSelector;
 	CComboBox	m_cbUserlevel;
-	void	SetBoxes();
+	void	SetMultiBoxes();
 	void	FillComboBox();
 	void	FillUserlevelBox();
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle

@@ -3477,11 +3477,12 @@
 #define IDS_SERVICE_DESCR               61620
 #define IDS_SERVICE_NAME_CHANGED        61621
 #define IDS_SERVICE_STR_CHANGED         61622
-#define IDS_SERVICE_DISP_CHANGED        61623
-#define IDS_SERVICE_UNINSTALL_FAIL      61624
-#define IDS_SERVICE_UNINSTALL_TITLE     61625
-#define IDS_SERVICE_INSTALL_FAIL        61626
-#define IDS_SERVICE_INSTALL_TITLE       61627
+#define IDS_SERVICE_DISP_CHANGE_FAIL    61623
+#define IDS_SERVICE_STR_CHANGE_FAIL     61624
+#define IDS_SERVICE_UNINSTALL_FAIL      61625
+#define IDS_SERVICE_UNINSTALL_TITLE     61626
+#define IDS_SERVICE_INSTALL_FAIL        61627
+#define IDS_SERVICE_INSTALL_TITLE       61628
 // <== Adjustable NT Service Strings - Stulle
 // ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
 #define IDD_ASKEXIT                     61630

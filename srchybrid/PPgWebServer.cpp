@@ -340,9 +340,9 @@ BOOL CPPgWebServer::OnApply()
 		GetDlgItem(IDC_SERVICE_DESCR)->GetWindowText(strServiceDescr);
 
 		int iChangedStr = 0; // nothing changed
-		if(CompareLocaleStringNoCase(thePrefs.GetServiceName(),strServiceName))
+		if(strServiceName.Compare(thePrefs.GetServiceName()) != 0)
 			iChangedStr = 1; // name under which we install changed, this is important!
-		else if(CompareLocaleStringNoCase(thePrefs.GetServiceDispName(),strServiceDispName) || CompareLocaleStringNoCase(thePrefs.GetServiceDescr(),strServiceDescr))
+		else if((strServiceDispName.Compare(thePrefs.GetServiceDispName()) != 0) || (strServiceDescr.Compare(thePrefs.GetServiceDescr()) != 0))
 			iChangedStr = 2; // only visual strings changed, not so important...
 
 		if(iChangedStr>0)
@@ -352,24 +352,30 @@ BOOL CPPgWebServer::OnApply()
 				thePrefs.SetServiceName(strServiceName);
 				thePrefs.SetServiceDispName(strServiceDispName);
 				thePrefs.SetServiceDescr(strServiceDescr);
+				FillStatus();
 			}
 			else
 			{
 				int iResult = IDCANCEL;
 				if(iChangedStr == 1)
-					iResult = MessageBox(GetResString(IDS_SERVICE_NAME_CHANGED),GetResString(IDS_SERVICE_STR_CHANGED),MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);
+					iResult = MessageBox(GetResString(IDS_SERVICE_NAME_CHANGED),GetResString(IDS_SERVICE_STR_CHANGED),MB_YESNOCANCEL|MB_ICONQUESTION|MB_DEFBUTTON3);
 				else if(iChangedStr == 2)
-					iResult = MessageBox(GetResString(IDS_SERVICE_DISP_CHANGED),GetResString(IDS_SERVICE_STR_CHANGED),MB_YESNOCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);
-
-				if((iChangedStr == 1 && iResult == IDYES) || (iChangedStr == 2 && iResult != IDCANCEL))
 				{
-					if(iChangedStr == 2 && iResult == IDNO)
+					if(NTServiceChangeDisplayStrings(strServiceDispName,strServiceDescr) != 0)
 					{
-						thePrefs.SetServiceName(strServiceName);
-						thePrefs.SetServiceDispName(strServiceDispName);
-						thePrefs.SetServiceDescr(strServiceDescr);
+						if(MessageBox(GetResString(IDS_SERVICE_DISP_CHANGE_FAIL),GetResString(IDS_SERVICE_STR_CHANGE_FAIL),MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2) == IDYES)
+						{
+							iChangedStr = 1;
+							iResult = IDYES;
+						}
 					}
-					else if(CmdRemoveService()==0)
+					else
+						iResult = IDNO;
+				}
+
+				if(iChangedStr == 1 && iResult == IDYES) // reinstall service
+				{
+					if(CmdRemoveService()==0)
 					{
 						thePrefs.SetServiceName(strServiceName);
 						thePrefs.SetServiceDispName(strServiceDispName);
@@ -384,8 +390,16 @@ BOOL CPPgWebServer::OnApply()
 						GetDlgItem(IDC_SERVICE_DISP_NAME)->SetWindowText(thePrefs.GetServiceDispName());
 						GetDlgItem(IDC_SERVICE_DESCR)->SetWindowText(thePrefs.GetServiceDescr());
 					}
+					FillStatus();
 				}
-				else
+				else if(iResult == IDNO) // just save settings
+				{
+					thePrefs.SetServiceName(strServiceName);
+					thePrefs.SetServiceDispName(strServiceDispName);
+					thePrefs.SetServiceDescr(strServiceDescr);
+					FillStatus();
+				}
+				else // revert settings
 				{
 					GetDlgItem(IDC_SERVICE_NAME)->SetWindowText(thePrefs.GetServiceName());
 					GetDlgItem(IDC_SERVICE_DISP_NAME)->SetWindowText(thePrefs.GetServiceDispName());
@@ -936,7 +950,6 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_SVC_RUNBROWSER)->EnableWindow(TRUE);
 				GetDlgItem(IDC_SVC_REPLACESERVICE)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_SVC_REPLACESERVICE)->EnableWindow(TRUE);
-				FillStatus();
 				// ==> Adjustable NT Service Strings [Stulle] - Stulle
 				GetDlgItem(IDC_SERVICE_STR_GROUP)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_SERVICE_STR_GROUP)->EnableWindow(TRUE);
@@ -959,6 +972,7 @@ void CPPgWebServer::SetTab(eTab tab){
 				GetDlgItem(IDC_SERVICE_OPT_LABEL)->EnableWindow(TRUE);
 				GetDlgItem(IDC_SERVICE_OPT_BOX)->ShowWindow(SW_SHOW);
 				GetDlgItem(IDC_SERVICE_OPT_BOX)->EnableWindow(TRUE);
+				FillStatus();
 				break;
 			// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 			default:

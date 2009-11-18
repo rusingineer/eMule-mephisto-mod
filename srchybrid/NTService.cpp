@@ -605,9 +605,93 @@ int NTServiceSetStartupMode(int i_startupmode){
 	return 0; 
 }
 
+// ==> Adjustable NT Service Strings - Stulle
+int NTServiceChangeDisplayStrings(CString strDisplayName, CString strServiceDescr)
+{
+	SC_HANDLE	schService;
+	SC_HANDLE	schSCManager;
+	CString ErrString;
+	int iResult = 0;
 
+	schSCManager = OpenSCManager(
+		NULL,					// machine (NULL ==	local)
+		NULL,					// database	(NULL == default)
+		GENERIC_WRITE|GENERIC_READ// access required
+		);
 
-/* for interactive windows, seeh ttp://support.microsoft.com/kb/164166 */
+	if ( schSCManager )
+	{   
+		schService = OpenService(schSCManager, (!thePrefs.GetServiceName().IsEmpty())?thePrefs.GetServiceName():TEXT(SZSERVICENAME),GENERIC_WRITE|GENERIC_READ);
+		if (schService)
+		{
+			// changed displayed name?
+			if (strDisplayName.Compare(thePrefs.GetServiceDispName()) != 0)
+			{
+				if(strDisplayName.IsEmpty())
+					strDisplayName.Format(_T(SZSERVICEDISPLAYNAME),MOD_VERSION);
+
+				if (ChangeServiceConfig( 
+					schService,        // handle of service 
+					SERVICE_NO_CHANGE, // service type: no change 
+					SERVICE_NO_CHANGE,// change service start type 
+					SERVICE_NO_CHANGE, // error control: no change 
+					NULL,              // binary path: no change 
+					NULL,              // load order group: no change 
+					NULL,              // tag ID: no change 
+					NULL,              // dependencies: no change 
+					NULL,              // account name: no change 
+					NULL,              // password: no change 
+					strDisplayName)!=0 )            // display name: no change
+					AddLogLine(false,_T("Succesfully changed display name of service."));
+				else
+				{ 
+					GetSystemErrorString(GetLastError(),ErrString);
+					AddLogLine(false,_T("Unable to change display name of service %s"),ErrString);
+					iResult = 1;
+				}
+			}
+
+			// changed discription?
+			if (strServiceDescr.Compare(thePrefs.GetServiceDescr()) != 0)
+			{
+				SERVICE_DESCRIPTION sdBuf;
+				if(!strServiceDescr.IsEmpty()) 
+					sdBuf.lpDescription = const_cast<LPWSTR>((LPCWSTR)strServiceDescr);
+				else
+					sdBuf.lpDescription = SZSERVICEDESCR;
+
+				if( ChangeServiceConfig2( // I don't care if it works :P
+					schService,                 // handle to service
+					SERVICE_CONFIG_DESCRIPTION, // change: description
+					&sdBuf)!=0 )
+					AddLogLine(false,_T("Succesfully changed displayed description of service."));
+				else
+				{ 
+					GetSystemErrorString(GetLastError(),ErrString);
+					AddLogLine(false,_T("Unable to change displayed description of service %s"),ErrString);
+					iResult = 1;
+				}
+			}
+
+			CloseServiceHandle(schService);
+		}
+		else {
+			GetSystemErrorString(GetLastError(),ErrString);
+			AddLogLine(false,_T("Failed to open service to change startup mode:%s"),ErrString);
+			iResult = 1;
+		}
+		CloseServiceHandle(schSCManager);
+	}
+	else {
+		GetSystemErrorString(GetLastError(),ErrString);
+		AddLogLine(false,_T("Failed to open servicemanager to change startup mode:%s"),ErrString);
+		iResult = 1;
+	}
+	return iResult; 
+}
+// <== Adjustable NT Service Strings - Stulle
+
+/* for interactive windows, see ttp://support.microsoft.com/kb/164166 */
 
  BOOL CALLBACK EnumProc( HWND hWnd, LPARAM /*lParam */ )
  {

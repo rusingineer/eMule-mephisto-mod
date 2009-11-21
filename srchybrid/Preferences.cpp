@@ -1000,6 +1000,7 @@ int		CPreferences::m_iServiceStartupMode;
 int		CPreferences::m_iServiceOptLvl;
 // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 // ==> Adjustable NT Service Strings [Stulle] - Stulle
+bool	CPreferences::m_bServiceStringsLoaded = false;
 CString	CPreferences::m_strServiceName;
 CString	CPreferences::m_strServiceDispName;
 CString	CPreferences::m_strServiceDescr;
@@ -4323,6 +4324,7 @@ void CPreferences::LoadPreferences()
 	m_strServiceName = ini.GetString(L"ServiceName",NULL);
 	m_strServiceDispName = ini.GetString(L"ServiceDispName",NULL);
 	m_strServiceDescr = ini.GetString(L"ServiceDescr",NULL);
+	m_bServiceStringsLoaded = true;
 	// <== Adjustable NT Service Strings [Stulle] - Stulle
 
 	m_bCloseEasteregg=false; // Diabolic Easteregg [Stulle] - Mephisto
@@ -6420,3 +6422,13 @@ uint16	CPreferences::GetWSPort()
 	return m_nWebPort; 
 }
 // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
+
+// ==> Adjustable NT Service Strings [Stulle] - Stulle
+CString CPreferences::GetServiceName()
+{
+	// if the strings have not been loaded yet we need to load the name directly from the .ini
+	if (!m_bServiceStringsLoaded)
+		m_strServiceName = theApp.GetProfileString(_T("ScarAngel"), _T("ServiceName"), NULL);
+	return m_strServiceName;
+}
+// <== Adjustable NT Service Strings [Stulle] - Stulle

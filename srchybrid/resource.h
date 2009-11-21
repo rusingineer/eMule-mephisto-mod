@@ -3492,6 +3492,7 @@
 #define IDS_YESSERVICE                  61634
 #define IDS_NOMINIMIZE                  61635
 // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
+#define IDS_WS_FRIENDSLOT               61670 // Friendslot support for WebInterface [Stulle] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto
 #define IDC_EASTEREGG                   62000
 #define IDS_EASTEREGG                   62001

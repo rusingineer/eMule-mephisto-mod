@@ -1159,6 +1159,7 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	Out.Replace(_T("[RemoveServer]"), _GetPlainResString(IDS_REMOVETHIS));
 	Out.Replace(_T("[StaticServer]"), _GetPlainResString(IDS_STATICSERVER));
 	Out.Replace(_T("[Friend]"), _GetPlainResString(IDS_PW_FRIENDS));
+	Out.Replace(_T("[Friendslot]"), _GetPlainResString(IDS_WS_FRIENDSLOT)); // Friendslot support for WebInterface [Stulle] - Stulle
 
 	// ==> PowerShare support for WebInterface [Stulle] - Stulle
 	Out.Replace(_T("[PsDefault]"), _GetPlainResString(IDS_DEFAULT));
@@ -2185,6 +2186,14 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 							CFriend* f=theApp.friendlist->SearchFriend(UserHash,0,0);
 							if (f)
 								SendMessage(theApp.emuledlg->m_hWnd,WEB_ADDREMOVEFRIEND,(WPARAM)f,(LPARAM)0);
+						// ==> Friendslot support for WebInterface [Stulle] - Stulle
+							cur_client->SetFriendSlot(false);
+						}
+						if (sOp.CompareNoCase(_T("addfriendslot")) == 0)
+							cur_client->SetFriendSlot(true);
+						else if (sOp.CompareNoCase(_T("removefriendslot")) == 0) {
+							cur_client->SetFriendSlot(false);
+						// <== Friendslot support for WebInterface [Stulle] - Stulle
 						}
 					}
 				}
@@ -2816,6 +2825,10 @@ CString CWebServer::_GetTransferList(ThreadData Data)
 		
 		if (cur_client->IsBanned())
 			dUser.sClientExtra = _T("banned");
+		// ==> Friendslot support for WebInterface [Stulle] - Stulle
+		else if (cur_client->IsFriend() && cur_client->GetFriendSlot())
+			dUser.sClientExtra = _T("friendslot");
+		// <== Friendslot support for WebInterface [Stulle] - Stulle
 		else if (cur_client->IsFriend())
 			dUser.sClientExtra = _T("friend");
 		//Xman Credit System
@@ -2968,6 +2981,14 @@ CString CWebServer::_CreateTransferList(CString Out, CWebServer *pThis, ThreadDa
 			nCountQueueBanned++;
 			if (bSecure) nCountQueueBannedSecure++;
 		}
+		// ==> Friendslot support for WebInterface [Stulle] - Stulle
+		else if (cur_client->IsFriend() && cur_client->GetFriendSlot())
+		{
+			dUser.sClientExtra = _T("friendslot");
+			nCountQueueFriend++;
+			if (bSecure) nCountQueueFriendSecure++;
+		}
+		// <== Friendslot support for WebInterface [Stulle] - Stulle
 		else if (cur_client->IsFriend())
 		{
 			dUser.sClientExtra = _T("friend");
@@ -3460,11 +3481,17 @@ CString CWebServer::_CreateTransferList(CString Out, CWebServer *pThis, ThreadDa
 		CString sQueueFriend;
 		
 		OutE = pThis->m_Templates.sTransferUpQueueFriendLine;
+		OutE.Replace(_T("[admin]"), (bAdmin) ? _T("admin") : _T("")); // Show friend menu in Friendlist of Webinterface [Stulle] - Stulle
 
 		for(int i = 0; i < QueueArray.GetCount(); i++)
 		{
             TCHAR HTTPTempC[100] = _T("");
+			// ==> Friendslot support for WebInterface [Stulle] - Stulle
+			/*
 			if (QueueArray[i].sClientExtra == _T("friend"))
+			*/
+			if (QueueArray[i].sClientExtra == _T("friend") || QueueArray[i].sClientExtra == _T("friendslot"))
+			// <== Friendslot support for WebInterface [Stulle] - Stulle
 			{
 				HTTPProcessData = OutE;
 				pcTmp = (!WSqueueColumnHidden[0]) ? QueueArray[i].sUserName.GetString() : _T("");

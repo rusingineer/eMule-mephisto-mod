@@ -3,12 +3,16 @@
 <-- ##                                                             ## -->
 <-- ##                BASED ON MODIFIED VERSION BY eMule+          ## -->
 <-- ##                BASED ON TEMPLATE BY Chicane                 ## -->
+<-- ## Added tMPL_FAILEDLOGIN--> and noindex nofollow
 <-- ################################################################# -->
 
 <--TMPL_VERSION-->
 7
 <--TMPL_VERSION_END-->
 
+<--TMPL_MULTIUSERVERSION-->
+0
+<--TMPL_MULTIUSERVERSION_END-->
 
 
 
@@ -399,6 +403,7 @@ text-decoration: none;
 .upqueue-none-line, .upqueue-none-line-left,
 .upqueue-banned-line, .upqueue-banned-line-left,
 .upqueue-friend-line, .upqueue-friend-line-left,
+.upqueue-friendslot-line, .upqueue-friendslot-line-left,
 .upqueue-credit-line, .upqueue-credit-line-left,
 .upqueue-next-line, .upqueue-next-line-left,
 .search-header, .search-header-left, .search-header-right, .search-main, .search-line, .search-line-left, .search-line-right,
@@ -440,7 +445,7 @@ background-color : #005784;
 .up-header, .up-line-connecting, .up-line-uploading,
 .server-header, .server-line-disconnected, .server-line-high, .server-line-low, .server-line-connecting, .server-line-failed,
 .shared-header, .shared-line-file, .shared-line-filedown,
-.upqueue-header, .upqueue-none-line, .upqueue-banned-line, .upqueue-friend-line, .upqueue-credit-line, .upqueue-next-line,
+.upqueue-header, .upqueue-none-line, .upqueue-banned-line, .upqueue-friend-line, .upqueue-friendslot-line, .upqueue-credit-line, .upqueue-next-line,
 .search-header, .search-line, .addserver-header, .addserver-line
 {
 text-align : center;
@@ -449,7 +454,7 @@ text-align : center;
 .up-header-left, .upqueue-header-left, .up-line-uploading-left, .up-line-connecting-left,
 .server-header-left, .server-line-disconnected-left, .server-line-high-left, .server-line-low-left, .server-line-connecting-left, .server-line-failed-left, .shared-header-left,
 .shared-line-file-left, .shared-line-filedown-left,
-.upqueue-none-line-left, .upqueue-banned-line-left, .upqueue-friend-line-left, .upqueue-credit-line-left, .upqueue-next-line-left,
+.upqueue-none-line-left, .upqueue-banned-line-left, .upqueue-friend-line-left, .upqueue-friendslot-line-left, .upqueue-credit-line-left, .upqueue-next-line-left,
 .search-line-left, .search-header-left, .search-main
 {
 text-align : left;
@@ -497,6 +502,7 @@ color : #000000;
 .upqueue-none-line, .upqueue-none-line-left,
 .upqueue-banned-line, .upqueue-banned-line-left,
 .upqueue-friend-line, .upqueue-friend-line-left,
+.upqueue-friendslot-line, .upqueue-friendslot-line-left,
 .upqueue-credit-line, .upqueue-credit-line-left,
 .upqueue-next-line, .upqueue-next-line-left,
 .search-line, .search-line-left, .search-line-right, .addserver-line
@@ -511,6 +517,7 @@ color : #ffffff;
 }
 .server-line-high, .server-line-high-left, .server-line-high a:active, .server-line-high a:link, .server-line-high a:visited,
 .upqueue-friend-line, .upqueue-friend-line-left,
+.upqueue-friendslot-line, .upqueue-friendslot-line-left,
 .up-line-uploading, .up-line-uploading-left,
 .down-line-downloading, .down-line-downloading-left, .down-line-downloading-right, .down-line-downloading a:link, .down-line-downloading a:active, .down-line-downloading a:visited
 {

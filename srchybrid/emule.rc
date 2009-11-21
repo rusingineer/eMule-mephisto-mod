@@ -6513,6 +6513,7 @@ BEGIN
     IDS_YESSERVICE          "Yes, and start eMule service"
     IDS_NOMINIMIZE          "No, To tray"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
+    IDS_WS_FRIENDSLOT       "Friendslot" // Friendslot support for WebInterface [Stulle] - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

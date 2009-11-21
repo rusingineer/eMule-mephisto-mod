@@ -669,6 +669,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 					ipWatched = RegisterFailedLogin(Data);
 				login=false;
 				isUseGzip = false; // [Julien]
+			// <== New failed login handling for WebInterface [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
 			}
 		}
 
@@ -1308,11 +1309,13 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	*/
 	uint32 eMuleIn;
 	uint32 eMuleOut;
+	uint32 NetworkIn;
+	uint32 NetworkOut;
 	uint32 notUsed;
 	theApp.pBandWidthControl->GetDatarates(thePrefs.GetDatarateSamples(),
 		eMuleIn, notUsed,
 		eMuleOut, notUsed,
-		notUsed, notUsed);
+		NetworkIn, NetworkOut);
 
 	if(thePrefs.GetMaxUpload() == UNLIMITED)
 		_stprintf(HTTPHeader, _T("%.1f"), static_cast<double>(100 * eMuleOut) / 1024 / thePrefs.GetMaxGraphUploadRate());
@@ -1328,9 +1331,15 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 
 	_stprintf(HTTPHeader, _T("%.1f"), (static_cast<double>(theApp.listensocket->GetOpenSockets()))/(thePrefs.GetMaxConnections())*100.0);
 	Out.Replace(_T("[ConnectionValue]"), HTTPHeader);
-	_stprintf(HTTPHeader, _T("%.1f"), (static_cast<double>(eMuleOut)/1024.0));
+	if(thePrefs.GetNAFCFullControl())
+		_stprintf(HTTPHeader, _T("%.1f / %.1f"), (static_cast<double>(eMuleOut)/1024.0), (static_cast<double>(NetworkOut)/1024.0));
+	else
+		_stprintf(HTTPHeader, _T("%.1f"), (static_cast<double>(eMuleOut)/1024.0));
 	Out.Replace(_T("[CurUpload]"), HTTPHeader);
-	_stprintf(HTTPHeader, _T("%.1f"), (static_cast<double>(eMuleIn)/1024.0));
+	if(thePrefs.GetNAFCFullControl())
+		_stprintf(HTTPHeader, _T("%.1f / %.1f"), (static_cast<double>(eMuleIn)/1024.0), (static_cast<double>(NetworkIn)/1024.0));
+	else
+		_stprintf(HTTPHeader, _T("%.1f"), (static_cast<double>(eMuleIn)/1024.0));
 	Out.Replace(_T("[CurDownload]"), HTTPHeader);
 	_stprintf(HTTPHeader, _T("%.0f"), (static_cast<double>(theApp.listensocket->GetOpenSockets())));
 	Out.Replace(_T("[CurConnection]"), HTTPHeader);
@@ -1344,14 +1353,14 @@ CString CWebServer::_GetHeader(ThreadData Data, long lSession)
 	if (dwMax == UNLIMITED)
 		HTTPHelp = GetResString(IDS_PW_UNLIMITED);
 	else
-		HTTPHelp.Format(_T("%f"), dwMax);
+		HTTPHelp.Format(_T("%.1f"), dwMax);
 	Out.Replace(_T("[MaxUpload]"), HTTPHelp);
 
 	dwMax = thePrefs.GetMaxDownload();
 	if (dwMax == UNLIMITED)
 		HTTPHelp = GetResString(IDS_PW_UNLIMITED);
 	else
-		HTTPHelp.Format(_T("%f"), dwMax);
+		HTTPHelp.Format(_T("%.1f"), dwMax);
 	Out.Replace(_T("[MaxDownload]"), HTTPHelp);
 
 	UINT udwMax = thePrefs.GetMaxConnections();

@@ -3462,35 +3462,60 @@
 #define IDS_SERVICE_OPT_BASIC           61606
 #define IDS_SERVICE_OPT_LISTS           61607
 #define IDS_SERVICE_OPT_FULL            61608
+#define IDS_SVC_STRT_MGR_FAIL           61609
+#define IDS_SVC_PAUSE_MGR_FAIL          61610
+#define IDS_SVC_INST_PATH_FAIL          61611
+#define IDS_SVC_INST_SUCCESS            61612
+#define IDS_SVC_INST_FAIL               61613
+#define IDS_SVC_SVCCTRL_FAIL            61614
+#define IDS_SVC_STOPPING                61615
+#define IDS_SVC_STOP_PNDNG              61616
+#define IDS_SVC_STOPPED                 61617
+#define IDS_SVC_STOP_FAIL               61618
+#define IDS_SVC_DELETED                 61619
+#define IDS_SVC_DELETE_FAIL             61620
+#define IDS_SVC_OPEN_FAIL               61621
+#define IDS_SVC_TERMINATE               61622
+#define IDS_SVC_STRTUP_SUCCESS          61623
+#define IDS_SVC_STRTUP_FAIL             61624
+#define IDS_SVC_STRTUP_OPN_FAIL         61625
+#define IDS_SVC_STRTUP_CTRL_FAIL        61626
+#define IDS_SVC_LINK_PASS_FAIL          60627
 // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 // ==> Adjustable NT Service Strings - Stulle
-#define IDC_SERVICE_STR_GROUP           61610
-#define IDC_SERVICE_NAME_LABEL          61611
-#define IDC_SERVICE_NAME                61612
-#define IDC_SERVICE_DISP_NAME_LABEL     61613
-#define IDC_SERVICE_DISP_NAME           61614
-#define IDC_SERVICE_DESCR_LABEL         61615
-#define IDC_SERVICE_DESCR               61616
-#define IDS_SERVICE_STR_GROUP           61617
-#define IDS_SERVICE_NAME                61618
-#define IDS_SERVICE_DISP_NAME           61619
-#define IDS_SERVICE_DESCR               61620
-#define IDS_SERVICE_NAME_CHANGED        61621
-#define IDS_SERVICE_STR_CHANGED         61622
-#define IDS_SERVICE_DISP_CHANGE_FAIL    61623
-#define IDS_SERVICE_STR_CHANGE_FAIL     61624
-#define IDS_SERVICE_UNINSTALL_FAIL      61625
-#define IDS_SERVICE_UNINSTALL_TITLE     61626
-#define IDS_SERVICE_INSTALL_FAIL        61627
-#define IDS_SERVICE_INSTALL_TITLE       61628
+#define IDC_SERVICE_STR_GROUP           61630
+#define IDC_SERVICE_NAME_LABEL          61631
+#define IDC_SERVICE_NAME                61632
+#define IDC_SERVICE_DISP_NAME_LABEL     61633
+#define IDC_SERVICE_DISP_NAME           61634
+#define IDC_SERVICE_DESCR_LABEL         61635
+#define IDC_SERVICE_DESCR               61636
+#define IDS_SERVICE_STR_GROUP           61637
+#define IDS_SERVICE_NAME                61638
+#define IDS_SERVICE_DISP_NAME           61639
+#define IDS_SERVICE_DESCR               61640
+#define IDS_SERVICE_NAME_CHANGED        61641
+#define IDS_SERVICE_STR_CHANGED         61642
+#define IDS_SERVICE_DISP_CHANGE_FAIL    61643
+#define IDS_SERVICE_STR_CHANGE_FAIL     61644
+#define IDS_SERVICE_UNINSTALL_FAIL      61645
+#define IDS_SERVICE_UNINSTALL_TITLE     61646
+#define IDS_SERVICE_INSTALL_FAIL        61647
+#define IDS_SERVICE_INSTALL_TITLE       61648
+#define IDS_SVC_DISP_SUCCESS            61649
+#define IDS_SVC_DISP_FAIL               61650
+#define IDS_SVC_DESCR_SUCCESS           61651
+#define IDS_SVC_DESCR_FAIL              61652
+#define IDS_SVC_STR_OPN_FAIL            61653
+#define IDS_SVC_STR_CTRL_FAIL           61654
 // <== Adjustable NT Service Strings - Stulle
 // ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
-#define IDD_ASKEXIT                     61630
-#define IDC_EXITQUESTION                61631
-#define IDNOMINIMIZE                    61632
-#define IDYESSERVICE                    61633
-#define IDS_YESSERVICE                  61634
-#define IDS_NOMINIMIZE                  61635
+#define IDD_ASKEXIT                     61660
+#define IDC_EXITQUESTION                61661
+#define IDNOMINIMIZE                    61662
+#define IDYESSERVICE                    61663
+#define IDS_YESSERVICE                  61664
+#define IDS_NOMINIMIZE                  61665
 // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
 #define IDS_WS_FRIENDSLOT               61670 // Friendslot support for WebInterface [Stulle] - Stulle
 // ==> Diabolic Easteregg [Stulle] - Mephisto

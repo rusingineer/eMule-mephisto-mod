@@ -1053,7 +1053,6 @@ bool CemuleApp::ProcessCommandline()
 		if (pszParam[0] == _T('-') || pszParam[0] == _T('/')){
 			pszParam++;
 			// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
-		}
 			if (_tcscmp(pszParam, _T("install"))==0)  {CmdInstallService();bExitParam = true; }
 			if (_tcscmp(pszParam, _T("uninstall"))==0){CmdRemoveService();bExitParam = true; }
 			if (_tcscmp(pszParam, _T("AsAService"))==0){OnStartAsService();} // NTservice entry point registation.
@@ -1067,11 +1066,7 @@ bool CemuleApp::ProcessCommandline()
 
 			if (_tcsicmp(pszParam, _T("AutoStart")) == 0)
 				m_bAutoStart = true;
-		// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
-		/*
 		}
-		*/
-		// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	}
 
 	CCommandLineInfo cmdInfo;

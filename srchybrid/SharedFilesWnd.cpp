@@ -336,7 +336,7 @@ void CSharedFilesWnd::ShowSelectedFilesSummary(bool bHistory /*=false*/)
 		if(bHistory){
 			iItem = historylistctrl.GetNextSelectedItem(pos);
 			//this should be redundant but we keep it just in case
-			if (!((CObject*)sharedfilesctrl.GetItemData(iItem))->IsKindOf(RUNTIME_CLASS(CKnownFile)))
+			if (!((CObject*)historylistctrl.GetItemData(iItem))->IsKindOf(RUNTIME_CLASS(CKnownFile)))
 				continue;
 			pFile = (CKnownFile*)historylistctrl.GetItemData(iItem);
 		}

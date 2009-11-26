@@ -787,14 +787,6 @@ bool  InterfaceToService()
 							break;
 					}
 				}
-				/*
-				else
-				{
-					CString ErrString;
-					GetSystemErrorString(GetLastError(),ErrString);
-					AddLogLine(false,GetResString(IDS_SVC_STOP_FAIL),ErrString);
-				}
-				*/
 				CloseServiceHandle(schService);
 			}
 			CloseServiceHandle(schSCManager);

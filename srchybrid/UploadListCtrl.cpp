@@ -309,10 +309,25 @@ void CUploadListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	const ThrottledFileSocket* socket=(client->GetFileUploadSocket());
 	if( socket!=NULL)
 	{
+		// ==> Design Settings [eWombat/Stulle] - Stulle
+		/*
 		if (socket->IsFull())
 			dc.SetTextColor(RGB(0,0,0));
 		else if (socket->IsTrickle())
 			dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+		*//*
+#define MLC_BLEND(A, B, X) ((A + B * (X-1) + ((X+1)/2)) / X)
+
+#define MLC_RGBBLEND(A, B, X) (                   \
+	RGB(MLC_BLEND(GetRValue(A), GetRValue(B), X), \
+	MLC_BLEND(GetGValue(A), GetGValue(B), X),     \
+	MLC_BLEND(GetBValue(A), GetBValue(B), X))     \
+)
+		if (socket->IsFull())
+			;
+		else if (socket->IsTrickle())
+			dc.SetTextColor(MLC_RGBBLEND(dc.GetTextColor(), dc.GetBkColor(), 2));
+		// <== Design Settings [eWombat/Stulle] - Stulle
 		//Xman this is used for testing purpose
 		else
 		{

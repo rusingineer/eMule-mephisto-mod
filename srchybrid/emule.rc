@@ -6498,7 +6498,7 @@ BEGIN
     IDS_SVC_PAUSE_MGR_FAIL  "Service paused succesfully but failed to tell servicemanger. Quitting."
     IDS_SVC_INST_PATH_FAIL  "Unable to install service, no valid path. %s"
     IDS_SVC_INST_SUCCESS    "Installed as service."
-    IDS_SVC_INST_FAIL       "Failed to installed as a service: %s"
+    IDS_SVC_INST_FAIL       "Failed to install as a service: %s"
     IDS_SVC_SVCCTRL_FAIL    "Failed to connect to Service control: %s"
     IDS_SVC_STOPPING        "Stopping service"
     IDS_SVC_STOP_PNDNG      "Service stop pending"
@@ -6538,7 +6538,7 @@ BEGIN
     IDS_YESSERVICE          "Yes, and start eMule service"
     IDS_NOMINIMIZE          "No, To tray"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
-    IDS_WS_FRIENDSLOT       "Friendslot" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_WS_FRIENDSLOT       "Friend Slot" // Friendslot support for WebInterface [Stulle] - Stulle
     // ==> Diabolic Easteregg [Stulle] - Mephisto
     IDS_EASTEREGG           "Don't like the design? Click!"
     IDS_EASTEREGG_PROMPT    "Are you sure you don't like the mods design?"

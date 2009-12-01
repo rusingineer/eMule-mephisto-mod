@@ -4436,6 +4436,10 @@ CString GetColoredText(UINT in, int iStyle)
 
 CString GetColoredText(CString str, int iStyle)
 {
+	// just give the string back if we don't use personalized settings
+	if(thePrefs.GetColorFeedback() == false)
+		return str;
+
 	// Get styles
 	StylesStruct style, defaultStyle;
 	thePrefs.GetStyle(feedback_styles, abs(iStyle), &style);

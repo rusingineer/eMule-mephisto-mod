@@ -577,7 +577,7 @@ void CSearchResultsWnd::DownloadSelected(bool bPaused)
 
 	int useCat = GetSelectedCat();
 	bool	bCreatedNewCat = false;
-	if (useCat==-1 && thePrefs.SelectCatForNewDL())
+	if (useCat==-1 && thePrefs.SelectCatForNewDL() && thePrefs.GetCatCount()>1)
 	{
 		CSelCategoryDlg* getCatDlg = new CSelCategoryDlg((CWnd*)theApp.emuledlg);
 		getCatDlg->DoModal();

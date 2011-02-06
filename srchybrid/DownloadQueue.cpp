@@ -3240,7 +3240,7 @@ bool CDownloadQueue::PurgeED2KLinkQueue()
 	int		addedFiles = 0;
 	bool	bCreatedNewCat = false;
 	bool	bCanceled = false;
-	if (thePrefs.SelectCatForNewDL())
+	if (thePrefs.SelectCatForNewDL() && thePrefs.GetCatCount()>1)
 	{
 		CSelCategoryDlg* getCatDlg = new CSelCategoryDlg((CWnd*)theApp.emuledlg);
 		getCatDlg->DoModal();

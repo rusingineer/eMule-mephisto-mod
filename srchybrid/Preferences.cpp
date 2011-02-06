@@ -4317,7 +4317,7 @@ void CPreferences::LoadPreferences()
 	m_bIonixWebsrv = ini.GetBool(_T("UseIonixWebsrv"), false); // Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 
 	// ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
-	m_iServiceStartupMode = ini.GetInt(L"ServiceStartupMode",1);
+	GetServiceName();
 	m_iServiceOptLvl = ini.GetInt(L"ServiceOptLvl",SVC_SVR_OPT);
 	// <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
 	// ==> Adjustable NT Service Strings [Stulle] - Stulle

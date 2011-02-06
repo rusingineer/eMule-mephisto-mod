@@ -3482,7 +3482,7 @@
 #define IDS_SVC_STRTUP_CTRL_FAIL        61626
 #define IDS_SVC_LINK_PASS_FAIL          60627
 // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
-// ==> Adjustable NT Service Strings - Stulle
+// ==> Adjustable NT Service Strings [Stulle] - Stulle
 #define IDC_SERVICE_STR_GROUP           61630
 #define IDC_SERVICE_NAME_LABEL          61631
 #define IDC_SERVICE_NAME                61632
@@ -3508,7 +3508,7 @@
 #define IDS_SVC_DESCR_FAIL              61652
 #define IDS_SVC_STR_OPN_FAIL            61653
 #define IDS_SVC_STR_CTRL_FAIL           61654
-// <== Adjustable NT Service Strings - Stulle
+// <== Adjustable NT Service Strings [Stulle] - Stulle
 // ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
 #define IDD_ASKEXIT                     61660
 #define IDC_EXITQUESTION                61661

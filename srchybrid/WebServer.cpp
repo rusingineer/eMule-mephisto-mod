@@ -746,7 +746,7 @@ void CWebServer::ProcessURL(ThreadData Data)
 			*/
 			else if (_ParseURL(Data.sURL, _T("w")) == _T("reboot") && IsSessionAdmin(Data,sSession,3) )
 			{
-				LPARAM lParam = 1;
+				LPARAM lParam = 2;
 				if (thePrefs.UseIonixWebsrv())
 				{
 					//long lSession = _tstol(sSession);

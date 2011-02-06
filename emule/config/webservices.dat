@@ -17,7 +17,7 @@
 
 /eMule FAQ,http://www.emule-project.org/faq/
 
-eMule Xtreme Homepage, http://www.xtreme-mod.net
+eMule Mephisto Homepage, http://mephisto.emule-web.de/
 emugle search, http://www.emugle.com/
 --,--
 eMule Support, http://www.emule-web.de/
@@ -26,3 +26,5 @@ Server-List (FakeFree), http://www.server-met.de/server-liste.php
 Last IP-Filter.dat, http://www.emule-mods.de/?mods=ipfilter
 Donkeyfakes,http://www.donkeyfakes.net/fakes.php?hash=#hashid&size=#filesize
 Ed2khistory Power,http://ed2kstats.power-portal.to/ed2k.php?hash=#hashid
+ed2k-stats shortypower,http://ed2k.shortypower.dyndns.org/?hash=#hashid
+ed2k-check peerates,http://edk.peerates.net/check.php?hash=#hashid

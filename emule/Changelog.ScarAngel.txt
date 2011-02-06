@@ -1,6 +1,85 @@
 CHANGELOG FOR EMULE ScarAngel MOD
 
 
+eMule v0.49c ScarAngel v3.x:
+------------------------
+- XX.XX.2010 -
+-------------------------------------------------------------------------------
+based on eMule 0.49c Xtreme 7.2 compiled with vs2008 SP1
+
+Fixed: Reboot in webserver invoked shutdown instead of reboot [Stulle] - Stulle
+
+
+eMule v0.49c ScarAngel v3.3:
+------------------------
+- 03.12.2009 -
+-------------------------------------------------------------------------------
+based on eMule 0.49c Xtreme 7.2 compiled with vs2008 SP1
+
+Added: Date File Name Log (enabled by default) [AndCycle] - Stulle
+Added: Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+Added: Multiuser WebInterface (WI) Cookie settings [Aireoreion] - Stulle
+	+ added code missing in MorphXT so it works
+Added: New failed login handling for WI [MorphXT/leuk_he/dreamwalker/Stulle] - Stulle
+Added: Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+	+ Also for multiuser WI
+Added: Tabbed WebInterface settings panel [Stulle] - Stulle
+	+ For multiuser settings
+Added: Extra logging to notify of missing webserver files [leuk_he] - Stulle
+Added: PowerShare support for WebInterface [Stulle] - Stulle
+	+ fixed missing tick in menu and improper table display from StulleMule
+Added: Rebind UPnP mappings (UDP, TCP and Webserver for now) like official [Stulle] - Stulle
+Added: Run eMule as NT Service [leuk_he/Stulle] - Stulle
+	+ localized logging, cleaned up code
+Added: Adjustable NT Service Strings [Stulle] - Stulle
+Added: Extended Prompt on Exit dialog [leuk_he] - Stulle
+Added: Friendslot support for WebInterface [Stulle] - Stulle
+Added: Installer for eMule ScarAngel [leuk_he/Stulle] - Stulle
+	+ translations taken from eMule Morph so credits to the respective creators
+
+Changed: Disable FollowTheMajority per file when file is renamed manually [AndCycle] - Stulle
+Changed: Disable ASFU if too many folders are shared [Stulle] - Stulle
+	+ fixes related crashes; increases ASFU version number to 3.5
+Changed: Only display cat selection dialog if there is more than one cat [Stulle] - Stulle
+
+Fixed: Sorting priority descending failed for powershared files [Stulle] - Stulle
+Fixed: UPnP setting in First Runtime Wizard [leuk_he] - Stulle
+Fixed: Port settings in First Runtime Wizard for Random Ports feature [leuk_he] - Stulle
+Fixed: Missing checkmark for PS limited by amount context menu [Stulle] - Stulle
+Fixed: (Official) Malfunctioning search results in eMule Light template [Stulle] - Stulle
+Fixed: Show last tab in ScarAngel prefs panel on reopening prefs dialog [Stulle] - Stulle
+Fixed: Show friend menu in Friendlist of Webinterface [Stulle] - Stulle
+Fixed: Design settings font colors overridden in UploadListCtrl [Stulle] - Stulle
+Fixed: Personalize Feedback could not be turned off [Stulle] - Stulle
+
+Note: Following languages updated/added: German [Stulle]; French [Heaven]; 
+Chinese (P.R.C.) [jason_jiang]; Italian [Idro182]; Turkish [omeringen]; 
+Spanish [guijarrelson]; Chinese (Taiwan) [alisa/DargonD]
+
+Ionix advanced (multiuser) webserver:
++ You must select the multi user template to enable the multi user settings.
++ Changed user privileges (see below)
++ Added option to restrict user from downloading files via webserver.
++ Multiuser is enabled/disabled automatically on changing template.
+
+Ionix advanced (multiuser) webserver user privileges:
++ Guest: Viewing information from webinterface
++ Operator: Adding/Removing downloads and according to other settings
++ Admin: Like Operator plus privilege to close eMule
++ Hi-Admin: Like Admin plus privilege to shutdown/reboot windows
+
+Run as NT Service:
++ No need to login into windows
++ Keeps running after logging out/ switching users
++ New command line options:
+	- "emule -install"   --> install as a service
+	- "emule -uninstall" --> uninstall as a service
++ Make sure all settings are correct before installing as a service
++ Links are passed to webservice
++ Option to set level of optimization (Full may cause errors!)
++ See Preferences->Web Server->NTservice tab
+
+
 eMule v0.49c ScarAngel v3.2:
 ------------------------
 - 17.09.2009 -

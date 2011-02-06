@@ -198,8 +198,7 @@ BEGIN
     IDS_AUTOUPDATEIPFILTER  "自动升级IP过滤文件(IPFilter.dat)"
     IDS_DROPBLOCKINGSOCKETS "剔除频繁阻塞的Sockets"
     IDS_LOGPARTMISMATCH     "记录大小不匹配的被请求文件"
-    IDS_CN_UPNPTRYRANDOM    "对UPnP网关使用随机端口"
-    IDS_CN_UPNPNAT          "启用 UPnP"
+    IDS_CN_UPNPNAT          "启用 UPnP" //"Enable UPnP support"
     IDS_CHUNKCHOOSER        "文件块选择方式:"
     IDS_UPLOADINSTABLE      "警告: 你的上传值设置似乎太高了. 请检查你的设置!\n查看上传统计曲线, 白色或者黄色(使用NAFC时)的线应该是比较平整的.\n 此消息只提示一次"
 END
@@ -207,7 +206,6 @@ END
 STRINGTABLE 
 BEGIN
     IDS_CLIENTPERCENTAGE    "显示客户端百分比"
-    IDS_ONERELEASESLOT      "预留上传槽给发布级文件"
     IDS_A_UPPRIO            "使用全自动上传优先级"
     IDS_SHAREFACTOR         "共享系数"
     IDS_MASSRENAME1         "文件名过滤 (此设置将会被应用到以下所有的文件名)"
@@ -316,18 +314,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_UPNPSTART           "启用UPnP端口映射"
-    IDS_UPNPSETUP           "正在尝试以UPnP进行端口映射..."
-    IDS_UPNPFAILED          "UPnP:初始化映射端口失败,有必要的话请手动进行端口映射!"
-    IDS_UPNPSUCCESS         "UPnP:成功映射端口 %u(TCP) 和 %u(UDP)"
     IDS_FO_PREFBUTTON_NEW   "打开 WinXP SP2 防火墙端口"
-    IDS_UPNP_NOSERVICE      "主机路由UPnP驱动服务未运行,忽略UPnP初始化"
-    IDS_DELAYEDBYUPNP       "UPnP正在初始化端口映射,网络连接被延迟."
-    IDS_DELAYEDBYUPNP2      "请等稍等,eMule将在UPnP映射完毕时开始连接."
-    IDS_UPNP                "UPnP"
-    IDS_UPNPCLOSEONEXIT     "退出时移除UPnP映射端口"
-    IDS_UPNPSKIPWANIP       "跳过广域网(WAN)IP映射"
-    IDS_UPNPSKIPWANPPP      "跳过广域网(WAN)PPP映射"
     IDS_SHAREEMULELABEL     "多用户本地共享电骡"
     IDS_SHAREEMULEMULTI     "每个用户使用独立的配置和下载"
     IDS_SHAREEMULEPUBLIC    "所有用户共享相同的配置和下载"
@@ -2102,13 +2089,6 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_UPNPSTATUS          "UPnP 状态:"
-    IDS_UPNPSTATUS_OK       "绑定成功"
-    IDS_UPNPSTATUS_NOTINLAN "你并不在某个硬件防火墙或者路由器之后"
-    IDS_UPNPSTATUS_ERROR    "无法找到支持 UPnP 的路由器"
-    IDS_UPNPSTATUS_PORTINUSE "外部 NAT 端口被占用"
-    IDS_UPNPSTATUS_PORTINUSE2 "经过多次重试, 外部 NAT 端口均被占用"
-    IDS_UPNP_REBINDTEXT     "当 IP 改变时重新绑定 UPnP"
     IDS_IMPORTPARTS         "导入文件块..."
     IDS_IMPORTPARTS_STOP    "停止导入文件块"
     IDS_SR13_IMPORTPARTS_ERR_ALREADYCOMPLETE "导入终止: 不能导入已完成文件."
@@ -2132,9 +2112,6 @@ BEGIN
                             "文件比 AICH 能处理的最小分块还要小 - 导入不会有任何效果."
     IDS_SR13_IMPORTPARTS_IMPORTFINISH "导入完成. %i 个分块被导入到文件 %s."
     IDS_OBFUSCATION_PADDING_LENGTH "协议加密附加长度 [10-254]"
-    IDS_PUSH_SMALL          "推送小文件"
-    IDS_SMALL               "小文件"
-    IDS_PUSH_SMALL_FILE_SIZE "小文件大小上限 [1-2048 KB]"
 END
 
 STRINGTABLE 
@@ -2149,7 +2126,672 @@ BEGIN
 	IDS_DOWNLOADEMFRIENDSMET "下载 emfriends.met"
     IDS_EMFRIENDSMETURL     "请输入 emfriends.met 的 URL:"
 	IDS_USER_ALREADY_FRIEND "用户 ""%s"" 已经存在于你的好友列表之中"
-	IDS_TRUSTEVERYHASH      "信任每一个AICHHash (只在本次任务有效, 不保存, 不推荐)"
+    IDS_PROGRESSHASHDONE "校验完成 %s"
+END
+
+STRINGTABLE 
+BEGIN
+    // ==> ScarAngel Preferences window - Stulle
+    IDS_CON_TWEAKS          "连接调整"
+    IDS_MISC                "杂项设置"
+    // <== ScarAngel Preferences window - Stulle
+    // ==> Global Source Limit [Max/Stulle] - Stulle
+    IDS_GLOBAL_HL           "全局来源限制"
+    IDS_GLOBAL_HL_LIMIT     "全局硬性限制"
+    IDS_GLOBAL_HL_ALL       "作用于所有文件"
+    IDS_GLOBAL_HL_DEFAULT   "默认的全局来源限制"
+    IDS_ENABLE              "允许"
+    // <== Global Source Limit [Max/Stulle] - Stulle
+    IDS_PUSH                "推送设置" // push files - Stulle
+    // ==> push small files [sivka] - Stulle
+    IDS_PUSH_SMALL          "推送小文件"
+	IDS_SMALL               "小"
+	IDS_PUSH_SMALL_BOOST    "推送加速度"
+    // <== push small files [sivka] - Stulle
+    // ==> push rare file - Stulle
+    IDS_PUSH_RARE           "推送稀有文件"
+    IDS_RARE                "稀有"
+    IDS_RARE_RATIO          "稀有率"
+    // <== push rare file - Stulle
+    IDS_SHOWINMSN7          "在MSN信息栏中显示eMule状态" //Show in MSN7 [TPT] - Stulle
+    // ==> Show sources on title - Stulle
+    IDS_SHOWSRCONTITLE      "在标题栏中显示来源数"
+    IDS_SHOWSRCSTRING       "来源:"
+    // <== Show sources on title - Stulle
+    IDS_SHOWOVERHEADONTITLE "在标题栏中显示负载"// show overhead on title - Stulle
+    // ==> CreditSystems [EastShare/ MorphXT] - Stulle
+    IDS_CREDIT_SYSTEM       "信用机制"
+    IDS_OFFICIAL_CREDIT     "官方"
+    IDS_LOVELACE_CREDIT     "lovelace"
+    IDS_RATIO_CREDIT        "Ratio"
+    IDS_PAWCIO_CREDIT       "Pawcio"
+    IDS_EASTSHARE_CREDIT    "EastShare"
+    IDS_SIVKA_CREDIT        "Sivka"
+    IDS_SWAT_CREDIT         "S.W.A.T."
+    IDS_XMAN_CREDIT         "Xman"
+    IDS_TK4_CREDIT          "TK4"
+    IDS_ZZUL_CREDIT         "ZZUL"
+    // <== CreditSystems [EastShare/ MorphXT] - Stulle
+    // ==> SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
+    IDS_SUQWT_LOAD          "载入%s"
+    IDS_SUQWT               "允许保存上传排队时间(SUQWT)"
+    // <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
+    IDS_SHOW_FILE_HL_CONST  "总是显示每个文件的硬性限制" // show HL per file constantly - Stulle
+    IDS_SHOW_GLOBAL_HL      "显示全局硬性限制" // show global HL - Stulle
+    // ==> File Settings [sivka/Stulle] - Stulle
+    IDS_NNS_TIMERLABEL      "自动丢弃NNS时间(0-60秒)"
+    IDS_REMOVENNSLIMITLABEL "丢弃无需要部分的来源 > X%"
+    IDS_FQS_TIMERLABEL      "自动丢弃FQS时间(0-60秒)"
+    IDS_REMOVEFQSLIMITLABEL "丢弃队列已满的来源 > X%"
+    IDS_HQRS_TIMERLABEL     "自动丢弃HQRS时间(0-120秒)"
+    IDS_REMOVEQRSLABEL      "允许的最大排队位置 <= X"
+    IDS_REMOVEQRSLIMITLABEL "丢弃排队位置太靠后的来源 > X%"
+    IDS_AUTO_NNS            "自动丢弃无需要部分的来源"
+    IDS_AUTO_FQS            "自动丢弃队列已满的来源"
+    IDS_AUTO_QRS            "自动丢弃排队位置太靠后的来源"
+    IDS_SIVKAFILESETTINGS   "Sivka - 文件设置"
+    IDS_HARDLIMIT_LABEL     "硬性限制(0=使用默认值)"
+    IDS_FILE_DEFAULTS       "文件默认设置"
+    IDS_XMAN_DROPPING       "使用Xman丢弃法"
+    IDS_SIVKA_DROPPING      "使用Sivka丢弃法"
+    IDS_HQR_WAY             "丢弃法"
+    // <== File Settings [sivka/Stulle] - Stulle
+    IDS_SHOW_DROPPED_SRC    "已丢弃的来源" // show # of dropped sources - Stulle
+    // ==> Source Graph - Stulle
+    IDS_SRCGRAPH            "绘制来源统计图"
+    IDS_STATIC_STATSHL      "统计图的最小/最大硬性限制值:"
+    IDS_SP_SRCGRAPH         "来源统计图"
+    // <== Source Graph - Stulle
+    IDS_FD_AVGDL            "平均下载速度:" // Average download speed - Stulle
+    // ==> FunnyNick [SiRoB/Stulle] - Stulle
+    IDS_FN_TAG              "个性昵称标签"
+    IDS_NO_TAG              "无"
+    IDS_SHORT_TAG           "[FN]"
+    IDS_FULL_TAG            "[FunnyNick]"
+    IDS_CUSTOM_TAG          "自定义"
+    IDS_SET_CUSTOM_TAG      "设置自定义标签"
+    IDS_FN_TAG_AT_END       "在末尾显示标签"
+    // <== FunnyNick [SiRoB/Stulle] - Stulle
+    IDS_CLIENTQUEUEPROGRESSBAR "显示客户端排队进度" // Client queue progress bar [Commander] - Stulle
+    IDS_ACC                 "允许主动连接控制" // ACC [Max/WiZaRd] - Max
+    // ==> ScarAngel Version Check - Stulle
+    IDS_VISITSVERSIONCHECK  "\n\n你想访问ScarAngel主页吗?"
+    IDS_SVERSIONCHECK       "版本检查(ScarAngel)"
+    IDS_NONEWSVERVERSION    "没有检查到新的eMule ScarAngel版本."
+    IDS_NEWSVERSIONAVL      "检查到新的ScarAngel版本!请访问ScarAngel主页."
+    IDS_NEWSVERSIONAVLPOPUP "检查到新的ScarAngel版本!点击这里阅读有关信息."
+    // <== ScarAngel Version Check - Stulle
+    // ==> Quick start [TPT] - Max
+    IDS_QUICK_START_GROUP   "快速启动"
+    IDS_QUICK_START         "允许快速启动"
+    IDS_QUICK_START_MAX_TIME "快速启动持续时间(8-18分钟)"
+    IDS_QUICK_START_MAX_CONN_PER_FIVE "每5秒的最大连接数"
+    IDS_QUICK_START_MAX_CONN "最大连接数"
+    IDS_QUICK_START_AFTER_IP_CHANGE "IP地址改变后进行快速启动"
+	IDS_QUICK_START_MAX_CONN_PER_FIVE_BACK "恢复到的每5秒最大连接数"
+    IDS_QUICK_START_MAX_CONN_BACK "恢复到的最大连接数"
+    // <== Quick start [TPT] - Max
+    // ==> CPU/MEM usage [$ick$/Stulle] - Stulle
+    IDS_SYS_INFO_GROUP      "系统信息"
+    IDS_SYS_INFO_GLOBAL     "允许全局信息"
+    // <== CPU/MEM usage [$ick$/Stulle] - Stulle
+    // ==> TBH: Backup [TBH/EastShare/MorphXT] - Stulle
+    IDS_BACKUP_FILEFRAME    "选择要备份的文件类型"
+    IDS_BACKUP_SELECTALL    "全选"
+    IDS_BACKUP_AUTOFRAME    "自动备份"
+    IDS_BACKUP_AUTOBACKUP   "退出时自动备份"
+    IDS_BACKUP_NOTE         "注:"
+    IDS_BACKUP_BACKUPNOW    "立即备份"
+    IDS_BACKUP_MESSAGE      "将在你的eMule安装目录里创建Backup目录,用来放置备份"
+    IDS_BACKUP_AUTOBACKUP2  "双备份"
+    IDS_ABORT               "中止?"
+    IDS_CONTINUE            "继续"
+    IDS_DONOTASKAGAIN       "不要再问我"
+    IDS_DONOTSHOWAGAIN      "不要再显示"
+    IDS_DONOTTELLAGAIN      "不要再告诉我"
+    IDS_HELP                "帮助"
+    IDS_IGNORE              "忽略"
+    IDS_IGNOREALL           "全部忽略"
+    IDS_NOTOALL             "全部不"
+    IDS_OK                  "确定"
+    IDS_REPORT              "报告"
+    IDS_RETRY               "重试"
+    IDS_SKIP                "跳过"
+    IDS_SKIPALL             "全部跳过"
+    IDS_TRYAGAIN            "重试"
+    IDS_YESTOALL            "全部是"
+    // <== TBH: Backup [TBH/EastShare/MorphXT] - Stulle
+    // ==> TBH: minimule - Max
+    IDS_MM_SHOW             "使用TBH迷你骡"
+    IDS_MM_LIVES            "总是更新迷你骡数据"
+    IDS_MM_UPDATE_TIME      "迷你骡更新间隔(秒)"
+    IDS_MM_TRANS            "迷你骡透明度(1-255)"
+    IDS_MM_ACTDL            "正进行的下载: %i"
+    IDS_MM_DATA             "上传: %s | 下载: %s"
+    IDS_MM_UPDOWN           "上传: %s(%.1f) | 下载: %s(%.1f)"
+    IDS_MM_COMPL            "显示会话中的完成数"
+    IDS_MM_RATIO            "上传下载比:"
+    IDS_MM_OPEN             "最小化到托盘时显示迷你骡"
+    IDS_MM_GROUP            "TBH迷你骡"
+    // <== TBH: minimule - Max
+    // ==> Copy feedback feature [MorphXT] - Stulle
+    IDS_COPYFEEDBACK        "把反馈信息复制到剪贴板"
+    IDS_COPYFEEDBACK_US     "把反馈信息复制到剪贴板(US)"
+    IDS_FEEDBACK_TRANSFERRED "已传输"
+    IDS_FEEDBACK_REQUESTED  "已请求"
+    IDS_FEEDBACK_ACCEPTED   "已接受的请求"
+    IDS_FEEDBACK_FROM       "反馈信息来自 %s 在 [%s]"
+    IDS_FEEDBACK_FILENAME   "文件名"
+    IDS_FEEDBACK_FILETYPE   "文件类型"
+    IDS_FEEDBACK_FILESIZE   "大小"
+    IDS_FEEDBACK_DOWNLOADED "已下载"
+//    IDS_FEEDBACK_TOTAL      "总计来源"
+    IDS_FEEDBACK_AVAILABLE  "可用来源"
+    IDS_FEEDBACK_NONEEDPART "无需要部分的来源"
+    IDS_FEEDBACK_COMPLETE   "已完成的来源"
+    IDS_FEEDBACK_ON_QUEUE   "排队中"
+    IDS_FEEDBACK_ALL_TRANSFERRED "已传输(所有文件)"
+    // <== Copy feedback feature [MorphXT] - Stulle
+    // ==> Simple cleanup [MorphXT] - Stulle
+    IDS_CHECKDOTTOSPACE     "把小数点换成空格"
+    IDS_CHECKUNDERLINETOSPACE "把半角下划线换成空格"
+    IDS_CHECKCONVERTAPOSTROPHES 
+                            "把错误的撇号换成标准的撇号"
+    IDS_CHECKCONVERTHEX     "把十六进制数 ""%xx"" 换成字符"
+    IDS_CHECKSEARCHANDREPLACE "查找和替换:"
+    IDS_SC_SEARCHFOR        "找什么:"
+    IDS_SC_REPLACEBY        "替换成:"
+    IDS_CHECKCASESENSITIVE  "区分大小写"
+    IDS_CHECKCHARACTERREPLACE "替换字符:"
+    IDS_REPLACECHAR         "替换"
+    IDS_REPLACECHARBY       "为"
+    IDS_SC_ADD              "添加"
+    IDS_SC_EDIT             "编辑"
+    IDS_SC_DELETE           "删除"
+    IDS_SEARCHFORCHAR       "找什么:"
+    IDS_REPLACEBYCHAR       "替换成"
+    IDS_SC_HEADLINE         "简易清理"
+    // <== Simple cleanup [MorphXT] - Stulle
+    // ==> Startupsound [Commander] - mav744
+    IDS_STARTUPSOUND        "播放启动音效"
+    IDS_MISSING_STARTUPSOUND 
+                            "未找到启动音效文件startup.wav, 请将其放在config目录里."
+    // <== Startupsound [Commander] - mav744
+    IDS_COMPRESS_LVL        "压缩等级(0=禁止)" // Adjust Compress Level [Stulle] - Stulle
+    // ==> Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
+    IDS_CAT_MINIMUM         "最小"
+    IDS_CAT_MAXIMUM         "最大"
+    IDS_CAT_DLGHELP         "这些复选框表示当为一个新文件选择分类时是否使用此规则"
+    IDS_CAT_FILTERS         "分类过滤规则"
+    IDS_CAT_RS              "剩余大小(MB)"
+    IDS_CAT_FS              "     文件大小(MB)"
+    IDS_CAT_RT              "剩余时间(M)"
+    IDS_CAT_SC              "来源数"
+    IDS_CAT_ASC             "可用来源数"
+    IDS_CAT_THISCAT         "此分类"
+    IDS_CAT_SUSPENDFILTERS  "暂时禁用视图过滤规则"
+    IDS_CAT_FROMCATSINFO    "将此分类设为“显示所有文件”或“所有未指定的文件”之前, 你必须将此分类中的所有文件都指定为别的分类!"
+    IDS_CAT_FROMCATSCAP     "未指定的文件"
+    IDS_CAT_FILTERSACTIVE   "已启用的过滤规则"
+    IDS_CAT_FILTERSSUSP     "已禁用的过滤规则"
+    IDS_CAT_SETORDER        "设置线性优先级"
+    IDS_CAT_ORDER           "输入一个大于等于零的整数, 小的值会先恢复"
+    IDS_CAT_PAUSEDSHOWN     " | 显示已暂停的"
+    IDS_CAT_PAUSEDHIDDEN    " | 隐藏已暂停的"
+    IDS_CAT_COLCATEGORY     "分类"
+    IDS_CAT_COLORDER        "LP"
+    IDS_CAT_MNUAUTOINC      "自动增加已选择的"
+    IDS_CAT_MNUSTEPTHRU     "步进所有已选择的"
+    IDS_CAT_MNUALLSAME      "全部设为同一个值"
+    IDS_CAT_EXPAUTOINC      "输入一个非负数的起始数:"
+    IDS_CAT_EXPSTEPTHRU     "输入一个非负数, 小的值会先恢复.\n文件:"
+    IDS_CAT_EXPALLSAME      "输入一个非负数, 这将应用到所有已选择的文件:"
+    IDS_CAT_ABORTSTEPTHRU   "你想中止步进线性优先级吗?"
+    IDS_CAT_SHOWPAUSED      "显示已暂停的"
+    IDS_CAT_HIDEPAUSED      "隐藏已暂停的"
+    IDS_CAT_SELDLGTXT       "从列表中选择一个分类, 或输入一个新分类:"
+    IDS_CAT_SELDLGCAP       "选择分类"
+    IDS_CAT_SHOWCATNAME     "在“分类”栏中显示完整分类名"
+    IDS_CAT_SHOWSELCATDLG   "显示“选择分类”对话框"
+    IDS_CAT_USEACTIVE       "默认将新下载任务设为当前分类"
+    IDS_CAT_AUTORESUMEORD   "自动增加并指定线性优先级"
+    IDS_CAT_SMALLFILEDLPUSH "先下载小于150KB的文件"
+    IDS_CAT_AUTOCAT         "高级过滤通配, 使用|分隔 "
+    IDS_CAT_USEAUTOCAT      "添加新下载到分类时使用视图过滤规则"
+    IDS_CAT_MERGE           "合并分类"
+    IDS_CAT_GROUP           "组"
+    IDS_CAT_RESUMEFILEONLYINSAMECAT 
+                            "只恢复相同分类中的已暂停文件"
+    IDS_CAT_RESUMENEXT      "恢复下一个"
+    IDS_CAT_PAUSELAST       "暂停最后一个"
+    IDS_CAT_STOPLAST        "停止最后一个"
+    IDS_SCC                 "智能分类控制(SCC)"
+    IDS_DL_MODE             "恢复模式"
+    IDS_LP                  "线性优先级"
+    IDS_CAT_STARTFILESONADD "当添加到一个新分类时开始的文件数"
+    IDS_DL_MODE_DEFAULT     "默认恢复模式"
+    IDS_DL_NONE             "无"
+    IDS_SEARCH_INVALIDMINMAX "指定的最小/最大文件大小中有无效的单位"
+    // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
+    IDS_SHARED_PREFS        "共享文件管理" // Shared Files Management [Stulle] - Stulle
+    // ==> Spread bars [Slugfiller/MorphXT] - Stulle
+    IDS_SPREAD_BARS         "允许传播条"
+    IDS_SF_UPLOADED_PARTS   "传播条(上传区块历史)"
+    IDS_SF_TURN_PART        "文件上传(区块)"
+    IDS_SF_TURN_SIMPLE      "文件上传(简易)"
+    IDS_SF_FULLUPLOAD       "文件上传(完整)"
+    IDS_SPREAD_RESET        "清空传播条"
+	// <== Spread bars [Slugfiller/MorphXT] - Stulle
+    // ==> HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
+    IDS_HIDEOS              "隐藏过度共享"
+    IDS_SHAREONLYTHENEED    "只共享需要的部分"
+    IDS_HIDEOVERSHARES      "在隐藏区块前过度共享(0=禁止)"
+    IDS_SELECTIVESHARE      "选择性的区块共享"
+    IDS_ERR_HIDDENBLOCK     "请求隐藏的区块"
+    // <== HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
+    // ==> PowerShare [ZZ/MorphXT] - Stulle
+    IDS_POWERSHARE_ACTIVATED "激活"
+    IDS_POWERSHARE_DISABLED "禁止"
+    IDS_POWERSHARE_ON_LABEL "开"
+    IDS_POWERSHARE_OFF_LABEL "关"
+    IDS_POWERSHARE_COLUMN_LABEL "强力共享"
+    IDS_POWERSHARE_PREFIX   "PS"
+    IDS_POWERSHARE          "强力共享"
+    IDS_POWERSHARE_DENIED_LABEL "已拒绝"
+    IDS_POWERSHARE_ADVISED_LABEL "已建议"
+    IDS_POWERSHARE_AUTHORIZED_LABEL "已认证"
+    IDS_POWERSHARE_ACTIVATED_LABEL "已激活"
+    IDS_POWERSHARE_DISABLED_LABEL "已禁止"
+    IDS_POWERSHARE_AUTO_LABEL "自动"
+    IDS_POWERSHARE_AUTO     "自动"
+    IDS_POWERSHARE_LIMITED  "有限"
+    IDS_POWERSHARE_LIMIT    "完成来源限制"
+	// <== PowerShare [ZZ/MorphXT] - Stulle
+    // ==> Release Bonus [sivka] - Stulle
+    IDS_RELEASE_BONUS_GROUP "发布奖励"
+    IDS_RELEASE_BONUS_EDIT  "设置奖励天数"
+    IDS_RELEASE_BONUS_12    "12小时"
+    // <== Release Bonus [sivka] - Stulle
+    IDS_RELEASE_SCORE_ASSURANCE "保证发布文件的默认积分" // Release Score Assurance [Stulle] - Stulle
+    // ==> Design Settings [eWombat/Stulle] - Stulle
+    IDS_COLOR_MASTER1       "客户"
+    IDS_COLOR_MASTER2       "正下载的文件"
+    IDS_COLOR_MASTER3       "共享的文件"
+    IDS_COLOR_BOX           "布局设置"
+    IDS_COLOR_FONT_LABEL    "字体色"
+    IDS_COLOR_BACK_LABEL    "背景色"
+    IDS_COLOR_B7            "服务器列表"
+    IDS_COLOR_C1            "好友"
+    IDS_COLOR_S1            "仍在下载的"
+    IDS_COLOR_S2            "强力共享的"
+    IDS_COLOR_C2            "正在请求强力共享的文件"
+    IDS_COLOR_C3            "正在请求强力发布的文件"
+    IDS_COLOR_C4            "下载来自"
+    IDS_COLOR_C5            "上传到"
+    IDS_COLOR_C6            "吸血骡"
+    IDS_COLOR_B1            "已知的客户"
+    IDS_COLOR_MASTER5       "背景色"
+    IDS_COLOR_B2            "正在下载的客户"
+    IDS_COLOR_B3            "正在等待的客户"
+    IDS_COLOR_B4            "正在上传的客户"
+    IDS_COLOR_B5            "正在下载的文件"
+    IDS_COLOR_B6            "共享的文件"
+    IDS_COLOR_C7            "低ID"
+    IDS_COLOR_C8            "好评"
+    IDS_COLOR_ON            "开"
+    IDS_COLOR_OFF           "关"
+    IDS_COLOR_MASTER4       "服务器"
+    IDS_COLOR_SE1           "当前连接的服务器"
+    IDS_COLOR_SE2           "静态服务器"
+    IDS_COLOR_SE3           "已过滤的服务器"
+    IDS_COLOR_SE4           "失效服务器"
+    IDS_COLOR_SE5           "不可信的服务器"
+    IDS_COLOR_W1            "Kad窗口"
+    IDS_COLOR_W2            "服务器窗口"
+    IDS_COLOR_W3            "传输窗口"
+    IDS_COLOR_W4            "搜索窗口"
+    IDS_COLOR_W5            "共享文件窗口"
+    IDS_COLOR_W6            "消息窗口"
+    IDS_COLOR_W7            "IRC窗口"
+    IDS_COLOR_W8            "统计窗口"
+    IDS_COLOR_W9            "状态栏"
+    IDS_COLOR_MASTER6       "窗口"
+    IDS_COLOR_W10           "工具栏"
+    IDS_COLOR_WARNING       "你正在使用WinXP或更高版本的操作系统. 只有在使用经典样式时, 状态栏和工具栏才能改变颜色."
+    IDS_COLOR_S3            "可共享"
+    // <== Design Settings [eWombat/Stulle] - Stulle
+    // ==> Limit PS by amount of data uploaded [Stulle] - Stulle
+    IDS_PS_AMOUNT_LIMIT         "基于上传数据量限制"
+    IDS_PS_AMOUNT_LIMIT_LABEL   "基于上传数据量限制(最大10000%)"
+    IDS_PS_AMOUNT_LIMIT_WRONG   "输入了无效的值"
+    // <== Limit PS by amount of data uploaded [Stulle] - Stulle
+    // ==> Enforce Ratio [Stulle] - Stulle
+    IDS_RATIO_GROUP             "上传下载比"
+    IDS_ENFORCE_RATIO           "总是强制使用比率"
+    IDS_RATIO_VALUE             "最大比率1"
+	IDS_RATIO_REASON            "因数"
+    IDS_RATIO_REASON2           "全局硬性限制(为了公平)"
+    IDS_RATIO_REASON3           "如果上传带宽小于11KB/s, 就强制使用1:3比率"
+    IDS_RATIO_REASON4           "NAFC动态下载限制"
+    IDS_RATIO_REASON5           "强制比率"
+	IDS_RATIO_ACTIVATION        "下载限制已激活"
+    IDS_RATIO_LIMIT             "上传下载比将被限制到1:1"
+    // <== Enforce Ratio [Stulle] - Stulle
+    // ==> Tabbed Preferences [TPT] - Stulle
+    IDS_SCARANGEL               "ScarAngel"
+    IDS_BACKUP                  "备份"
+    // <== Tabbed Preferences [TPT] - Stulle
+    IDS_ERR_HIDDENSOURCE    "不显示对方的区块请求" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
+    // ==> Improved ICS-Firewall support [MoNKi] - Max
+    IDS_ICFSUPPORT          "允许ICF支持"
+    IDS_ICFSUPPORTFIRST     "Windows连接防火墙(ICF)正在运行,\n\r你想让eMule自动配置它吗? (推荐)"
+    IDS_ICF                 "Windows连接防火墙(ICF)"
+    IDS_ICF_SERVERUDP       "添加服务器UDP端口的规则"
+    // <== Improved ICS-Firewall support [MoNKi] - Max
+    // ==> Invisible Mode [TPT/MoNKi] - Stulle
+    IDS_CTRLKEY             "CTRL"
+    IDS_ALTKEY              "ALT"
+    IDS_SHIFTKEY            "SHIFT"
+    IDS_INVMODE             "允许隐身模式(老板键)"
+    IDS_INVMODE_MODKEY      "组合键:"
+    IDS_INVMODE_VKEY        "基本键:"
+    IDS_INVMODE_GROUP       "隐身模式"
+    IDS_INVMODE_START       "启动时隐身"
+    // <== Invisible Mode [TPT/MoNKi] - Stulle
+    // ==> UPnP support [MoNKi] - leuk_he
+    IDS_UPNP_INIT           "UPnP: 初始化于 %s:%d, 正在查找设备"
+    IDS_UPNP_FAILEDINIT     "UPnP: 初始化UPnP失败, 在端口 %d [%s]"
+    IDS_UPNP_PUBLICIP       "UPnP: 你有公网IP, 不需要UPnP"
+    IDS_UPNP_FAILEDREGISTER "UPnP: 注册控制点 [%s] 失败"
+    IDS_UPNP_NEWDEVICE      "UPnP: 找到新的兼容设备: %s"
+    IDS_UPNP_VERBOSELOG     "UPnP事件"
+    IDS_UPNP_NETSTATUS      "UPnP"
+    IDS_UPNP_GROUP          "通用即插即用(UPnP)"
+    IDS_UPNP_ENABLE         "允许UPnP"
+    IDS_UPNP_ENABLE_WEB     "在Web界面端口上允许UPnP"
+    IDS_UPNPBINDADDR        "UPnP主机地址绑定到"
+    IDS_UPNP_INFO_NONEED    "失败或不需要"
+    IDS_UPNP_INFOUNINIT     ", 未初始化\r\n"
+    IDS_UPNP_INFOENABLED    ", 已允许\r\n"
+    IDS_UPNP_INFODISABLED   ", 已禁止\r\n"
+    IDS_UPNP_INFOSTANDBY    "没有找到设备\r\n"
+    IDS_UPNFORCEUPDATE      "强制定期更新"
+    // <== UPnP support [MoNKi] - leuk_he
+    // ==> Random Ports [MoNKi] - Stulle
+    IDS_RND_PORT_GROUP      "随机端口"
+    IDS_RND_PORT_FIRST      "起始端口"
+    IDS_RND_PORT_LAST       "结束端口"
+    IDS_RND_PORT_RESET      "随机端口安全重启时间"
+    // <== Random Ports [MoNKi] - Stulle
+    // ==> Support page in preferences [Stulle] - Stulle
+    IDS_SUPPORT             "技术支持"
+	IDS_HOMEPAGE            "主页"
+    IDS_BOARD_GER           "德文技术论坛"
+    IDS_BOARD_ENG           "英文技术论坛"
+    IDS_RATE                "评价ScarAngel"
+    IDS_XTREME              "Xtreme主页"
+    // <== Support page in preferences [Stulle] - Stulle
+    // ==> Automatic shared files updater [MoNKi] - Stulle
+    IDS_AUTO_SHARED_UPDATER "自动刷新共享文件(ASFU)"
+    IDS_ASFU_RELOADTIME     "ASFU: 共享目录发生变化, 将于%d秒后刷新共享文件..."
+    IDS_ASFU_DELAY          "ASFU: 有一个文件正在完成, 推迟刷新..."
+    IDS_ASFU_RELOAD         "共享目录发生变化, 正在刷新共享文件..."
+    IDS_ASFU_RELOADING      "ASFU: 正在刷新..."
+    IDS_ASFU_SINGLE         "监视只共享了一个文件的目录"
+    IDS_ASFU_TIMEBETWEEN    "自动刷新间隔时间 [秒]"
+    // <== Automatic shared files updater [MoNKi] - Stulle
+    // ==> Anti Uploader Ban [Stulle] - Stulle
+    IDS_UNBAN_UPLOADER      "防封禁限制的MB数 [0=禁止]"
+    IDS_ANTI_CASE_1         "上传 >= 限制"
+    IDS_ANTI_CASE_2         "上传-下载 >= 限制"
+    IDS_ANTI_CASE_3         "上传-下载 >= 限制, 直到达到1:1比率"
+    // <== Anti Uploader Ban [Stulle] - Stulle
+    // ==> Emulate others [WiZaRd/Spike/shadow2004] - Stulle
+    IDS_EMULATOR_GROUP      "允许伪装成其它客户端"
+    IDS_EMULATE_ML          "允许伪装成MLDonkey"
+    IDS_EMULATE_DONK        "允许伪装成eDonkey"
+    IDS_EMULATE_DONK_HYB    "允许伪装成eDonkey-hybrid"
+    IDS_EMULATE_SHA         "允许伪装成Shareza"
+    IDS_EMULATE_PHANT       "允许伪装成lPhant"
+    IDS_EMULATE_LOG         "记录伪装行为"
+    // <== Emulate others [WiZaRd/Spike/shadow2004] - Stulle
+    // ==> Spread Credits Slot [Stulle] - Stulle
+    IDS_SPREAD_CREDITS_SLOT "传播信用槽(SCS)"
+    IDS_SPREAD_CREDITS_SLOT_COUNTER "传播信用槽, 每X个槽"
+    // <== Spread Credits Slot [Stulle] - Stulle
+    // ==> Pay Back First [AndCycle/SiRoB/Stulle] - Stulle
+    IDS_PAYBACKFIRST        "优先回报"
+    IDS_PAYBACKFIRSTLIMIT   "触发前的数据量(默认10MB)"
+    IDS_PAYBACKFIRST2       "回报无安全认证的客户(不推荐)"
+    IDS_PAYBACKFIRSTLIMIT2  "触发前的数据量(默认50MB)"
+    // <== Pay Back First [AndCycle/SiRoB/Stulle] - Stulle
+    IDS_IGNORE_THIRD        "不保留1/3的上传限制" // Do not reserve 1/3 of your uploadlimit for emule [Stulle] - Stulle
+    IDS_UL_THRES            "只接受过去30分钟内请求过的客户" // Disable accepting only clients who asked within last 30min [Stulle] - Stulle
+    IDS_FOLLOWTHEMAJORITY   "自动更正文件名为最常见的名字" // Follow The Majority [AndCycle/Stulle] - Stulle
+    IDS_FAIR_PLAY           "公平游戏 - 上传X倍(0 = 禁用)" // Fair Play [AndCycle/Stulle] - Stulle
+    IDS_MAX_SLOTSPEED       "总是最大化上传通道" // Alwasy maximize slot speed [Stulle] - Stulle
+    IDS_REASK_FILE_SRC      "重新请求来源的间隔时间 [29-55分钟]" // Timer for ReAsk File Sources [Stulle] - Stulle
+    // ==> Advanced Options [Official/MorphXT] - Stulle
+    IDS_MINIMULEAUTOCLOSE   "自动关闭迷你骡"
+    IDS_MINIMULETRANSPARENCY "迷你骡透明度"
+    IDS_CHECKCOMCTL32       "检查Comctl32.dll"
+    IDS_CHECKSHELL32        "检查Shell32.dll"
+    IDS_IGNOREINSTANCES     "同一时间只允许运行一个eMule"
+    IDS_NOTIFIERMAILENCRYPTCERTNAME "邮件通知加密证书名"
+    IDS_MEDIAINFO_MEDIAINFODLLPATH "mediainfo.dll路径"
+    IDS_MEDIAINFO_RIFF      "使用mediainfo.dll识别avi文件"
+    IDS_MEDIAINFO_ID3LIB    "使用mediainfo.dll或ID3Lib识别mpeg文件"
+    IDS_MAXLOGBUFF          "最多允许日志文件占用多少内存"
+    IDS_MAXCHATHISTORY      "最多显示几行IRC聊天记录"
+    IDS_PREVIEWSMALLBLOCKS  "预览小的文件块 (for VLC)"
+    IDS_RESTORELASTMAINWNDDLG "启动时打开上次的窗口"
+    IDS_RESTORELASTLOGPANE  "启动时打开上次的日志页"
+    IDS_PREVIEWCOPIEDARCHIVES "预览已复制的压缩包"
+    IDS_STRAIGHTWINDOWSTYLES "整齐的窗口外观 (可能需要重启)"
+    IDS_LOGFILEFORMAT       "日志文件编码 (允许=UTF-8, 禁止=Unicode)"
+    IDS_RTLWINDOWSLAYOUT    "从右到左的窗口布局"
+    IDS_PREVIEWONICONDBLCLK "双击图标时预览"
+    IDS_INTERNETSECURITYZONE "Internet安全区域"
+    IDS_TXTEDITOR           "web服务和IPFilter.dat默认使用的文本编辑器"
+    IDS_SERVERUDPPORT       "服务器UDP端口"
+    IDS_MAXMSGSESSIONS      "最多打开几个聊天会话"
+    IDS_PREFERRESTRICTEDOVERUSER "偏好受限用户"
+    IDS_WEBFILEUPLOADSIZELIMITMB "最多允许通过Web界面上传多少数据(单位MB，0=无)"
+    IDS_HIGHRESTIMER        "高精度计时"
+    IDS_ALLOWEDIPS          "允许使用web服务的IP (用分号隔开)"
+    IDS_REMOVEFILESTOBIN    "删除文件到回收站, 而不是直接删除"
+    IDS_DEBUGSEARCHDETAILLEVEL "调试搜索精度"
+    IDS_CRYPTTCPPADDINGLENGTH "协议加密头长度 (1-254)"
+    IDS_USEUSERSORTEDSERVERLIST "用户排列的服务器列表"
+    IDS_MINIMULE            "迷你骡"
+    IDS_TRUSTEVERYHASH      "在本次运行期间信任所有的AICH Hash"
+    IDS_INSPECTALLFILETYPES "检测所有文件的头部以判断其类型"
+    IDS_X_ADJUSTNTFSDAYLIGHTFILETIME "在NTFS分区上自动调整夏令时"
+    IDS_X_DATETIMEFORMAT    "日期时间格式"
+    IDS_X_DATETIMEFORMAT4LOG "日志使用的日期时间格式"
+    IDS_X_LOGWARNING        "日志使用的警告信息色"
+    IDS_X_LOGSUCCESS        "日志使用的成功信息色"
+    IDS_X_LOGERROR          "日志使用的错误信息色"
+    IDS_X_ICH               "智能纠错(ICH)"
+    IDS_X_DONTCOMPRESSAVI   "不压缩avi"
+    IDS_X_SHOWCOPYED2KLINK  "显示“复制ed2k链接”命令"
+    IDS_X_ICON_FLASH_ON_NEW_MESSAGE "有新消息时闪动托盘图标"
+    IDS_X_SHOWVERTICALHOURMARKERS "统计- 在纵轴显示小时标记"
+    IDS_X_REBARTOOLBAR      "* ReBar 工具栏"
+    IDS_BINDADDR            "绑定emule到界面"
+    IDS_MEDIAINFO_MEDIADET  "使用Media Detector(MediaDet)获取媒体文件的信息"
+    IDS_MEDIAINFO_RM        "使用mediainfo.dll识别Real媒体文件"
+    IDS_MEDIAINFO_WM        "使用mediainfo.dll识别Windows Media文件"
+    // <== Advanced Options [Official/MorphXT] - Stulle
+    // ==> Advanced Updates [MorphXT/Stulle] - Stulle
+    IDS_UPDATEANTILEECHERONSTART "每次启动时更新antiLeech.dll"
+    IDS_AUTOUPWEEK          "每周更新"
+    IDS_URL_FOR_UPDATING    "更新地址"
+    IDS_UPDATEIPCURL        "更新"
+    IDS_UPDATEIPFILTERONSTART "每次启动时更新ipfilter.dat"
+    IDS_RESET               "还原"
+    IDS_COUNTRY             "国家"
+    IDS_AUTOUPIP2COUNTRY    "每次启动时更新ip-to-country.csv"
+    IDS_SCHED_UPDATE_IPCONFIG_LOG "开始更新ipfilter.dat"
+    IDS_SCHED_UPDATE_ANTILEECH_LOG "开始更新antiLeech.dll"
+    IDS_SCHEDTEXT           "由ScarAngel自动更新添加"
+    IDS_SCHED_UPDATE_IPCONFIG "更新ipfilter.dat"
+    IDS_SCHED_UPDATE_ANTILEECH "更新antiLeech.dll"
+    IDS_SCHED_UPDATE_WARNING 
+                            "自动更新任务不需要设置得太频繁.\r\n一周一次就够了."
+    IDS_SCHED_WARNENDTIME   "对于一次性任务, 起始时间应设为等于开始时间"
+    IDS_IP2COUNTRY_DWNFILE  "正在下载ip-to-country.csv"
+    IDS_IP2COUNTRY_UPUNLOAD "为了更新ip-to-country.csv, 已暂时将其禁用"
+    IDS_IP2COUNTRY_UPLOAD   "ip-to-country.csv更新完成"
+    IDS_LOG_ERRDWN          "下载 %s 出错"
+    IDS_IP2COUNTRY_ERROR7   "从下载的文件 %s 中解压ip-to-country.csv时出错"
+    IDS_IP2COUNTRY_ERROR8   "下载的文件 %s 中包含未知内容"
+    IDS_AUTODLPFAILED       "检查DLP版本失败"
+    IDS_ANTILEECH_DWNFILE   "正在下载DLP"
+    IDS_AUTOIPFILTERFAILED  "检查ipfilter版本失败"
+    // <== Advanced Updates [MorphXT/Stulle] - Stulle
+    // ==> Links for Server list and nodes file [Stulle] - Stulle
+    IDS_NODESFILEBUTTON     "节点文件"
+    IDS_SERVER_LISTS        "服务器列表"
+    // <== Links for Server list and nodes file [Stulle] - Stulle
+    IDS_SHOW_SPEED_METER    "在工具栏中显示速度统计图" // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
+    // ==> Control download priority [tommy_gun/iONiX] - MyTh88
+    IDS_AUTO_DOWN_GROUP     "控制下载优先级"
+    IDS_AUTO_DOWN_PERC      "基于完成百分比"
+    IDS_AUTO_DOWN_PERC_VAL  "完成百分比"
+    IDS_AUTO_DOWN_SIZE      "基于剩余大小"
+    IDS_AUTO_DOWN_SIZE_VAL  "剩余大小(MB)"
+    IDS_AUTO_DOWN_PRIO      "更改优先级为"
+    // <== Control download priority [tommy_gun/iONiX] - MyTh88
+    // ==> XP Style Menu [Xanatos] - Stulle
+    IDS_MENU_PREVIEW        "预览"
+    IDS_HISTORY             "历史任务"
+    IDS_COLUMNS             "栏"
+    IDS_PS_LIMITED_SRC      "基于来源限制"
+    IDS_PS_LIMITED_AMNT     "基于数量限制"
+    IDS_FUNCTION            "功能"
+    IDS_RELEASER            "发布者功能"
+    // <== XP Style Menu [Xanatos] - Stulle
+    IDS_FINECS              "良性信用系统(阈值: 4个块)" // Modified FineCS [CiccioBastardo/Stulle] - Stulle
+    IDS_IPFILTERWHITELOADED "%u个IP已载入ipfilter白名单" // IP Filter White List [Stulle] - Stulle
+    IDS_TRAY_COMPLETE       "在托盘中显示完成的下载数" // Completed in Tray [Stulle] - Stulle
+     // ==> Feedback personalization [Stulle] - Stulle
+    IDS_COLOR_FEEDBACK      "定制上传反馈"
+    IDS_COLOR_MASTER7       "反馈"
+    IDS_COLOR_F1            "标签"
+    IDS_COLOR_F2            "名字"
+    IDS_COLOR_F3            "文件类型和下载"
+    IDS_COLOR_F4            "下载状态"
+    IDS_COLOR_F5            "已传输的数据"
+    IDS_COLOR_F6            "请求"
+    IDS_COLOR_F7            "来源(Part文件)"
+    IDS_COLOR_F8            "排队中的客户"
+    // <== Feedback personalization [Stulle] - Stulle
+    IDS_STATIC_ICON         "总是显示托盘图标" // Static Tray Icon - MyTh88
+    IDS_DATEFILENAMELOG     "在日志文件名中插入日期" // Date File Name Log [AndCycle] - Stulle
+    // ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+    IDS_ADVADMIN_GROUP      "Web服务高级设置"
+    IDS_ADVADMIN_ACC        "用户"
+    IDS_ADVADMIN_DELETE     "删除用户"
+    IDS_ADVADMIN_NEW        "新建用户"
+    IDS_ADVADMIN_KAD        "访问 － Kad"
+    IDS_ADVADMIN_TRANSFER   "访问 － 传输"
+    IDS_ADVADMIN_SEARCH     "访问 － 搜索"
+    IDS_ADVADMIN_SERVER     "访问 － 服务器"
+    IDS_ADVADMIN_SHARED     "访问 － 已共享"
+    IDS_ADVADMIN_STATS      "访问 － 统计"
+    IDS_ADVADMIN_PREFS      "访问 － 选项"
+    IDS_ADVADMIN_PASS       "密码"
+    IDS_ADVADMIN_USER       "用户名"
+    IDS_ADVADMIN_CAT        "分类(用竖线隔开)"
+    IDS_WS_COOKIE_LOGGEDIN  "在多长时间内保持登录"
+	IDS_WS_COOKIE_LASTUSER  "记住上次登录的用户"
+    IDS_ADVADMIN_NOTE       "注意：你必须使用支持多用户的Web模板，否则无法启用\n\n"
+    IDS_ADVADMIN_USERLEVEL  "用户等级"
+    IDS_ADVADMIN_OPERATOR   "操作员"
+    IDS_ADVADMIN_ADMIN      "管理员"
+    IDS_ADVADMIN_HIADMIN    "高级管理员"
+    IDS_ADVADMINENABLED     "启用多用户Web界面权限管理"
+    IDS_ADVADMIN_GUEST      "访客"
+    IDS_ADVADMIN_DFILES     "访问 - 已下载"
+    // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+    // ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+    IDS_TAB_WEB_SERVER      "Web服务"
+    IDS_TAB_MULTI_USER      "多用户"
+    IDS_TAB_NT_SERVICE      "系统服务"
+    // <== Tabbed WebInterface settings panel [Stulle] - Stulle
+    IDS_WS_FAILED_LOGIN     "由于多次试图登录失败，你已被封禁15分钟" // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+    // ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+    IDS_SVC_RUNNINGASSERVICE "当前已作为服务运行"
+    IDS_SVC_ACCESSDENIED    "访问服务被拒绝"
+    IDS_SVC_NOTINSTALLED    "未安装服务"
+    IDS_SVC_INSTALLED       "已安装服务"
+    IDS_SVC_INSTALLFAILED   "安装失败，请检查日志"
+    IDS_SVC_UNINSTALLFAILED "卸载失败，请检查日志"
+    IDS_SVC_INSTALLED_DISABLED "已禁用服务(标记为待删除)"
+    IDS_SVC_INSTALLSERVICE  "安装"
+    IDS_SVC_SERVERUNINSTALL "卸载"
+    IDS_SVC_STARTWITHSYSTEM "系统启动时启动服务"
+    IDS_SVC_SETTINGS        "设置服务选项"
+    IDS_SVC_RUNBROWSER      "浏览到Web服务"
+    IDS_SVC_REPLACESERVICE  "停止服务并启动GUI"
+    IDS_SVC_ONSTARTBOX      "当eMule启动时"
+    IDS_SVC_STARTUPBOX      "启动"
+    IDS_SVC_MANUALSTART     "手动启动"
+    IDS_SVC_CURRENT_STATUS_LABEL "当前状态"
+    IDS_APPLY_SETTINGS      "是否立即应用必要的设置？"
+    IDS_CHANGEUSERASSERVICE "你需要手动更改服务的用户登录设置，或在程序目录中保存配置"
+    IDS_SERVICE_OPT_GROUP   "系统服务优化"
+    IDS_SERVICE_OPT_LABEL   "优化等级"
+    IDS_SERVICE_OPT_NONE    "无"
+    IDS_SERVICE_OPT_BASIC   "基本"
+    IDS_SERVICE_OPT_LISTS   "除服务器列表以外"
+    IDS_SERVICE_OPT_FULL    "完全"
+    IDS_SVC_STRT_MGR_FAIL   "启动服务成功，但通知服务管理器失败，正在退出"
+    IDS_SVC_PAUSE_MGR_FAIL  "暂停服务成功，但通知服务管理器失败，正在退出"
+    IDS_SVC_INST_PATH_FAIL  "无法安装服务，无有效路径 %s"
+    IDS_SVC_INST_SUCCESS    "已安装服务"
+    IDS_SVC_INST_FAIL       "安装服务失败 %s"
+    IDS_SVC_SVCCTRL_FAIL    "连接到服务控制失败 %s"
+    IDS_SVC_STOPPING        "正在停止服务"
+    IDS_SVC_STOP_PNDNG      "停止服务已挂起"
+    IDS_SVC_STOPPED         "已停止服务"
+    IDS_SVC_STOP_FAIL       "停止服务失败 %s"
+    IDS_SVC_DELETED         "已删除服务"
+    IDS_SVC_DELETE_FAIL     "删除服务失败 %s"
+    IDS_SVC_OPEN_FAIL       "打开服务失败 %s"
+    IDS_SVC_TERMINATE       "已终止服务，错误代码 %d:%s"
+    IDS_SVC_STRTUP_SUCCESS  "已成功更改服务启动模式"
+    IDS_SVC_STRTUP_FAIL     "无法更改服务启动模式 %s"
+    IDS_SVC_STRTUP_OPN_FAIL "打开服务失败 %s"
+    IDS_SVC_STRTUP_CTRL_FAIL "连接到服务控制失败 %s"
+    IDS_SVC_LINK_PASS_FAIL  "连接到Web服务失败：网络连接出错"
+    // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
+    // ==> Adjustable NT Service Strings - Stulle
+    IDS_SERVICE_STR_GROUP   "系统服务字串(留空为默认)"
+    IDS_SERVICE_NAME        "服务安装名称"
+    IDS_SERVICE_DISP_NAME   "服务显示名称"
+    IDS_SERVICE_DESCR       "服务描述"
+    IDS_SERVICE_NAME_CHANGED "你在服务运行时更改了服务名\n要使更改生效，你需要重新安装服务\n\n按“是”重新安装服务\n按“否”只更改服务名\n按“取消”放弃更改"
+    IDS_SERVICE_STR_CHANGED "系统服务字串已更改"
+    IDS_SERVICE_DISP_CHANGE_FAIL "更改服务显示名称或描述失败\n你想重新安装服务使更改生效吗？"
+    IDS_SERVICE_STR_CHANGE_FAIL "更改系统服务字串失败"
+    IDS_SERVICE_UNINSTALL_FAIL "卸载系统服务失败\n请检查日志\n所有更改已还原"
+    IDS_SERVICE_UNINSTALL_TITLE "卸载失败"
+    IDS_SERVICE_INSTALL_FAIL "安装系统服务失败\n请检查日志"
+    IDS_SERVICE_INSTALL_TITLE "安装失败"
+    IDS_SVC_DISP_SUCCESS    "更改服务显示名称成功"
+    IDS_SVC_DISP_FAIL       "无法更改服务显示名称 %s"
+    IDS_SVC_DESCR_SUCCESS   "更改服务描述成功"
+    IDS_SVC_DESCR_FAIL      "无法更改服务描述 %s"
+    IDS_SVC_STR_OPN_FAIL    "打开服务失败 %s"
+    IDS_SVC_STR_CTRL_FAIL   "连接到服务控制失败 %s"
+    // <== Adjustable NT Service Strings - Stulle
+    // ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
+    IDS_YESSERVICE          "是，启动eMule服务"
+    IDS_NOMINIMIZE          "否，缩小到系统托盘"
+    // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
+    IDS_WS_FRIENDSLOT       "好友通道" // Friendslot support for WebInterface [Stulle] - Stulle
 END
 
 #endif    // 中文(中华人民共和国) resources

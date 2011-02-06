@@ -1910,18 +1910,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_UPNPSTART           "Použít UPnP pro nastavení portù"
-    IDS_UPNPSETUP           "Nastavuje se pøesmìrování portù pomocí UPnP..."
-    IDS_UPNPFAILED          "UPnP nastavení se nezdaøilo. Pokud je to tøeba, nastavte prosím pøesmìrování manuálnì!"
-    IDS_UPNPSUCCESS         "Pomocí UPnP bylo úspìšnì nastaveno pøesmìrování portù %u (TCP) a %u (UDP)."
     IDS_FO_PREFBUTTON_NEW   "Otevøít porty ve WinXP SP1 firewall"
-    IDS_UPNP_NOSERVICE      "Služba UPnP Device Host naní spuštìna. Nelze pokraèovat v nastavení pomocí UPnP."
-    IDS_DELAYEDBYUPNP       "Pøipojení k síti je zpoždìno, nebo? UPnP je zaneprázdnìno nastavováním pøesmìrování portù."
-    IDS_DELAYEDBYUPNP2      "Vyèkejte prosím nìkolik sekund, eMule se pøipojí, jakmile skonèí nastavování pomocí UPnP."
-    IDS_UPNP                "UPnP" //!
-    IDS_UPNPCLOSEONEXIT     "Pøi ukonèení odstranit UPnP pøesmìrování portù."
-    IDS_UPNPSKIPWANIP       "Vynechat nastavení WAN IP"
-    IDS_UPNPSKIPWANPPP      "Vynechat nastavení WAN PPP"
     IDS_SHAREEMULELABEL     "Sdílení eMule s ostatními uživateli poèítaèe"
     IDS_SHAREEMULEMULTI     "Každý uživatel má své vlastní nastavení a downloady"
     IDS_SHAREEMULEPUBLIC    "Všichni mají stejné nastavení a downloady"
@@ -2119,7 +2108,6 @@ BEGIN
     IDS_AUTOUPDATEIPFILTER  "Automatická aktualizace IPFilter.dat"
     IDS_DROPBLOCKINGSOCKETS "Pøeruš èasto blokující spojení"
     IDS_LOGPARTMISMATCH     "Zaznamenej nesouhlas velikosti požadovaných souborù"
-    IDS_CN_UPNPTRYRANDOM    "Zkus použít náhodný port v UPnP bránì"
     IDS_CN_UPNPNAT          "Povol UPnP podporu"
     IDS_CHUNKCHOOSER        "Metoda výbìru chunku"
     IDS_UPLOADINSTABLE      "Varování: Limit uploadu je asi pøíliš vysoký. Zkontroluj nastavení! \n Podívej se na graf uploadu, bílá nebo žlutá (s NAFC) èára má být rovná \n Tato zpráva je zobrazena pouze jednou"

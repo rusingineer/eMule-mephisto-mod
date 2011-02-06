@@ -32,12 +32,25 @@ DirectX SDK
 MiniUPnP Lib (as of official)
 
 
+Xtreme 7.2 second source edit
+* this version is modded by Stulle
+- add: added VS08 solution and project files (Stulle)
+- add: display network speed in WebInterface if NAFC enabled (Stulle)
+	Displayed like this: Current speed / Network speed (Speed limit)
+- improved: Don't reset Connection Settings for Webserver/CML/MM (Stulle)
+- fixed: MassRename in SharedFilesCtrl was broken (Stulle)
+- fixed: HistoryListCtrl threw error when clicking a shared file (Stulle)
+- change: cleaned up VS03 and VS05 solution and project files (Stulle)
+- change: revert to original tray right-click dialog and adapted it for 0.1 increase (Stulle)
+- change: only show 1 decimal fraction for speed limits in WebInterface (Stulle)
+
 Xtreme 7.2
 * this version is modded by Stulle
 - updated to 0.49c codebase
 - improved: simply unsharing single shared files instead of excluding them
 - improved: greatly simplified remove unused AICH-hashes code while keeping original idea
 - fixed: official problem with downloading from webserver
+- fixed: Don't reset Connection Settings for Webserver/CML/MM (Stulle)
 partially updated to 7.2 by zz_fly:
 - change: switch to official UPnP lib
 - add: support Ctrl+C and Delete handling in downloaded history list (Stulle)

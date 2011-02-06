@@ -4811,6 +4811,8 @@ LRESULT CemuleDlg::OnWebGUIInteraction(WPARAM wParam, LPARAM lParam) {
 		case WEBGUIIA_WINFUNC:{
 			// ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			// There should be no need for this as we check before sending the message.
+			// However, we do this all a little complicated to be sure that settings did not change
+			// during the webserver session and we allow something that should not be allowed.
 			/*
 			if (thePrefs.GetWebAdminAllowedHiLevFunc())
 			*/
@@ -4820,7 +4822,10 @@ LRESULT CemuleDlg::OnWebGUIInteraction(WPARAM wParam, LPARAM lParam) {
 				bIsHiAdmin = (lParam&4) ? true : false;
 				lParam &= 3;
 			}
-			if (bIsHiAdmin || thePrefs.GetWebAdminAllowedHiLevFunc())
+			else if (thePrefs.GetWebAdminAllowedHiLevFunc())
+				bIsHiAdmin = true;
+
+			if (bIsHiAdmin)
 			// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
 			{
 				try {

@@ -1887,18 +1887,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_UPNPSTART           "Benutze UPnP zur Porteinstellung"
-    IDS_UPNPSETUP           "Versuche Port-Weiterleitungen via UPnP einzustellen..."
-    IDS_UPNPFAILED          "UPnP konnte die Portweiterleitung nicht konfigurieren. Bitte führe die Portweiterleitung manuell durch!"
-    IDS_UPNPSUCCESS         "UPnP hat erfolgreich Portweiterleitungen für die Ports %u (TCP) und %u (UDP) durchgeführt."
     IDS_FO_PREFBUTTON_NEW   "Öffne Ports in der WinXP SP1 Firewall"
-    IDS_UPNP_NOSERVICE      "UPnP Device Host Dienst läuft nicht - überspringe UPnP Setup"
-    IDS_DELAYEDBYUPNP       "Verbinden mit dem Netzwerk wird verzögert, da UPnP noch die Portweiterleitungen konfiguriert."
-    IDS_DELAYEDBYUPNP2      "Bitte warte einige Sekunden, eMule wird sich verbinden sobald UPnP fertig ist."
-    IDS_UPNP                "UPnP" //!
-    IDS_UPNPCLOSEONEXIT     "Lösche UPnP Portweiterleitungen beim Programmende"
-    IDS_UPNPSKIPWANIP       "Überspringe WAN IP Setup"
-    IDS_UPNPSKIPWANPPP      "Überspringe WAN PPP Setup"
     IDS_SHAREEMULELABEL     "eMule mit anderen Benutztern teilen"
     IDS_SHAREEMULEMULTI     "Jeder Nutzer hat seine eigene Konfiguration und Downloads"
     IDS_SHAREEMULEPUBLIC    "Jeder hat dieselbe Konfiguration und Downloads"
@@ -2096,7 +2085,6 @@ BEGIN
     IDS_AUTOUPDATEIPFILTER  "Auto-update IPFilter.dat"
     IDS_DROPBLOCKINGSOCKETS "Entferne zu häufig blockierende Sockets"
     IDS_LOGPARTMISMATCH     "Logge Größendifferenz der angeforderten Dateien"
-    IDS_CN_UPNPTRYRANDOM    "Versuche einen zufälligen Port am UPNP Gateway zu verwenden falls der eingestellte Port schon belegt"
     IDS_CN_UPNPNAT          "Aktiviere UPnP support"
     IDS_CHUNKCHOOSER        "Download Chunk Auswahlmethode"
     IDS_UPLOADINSTABLE      "Warnung: Dein Uploadlimit scheint zu hoch gewählt zu sein. Bitte überprüfe Deine Uploadeinstellungen! \n Schaue auf Deinen Uploadgraphen, die weiße oder gelbe (mit NAFC) Linie sollte möglichst gerade sein \n Diese Nachricht wird nur einmal generiert."
@@ -2121,6 +2109,7 @@ BEGIN
     IDS_MR                  "Mehrfach-Umbenennung.."
     IDS_MASSRENAME_TITLE    "Mehrfach-Umbenennung"
     IDS_STATIC_DOWNINFO     "Download 0 = unlimitiert"
+    IDS_ANTILEECHERUSERHASH_CHECK "Erkenne schlechte Userhashe"
 END
 
 STRINGTABLE 
@@ -2150,6 +2139,7 @@ END
 
 STRINGTABLE 
 BEGIN
+	IDS_OBFUSCATION_PADDING_LENGTH	"Obfuskation-Füll-Länge [10-254]"
 	//Friendlinks
 	IDS_GETFRIENDED2KLINK   "Kopiere Freund-Link in Zwischenablage"
     IDS_GETHTMLFRIENDED2KLINK "Kopiere Freund-Link in Zwischenablage (HTML)"
@@ -2157,7 +2147,674 @@ BEGIN
                             "Download der Freunde-Liste von %s fehlgeschlagen"
     IDS_GETMYFRIENDED2KLINK "Kopiere Freund-Link in Zwischenablage"
     IDS_GETMYHTMLFRIENDED2KLINK "Kopiere Freund-Link in Zwischenablage (HTML)"
-    IDS_FRIENDLINKMENUTITLE "FreundLinks"
+    IDS_FRIENDLINKMENUTITLE "Freund-Links"
+	IDS_DOWNLOADEMFRIENDSMET "Lade emfriends.met herunter"
+    IDS_EMFRIENDSMETURL     "Bitte gib die URL der emfriends.met ein:"
+	IDS_USER_ALREADY_FRIEND "Nutzer ""%s"" ist bereits in der Freunde-Liste"
+	IDS_PROGRESSHASHDONE	"Überprüfung erledigt: %s"
+END
+
+STRINGTABLE 
+BEGIN
+    // ==> ScarAngel Preferences window - Stulle
+    IDS_CON_TWEAKS          "Verbindung Einstellungen"
+    IDS_MISC                "Verschiedene Einstellungen"
+    // <== ScarAngel Preferences window - Stulle
+    // ==> Global Source Limit [Max/Stulle] - Stulle
+    IDS_GLOBAL_HL           "Globales Quellenlimit (GQL)"
+    IDS_GLOBAL_HL_LIMIT     "Globales Quellenlimit"
+    IDS_GLOBAL_HL_ALL       "GQL für alle Dateien nutzen"
+    IDS_GLOBAL_HL_DEFAULT   "GQL als Standard für Dateien"
+    IDS_ENABLE              "Aktivieren"
+    // <== Global Source Limit [Max/Stulle] - Stulle
+    IDS_PUSH                "Push Einstellungen"
+    // ==> push small files [sivka] - Stulle
+    IDS_PUSH_SMALL          "Bevorzuge kleine Dateien"
+    IDS_SMALL               "Klein"
+    IDS_PUSH_SMALL_BOOST    "Bevorzuge kleine Dateien Faktor"
+    // <== push small files [sivka] - Stulle
+    // ==> push rare file - Stulle
+    IDS_PUSH_RARE           "Pushe seltene Dateien"
+    IDS_RARE                "Selten"
+    // <== push rare file - Stulle
+    IDS_SHOWINMSN7          "Zeige eMule Status in MSN7 (oder neuer) Nachrichten Feld" //Show in MSN7 [TPT] - Stulle
+    // ==> Show sources on title - Stulle
+    IDS_SHOWSRCONTITLE      "Zeige Quellen im Titel"
+    IDS_SHOWSRCSTRING       "Quellen:"
+    // <== Show sources on title - Stulle
+    IDS_SHOWOVERHEADONTITLE "Zeige Overhead im Titel"// show overhead on title - Stulle
+    // ==> CreditSystems [EastShare/ MorphXT] - Stulle
+    IDS_CREDIT_SYSTEM       "Credit System"
+    IDS_OFFICIAL_CREDIT     "Official Credit"
+    IDS_LOVELACE_CREDIT     "Lovelace Credit"
+    IDS_RATIO_CREDIT        "Ratio Credit"
+    IDS_PAWCIO_CREDIT       "Pawcio Credit"
+    IDS_EASTSHARE_CREDIT    "EastShare Credit"
+    IDS_SIVKA_CREDIT        "Sivka Credit"
+    IDS_SWAT_CREDIT         "S.W.A.T. Credit"
+    IDS_XMAN_CREDIT         "Xman Credit"
+    IDS_TK4_CREDIT          "TK4 Credit"
+    IDS_ZZUL_CREDIT         "ZZUL Credit"
+    // <== CreditSystems [EastShare/ MorphXT] - Stulle
+    // ==> SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
+    IDS_SUQWT_LOAD          "Lade %s"
+    IDS_SUQWT               "gleiche Chance für alle Dateien (SUQWT)"
+    // <== SUQWT [Moonlight/EastShare/ MorphXT] - Stulle
+    IDS_SHOW_FILE_HL_CONST   "Zeige HL pro Datei kontinuierlich" // show HL per file constantaniously - Stulle
+    IDS_SHOW_GLOBAL_HL      "Zeige globales Hardlimit" // show global HL - Stulle
+    // ==> file settings - Stulle
+    IDS_NNS_TIMERLABEL      "AutoNNS Timer 0...60 Sek"
+    IDS_REMOVENNSLIMITLABEL "Starte NNS Entfernen > X%"
+    IDS_FQS_TIMERLABEL      "AutoFQS Timer 0...60 Sek"
+    IDS_REMOVEFQSLIMITLABEL "Starte FullQS Entfernen > X%"
+    IDS_HQRS_TIMERLABEL     "AutoHQRS Timer 0...60 Sek"
+    IDS_REMOVEQRSLABEL      "Maximal erlaubter QR <= X"
+    IDS_REMOVEQRSLIMITLABEL "Starte HighQRS Entfernen > X%"
+    IDS_AUTO_NNS            "Automatisches NNS Entfernen einschalten"
+    IDS_AUTO_FQS            "Automatisches FullQS Entfernen einschalten"
+    IDS_AUTO_QRS            "Automatisches HighQS Entfernen einschalten"
+    IDS_SIVKAFILESETTINGS   "Sivka - Datei(en) Einstellungen"
+    IDS_HARDLIMIT_LABEL     "Hard Limit (0=Nutze standard)"
+    IDS_FILE_DEFAULTS       "Standard Entfernen Einstellungen"
+    IDS_XMAN_DROPPING       "Xman Entfernungssystem verwenden"
+    IDS_SIVKA_DROPPING      "Sivka Entfernungssystem verwenden"
+    IDS_HQR_WAY             "Entfernungssystem"
+    // <== file settings - Stulle
+    IDS_SHOW_DROPPED_SRC    "Gedroppte Quellen" // show # of dropped sources - Stulle
+    // ==> Source Graph - Stulle
+    IDS_SRCGRAPH            "Zeichne Quellen Graph"
+    IDS_STATIC_STATSHL      "Min/ Max Hard Limit Wert für Graph:"
+    IDS_SP_SRCGRAPH         "Quellen Graph"
+    // <== Source Graph - Stulle
+    IDS_FD_AVGDL             "Durchschn. DL Geschw.:" // Average download speed - Stulle
+    // ==> FunnyNick [SiRoB/Stulle] - Stulle
+    IDS_FN_TAG              "FunnyNick Tag"
+    IDS_NO_TAG              "Kein Tag"
+    IDS_SHORT_TAG           "[FN]"
+    IDS_FULL_TAG            "[FunnyNick]"
+    IDS_CUSTOM_TAG          "Eigenen Tag"
+    IDS_SET_CUSTOM_TAG      "Setze eigenen Tag"
+    IDS_FN_TAG_AT_END       "Zeige Tag am Ende"
+    // <== FunnyNick [SiRoB/Stulle] - Stulle
+    IDS_CLIENTQUEUEPROGRESSBAR 
+                            "Zeige Fortschrittsbalken der Client-Warteliste an"
+    IDS_ACC                 "Verbindungskontrolle aktivieren" // ACC [Max/WiZaRd] - Max
+    // ==> ScarAngel Version Check - Stulle
+    IDS_VISITSVERSIONCHECK  "\n\nMöchtest du die ScarAngel Webseite besuchen?"
+    IDS_SVERSIONCHECK       "&Versioncheck (ScarAngel)"
+    IDS_NONEWSVERVERSION    "Es ist keine neuere Scarangel Version verfügbar.."
+    IDS_NEWSVERSIONAVL      "Eine neue ScarAngel Version ist verfügbar! Besuche die Projekt-Homepage um mehr Informationen zu erhalten."
+    IDS_NEWSVERSIONAVLPOPUP "Eine neuere Version von ScarAngel ist verfügbar. Klicke hier um mehr über die neue Version zu erfahren!"
+    // <== ScarAngel Version Check - Stulle
+    // ==> Quick start [TPT] - Max
+    IDS_QUICK_START_GROUP   "Schnellstart"
+    IDS_QUICK_START         "Schalte Schnellstart ein"
+    IDS_QUICK_START_MAX_TIME "Zeit für Schnellstart [8-18 Min.]"
+    IDS_QUICK_START_MAX_CONN_PER_FIVE "Max. Verb./5sec"
+    IDS_QUICK_START_MAX_CONN "Max. Verb."
+    IDS_QUICK_START_AFTER_IP_CHANGE "Schalte Schnellstart nach IP-Wechsel ein"
+    IDS_QUICK_START_MAX_CONN_PER_FIVE_BACK "Zurück zu Max. Verb./5sec"
+    IDS_QUICK_START_MAX_CONN_BACK "Zurück zu Max. Verb."
+    // <== Quick start [TPT] - Max
+    // ==> CPU/MEM usage [$ick$/Stulle] - Stulle
+    IDS_SYS_INFO_GROUP      "System Informationen"
+    IDS_SYS_INFO_GLOBAL     "Globale Informationen aktivieren"
+    // <== CPU/MEM usage [$ick$/Stulle] - Stulle
+    // ==> TBH: Backup [TBH/EastShare/MorphXT] - Stulle
+    IDS_BACKUP_FILEFRAME    "Dateiarten für Backup"
+    IDS_BACKUP_SELECTALL    "Alle"
+    IDS_BACKUP_AUTOFRAME    "Auto Backup"
+    IDS_BACKUP_AUTOBACKUP   "Backup beim Beenden"
+    IDS_BACKUP_NOTE         "Beachte:"
+    IDS_BACKUP_BACKUPNOW    "Sofortbackup"
+    IDS_BACKUP_MESSAGE      "Hinweis: Im Emule-Programmverzeichnis wird ein Ordner ""Backup"" zum Speichern einer Sicherheitskopie angelegt."
+    IDS_BACKUP_AUTOBACKUP2  "Doppel-Backup"
+    IDS_ABORT               "Abbruch?"
+    IDS_CONTINUE            "&Weiter"
+    IDS_DONOTASKAGAIN       "Nicht noch mal frage"
+    IDS_DONOTSHOWAGAIN      "Nicht noch mal anzeigen"
+    IDS_DONOTTELLAGAIN      "Nicht noch mal melden"
+    IDS_HELP                "&Hilfe"
+    IDS_IGNORE              "&Ignorieren"
+    IDS_IGNOREALL           "I&gnoriere Alles"
+    IDS_NOTOALL             "N&ein zu Allem"
+    IDS_OK                  "OK"
+    IDS_REPORT              "Me&ldung"
+    IDS_RETRY               "&Noch mal"
+    IDS_SKIP                "&Überspringe"
+    IDS_SKIPALL             "Ü&berspringe Alles"
+    IDS_TRYAGAIN            "&Noch ein mal versuchen"
+    IDS_YESTOALL            "J&a zu Allem"
+    // <== TBH: Backup [TBH/EastShare/MorphXT] - Stulle
+    // ==> TBH: minimule - Max
+    IDS_MM_SHOW             "Nutze TBH Mini-Mule stattdessen"
+    IDS_MM_LIVES            "Halte Mini-Mule aktuell"
+    IDS_MM_UPDATE_TIME      "Mini-Mule Update Interval (in Sek.)"
+    IDS_MM_TRANS            "Mini-Mule Transparenz (1-255)"
+    IDS_MM_ACTDL            "Aktive Downloads: %i"
+    IDS_MM_DATA             "Up: %s | Down: %s"
+    IDS_MM_UPDOWN           "Up: %s(%.1f) | Down: %s(%.1f)"
+    IDS_MM_COMPL            "Zeige Dateien die in der Laufzeit beendet wurden"
+    IDS_MM_RATIO            "UL:DL :"
+    IDS_MM_OPEN             "Öffne Mini-Mule wenn eMule in den Tray minimiert wird"
+    // <== TBH: minimule - Max
+    // ==> Copy feedback feature [MorphXT] - Stulle
+    IDS_COPYFEEDBACK        "Kopiere Rückmeldung in Zwischenablage (de)"
+    IDS_COPYFEEDBACK_US     "Kopiere Rückmeldung in Zwischenablage (en)"
+    IDS_FEEDBACK_TRANSFERRED "Übertragen"
+    IDS_FEEDBACK_REQUESTED  "Angefragt"
+    IDS_FEEDBACK_ACCEPTED   "Akzeptierte Anfragen"
+    IDS_FEEDBACK_FROM       "Feedback von %s zu [%s]"
+    IDS_FEEDBACK_FILENAME   "Dateiename"
+    IDS_FEEDBACK_FILETYPE   "Datei Typ"
+    IDS_FEEDBACK_FILESIZE   "Größe"
+    IDS_FEEDBACK_DOWNLOADED "Downloaded"
+    IDS_FEEDBACK_TOTAL      "Alle Quellen"
+    IDS_FEEDBACK_AVAILABLE  "Verfügbare Quellen"
+    IDS_FEEDBACK_NONEEDPART "Quellen ohne benötigte Teile"
+    IDS_FEEDBACK_COMPLETE   "Vollständige Quellen"
+    IDS_FEEDBACK_ON_QUEUE   "In der Warteschlange"
+    IDS_FEEDBACK_ALL_TRANSFERRED "Übertragen (alle Dateien)"
+    // <== Copy feedback feature [MorphXT] - Stulle
+    // ==> MassRename [Dragon] - Stulle
+    IDS_CHECKDOTTOSPACE     "Konvertiere ""."" zu "" """
+    IDS_CHECKUNDERLINETOSPACE "Konvertiere ""_"" zu "" """
+    IDS_CHECKCONVERTAPOSTROPHES 
+                            "Konvertiere falsches Apostroph ""´"", ""`""zu Standard Apostroph "" ' """
+    IDS_CHECKCONVERTHEX     "Konvertiere Hex-Zahlen ""%xx"" zu Buchstaben"
+    IDS_CHECKSEARCHANDREPLACE "Suchen und ersetzen:"
+    IDS_SC_SEARCHFOR        "Suche nach:"
+    IDS_SC_REPLACEBY        "Ersetze durch:"
+    IDS_CHECKCASESENSITIVE  "Groß/klein beachten"
+    IDS_CHECKCHARACTERREPLACE "Ersetze Buchstaben:"
+    IDS_REPLACECHAR         "Ersetze"
+    IDS_REPLACECHARBY       "mit"
+    IDS_SC_ADD              "&Hinzufügen"
+    IDS_SC_EDIT             "&Edit"
+    IDS_SC_DELETE           "&Löschen"
+    IDS_SEARCHFORCHAR       "Suche nach"
+    IDS_REPLACEBYCHAR         "Ersetze durch"
+    IDS_SC_HEADLINE         "Dateienamen bereinigen"
+    // <== MassRename [Dragon] - Stulle
+    // ==> Startupsound [Commander] - mav744
+    IDS_STARTUPSOUND        "Startsound abspielen"
+    IDS_MISSING_STARTUPSOUND 
+                            "Fehlende startup.wav! Note: Die Datei 'startup.wav' muss sich im eMule - Config Ordner befinden"
+    // <== Startupsound [Commander] - mav744
+    IDS_COMPRESS_LVL        "Kompressionslevel (0 = deaktiviert)" // Adjust Compress Level [Stulle] - Stulle
+    // ==> Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
+    IDS_CAT_MINIMUM         "Minimum"
+    IDS_CAT_MAXIMUM         "Maximum"
+    IDS_CAT_DLGHELP         "Die Check-Boxen zeigen an, ob die Kriterien verwendet werden sollten wenn man eine Kategorie für neue Dateien auswählt."
+    IDS_CAT_FILTERS         "Kategorien Filter"
+    IDS_CAT_RS              "Restliche Größe (MB)"
+    IDS_CAT_FS              "    Dateigröße (MB)"
+    IDS_CAT_RT              "Restzeit (M)"
+    IDS_CAT_SC              "alle Quellen"
+    IDS_CAT_ASC             "verfügbare Quellen"
+    IDS_CAT_THISCAT         "Diese Kategorie"
+    IDS_CAT_SUSPENDFILTERS  "Ansicht-Filter aus"
+    IDS_CAT_FROMCATSINFO    "Es müssen alle Dateien dieser Kategorie erst einer anderen Kategorie zugewiesen werden, bevor sie gelöscht werden kann."
+    IDS_CAT_FROMCATSCAP     "Dateien nicht zugewiesen"
+    IDS_CAT_FILTERSACTIVE   "Filter aktiv"
+    IDS_CAT_FILTERSSUSP     "Filter inaktiv"
+    IDS_CAT_SETORDER        "setze gleichmässige Prioriät"
+    IDS_CAT_ORDER           "Bitte eine Zahl größer oder gleich Null eingeben. Kleinere Werte werden zuerst fortgesetzt."
+    IDS_CAT_PAUSEDSHOWN     " | Pausierte anzeigen"
+    IDS_CAT_PAUSEDHIDDEN    " | Pausierte verstecken"
+    IDS_CAT_COLCATEGORY     "Kategorie"
+    IDS_CAT_COLORDER        "LP"
+    IDS_CAT_MNUAUTOINC      "Automatische Erhöhung ausgewählt"
+    IDS_CAT_MNUSTEPTHRU     "Schritt für jedes Angewählte"
+    IDS_CAT_MNUALLSAME      "alle auf selben Wert einstellen"
+    IDS_CAT_EXPAUTOINC      "Eingabe einer positiven Zahl"
+    IDS_CAT_EXPSTEPTHRU     "Eingabe einer positiven Zahl, kleinere Werte werden zuerst fortgesetzt.\nFile:"
+    IDS_CAT_EXPALLSAME      "Eingabe einer positiven Zahl, wird auf alle vorgewählten Dateien angewendet:"
+    IDS_CAT_ABORTSTEPTHRU   "Willst Du den Abschnitt für gleichmäßige Priorität abbrechen"
+    IDS_CAT_SHOWPAUSED      "pausierte Dateien anzeigen"
+    IDS_CAT_HIDEPAUSED      "pausierte Dateien verbergen"
+    IDS_CAT_SELDLGTXT       "Auswahl der Kategorie von der Liste oder Eingabe eines Namen für ein neue Kategorie:"
+    IDS_CAT_SELDLGCAP       "Kategorien-Auswahl"
+    IDS_CAT_SHOWCATNAME     "Vollen Kategorie-Namen im Karteireiter anzeigen"
+    IDS_CAT_SHOWSELCATDLG   "Zeige 'Kategorien-Auswahl-Dialog' an"
+    IDS_CAT_USEACTIVE       "Neue Downloads der gerade angezeigten Kategorie zuordnen"
+    IDS_CAT_AUTORESUMEORD   "Wert automatisch erhöhen und eine gleichmäßige Priorität zuweisen"
+    IDS_CAT_SMALLFILEDLPUSH "Kleine Dateien (< 150 KB) zuerst laden"
+    IDS_CAT_AUTOCAT         "Erweiterte Filtermaske (Separator: | )"
+    IDS_CAT_USEAUTOCAT      "Neue Downloads werden mit Ansichtsfilter den Kategorien hinzugefügt"
+    IDS_CAT_MERGE           "zusammenführen der Kategorien"
+    IDS_CAT_GROUP           "Gruppe"
+    IDS_CAT_RESUMEFILEONLYINSAMECAT 
+                            "Fortsetzen der angehaltenen Downloads nur in derselben Kategorie"
+    IDS_CAT_RESUMENEXT      "Nächste fortsetzen"
+    IDS_CAT_PAUSELAST       "Zuletzt pausiert"
+    IDS_CAT_STOPLAST        "Zuletzt gestoppt"
+    IDS_SCC                 "Intelligente Kategorie-Steuerung (SCC)"
+    IDS_DL_MODE             "Fortsetzungsmodus"
+    IDS_LP                  "Lineare Priorität"
+    IDS_CAT_STARTFILESONADD "Starte # Dateien,  wenn sie zu einer neuen Kategorie hinzugefügt werden"
+    IDS_DL_MODE_DEFAULT     "Standard Fortsetzungsmodus"
+    IDS_DL_NONE             "Keinen"
+    // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
+    IDS_SHARED_PREFS        "Freigegebene Dateien Verwaltung" // Shared Files Management [Stulle] - Stulle
+    // ==> Spread bars [Slugfiller/MorphXT] - Stulle
+    IDS_SPREAD_BARS         "Benutze Spread Bar"
+    IDS_SF_UPLOADED_PARTS   "Spread Bar (UL Teil History)"
+    IDS_SF_TURN_PART        "Datei UL (Teil)"
+    IDS_SF_TURN_SIMPLE      "Datei UL (einfach)"
+    IDS_SF_FULLUPLOAD       "Datei UL (Voll)"
+    IDS_SPREAD_RESET        "Reset Spread Bar(s)"
+	// <== Spread bars [Slugfiller/MorphXT] - Stulle
+    // ==> HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
+    IDS_HIDEOS              "Verstecke viel verteiltes (HideOS)"
+    IDS_SHAREONLYTHENEED    "Share nur das benötigte"
+    IDS_HIDEOVERSHARES      "Uploads bis Chunk versteckt werden (0 = kein Limit)"
+    IDS_SELECTIVESHARE      "Selektives Chunk freigeben"
+    IDS_ERR_HIDDENBLOCK     "Fragte einen versteckten Block an "
+    // <== HideOS & SOTN [Slugfiller/ MorphXT] - Stulle
+    // ==> PowerShare [ZZ/MorphXT] - Stulle
+    IDS_POWERSHARE_ACTIVATED "Aktiviert"
+    IDS_POWERSHARE_DISABLED "Deaktiviert"
+    IDS_POWERSHARE_ON_LABEL "An"
+    IDS_POWERSHARE_OFF_LABEL "Aus"
+    IDS_POWERSHARE_COLUMN_LABEL "Powershare"
+    IDS_POWERSHARE_PREFIX   "PS"
+    IDS_POWERSHARE          "Powershare"
+    IDS_POWERSHARE_DENIED_LABEL "nicht erlaubt"
+    IDS_POWERSHARE_ADVISED_LABEL "Empfolen"
+    IDS_POWERSHARE_AUTHORIZED_LABEL "Authorisiert"
+    IDS_POWERSHARE_ACTIVATED_LABEL "Aktiviert"
+    IDS_POWERSHARE_DISABLED_LABEL "Deaktiviert"
+    IDS_POWERSHARE_AUTO_LABEL "Auto"
+    IDS_POWERSHARE_AUTO     "Auto"
+    IDS_POWERSHARE_LIMITED  "Limitiert"
+    IDS_POWERSHARE_LIMIT    "Limit der vollständigen Quellen"
+	// <== PowerShare [ZZ/MorphXT] - Stulle
+    // ==> Release Bonus [sivka] - Stulle
+    IDS_RELEASE_BONUS_GROUP "Release Bonus"
+    IDS_RELEASE_BONUS_EDIT  "Setzte bunus Tage"
+    IDS_RELEASE_BONUS_12    "12h"
+    // <== Release Bonus [sivka] - Stulle
+    IDS_RELEASE_SCORE_ASSURANCE "Punkte für Release Dateien" // Release Score Assurance [Stulle] - Stulle
+    // ==> Design Settings [eWombat/Stulle] - Stulle
+    IDS_COLOR_MASTER1       "Klienten Stile"
+    IDS_COLOR_MASTER2       "Runterladende Dateien Stile"
+    IDS_COLOR_MASTER3       "Freigegebene Dateien Stile"
+    IDS_COLOR_BOX           "Farbeinstellungen"
+    IDS_COLOR_FONT_LABEL    "Schriftfarbe"
+    IDS_COLOR_BACK_LABEL    "Hintergrundfarbe"
+    IDS_COLOR_B7            "Serverliste"
+    IDS_COLOR_C1            "Freunde"
+    IDS_COLOR_S1            "Runterladend"
+    IDS_COLOR_S2            "Powershare Dateien"
+    IDS_COLOR_C2            "Fragt nach PowerShare Dateien"
+    IDS_COLOR_C3            "Fragt nach PowerRelease Dateien"
+    IDS_COLOR_C4            "Aktiver Download von"
+    IDS_COLOR_C5            "Aktiver Upload zu"
+    IDS_COLOR_C6            "Leecher"
+    IDS_COLOR_B1            "Bekannte Klienten"
+    IDS_COLOR_MASTER5       "Hintergrundfarben"
+    IDS_COLOR_B2            "Aktuelle Download Klienten"
+    IDS_COLOR_B3            "Wartende Klienten"
+    IDS_COLOR_B4            "Aktuelle Upload Klienten"
+    IDS_COLOR_B5            "Aktuelle Download Dateien"
+    IDS_COLOR_B6            "Freigegeben Dateien"
+    IDS_COLOR_C7            "Niedrige ID"
+    IDS_COLOR_C8            "Positive Position"
+    IDS_COLOR_ON            "An"
+    IDS_COLOR_OFF           "Aus"
+    IDS_COLOR_MASTER4       "Servers Stile"
+    IDS_COLOR_SE1           "Aktuell verbundener Server"
+    IDS_COLOR_SE2           "Statischer Server"
+    IDS_COLOR_SE3           "Gefilterter Sever"
+    IDS_COLOR_SE4           "Unerreichbarer Server"
+    IDS_COLOR_SE5           "Unverlässlicher Server"
+    IDS_COLOR_W1            "Kademlia Fenster"
+    IDS_COLOR_W2            "Server Fenster"
+    IDS_COLOR_W3            "Transfer Fenster"
+    IDS_COLOR_W4            "Suche Fenster"
+    IDS_COLOR_W5            "Freigegebene Dateien Fenster"
+    IDS_COLOR_W6            "Nachrichten Fenster"
+    IDS_COLOR_W7            "IRC Fenster"
+    IDS_COLOR_W8            "Statistiken Fenster"
+    IDS_COLOR_W9            "Statusleiste"
+    IDS_COLOR_MASTER6       "Fenster Stile"
+    IDS_COLOR_W10           "Symbolleiste"
+    IDS_COLOR_WARNING       "Du benutzt Windows XP oder höher. Die Statusleiste und die Symbolleiste können nur die Farbe ändern wenn der klassische Stil gewählt ist."
+    IDS_COLOR_S3            "Freigebbar"
+    // <== Design Settings [eWombat/Stulle] - Stulle
+    // ==> Limit PS by amount of data uploaded [Stulle] - Stulle
+    IDS_PS_AMOUNT_LIMIT         "Limit der Datenübertragung bei Upload"
+    IDS_PS_AMOUNT_LIMIT_LABEL   "Limit der Datenübertragung bei Upload (max. 10000%)"
+    IDS_PS_AMOUNT_LIMIT_WRONG   "Ungültigen Wert eingegeben."
+    // <== Limit PS by amount of data uploaded [Stulle] - Stulle
+    // ==> Enforce Ratio [Stulle] - Stulle
+    IDS_RATIO_GROUP             "UL:DL Verhältnis"
+    IDS_ENFORCE_RATIO           "Erzwinge Verhältnis immer"
+    IDS_RATIO_VALUE             "Max Verhältnis 1"
+    IDS_RATIO_REASON            "Erzwinge"
+    IDS_RATIO_REASON2           "Globales Quellenlimit für fairness"
+    IDS_RATIO_REASON3           "Erzwinge 1:3 Verhältnis, wenn Upload < 11"
+    IDS_RATIO_REASON4           "NAFC dynamisches Downloadlimit"
+    IDS_RATIO_REASON5           "Erzwinge Verhältnis"
+    IDS_RATIO_ACTIVATION        "Downloadlimit aktiviert"
+    IDS_RATIO_LIMIT             "UL:DL Verhältnis wird limitiert max auf: 1"
+    // <== Enforce Ratio [Stulle] - Stulle
+    // ==> Tabbed Preferences [TPT] - Stulle
+    IDS_SCARANGEL               "ScarAngel"
+    IDS_BACKUP                  "Backup"
+    // <== Tabbed Preferences [TPT] - Stulle
+    IDS_ERR_HIDDENSOURCE    "Fragt nach einem Block ohne zu sagen was er braucht" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
+    // ==> Improved ICS-Firewall support [MoNKi] - Max
+    IDS_ICFSUPPORT          "Aktiviere ICF Unterstützung"
+    IDS_ICFSUPPORTFIRST     "eMule hat Windows Internet Connection Firewall (ICF) auf deinem Computer gefunden,\n\rSoll eMule diese automatisch einstellen? (Empfohlen)"
+    IDS_ICF                 "Windows Internet Connection Firewall (ICF)"
+    IDS_ICF_SERVERUDP       "Füge Regel fuer ""Server UDP"" Port hinzu"
+    // <== Improved ICS-Firewall support [MoNKi] - Max
+    // ==> Invisible Mode [TPT/MoNKi] - Stulle
+    IDS_CTRLKEY             "STRG"
+    IDS_ALTKEY              "ALT"
+    IDS_SHIFTKEY            "UMSCHALTEN"
+    IDS_INVMODE             "Aktiviere Unsichtbar-Modus"
+    IDS_INVMODE_MODKEY      "Modifikationstaste(n):"
+    IDS_INVMODE_VKEY        "Taste:"
+    IDS_INVMODE_GROUP       "Unsichtbar-Modus"
+    IDS_INVMODE_START       "Starte unsichtbar"
+    // <== Invisible Mode [TPT/MoNKi] - Stulle
+    // ==> UPnP support [MoNKi] - leuk_he
+    IDS_UPNP_INIT           "UPnP: Initialisiere auf %s:%d, suche Gerät..."
+    IDS_UPNP_FAILEDINIT     "UPnP: UPnP Initialisierung auf Port %d [%s] fehlgeschlagen"
+    IDS_UPNP_PUBLICIP       "UPnP: Deine IP ist eine öffentliche Internet IP, UPnP wird abgeschaltet"
+    IDS_UPNP_FAILEDREGISTER "UPnP: Registrieren von Kontrollpunkt [%s]fehlgeschlagen"
+    IDS_UPNP_NEWDEVICE      "UPnP: Neues kompatibles Gerät gefunden: %s"
+    IDS_UPNP_VERBOSELOG     "Upnp Events"
+    IDS_UPNP_NETSTATUS      "Upnp"
+    IDS_UPNP_GROUP          "Universal Plug and Play (UPnP)"
+    IDS_UPNP_ENABLE         "UPnP einschalten"
+    IDS_UPNP_ENABLE_WEB     "UPnP für Webinterface Port einschalten"
+    IDS_UPNPBINDADDR        "UPnP host address bind to"
+    IDS_UPNP_INFO_NONEED    "Failed or not needed"
+    IDS_UPNP_INFOUNINIT     ",nicht initialisiert\r\n"
+    IDS_UPNP_INFOENABLED    ",aktiviert\r\n"
+    IDS_UPNP_INFODISABLED   ",deaktiviert\r\n"
+    IDS_UPNP_INFOSTANDBY    "Kein Adapter gefunden\r\n"
+    IDS_UPNFORCEUPDATE      "fehlgeschlagen oder nicht benötigt"
+    // <== UPnP support [MoNKi] - leuk_he
+    // ==> Random Ports [MoNKi] - Stulle
+    IDS_RND_PORT_GROUP      "Zufalls-Ports"
+    IDS_RND_PORT_FIRST      "Erster Zufalls-port"
+    IDS_RND_PORT_LAST       "Letzter Zufalls-port"
+    IDS_RND_PORT_RESET      "Zufalls-port sparen neustart-Zeit"
+    // <== Random Ports [MoNKi] - Stulle
+    // ==> Support page in preferences [Stulle] - Stulle
+    IDS_SUPPORT             "Unterstützung"
+    IDS_HOMEPAGE            "Homepage"
+    IDS_BOARD_GER           "Deutsches Hilfe Forum"
+    IDS_BOARD_ENG           "Englisches Hilfe Forum"
+    IDS_RATE                "Bewerte ScarAngel"
+    IDS_XTREME              "Xtreme Mod Homepage"
+    // <== Support page in preferences [Stulle] - Stulle
+    // ==> Automatic shared files updater [MoNKi] - Stulle
+    IDS_AUTO_SHARED_UPDATER "Automatisches Neuladen der Freigegebenen Dateien"
+    IDS_ASFU_RELOADTIME     "ASFU: Veränderung in freigegebenem Ordner gefunden, Neuladen der freigegebenen Dateien in %d Sekunden..."
+    IDS_ASFU_DELAY          "ASFU: Datei in Fertigstellung gefunden, Neuladen verzögert..."
+    IDS_ASFU_RELOAD         "Veränderung in freigegebenem Ordner gefunden. Lade freigegebene Dateien neu..."
+    IDS_ASFU_RELOADING      "ASFU: Neu laden..."
+    IDS_ASFU_SINGLE         "Überprüfe Ordner mit einzeln freigegebenen Dateien"
+    IDS_ASFU_TIMEBETWEEN    "Zeit zwischen zwei Mal automatisch neu laden [sek]"
+    // <== Automatic shared files updater [MoNKi] - Stulle
+    // ==> Anti Uploader Ban [Stulle] - Stulle
+    IDS_UNBAN_UPLOADER      "Limit für Ban-Schutz in MB [0=deaktiviert]"
+    IDS_ANTI_CASE_1         "UL >= Limit"
+    IDS_ANTI_CASE_2         "UL-DL >= Limit"
+    IDS_ANTI_CASE_3         "UL-DL >= Limit bis 1:1"
+    // <== Anti Uploader Ban [Stulle] - Stulle
+    // ==> Emulate others [WiZaRd/Spike/shadow2004] - Stulle
+    IDS_EMULATOR_GROUP      "Emuliere andere Klienten"
+    IDS_EMULATE_ML          "Emuliere MLDonkeys"
+    IDS_EMULATE_DONK        "Emuliere eDonkeys"
+    IDS_EMULATE_DONK_HYB    "Emuliere eDonkey-hybrids"
+    IDS_EMULATE_SHA         "Emuliere Sharezas"
+    IDS_EMULATE_PHANT       "Emuliere lPhants"
+    IDS_EMULATE_LOG         "Logge Emulationen"
+    // <== Emulate others [WiZaRd/Spike/shadow2004] - Stulle
+    // ==> Spread Credits Slot [Stulle] - Stulle
+    IDS_SPREAD_CREDITS_SLOT "Verteile Credits Slot (SCS)"
+    IDS_SPREAD_CREDITS_SLOT_COUNTER "Verteile Credits Slot alle X slots"
+    // <== Spread Credits Slot [Stulle] - Stulle
+    // ==> Pay Back First [AndCycle/SiRoB/Stulle] - Stulle
+    IDS_PAYBACKFIRST        "Zahle zuerst zurück (PBF)"
+    IDS_PAYBACKFIRSTLIMIT   "Menge vor Auslösung (Standard 10MB)"
+    IDS_PAYBACKFIRST2       "PBF für Klienten ohne sichere Identifizierung"
+    IDS_PAYBACKFIRSTLIMIT2  "Menge vor Auslösung (Standard 50MB)"
+    // <== Pay Back First [AndCycle/SiRoB/Stulle] - Stulle
+    IDS_IGNORE_THIRD        "Reserviere nicht 1/3 vom Uploadlimit fuer eMule" // Do not reserve 1/3 of your uploadlimit for emule [Stulle] - Stulle
+    IDS_UL_THRES            "Aktzeptiere nur Clients die innerhalb der letzten 30 min nachgefragt haben" // Disable accepting only clients who asked within last 30min [Stulle] - Stulle
+    IDS_FOLLOWTHEMAJORITY   "Folge der Mehrheit" // Follow The Majority [AndCycle/Stulle] - Stulle
+    IDS_FAIR_PLAY           "Fair Play - Lade X mal hoch (0 = deaktiviert)" // Fair Play [AndCycle/Stulle] - Stulle
+    IDS_MAX_SLOTSPEED       "Slot Geschwindigkeit immer maximieren" // Alwasy maximize slot speed [Stulle] - Stulle
+    IDS_REASK_FILE_SRC      "Nachfragezeit für Datei-Quellen [29-55 min.]" // Timer for ReAsk File Sources [Stulle] - Stulle
+    // ==> Advanced Options [Official/MorphXT] - Stulle
+    IDS_MINIMULEAUTOCLOSE   "MiniMule automatisch schliessen"
+    IDS_MINIMULETRANSPARENCY "MiniMule Durchsichtigkeit"
+    IDS_CHECKCOMCTL32       "Kontrolliere Comctl32.dll"
+    IDS_CHECKSHELL32        "Kontrolliere Shell32.dll"
+    IDS_IGNOREINSTANCES     "Ignoriere Sitzungen"
+    IDS_NOTIFIERMAILENCRYPTCERTNAME "Name des Mail-benachrichtungs-verschlüsselungs-zertifikats"
+    IDS_MEDIAINFO_MEDIAINFODLLPATH "Pfad zu mediainfo.dll"
+    IDS_MEDIAINFO_RIFF      "Benutze mediainfo.dll um 'avi' Dateien zu erkennen"
+    IDS_MEDIAINFO_ID3LIB    "Benutze mediainfo.dll oder ID3Lib um MPEG Dateien auf MPEG Header zu untersuchen"
+    IDS_MAXLOGBUFF          "Max Speicher für Log-Anzeige"
+    IDS_MAXCHATHISTORY      "Max im IRC chat gespeicherte Zeilen"
+    IDS_PREVIEWSMALLBLOCKS  "Vorschau kleiner Bloecke (für VLC)"
+    IDS_RESTORELASTMAINWNDDLG "Stelle letztes Fenster beim Start wieder her"
+    IDS_RESTORELASTLOGPANE  "Stelle letzte Log-seite beim Start wieder her"
+    IDS_PREVIEWCOPIEDARCHIVES "Vorschau aus Archiv-kopie"
+    IDS_STRAIGHTWINDOWSTYLES "Lineare Fenster-styles (könnte Neustart erfordern)"
+    IDS_LOGFILEFORMAT       "Log-Datei-Format (aktiviert=UTF-8, deaktiviert=Unicode)"
+    IDS_RTLWINDOWSLAYOUT    "Rechts-nach-Links Fenster-layout"
+    IDS_PREVIEWONICONDBLCLK "Vorschau bei Doppelklick auf Symbol"
+    IDS_INTERNETSECURITYZONE "Internet-Sicherheits-Zone"
+    IDS_TXTEDITOR           "Standard Editor für Webservices und IPFilter.dat"
+    IDS_SERVERUDPPORT       "Server UDP Port"
+    IDS_MAXMSGSESSIONS      "Max offene Chat-Sitzungen"
+    IDS_PREFERRESTRICTEDOVERUSER "Ziehe limitierten Nutzer vor"
+    IDS_WEBFILEUPLOADSIZELIMITMB "Limit für Dateiupload über Web Interface in MB (o=kein Limit)"
+    IDS_HIGHRESTIMER        "High resolution timer"
+    IDS_ALLOWEDIPS          "Erlaubte IPs für webserver (getrennt mit ;)"
+    IDS_REMOVEFILESTOBIN    "Entferne Dateien in Papierkorb"
+    IDS_DEBUGSEARCHDETAILLEVEL "Debug suche Detail level"
+    IDS_CRYPTTCPPADDINGLENGTH "CryptTCPPaddingLength=[1-254]"
+    IDS_USEUSERSORTEDSERVERLIST "Manuell sortierte Serverliste"
+    IDS_MINIMULE            "MiniMule"
+    IDS_TRUSTEVERYHASH      "Vertraue jedem AICH Hash (aktuelle session)"
+    IDS_INSPECTALLFILETYPES "Überprüfe alle Datei-Header auf Datei-Typ"
+    IDS_X_ADJUSTNTFSDAYLIGHTFILETIME "Adjust NTFS daylight file time"
+    IDS_X_DATETIMEFORMAT    "Datum&Zeit Format"
+    IDS_X_DATETIMEFORMAT4LOG "Datum&Zeit Format für Log"
+    IDS_X_LOGWARNING        "Log Warnung Farbe"
+    IDS_X_LOGSUCCESS        "Log Erfolg Farbe"
+    IDS_X_LOGERROR          "Log Fehler Farbe"
+    IDS_X_ICH               "Intelligent Corruption Handing (ICH)"
+    IDS_X_DONTCOMPRESSAVI   "Komprimiere keine AVI's"
+    IDS_X_SHOWCOPYED2KLINK  "Zeige 'kopiere ED2K link' Befehl"
+    IDS_X_ICON_FLASH_ON_NEW_MESSAGE "Bei neuer Nachricht Trayicon blinken lassen"
+    IDS_X_SHOWVERTICALHOURMARKERS "Stats- Zeige vertikale Stundenmarker"
+    IDS_X_REBARTOOLBAR      "* ReBar Toolbar"
+    IDS_BINDADDR            "Binde emule an Adapter"
+    // <== Advanced Options [Official/MorphXT] - Stulle
+    // ==> Advanced Updates [MorphXT/Stulle] - Stulle
+    IDS_UPDATEANTILEECHERONSTART "Aktualisiere antiLeech.dll beim Start"
+    IDS_AUTOUPWEEK          "Aktualisiere wöchentlich"
+    IDS_URL_FOR_UPDATING    "URL für aktualisierung"
+    IDS_UPDATEIPCURL        "Update"
+    IDS_UPDATEIPFILTERONSTART "Aktualisiere ipfilter.dat beim Start"
+    IDS_RESET               "Reset"
+    IDS_COUNTRY             "Land"
+    IDS_AUTOUPIP2COUNTRY    "Aktualisiere Ip-to-country.csv beim Start"
+    IDS_SCHED_UPDATE_IPCONFIG_LOG "Geplante IPFILTER.DAT-aktualisierung gestartet."
+    IDS_SCHED_UPDATE_ANTILEECH_LOG "Geplante antiLeech.dll-aktualisierung gestartet."
+    IDS_SCHEDTEXT           "Von ScarAngel AutoUpdate hinzugefügt"
+    IDS_SCHED_UPDATE_IPCONFIG "Aktualisiere IPFILTER.DAT-Datei"
+    IDS_SCHED_UPDATE_ANTILEECH "Aktualisiere antiLeech.dll-Datei"
+    IDS_SCHED_UPDATE_WARNING 
+                            "Automatische Updates nicht zu oft planen, um Netzwerktraffic niedrig zu halten!\r\nEinmal pro Woche sollte reichen!"
+    IDS_SCHED_WARNENDTIME   "EndZeit und StartZeit sollten uebereinstimmen für einmalige Ereignisse"
+    IDS_IP2COUNTRY_DWNFILE  "Lade IP2Country Datei"
+    IDS_IP2COUNTRY_UPUNLOAD "IP2Country.csv entladen wegen Update"
+    IDS_IP2COUNTRY_UPLOAD   "IP2Country.csv nach erfolgreichem Update geladen"
+    IDS_LOG_ERRDWN          "Download Fehler %s"
+    IDS_IP2COUNTRY_ERROR7   "Extrahieren der runtergeladenen IP to Country Datei aus der Zip Datei fehlgeschlagen ""%s""."
+    IDS_IP2COUNTRY_ERROR8   "Runtergeladene IP to Country Datei ""%s"" ist eine ZIP Datei mit unerwartetem Inhalt."
+    IDS_AUTODLPFAILED       "Kontrollieren der DLP fehlgeschlagen."
+    IDS_ANTILEECH_DWNFILE   "Download der DLP Datei"
+    IDS_AUTOIPFILTERFAILED  "Konnte IPFilter Version nicht überprüfen."
+    IDS_MEDIAINFO_MEDIADET  "Nutze Media Detector (MediaDet) um Informationen über Mediendateien zu erhalten"
+    IDS_MEDIAINFO_RM        "Nutze mediainfo.dll um Real Media Dateien zu erkennen"
+    IDS_MEDIAINFO_WM        "Nutze mediainfo.dll um Windows Media Dateien zu erkennen"
+    // <== Advanced Updates [MorphXT/Stulle] - Stulle
+    // ==> Links for Server list and nodes file [Stulle] - Stulle
+    IDS_NODESFILEBUTTON     "Nodes Datei"
+    IDS_SERVER_LISTS        "Server Listen"
+    // <== Links for Server list and nodes file [Stulle] - Stulle
+    IDS_SHOW_SPEED_METER    "Zeige Speedgrafik in der Toolbar" // High resolution speedmeter on toolbar [eFMod/Stulle] - Myth88
+    // ==> Control download priority [tommy_gun/iONiX] - MyTh88
+    IDS_AUTO_DOWN_GROUP     "Kontroliere Download Priorität"
+    IDS_AUTO_DOWN_PERC      "Durch Prozent geladen"
+    IDS_AUTO_DOWN_PERC_VAL  "Prozent geladen"
+    IDS_AUTO_DOWN_SIZE      "Durch Restgröße"
+    IDS_AUTO_DOWN_SIZE_VAL  "Restgröße (MB)"
+    IDS_AUTO_DOWN_PRIO      "Ändere Priorität in"
+    // <== Control download priority [tommy_gun/iONiX] - MyTh88
+    // ==> XP Style Menu [Xanatos] - Stulle
+    IDS_MENU_PREVIEW        "Vorschau"
+    IDS_HISTORY             "Verlaufsaufgaben"
+    IDS_COLUMNS             "Spalten"
+    IDS_PS_LIMITED_SRC      "Limitiert durch Quellen"
+    IDS_PS_LIMITED_AMNT     "Limitiert durch Datenolumen"
+    IDS_FUNCTION            "Funktionen"
+    IDS_RELEASER            "Releaser Funktionen"
+    // <== XP Style Menu [Xanatos] - Stulle
+    IDS_FINECS              "Fine Credit System (Schwelle: 4 Teile)" // Modified FineCS [CiccioBastardo/Stulle] - Stulle
+    IDS_IPFILTERWHITELOADED "%u IPs in die IPFilter Weiß Liste geladen" // IP Filter White List [Stulle] - Stulle
+    IDS_TRAY_COMPLETE       "Zeige komplette Downloads im Tray" // Completed in Tray [Stulle] - Stulle
+    // ==> Feedback personalization [Stulle] - Stulle
+    IDS_COLOR_FEEDBACK      "Personalisiere Uploadrückmeldung (Wasserstand)"
+    IDS_COLOR_MASTER7       "Uploadrückmeldung"
+    IDS_COLOR_F1            "Bezeichner"
+    IDS_COLOR_F2            "Namen"
+    IDS_COLOR_F3            "Dateityp und -größe"
+    IDS_COLOR_F4            "Download status"
+    IDS_COLOR_F5            "Übertragene Datenmenge"
+    IDS_COLOR_F6            "Anfragen"
+    IDS_COLOR_F7            "Quellen (Partfiles)"
+    IDS_COLOR_F8            "Klienten in Warteschlange"
+    // <== Feedback personalization [Stulle] - Stulle
+    IDS_STATIC_ICON         "Tray Icon immer anzeigen" // Static Tray Icon - MyTh88
+    IDS_DATEFILENAMELOG     "Schreibe Datum in den Namen der Log-Datei" // Date File Name Log [AndCycle] - Stulle
+    // ==> Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+    IDS_ADVADMIN_GROUP      "Erweiterte Webserver Einstellungen"
+    IDS_ADVADMIN_ACC        "Konto:"
+    IDS_ADVADMIN_DELETE     "Konto entfernen"
+    IDS_ADVADMIN_NEW        "Neues Konto"
+    IDS_ADVADMIN_KAD        "Zugriff auf - Kad"
+    IDS_ADVADMIN_TRANSFER   "Zugriff auf - Transfer"
+    IDS_ADVADMIN_SEARCH     "Zugriff auf - Suche"
+    IDS_ADVADMIN_SERVER     "Zugriff auf - Server"
+    IDS_ADVADMIN_SHARED     "Zugriff auf - Share"
+    IDS_ADVADMIN_STATS      "Zugriff auf - Statistik"
+    IDS_ADVADMIN_PREFS      "Zugriff auf - Optionen"
+    IDS_ADVADMIN_PASS       "Passwort:"
+    IDS_ADVADMIN_USER       "Name:"
+    IDS_ADVADMIN_CAT        "Kategorien (getrennt durch |):"
+    IDS_WS_COOKIE_LOGGEDIN  "Eingeloggt bleiben:"
+    IDS_WS_COOKIE_LASTUSER  "Letzen Benutzer merken:"
+    IDS_ADVADMIN_NOTE       "Bemerkung: Ihr müsst das Mehrbenutzer Webtemplate benutzen, andernfalls könnt ihr dies nicht aktivieren"
+    IDS_ADVADMIN_USERLEVEL  "Benutzer Level:"
+    IDS_ADVADMIN_OPERATOR   "Operator"
+    IDS_ADVADMIN_ADMIN      "Admin"
+    IDS_ADVADMIN_HIADMIN    "Hi-Admin"
+    IDS_ADVADMINENABLED     "Aktiviere Mehrbenutzer Webinterface Rechteverwaltung"
+    IDS_ADVADMIN_GUEST      "Gast"
+    IDS_ADVADMIN_DFILES     "Zugriff auf - Lade Dateien herunter?"
+    // <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
+    // ==> Tabbed WebInterface settings panel [Stulle] - Stulle
+    IDS_TAB_WEB_SERVER      "Webinterface"
+    IDS_TAB_MULTI_USER      "Mehrbenutzer"
+    IDS_TAB_NT_SERVICE      "NT Dienst"
+    // <== Tabbed WebInterface settings panel [Stulle] - Stulle
+    IDS_WS_FAILED_LOGIN     "Du wurdest für 15 Min gebannt, weil du zu viele fehlgeschlagene Loginversuche hattest!" // Failed login screen for WebInterface [SiRoB/CommanderGer/Stulle] - Stulle
+    // ==> Run eMule as NT Service [leuk_he/Stulle] - Stulle
+    IDS_SVC_RUNNINGASSERVICE "Läuft momentan als Dienst."
+    IDS_SVC_ACCESSDENIED    "Zugriff auf Dienst verweigert."
+    IDS_SVC_NOTINSTALLED    "Dienst ist nicht installiert."
+    IDS_SVC_INSTALLED       "Dienst installiert."
+    IDS_SVC_INSTALLFAILED   "Installation fehlgeschlagen, Log überprüfen."
+    IDS_SVC_UNINSTALLFAILED "Deinstallation fehlgeschlagen, Log überprüfen."
+    IDS_SVC_INSTALLED_DISABLED "Dienst gestoppt. (marked for deletion?)."
+    IDS_SVC_INSTALLSERVICE  "Installieren"
+    IDS_SVC_SERVERUNINSTALL "Deinstallieren"
+    IDS_SVC_STARTWITHSYSTEM "Bei Systemstart starten"
+    IDS_SVC_SETTINGS        "Einstellungen zur Nutzung als Dienst vornehmen"
+    IDS_SVC_RUNBROWSER      "Gehe zu webservice"
+    IDS_SVC_REPLACESERVICE  "Dienst stoppen und Programm starten"
+    IDS_SVC_ONSTARTBOX      "Bei Start von eMule"
+    IDS_SVC_STARTUPBOX      "Starttyp"
+    IDS_SVC_MANUALSTART     "Manuell starten"
+    IDS_SVC_CURRENT_STATUS_LABEL "Aktueller Status"
+    IDS_APPLY_SETTINGS      "Sollen die nötigen Einstellungen nun übernommen werden?"
+    IDS_CHANGEUSERASSERVICE "Ihr müsst die Benutzeranmeldung des Dienstes manuell ändern oder speichert die Config Datei in das Programmverzeichnis"
+    IDS_SERVICE_OPT_GROUP   "NT Dienst Optimierungen"
+    IDS_SERVICE_OPT_LABEL   "Optimierungs Level:"
+    IDS_SERVICE_OPT_NONE    "Keine"
+    IDS_SERVICE_OPT_BASIC   "Grundlegende"
+    IDS_SERVICE_OPT_LISTS   "Listen außer Server"
+    IDS_SERVICE_OPT_FULL    "Volle"
+    IDS_SVC_STRT_MGR_FAIL   "Dienst ist erfolgreich gestartet, konnte es aber dem Dienst Manager nicht sagen. Gebe auf."
+    IDS_SVC_PAUSE_MGR_FAIL  "Dienst wurde erfolgreich pausiert, konnte es aber dem Dienst Manager nicht sagen. Gebe auf."
+    IDS_SVC_INST_PATH_FAIL  "Installation von Dienst unmöglich, Pfad nicht zulässig. %s"
+    IDS_SVC_INST_SUCCESS    "Installiert als Dienst"
+    IDS_SVC_INST_FAIL       "Konnte nicht als Dienst installiert werden: %s"
+    IDS_SVC_SVCCTRL_FAIL    "Konnte keine Verbindung zu Dienstkontrolle herstellen: %s"
+    IDS_SVC_STOPPING        "Stoppe Dienst"
+    IDS_SVC_STOP_PNDNG      "Warte auf Dienst Stop"
+    IDS_SVC_STOPPED         "Dienst gestoppt"
+    IDS_SVC_STOP_FAIL       "Dienst stoppen fehlgeschlagen: %s"
+    IDS_SVC_DELETED         "Dienst gelöscht"
+    IDS_SVC_DELETE_FAIL     "Dienst löschen fehlgeschlagen: %s"
+    IDS_SVC_OPEN_FAIL       "Dienst öffnen fehlgeschlagen: %s"
+    IDS_SVC_TERMINATE       "Terminiere Dienst. Fehlercode %d:%s"
+    IDS_SVC_STRTUP_SUCCESS  "Erfolgreich Starttyp des Dienstes geändert."
+    IDS_SVC_STRTUP_FAIL     "Änderung des Starttyps fehlgeschlagen: %s"
+    IDS_SVC_STRTUP_OPN_FAIL "Öffnen des Dienstes zum Ändern des Starttyps fehlgeschlagen: %s"
+    IDS_SVC_STRTUP_CTRL_FAIL "Konnte keine Verbindung zu Dienstkontrolle für das Ändern des Starttyps herstellen: %s"
+	IDS_SVC_LINK_PASS_FAIL  "Übergebe Link an Webinterface: Internetopen fehlgeschlagen"
+    // <== Run eMule as NT Service [leuk_he/Stulle] - Stulle
+    // ==> Adjustable NT Service Strings - Stulle
+    IDS_SERVICE_STR_GROUP   "NT Dienst Bezeichnungen (leer = standard)"
+    IDS_SERVICE_NAME        "Name (für Installation)"
+    IDS_SERVICE_DISP_NAME   "Angezeigter Name"
+    IDS_SERVICE_DESCR       "Angezeigte Beschreibung"
+	IDS_SERVICE_NAME_CHANGED "Du hast den Namen unter dem der NT Dienst installiert ist geändert.\nUm die Änderung umzusetzen muss eMule den Dienst neu installieren.\n\nDrücke 'Ja' um den Dienst neu zu installieren.\n Drücke 'Nein' um nur den Installationsnamen zu ändern.\nDrücke 'Abbrechen' um die Änderungen rückgängig zu machen."
+    IDS_SERVICE_STR_CHANGED "NT Dienst Bezeichnung verändert"
+    IDS_SERVICE_DISP_CHANGE_FAIL "Ändern des angezeigten Namens oder der angezeigten Beschreibung fehlgeschlagen.\nMöchtest du versuchen den Dienst neu zu installieren um diese Bezeichnungen zu ändern?"
+    IDS_SERVICE_STR_CHANGE_FAIL "NT Dienst Bezeichnung ändern fehlgeschlagen."
+    IDS_SERVICE_UNINSTALL_FAIL "Deinstallation des NT Dienst fehlgeschlagen.\nBitte überprüfe das Log.\nAlle Änderungen wurden zurückgesetzt."
+    IDS_SERVICE_UNINSTALL_TITLE "Deinstallation fehlgeschlagen"
+    IDS_SERVICE_INSTALL_FAIL "Installation des NT Dienstes fehlgeschlagen.\nBitte überprüfe das Log und versuche den Dienst im NT Dienst Tab neu zu installieren."
+    IDS_SERVICE_INSTALL_TITLE "Installation fehlgeschlagen"
+    IDS_SVC_DISP_SUCCESS    "Erfolgreich angezeigten Namen des Dienstes geändert."
+    IDS_SVC_DISP_FAIL       "Änderung des angezeigten Namen des Dienstes fehlgeschlagen: %s"
+    IDS_SVC_DESCR_SUCCESS   "Erfolgreich angezeigte Beschreibung des Dienstes geändert."
+    IDS_SVC_DESCR_FAIL      "Änderung des angezeigte Beschreibung des Dienstes fehlgeschlagen: %s"
+    IDS_SVC_STR_OPN_FAIL    "Öffnen des Dienstes zum Ändern der angezeigten Bezeichnungen fehlgeschlagen: %s"
+    IDS_SVC_STR_CTRL_FAIL   "Konnte keine Verbindung zu Dienstkontrolle für das Ändern der angezeigten Bezeichnungen herstellen: %s"
+    // <== Adjustable NT Service Strings - Stulle
+    // ==> Extended Prompt on Exit dialog [leuk_he] - Stulle
+    IDS_YESSERVICE          "Ja, und starte eMule als Dienst"
+    IDS_NOMINIMIZE          "Nein, minimiere zu Tray"
+    // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
+    IDS_WS_FRIENDSLOT       "Freund-Uploadplatz" // Friendslot support for WebInterface [Stulle] - Stulle
 END
 
 #endif    // German (Germany) resources

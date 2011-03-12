@@ -104,12 +104,12 @@ public:
 
    //Xman 1:3 Ratio (use this instead of GetMaxDownload()
    //Xman GlobalMaxHarlimit for fairness	
-   // ==> Enforce Ratio [Stulle] - Stulle
-   /*
+	// ==> Enforce Ratio [Stulle] - Stulle
+	/*
 	float GetMaxDownloadEx(bool force);
 	*/
-	float GetMaxDownloadEx(uint8 force);
-   // <== Enforce Ratio [Stulle] - Stulle
+	float GetMaxDownloadEx(uint8 force, uint8 &uReason, uint8 &uRatio);
+	// <== Enforce Ratio [Stulle] - Stulle
 	float GetForcedDownloadlimit() const {return m_maxforcedDownloadlimit;}
 
    //Xman new adapter selection
@@ -147,7 +147,7 @@ private:
           timeStamp(time) {}
 
       uint64 eMuleOutOctets; // Data
-	  uint64 eMuleOutOctetsFriends; // Multiple friendslots [ZZ] - Mephisto
+      uint64 eMuleOutOctetsFriends; // Multiple friendslots [ZZ] - Mephisto
       uint64 eMuleInOctets;
       uint64 eMuleOutOverallOctets; // Data+Control
       uint64 eMuleInOverallOctets;
@@ -197,17 +197,18 @@ private:
    CBandWidthControl(const CBandWidthControl&);
    CBandWidthControl& operator=(const CBandWidthControl&);
 
-   // ==> Enforce Ratio [Stulle] - Stulle
+	// ==> Enforce Ratio [Stulle] - Stulle
 	float m_maxforcedDownloadlimitEnforced;
 	float m_fMaxDownloadEqualUploadLimit;
+	uint8 m_uNAFCRatio;
 public:
 	float GetForcedDownloadlimitEnforced() const {return m_maxforcedDownloadlimitEnforced;}
 	float GetMaxDownloadEqualUploadLimit() const {return m_fMaxDownloadEqualUploadLimit;}
-   // <== Enforce Ratio [Stulle] - Stulle
+	// <== Enforce Ratio [Stulle] - Stulle
 
-   // ==> Multiple friendslots [ZZ] - Mephisto
+	// ==> Multiple friendslots [ZZ] - Mephisto
 	float GetMaxDownloadFriends() const {return m_fMaxDownloadFriends;}
 private:
 	float m_fMaxDownloadFriends;
-   // <== Multiple friendslots [ZZ] - Mephisto
+	// <== Multiple friendslots [ZZ] - Mephisto
 };

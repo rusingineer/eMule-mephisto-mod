@@ -49,6 +49,7 @@ public:
     void EndThread();
 
     void Pause(bool paused);
+    //static uint32 UploadBandwidthThrottler::GetSlotLimit(uint32 currentUpSpeed); //Xman upload unused
 
 	//Xman Xtreme Upload
 	void	SetNoNeedSlot();
@@ -88,6 +89,8 @@ private:
     void RemoveFromAllQueues(ThrottledControlSocket* socket, bool lock); // ZZ:UploadBandWithThrottler (UDP)
     bool RemoveFromStandardListNoLock(ThrottledFileSocket* socket);
 
+    //uint32 CalculateChangeDelta(uint32 numberOfConsecutiveChanges) const; //Xman upload unused
+
     CTypedPtrList<CPtrList, ThrottledControlSocket*> m_ControlQueue_list; // a queue for all the sockets that want to have Send() called on them. // ZZ:UploadBandWithThrottler (UDP)
     CTypedPtrList<CPtrList, ThrottledControlSocket*> m_ControlQueueFirst_list; // a queue for all the sockets that want to have Send() called on them. // ZZ:UploadBandWithThrottler (UDP)
     CTypedPtrList<CPtrList, ThrottledControlSocket*> m_TempControlQueue_list; // sockets that wants to enter m_ControlQueue_list // ZZ:UploadBandWithThrottler (UDP)
@@ -113,10 +116,10 @@ private:
 	// ==> Mephisto Upload - Mephisto
 	/*
     uint16 m_highestNumberOfFullyActivatedSlots; //used inside
-    volatile uint16 m_highestNumberOfFullyActivatedSlots_out; //used outside
+	volatile uint16 m_highestNumberOfFullyActivatedSlots_out; //used outside
 	*/
 	// <== Mephisto Upload - Mephisto
-	bool doRun;
+    bool doRun;
 
 	// ==> Mephisto Upload - Mephisto
 	/*

@@ -92,8 +92,9 @@ CBandWidthControl::CBandWidthControl()
    boundIP=0;
 
 	// ==> Enforce Ratio [Stulle] - Stulle
-	m_maxforcedDownloadlimitEnforced=0;
+	m_maxforcedDownloadlimitEnforced=0.0f;
 	m_fMaxDownloadEqualUploadLimit=0.0f;
+	m_uNAFCRatio=0;
 	// <== Enforce Ratio [Stulle] - Stulle
 
 	m_fMaxDownloadFriends=0.0f; // Multiple friendslots [ZZ] - Mephisto
@@ -442,6 +443,7 @@ void CBandWidthControl::Process()
 		*/
 		m_maxforcedDownloadlimitEnforced=m_maxDownloadLimit; //initialize with the standard
 		m_fMaxDownloadEqualUploadLimit=m_maxDownloadLimit; //initialize with the standard
+		m_uNAFCRatio=0; // initialize with zero
 		// ==> Multiple friendslots [ZZ] - Mephisto
 		/*
 		if(thePrefs.m_bAcceptsourcelimit==false || thePrefs.GetEnforceRatio())
@@ -523,6 +525,7 @@ void CBandWidthControl::Process()
 					if(maxDownloadLimit < m_maxDownloadLimit){
 						m_maxDownloadLimit = maxDownloadLimit;
 					}
+					m_uNAFCRatio=3; // Enforce Ratio [Stulle] - Stulle
 				}
 				else if(eMuleOutOverall < 11*1024){ //Xman changed to 11
 					// Ratio 4x
@@ -530,6 +533,7 @@ void CBandWidthControl::Process()
 					if(maxDownloadLimit < m_maxDownloadLimit){
 						m_maxDownloadLimit = maxDownloadLimit;
 					}
+					m_uNAFCRatio=4; // Enforce Ratio [Stulle] - Stulle
 				}
 
 				if(m_maxDownloadLimit < 1.0f){
@@ -645,36 +649,6 @@ float CBandWidthControl::GetMaxDownloadEx(bool force)
 	//Xman end
 
    if(thePrefs.Is13Ratio() && GeteMuleIn()<=GeteMuleOut()*3) 
-*/
-float CBandWidthControl::GetMaxDownloadEx(uint8 force)
-{
-	uint64 ueMuleOut = GeteMuleOut();
-	uint64 ueMuleIn = GeteMuleIn();
-	// ==> Multiple friendslots [ZZ] - Mephisto
-	/*
-	if(force == 2)
-	*/
-	if(force == 3)
-	{
-		ueMuleOut -= theStats.sessionSentBytesToFriend;
-		if(ueMuleIn > (ueMuleOut*3))
-			return GetMaxDownloadEqualUploadLimit();
-		else if(ueMuleIn > (ueMuleOut*2.9f))
-			return GetMaxDownloadFriends();
-	}
-	else if(force == 2)
-	// <== Multiple friendslots [ZZ] - Mephisto
-	{
-		if(ueMuleIn > (ueMuleOut*thePrefs.GetRatioValue()))
-			return GetMaxDownloadEqualUploadLimit();
-		else if(ueMuleIn > (ueMuleOut*((float)(thePrefs.GetRatioValue()-0.1f))))
-			return GetForcedDownloadlimitEnforced();
-	}
-	else if(force == 1 && ueMuleIn>ueMuleOut*3) //session/amount based ratio
-		return GetForcedDownloadlimit();
-
-   if(thePrefs.Is13Ratio() && ueMuleIn<=ueMuleOut*3) 
-// <== Enforce Ratio [Stulle] - Stulle
        return UNLIMITED;
    else
       if(thePrefs.GetNAFCFullControl()==true)
@@ -682,6 +656,102 @@ float CBandWidthControl::GetMaxDownloadEx(uint8 force)
       else
          return thePrefs.GetMaxDownload();
 }
+*/
+// 1 = Forced 1:3 by sources
+// 2 = Enforce
+// 4 = Unlimited under 1:3
+// 8 = NAFC
+// ==> Multiple friendslots [ZZ] - Mephisto
+// 16 = Friendslots
+// <== Multiple friendslots [ZZ] - Mephisto
+float CBandWidthControl::GetMaxDownloadEx(uint8 force, uint8 &uReason, uint8 &uRatio)
+{
+	uint64 ueMuleOut = GeteMuleOut();
+	uint64 ueMuleIn = GeteMuleIn();
+	float fMaxDownload = -1.0f;
+
+	// ==> Multiple friendslots [ZZ] - Mephisto
+	/*
+	if(force&1 && ueMuleIn>ueMuleOut*3) //session/amount based ratio
+	{
+		uReason |= 1;
+		uRatio = 4;
+		fMaxDownload = GetForcedDownloadlimit();
+	}
+	*/
+	if(force&4)
+	{
+		// We exclude friend traffic here so it is not taken into account for the ratio calculation
+		ueMuleOut -= theStats.sessionSentBytesToFriend;
+		if(force&2 && thePrefs.GetRatioValue() <= 3)
+			; // Note: If we enforce a ratio <= 3 anyway we skip the Friend Ratio here and do it below
+		else if(ueMuleIn > (ueMuleOut*3))
+		{
+			uReason |= 16;
+			uRatio = 1;
+			fMaxDownload = GetMaxDownloadEqualUploadLimit();
+		}
+		else if(ueMuleIn > (ueMuleOut*2.9f))
+		{
+			uReason |= 16;
+			uRatio = 3;
+			fMaxDownload = GetMaxDownloadFriends();
+		}
+	}
+
+	if(force&1 && ueMuleIn>ueMuleOut*3) //session/amount based ratio
+	{
+		uReason |= 1;
+		if(fMaxDownload == -1.0f)
+		{
+			uRatio = 4;
+			fMaxDownload = GetForcedDownloadlimit();
+		}
+	}
+	// <== Multiple friendslots [ZZ] - Mephisto
+
+	if(force&2)
+	{
+		if(ueMuleIn > (ueMuleOut*thePrefs.GetRatioValue()))
+		{
+			uReason |= 2;
+			if(fMaxDownload == -1.0f || thePrefs.GetRatioValue() < 4)
+			{
+				uRatio = 1;
+				fMaxDownload = GetMaxDownloadEqualUploadLimit();
+			}
+		}
+		else if(ueMuleIn > (ueMuleOut*((float)(thePrefs.GetRatioValue()-0.1f))))
+		{
+			uReason |= 2;
+			if(fMaxDownload == -1.0f || thePrefs.GetRatioValue() < 4)
+			{
+				uRatio = thePrefs.GetRatioValue();
+				fMaxDownload = GetForcedDownloadlimitEnforced();
+			}
+		}
+	}
+
+	if(thePrefs.Is13Ratio() && ueMuleIn<=ueMuleOut*3 && fMaxDownload == -1.0f)
+	{
+		uReason |= 4;
+		fMaxDownload = UNLIMITED;
+	}
+	else
+	{
+		// Note: the NAFC limit can go below the enforced limits so we check if we should rather apply NAFC limit
+		if(thePrefs.GetNAFCFullControl()==true && (fMaxDownload == -1.0f || fMaxDownload > GetMaxDownload()))
+		{
+			uReason |= 8;
+			uRatio = m_uNAFCRatio;
+			fMaxDownload = GetMaxDownload();
+		}
+		else if(fMaxDownload == -1.0f)
+			fMaxDownload = thePrefs.GetMaxDownload();
+	}
+	return fMaxDownload;
+}
+// <== Enforce Ratio [Stulle] - Stulle
 //Xman end
 
 uint64 CBandWidthControl::GeteMuleOut() const 
@@ -891,6 +961,7 @@ void CBandWidthControl::PrintStatistic()
 	m_statisticLocker.Unlock();
 }
 #endif
+
 // ==> Multiple friendslots [ZZ] - Mephisto
 uint64 CBandWidthControl::GeteMuleOutFriends() const 
 {

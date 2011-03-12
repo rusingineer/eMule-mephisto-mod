@@ -40,8 +40,10 @@ static char THIS_FILE[] = __FILE__;
  */
 UploadBandwidthThrottler::UploadBandwidthThrottler(void) {
 	//Xman Xtreme Upload unused
-	//m_SentBytesSinceLastCall = 0;
-	//m_SentBytesSinceLastCallOverhead = 0;
+	/*
+	m_SentBytesSinceLastCall = 0;
+	m_SentBytesSinceLastCallOverhead = 0;
+	*/
 	// ==> Mephisto Upload - Mephisto
 	/*
     m_highestNumberOfFullyActivatedSlots = 0;
@@ -334,6 +336,7 @@ void UploadBandwidthThrottler::AddToStandardList(int posCounter, ThrottledFileSo
 		sendLocker.Unlock();
 	}
 }
+
 //Xman Xtreme Upload
 void UploadBandwidthThrottler::SetNoNeedSlot()
 {
@@ -361,6 +364,7 @@ void UploadBandwidthThrottler::RecalculateOnNextLoop()
 */
 // <== Mephisto Upload - Mephisto
 //Xman end
+
 /**
  * Remove a socket from the list of sockets that have upload slots.
  *
@@ -453,7 +457,7 @@ bool UploadBandwidthThrottler::RemoveFromStandardListNoLock(ThrottledFileSocket*
 			realallowedDatarate -= ( counttrickles * 500);
 			const uint16 savedbytes = counttrickles > 1 ? 500 : 0;
 			//calculate the wanted slots
-			uint16 slots=(uint16)(realallowedDatarate/slotspeed);
+			uint16 slots=(uint16)max(realallowedDatarate/slotspeed,1);
 			if((realallowedDatarate-slots*slotspeed) > ((slots+1)*slotspeed-realallowedDatarate) - savedbytes)
 			{
 				slots++;
@@ -466,11 +470,13 @@ bool UploadBandwidthThrottler::RemoveFromStandardListNoLock(ThrottledFileSocket*
 	*/
 	// <== Mephisto Upload - Mephisto
 
-/*
+	//Xman unused
+	/*
     if(foundSocket && m_highestNumberOfFullyActivatedSlots > (uint32)m_StandardOrder_list.GetSize()) {
         m_highestNumberOfFullyActivatedSlots = m_StandardOrder_list.GetSize();
     }
-*/
+	*/
+	//Xman end
     return foundSocket;
 }
 
@@ -579,10 +585,8 @@ void UploadBandwidthThrottler::RemoveFromAllQueues(ThrottledFileSocket* socket) 
 	sendLocker.Lock();
 
 	if(doRun) {
-		
 		// And remove it from upload slots
 		RemoveFromStandardListNoLock(socket);
-
 		RemoveFromAllQueues(socket, false); //Xman 
 	}
 
@@ -616,6 +620,49 @@ void UploadBandwidthThrottler::Pause(bool paused) {
 		pauseEvent->SetEvent();
     }
 }
+
+//Xman upload unused
+/*
+uint32 UploadBandwidthThrottler::GetSlotLimit(uint32 currentUpSpeed) {
+    uint32 upPerClient = UPLOAD_CLIENT_DATARATE;
+
+    // if throttler doesn't require another slot, go with a slightly more restrictive method
+	if( currentUpSpeed > 20*1024 )
+		upPerClient += currentUpSpeed/43;
+
+	if( upPerClient > 7680 )
+		upPerClient = 7680;
+
+	//now the final check
+
+	uint16 nMaxSlots;
+	if (currentUpSpeed > 12*1024)
+		nMaxSlots = (uint16)(((float)currentUpSpeed) / upPerClient);
+	else if (currentUpSpeed > 7*1024)
+		nMaxSlots = MIN_UP_CLIENTS_ALLOWED + 2;
+	else if (currentUpSpeed > 3*1024)
+		nMaxSlots = MIN_UP_CLIENTS_ALLOWED + 1;
+	else
+		nMaxSlots = MIN_UP_CLIENTS_ALLOWED;
+
+    return max(nMaxSlots, MIN_UP_CLIENTS_ALLOWED);
+}
+
+uint32 UploadBandwidthThrottler::CalculateChangeDelta(uint32 numberOfConsecutiveChanges) const {
+    switch(numberOfConsecutiveChanges) {
+        case 0: return 50;
+        case 1: return 50;
+        case 2: return 128;
+        case 3: return 256;
+        case 4: return 512;
+        case 5: return 512+256;
+        case 6: return 1*1024;
+        case 7: return 1*1024+256;
+        default: return 1*1024+512;
+    }
+}
+*/
+//Xman end
 
 /**
  * Start the thread. Called from the constructor in this class.
@@ -716,9 +763,9 @@ UINT UploadBandwidthThrottler::RunInternal() {
 	// <== Mephisto Upload - Mephisto
 	//Xman count block/success send
 	uint32 last_block_process = timeGetTime() >> 10;
+	bool bAlwaysEnableBigSocketBuffers = false;
 
-	while(doRun) 
-	{
+	while(doRun) {
         pauseEvent->Lock();
 
 		DWORD timeSinceLastLoop = timeGetTime() - lastLoopTick;
@@ -779,7 +826,7 @@ UINT UploadBandwidthThrottler::RunInternal() {
 		allowedDataRate = (uint32)(theApp.pBandWidthControl->GetMaxUpload()*1024); 
 		if(allowedDataRate<old_value)
 		{
-			if(old_value -  allowedDataRate  >=1024)
+			if(old_value -  allowedDataRate >= 1024)
 				recalculate=true; //readjust socket: trickle or full
 		}
 		old_value=slotspeed;
@@ -916,7 +963,7 @@ UINT UploadBandwidthThrottler::RunInternal() {
 			const uint16 savedbytes = counttrickles > 1 ? 500 : 0;
 
 			//calculate the wanted slots
-			uint16 slots=(uint16)(realallowedDatarate/slotspeed);
+			uint16 slots=(uint16)(max(realallowedDatarate/slotspeed,1));
 			if(slots>=m_StandardOrder_list.GetSize())
 			{	//we don't have enough slots
 				needslot=true;
@@ -953,6 +1000,14 @@ UINT UploadBandwidthThrottler::RunInternal() {
 				}
 				SetNumberOfFullyActivatedSlots();
 			}
+			// if we are uploading fast, increase the sockets sendbuffers in order to be able to archive faster
+			// speeds
+			// NOTE: We do not call this an awful lot so it's fine to use a more constant approach here.
+			//bool bUseBigBuffers = bAlwaysEnableBigSocketBuffers;
+			if (allowedDataRate/slots > 100 * 1024 && realallowedDatarate > 300 * 1024)
+				bAlwaysEnableBigSocketBuffers = true;
+			else
+				bAlwaysEnableBigSocketBuffers = false;
 		}
 		else if(nexttrickletofull)		
 		{
@@ -972,7 +1027,15 @@ UINT UploadBandwidthThrottler::RunInternal() {
 			}
 		}
 		*/
-	    spentBytesFriends = 0;
+		spentBytesFriends = 0;
+		// if we are uploading fast, increase the sockets sendbuffers in order to be able to archive faster
+		// speeds
+		// NOTE: Since we use slot focus we start using bigger sockets ealier
+		// TODO: CHECKEN!
+		if (allowedDataRate > 150 * 1024)
+			bAlwaysEnableBigSocketBuffers = true;
+		else
+			bAlwaysEnableBigSocketBuffers = false;
 		// <== Mephisto Upload - Mephisto
 
 
@@ -1120,7 +1183,19 @@ UINT UploadBandwidthThrottler::RunInternal() {
 						theApp.QueueDebugLogLine(false, _T("Warning full on wrong possition"));
 						recalculate=true;
 					}
-					SocketSentBytes socketSentBytes = socket->SendFileAndControlData(doubleSendSize,doubleSendSize); 
+					if (bAlwaysEnableBigSocketBuffers)
+						socket->UseBigSendBuffer();
+
+					// netfinity: Maximum Segment Size (MSS - Vista only) //added by zz_fly
+					SocketSentBytes socketSentBytes;
+					if(thePrefs.retrieveMTUFromSocket && (socket->m_dwMSS!=0) && (allowedDataRate >= 6*1024)){ //let MTU=536 at very low speed
+						uint32 socketMSS = (thePrefs.usedoublesendsize && (allowedDataRate >= 16*1024)) ? ((socket->m_dwMSS - 40) * 2) : (socket->m_dwMSS - 40);
+						socketSentBytes = socket->SendFileAndControlData(socketMSS,socketMSS); 
+					}
+					else {
+						socketSentBytes = socket->SendFileAndControlData(doubleSendSize,doubleSendSize); 
+					}
+					// netfinity: end
 					uint32 lastSpentBytes = socketSentBytes.sentBytesControlPackets + socketSentBytes.sentBytesStandardPackets;
 					spentBytes += lastSpentBytes;
 					spentOverhead += socketSentBytes.sentBytesControlPackets;
@@ -1240,9 +1315,17 @@ UINT UploadBandwidthThrottler::RunInternal() {
 					continue; // too little data to give
 				}
 
+				// check if SendBuffer should be increased
+				if (bAlwaysEnableBigSocketBuffers)
+					socket->UseBigSendBuffer();
+
 				// set the maximum to give
 				//theApp.QueueDebugLogLine(false,_T("UBT: uSlope: %I64u"),uSlope);
 				uint32 uTempSendSize = minFragSize;
+				// netfinity: Maximum Segment Size (MSS - Vista only) //added by zz_fly
+				if(thePrefs.retrieveMTUFromSocket && (socket->m_dwMSS!=0) && (allowedDataRate >= 6*1024)) //let MTU=536 at very low speed
+					uTempSendSize = socket->m_dwMSS - 40;
+				// netfinity: end
 				if(uSlope>minFragSize)
 					uTempSendSize = (uint32)(doubleSendSize*ceil((double)(uSlope)/(double)(doubleSendSize)));
 				//theApp.QueueDebugLogLine(false,_T("UBT: SlotFocus needed: %u"),uTempSendSize);
@@ -1467,8 +1550,6 @@ UINT UploadBandwidthThrottler::RunInternal() {
 
 	//end of the main loop
 	}
-
-
 
 	threadEndedEvent->SetEvent();
 

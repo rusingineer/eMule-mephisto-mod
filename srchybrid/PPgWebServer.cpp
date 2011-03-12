@@ -549,7 +549,7 @@ void CPPgWebServer::OnEnChangeWSEnabled()
 	GetDlgItem(IDC_WSTIMEOUT)->EnableWindow(bIsWIEnabled);
 	GetDlgItem(IDC_WSUPNP)->EnableWindow(thePrefs.IsUPnPEnabled() && bIsWIEnabled);
 	// <== Ionix advanced (multiuser) webserver [iOniX/Aireoreion/wizard/leuk_he/Stulle] - Stulle
-
+	
 	//GetDlgItem(IDC_WSRELOADTMPL)->EnableWindow(bIsWIEnabled);
 	SetTmplButtonState();
 

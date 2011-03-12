@@ -84,6 +84,28 @@ private:
 };
 // <== File Settings [sivka/Stulle] - Stulle
 
+// ==> Enforce Ratio [Stulle] - Stulle
+enum DownLimitReason
+{
+	DLR_NONE	= 0,	// no limit
+	DLR_NOUL	= 1,	// unlimited because no UL possible
+	DLR_13RATIO	= 2,	// unlimited because < 1:3 ratio
+	DLR_NAFC	= 4,	// NAFC limit
+	DLR_SESLIM	= 8,	// Will be session limited by sources
+	DLR_ENFLIM	= 16,	// Will be session limited by enforce
+	// ==> Multiple friendslots [ZZ] - Mephisto
+	/*
+	DLR_SOURCE	= 32,	// Forced 1:3 by sources
+	DLR_ENFORCE	= 64,	// Enforce
+	*/
+	DLR_FRILIM	= 32,	// Will be session limited by friendslots
+	DLR_SOURCE	= 64,	// Forced 1:3 by sources
+	DLR_ENFORCE	= 128,	// Enforce
+	DLR_FRIEND	= 256,	// Friendslots
+	// <== Multiple friendslots [ZZ] - Mephisto
+};
+// <== Enforce Ratio [Stulle] - Stulle
+
 class CDownloadQueue
 {
 	friend class CAddFileThread;
@@ -198,7 +220,12 @@ public:
 	void	StopUDPRequests();
 
 	// check diskspace
+	//zz_fly :: remove useless code :: Enig123 :: start
+	//note: not needed, because priority have been handled in CDownloadQueue::Process(), thanks Enig123
+	/*
 	void	SortByPriority();
+	*/
+	//zz_fly :: end
 	void	CheckDiskspace(bool bNotEnoughSpaceLeft = false);
 	void	CheckDiskspaceTimed();
 
@@ -226,7 +253,13 @@ public:
 	void	IncGlobSources() {m_uGlobsources++;	}
 	void	DecGlobSources() {m_uGlobsources--;	}
 	uint32	GetGlobalSources() const {return m_uGlobsources;	}
+	// ==> Multiple friendslots [ZZ] - Mephisto
+	/*
 	uint8	GetLimitState() const {return m_limitstate;}
+	*/
+	uint16	GetLimitState() const {return m_limitstate;}
+	// <== Multiple friendslots [ZZ] - Mephisto
+	uint8	GetLimitRatio() const {return m_limitratio;} // Enforce Ratio [Stulle] - Stulle
 	//Xman end
 
 #ifdef PRINT_STATISTIC
@@ -239,20 +272,25 @@ protected:
 	bool	IsMaxFilesPerUDPServerPacketReached(uint32 nFiles, uint32 nIncludedLargeFiles) const;
 	bool	SendGlobGetSourcesUDPPacket(CSafeMemFile* data, bool bExt2Packet, uint32 nFiles, uint32 nIncludedLargeFiles);
 
+	//zz_fly :: remove useless code :: Enig123 :: start
+	//note: not needed, because priority have been handled in CDownloadQueue::Process(), thanks Enig123
+	/*
 private:
 	bool	CompareParts(POSITION pos1, POSITION pos2);
 	void	SwapParts(POSITION pos1, POSITION pos2);
 	void	HeapSort(UINT first, UINT last);
+	*/
+	//zz_fly :: end
 
 //Xman see all sources
 public:
-	CTypedPtrList<CPtrList, CPartFile*> filelist;  
+	CTypedPtrList<CPtrList, CPartFile*> filelist;
 private:
 //Xman end
 	
 	CTypedPtrList<CPtrList, CPartFile*> m_localServerReqQueue;
 	uint16	filesrdy;
-	
+
 	// Maella -Pseudo overhead datarate control-
 	/*
 	uint32	datarate;
@@ -269,7 +307,6 @@ private:
 	uint8 m_maxdownprio;
 	uint8 m_maxdownprionew;
 	//Xman end
-
 
 	CPartFile*	lastfile;
 	uint32		lastcheckdiskspacetime;
@@ -293,10 +330,6 @@ private:
 	uint32		m_FailedTCPFileReask;
 	//Xman end
 
-	//Xman GlobalMaxHarlimit for fairness
-	uint32		m_uGlobsources;
-	uint8		m_limitstate;
-
 	//Xman
 	/*
 	// By BadWolf - Accurate Speed Measurement
@@ -309,9 +342,20 @@ private:
 	*/
 	//Xman end
 
+	//Xman GlobalMaxHarlimit for fairness
+	uint32		m_uGlobsources;
+	// ==> Multiple friendslots [ZZ] - Mephisto
+	/*
+	uint8		m_limitstate;
+	*/
+	uint16		m_limitstate;
+	// <== Multiple friendslots [ZZ] - Mephisto
+	uint8		m_limitratio; // Enforce Ratio [Stulle] - Stulle
+
 	CSourceHostnameResolveWnd m_srcwnd;
 
-	CCriticalSection srcLock;	//zz_fly :: make source add action thread safe :: Enig123
+	//is it necessary to use these codes to fix such a minor bug?
+	//CCriticalSection srcLock;	//zz_fly :: make source add action thread safe :: Enig123
 
     //Xman
     /*

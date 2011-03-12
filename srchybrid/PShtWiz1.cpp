@@ -411,6 +411,11 @@ void CPPgWiz1Ports::OnCancel(){
 
 // ** UPnP Button stuff
 void CPPgWiz1Ports::OnStartUPnP() {
+#ifdef DUAL_UPNP //zz_fly :: dual upnp
+	if (thePrefs.m_bUseACATUPnPCurrent)
+		return;
+#endif //zz_fly :: dual upnp
+
 	CDlgPageWizard::OnApply();
 	theApp.emuledlg->StartUPnP(true, GetTCPPort(), GetUDPPort());
 
@@ -449,7 +454,12 @@ void CPPgWiz1Ports::OnTimer(UINT /*nIDEvent*//*){
 void CPPgWiz1Ports::ResetUPnPProgress(){
 	KillTimer(1);
 	((CProgressCtrl*)GetDlgItem(IDC_UPNPPROGRESS))->SetPos(0);
-	GetDlgItem(IDC_UPNPSTART)->EnableWindow(TRUE);
+#ifdef DUAL_UPNP //zz_fly :: dual upnp
+	if (thePrefs.m_bUseACATUPnPCurrent)
+		GetDlgItem(IDC_UPNPSTART)->EnableWindow(FALSE);
+	else
+#endif //zz_fly :: dual upnp
+		GetDlgItem(IDC_UPNPSTART)->EnableWindow(TRUE);
 }
 */
 // <== UPnP support [MoNKi] - leuk_he
@@ -509,6 +519,12 @@ BOOL CPPgWiz1Ports::OnInitDialog()
 	SetDlgItemText(IDC_UDPDISABLE, GetResString(IDS_UDPDISABLED));
 	SetDlgItemText(IDC_UPNPSTART, GetResString(IDS_UPNPSTART));
 	SetDlgItemText(IDC_UPNPSTATUS, _T(""));
+#ifdef DUAL_UPNP //zz_fly :: dual upnp
+	if (thePrefs.m_bUseACATUPnPCurrent){
+		GetDlgItem(IDC_UPNPPROGRESS)->EnableWindow(FALSE);
+		GetDlgItem(IDC_UPNPSTART)->EnableWindow(FALSE);
+	}
+#endif //zz_fly :: dual upnp
 	*/
 	SetDlgItemText(IDC_ENABLE_PNP, GetResString(IDS_CN_UPNPNAT)); // enable upnpnat
 

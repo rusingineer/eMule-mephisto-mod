@@ -441,6 +441,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileIdentifier.cpp"
+				>
+			</File>
+			<File
 				RelativePath="FirewallOpener.cpp"
 				>
 			</File>
@@ -979,6 +983,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\kademlia\utils\LookupHistory.cpp"
+					>
+				</File>
+				<File
 					RelativePath="kademlia\utils\MiscUtils.cpp"
 					>
 				</File>
@@ -1149,6 +1157,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileIdentifier.h"
+				>
+			</File>
+			<File
 				RelativePath="FirewallOpener.h"
 				>
 			</File>
@@ -1257,10 +1269,6 @@
 				>
 			</File>
 			<File
-				RelativePath="PeerCacheClient.h"
-				>
-			</File>
-			<File
 				RelativePath="PeerCacheFinder.h"
 				>
 			</File>
@@ -1310,10 +1318,6 @@
 			</File>
 			<File
 				RelativePath="SearchFile.h"
-				>
-			</File>
-			<File
-				RelativePath="SearchFrm.h"
 				>
 			</File>
 			<File
@@ -1497,6 +1501,10 @@
 				</File>
 				<File
 					RelativePath="kademlia\utils\LittleEndian.h"
+					>
+				</File>
+				<File
+					RelativePath=".\kademlia\utils\LookupHistory.h"
 					>
 				</File>
 				<File
@@ -1725,6 +1733,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileDetailDlgStatistics.cpp"
+				>
+			</File>
+			<File
 				RelativePath="FileInfoDialog.cpp"
 				>
 			</File>
@@ -1770,6 +1782,10 @@
 			</File>
 			<File
 				RelativePath="KademliaWnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\KadLookupGraph.cpp"
 				>
 			</File>
 			<File
@@ -2001,7 +2017,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ToolbarWnd.cpp"
+				>
+			</File>
+			<File
 				RelativePath="ToolTipCtrlX.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TransferDlg.cpp"
 				>
 			</File>
 			<File
@@ -2309,6 +2333,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileDetailDlgStatistics.h"
+				>
+			</File>
+			<File
 				RelativePath="FileInfoDialog.h"
 				>
 			</File>
@@ -2358,6 +2386,10 @@
 			</File>
 			<File
 				RelativePath="KademliaWnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KadLookupGraph.h"
 				>
 			</File>
 			<File
@@ -2609,7 +2641,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ToolbarWnd.h"
+				>
+			</File>
+			<File
 				RelativePath="ToolTipCtrlX.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TransferDlg.h"
 				>
 			</File>
 			<File
@@ -2954,10 +2994,6 @@
 				>
 			</File>
 			<File
-				RelativePath="res\Close.ico"
-				>
-			</File>
-			<File
 				RelativePath=".\res\CloseTab.ico"
 				>
 			</File>
@@ -2971,10 +3007,6 @@
 			</File>
 			<File
 				RelativePath="res\colour.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\Comments.ico"
 				>
 			</File>
 			<File
@@ -3118,10 +3150,6 @@
 				>
 			</File>
 			<File
-				RelativePath="res\CycleView.ico"
-				>
-			</File>
-			<File
 				RelativePath="res\Delete.ico"
 				>
 			</File>
@@ -3222,10 +3250,6 @@
 				>
 			</File>
 			<File
-				RelativePath="res\emuleColl.ico"
-				>
-			</File>
-			<File
 				RelativePath="res\emuleCollAdd.ico"
 				>
 			</File>
@@ -3263,10 +3287,6 @@
 			</File>
 			<File
 				RelativePath="res\ExportAll.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\ExportSelected.ico"
 				>
 			</File>
 			<File
@@ -3382,10 +3402,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\FileTypeEmuleCollection.ico"
-				>
-			</File>
-			<File
 				RelativePath=".\res\FileTypePicture.ico"
 				>
 			</File>
@@ -3395,10 +3411,6 @@
 			</File>
 			<File
 				RelativePath=".\res\FileTypeVideo.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\FolderOpen.gif"
 				>
 			</File>
 			<File
@@ -3463,10 +3475,6 @@
 			</File>
 			<File
 				RelativePath="res\Help.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\iconmax.ico"
 				>
 			</File>
 			<File
@@ -3719,10 +3727,6 @@
 				>
 			</File>
 			<File
-				RelativePath="res\Prefs_Webcache.ico"
-				>
-			</File>
-			<File
 				RelativePath="res\Preview.ico"
 				>
 			</File>
@@ -3748,10 +3752,6 @@
 			</File>
 			<File
 				RelativePath="res\Proxy.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\queue.ico"
 				>
 			</File>
 			<File
@@ -4163,18 +4163,6 @@
 				>
 			</File>
 			<File
-				RelativePath="res\ViewDownload.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\ViewUpDown.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\ViewUpload.ico"
-				>
-			</File>
-			<File
 				RelativePath="res\Web.ico"
 				>
 			</File>
@@ -4184,10 +4172,6 @@
 			</File>
 			<File
 				RelativePath="res\Wizard.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\Wizzard.ico"
 				>
 			</File>
 			<File

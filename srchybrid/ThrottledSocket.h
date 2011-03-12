@@ -24,7 +24,7 @@ class ThrottledControlSocket
 public:
     virtual SocketSentBytes SendControlData(uint32 maxNumberOfBytesToSend, uint32 minFragSize) = 0;
 	//Xman 
-	virtual bool IsSocketUploading() const = false;
+	virtual bool IsSocketUploading() const = 0;
 };
 
 class ThrottledFileSocket : public ThrottledControlSocket
@@ -39,9 +39,10 @@ public:
 	//Xman end
 	virtual bool	IsBusy() const = 0;
     virtual bool    HasQueues() const = 0;
+	virtual bool	UseBigSendBuffer()								{ return false; }
 
 	//Xman Full chunk:
-	virtual bool StandardPacketQueueIsEmpty() const = false ;
+	virtual bool StandardPacketQueueIsEmpty() const = 0;
 
 	//Xman count block/success send
 	virtual float GetBlockRatio() const =0;
@@ -52,15 +53,12 @@ public:
 //Xman Xtreme Upload
 	bool IsSocketUploading() const {return slotstate!=0 && isready==true;} //Xman 
 
-	//virtual uint32	GetNeededBytes() = 0;
-
-	ThrottledFileSocket(void) {slotstate=0; isready=false;} //Xman 
+	ThrottledFileSocket(void) {slotstate=0; isready=false; m_dwMSS=0;} //Xman // netfinity: Maximum Segment Size
 
 	// ==> Mephisto Upload - Mephisto
 	/*
 	bool IsTrickle() const	{return slotstate==3;}
 	bool IsFull() const		{return slotstate==1;}
-
 
 	void SetTrickle()	{slotstate=3; CSlope=1;}
 	void SetFull()		{slotstate=1;}
@@ -98,6 +96,8 @@ public:
 	bool	isready;
 	sint32	CSlope;
 
+	// netfinity: Maximum Segment Size (MSS - Vista only) //added by zz_fly
+	DWORD		m_dwMSS;
 
 private:
 	uint8	slotstate;	//1=full, 3=trickle

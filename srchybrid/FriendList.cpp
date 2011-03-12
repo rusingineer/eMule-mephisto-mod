@@ -344,6 +344,7 @@ bool CFriendList::AddEmfriendsMetToList(const CString& strFile)
 	return true;
 }
 // MORPH END - Added by Commander, Friendlinks [emulEspaa]
+
 // ==> Multiple friendslots [ZZ] - Mephisto
 bool CFriendList::IsFriendSlot(){
 	for (POSITION pos = m_listFriends.GetHeadPosition();pos != 0; ){

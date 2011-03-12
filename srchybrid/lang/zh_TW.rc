@@ -461,7 +461,6 @@ BEGIN
     IDS_PW_USS              "¦b±Ò°Ê®É¦Û°Ê§ó·s¦øªA¾¹²M³æ"
     IDS_PW_MISC             "¦h¤è­±ªº"
     IDS_PW_TRAY             "³Ì¤p¤Æ®ÉÁY¨ì¨t²Î¦C"
-    IDS_PW_BEEP             "¿ù»~®Éµo¥XÁn­µ"
     IDS_PW_PROMPT           "Â÷¶}®É´£¥Ü"
     IDS_PW_SPLASH           "Åã¥Ü±Ò°Êµe­±"
     IDS_PW_DBLCLICK         "¤U¸ü²M³æÂI¤G¤U¨ÓÂX®i"
@@ -875,7 +874,6 @@ END
 STRINGTABLE 
 BEGIN
     IDS_DOWNLOADMOVIECHUNKS "¹Á¸Õ­º¥ý¤U¸ü¹wÄý°Ï¶ô"
-    IDS_UPDATEQUEUE         "¤£­n§Y®É§ó·sµ¥­Ô¤¤²M³æ"
     IDS_RECOVER_SINGLE      "1 ­ÓÀÉ®×¤wÁÙ­ì."
     IDS_RECOVER_MULTIPLE    "%u ­ÓÀÉ®×¤wÁÙ­ì."
     IDS_ATTEMPTING_RECOVERY "¹Á¸ÕÁÙ­ìÀÉ®×¤¤..."
@@ -1083,7 +1081,6 @@ BEGIN
     IDS_WEB_BADLOGINATTEMPT "Web-¬É­±: µn¤J¹Á¸Õ¤w¸g¥¢±Ñ"
     IDS_ERR_TOOLARGEFILE    "ÀÉ®×¶W¹L eDonkey ¨ó©w¤ä´©ªº¤j¤p (>=256GB)"
     IDS_MSGONLYFRIENDS      "¥u±µ¨ü¦n¤Í°T®§"
-    IDS_MSGONLYSEC          "¥u±µ¨ü¦³®Äªº«È¤áºÝ°T®§"
     IDS_DAY_MO_SA           "¤@-¤»"
     IDS_LIMITSOURCES        "­­¨î¨Ó·½¼Æ"
     IDS_LIMITCONS5SEC       "­­¨î³s½u¼Æ/5¬í"
@@ -1132,7 +1129,6 @@ BEGIN
     IDS_DL_RESUMENEXT       "Ä~Äò¤U¤@­Ó¤w¼È°±"
     IDS_STARTPRIO           "§ïÅÜ·s¤À°tÀÉ®×ªºÀu¥ýÅv"
     IDS_PREF_STARTNEXTFILECAT "°¾¦n¨Ï¥Î¬Û¦PÃþ§O"
-    IDS_REPAINTGRAPHS       "¦b§ïÅÜµøµ¡¤j¤p®É¤£­«·s«Ø¥ß²Î­p¹Ï§Î"
     IDS_SOFTFILES           "³n©ÊÀÉ®×­­¨î"
 END
 
@@ -1544,7 +1540,6 @@ BEGIN
     IDS_FO_PREF_FAILED      "¦b WinXP ¤º³¡¨¾¤õÀð³]©w¤w¿ï¾Üªº³s±µ°ð¥¢±Ñ!"
     IDS_FO_PREF_STARTUP     "·í ±Ò°Ê/Â÷¶} eMule ®É ¶}±Ò/Ãö³¬ ¦b WinXP ¨¾¤õÀðªº³s±µ°ð"
     IDS_LOG_LEVEL           "°O¿ý¼Ð·Ç"
-    IDS_DISABLEPEERACHE     "°±¥Î±q PeerCache ¤U¸ü"
     IDS_NEWMSG              "·sªº°T®§¨Ó¦Û '%s' (IP:%s)"
     IDS_PREF_STARTNEXTFILECATONLY "¥u¦b¬Û¦PªºÃþ§O"
     IDS_LOG_ULDL_EVENTS     "°O¿ý ¤W¸ü/¤U¸ü ¨Æ¥ó"
@@ -1639,7 +1634,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_IACHHASH            "AICH ¤Á²Ó­È"
+    IDS_AICHHASH            "AICH ¤Á²Ó­È"
     IDS_BYTESPERSEC         "¦ì¤¸²Õ/¬í"
     IDS_KBYTESPERSEC        "KB/¬í"
     IDS_MBYTESPERSEC        "MB/¬í"
@@ -1930,7 +1925,7 @@ BEGIN
     IDS_FILE_WARNING_DRM    "ÀÉ®× ""%s"" ¦ü¥G³Q¼Æ¦ìª©ÅvºÞ²z«OÅ@(DRM).\r\n\r\n¦b¨S¦³³Ð§@ªÌªº±ÂÅv¤U¤j³¡¤À±¡ªp¤U±z±N¤£¯à¨Ï¥Î³o­ÓÀÉ®×. ±z¥²¶·ª`·N¨ì·í¶}±Ò³o­ÓÀÉ®×¤j³¡¤À±¡ªp¤U·|¨Ï±zªº¦h´CÅé¼½©ñ¾¹¥h¶}±Ò¤@­Ó Web ÂsÄý¾¹¥B±N·|¦Û°Ê³s±µ¨ìÀÉ®×ªº³Ð§@ªÌºô¯¸¨Ã¥B­n¨DÀò±o¤@­Ó±ÂÅv.\r\n\r\n±z¯uªº·Q­nÄ~Äò¶}±Ò³oÀÉ®×?"
     IDS_CHECK_FILE_OPEN     "·í¶}±Ò¥¼«H¥ôÀÉ®×®É´£¥XÄµ§i"
     IDS_BOOTABLE            "¥i±Ò°Êªº"
-    IDS_UNSUPPORTEDIMAGE    "¥¼¤ä´©ªº¼v¹³"
+    IDS_UNSUPPORTEDIMAGE    "¥¼ª¾´©ªº¼v¹³"
 END
 
 
@@ -1940,6 +1935,33 @@ BEGIN
     IDS_WEBUPNPINCLUDE      "¥]§t³s±µ°ð¦Ü UPnP ³]©w"
     IDS_ADDEDON             "¤w¥[¤J¦b"
     IDS_RESOLVELINKS        "¸ÑªR¦b¤w¤À¨É¸ê¤ºªº±¶®|"
+END
+
+
+STRINGTABLE 
+BEGIN
+    IDS_DOWNLOADCOMMANDS    "¤U¸ü«ü¥O"
+    IDS_CLOSETOOLBAR        "Ãö³¬¤u¨ã¦C"
+    IDS_SHOWTOOLBAR         "Åã¥Ü¤u¨ã¦C"
+    IDS_SEARCH_BADOPERATORCOMBINATION 
+                            "±z¤£¯à¦b Kad ·j´Mªº²Ä¤@­ÓÃöÁä¦r¨Ï¥Î OR ¹Bºâ¤¸!\n\n¨Ò¦p ""ÃöÁä¦r1 OR ÃöÁä¦r2"" ¬O¤£³Q¤¹³\. ¸ÕµÛ¨Ï¥Î ""ÃöÁä¦r1 AND (ÃöÁä¦r2 OR ÃöÁä¦r3)"" ©Î¬O¨Ï¥Î¦h¦¸·j´M¨Ó´À¥N³o­Ó°Ê§@."
+    IDS_DISCOVEREDBY        "±´¯Á¸g¥Ñ"
+    IDS_NODES               "¸`ÂI"
+    IDS_ROUTINGTABLE        "¸ô¥Ñªí"
+    IDS_PROTOCOLVERSION     "¨ó©wª©¥»"
+    IDS_FOUNDNODESUSEFUL    "µo²{¸`ÂI (¦³¥Îªº)"
+    IDS_NORESPONSE          "¨S¦³¦^À³"
+    IDS_NOTASKED            "©|¥¼¸ß°Ý"
+    IDS_LOOKUPGRAPH         "·j´M©ú²Ó"
+    IDS_AUTOKADLOOKUPGRAPH  "¦Û°Ê¦aÅã¥Ü§@¥Î¤¤·j´M"
+    IDS_PAUSEONPREVIEW      "¦b¦³¥i¯à¹wÄý®É¼È°±"
+    IDS_PREVIEWWITH         "¹wÄý¨Ï¥Î"
+    IDS_CLOSEEMULE          "Ãö³¬ eMule"
+    IDS_DONOTASKAGAIN       "¤£­n¦A¦¸¸ß°Ý§Ú"
+    IDS_POPULARITY          "¤H®ð±Æ¦W"
+    IDS_SHOWWIN7TASKBARGOODIES "±Ò¥Î Windows 7 ¤u§@¦C®ÄªG"
+    IDS_LANMODE             "LAN ¼Ò¦¡"
+    IDS_OPENPREFINI         "¶}? preferences.ini"
 END
 
 STRINGTABLE 
@@ -1963,23 +1985,23 @@ BEGIN
     IDS_AVG_DATARATE_TIME   "¥­§¡³t²vÅã¥Ü¶¡¹j: %u ¬í"
     IDS_XTREMESETTINGS      "Xtreme"
     IDS_ZOOMSTATIC          "©ñ¤j: %u ­¿"
-    IDS_AVGQR               "¥­§¡¶¤¦C"
-    IDS_USEDOUBLESENDSIZE   "¤@¦¸µo°e¨â­Ó«Ê¥]"//orignial¡G"Âù­¿µo°e¤Ø¤o" //"Use Double Sendsize"
+    IDS_AVGQR               "¥­§¡¦î¦C"
+    IDS_USEDOUBLESENDSIZE   "Âù­¿µo°e¤Ø¤o"
     IDS_LOGDROP             "°O¿ý­ç°£°Ê§@"
     IDS_ANTILEECHER_GROUP   "Anti-Leecher"
     IDS_ANTILEECHER_CHECK   "±Ò¥Î Anti-Leecher «OÅ@"
-    IDS_ANTILEECHERNAME_CHECK "ÀË´ú: Leecher by UserName"//"ÀË´ú: ¤£¨}ªº¥Î¤á¦W"
-    IDS_POWERRELEASE        "±j¤O¤À¨É"
+    IDS_ANTILEECHERNAME_CHECK "ÀË´ú: ¤£¨}ªº¥Î¤á¦W"
+    IDS_POWERRELEASE        "±j¤Oµo§G"
     IDS_DONTREMOVESTATICSERVER "¸T¤î¦Û°Ê²¾°£ÀRºA¦øªA¾¹"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_LISTREQUESTED       "³Q½Ð¨D¤å¥ó¦Cªí"//"³Q½Ð¨DÀÉ¦Cªí"
+    IDS_LISTREQUESTED       "³Q½Ð¨DÀÉ¦Cªí"
     IDS_HIGHPRIOPROCESS     "°ª"
-    IDS_ABOVENORMALPROCESS  "¤¤"//"¤¤°ª"
-    IDS_NORMALPROCESS       "¤@¯ë"//"¥¿±`"
-    IDS_PROCESSGROUP        "µ{¦¡Àu¥ý¯Å"//"µ{¦¡Àu¥ý¶¶§Ç"
+    IDS_ABOVENORMALPROCESS  "¤¤°ª"
+    IDS_NORMALPROCESS       "¥¿±`"
+    IDS_PROCESSGROUP        "µ{¦¡Àu¥ý¶¶§Ç"
 END
 
 STRINGTABLE 
@@ -1987,26 +2009,26 @@ BEGIN
     IDS_COUNTRYNAME_SHORT   "Åã¥Ü2¦r¥ÀÂ²ºÙ"
     IDS_COUNTRYNAME_MID     "Åã¥Ü3¦r¥ÀÂ²ºÙ"
     IDS_COUNTRYNAME_LONG    "Åã¥Ü°ê®a¥þºÙ"
-    IDS_COUNTRYNAME_SHOWFLAG "Åã¥Ü°êºX¼Ð¼m"
+    IDS_COUNTRYNAME_SHOWFLAG "Åã¥ÜºX¼m"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_IP2COUNTRY_MSG1     "°êÄy§PÂ_ ¨Ï¥Î WebHosting.Info ©Ò´£¨Ñªº IP-to-Country ¸ê®Æ®w"//"IP2Country uses the IP-to-Country Database provided by WebHosting.Info"
-    IDS_IP2COUNTRY_MSG2     "(http://www.webhosting.info), ¥i±o©ó http://ip-to-country.webhosting.info"//"(http://www.webhosting.info), available from http://ip-to-country.webhosting.info"
-    IDS_IP2COUNTRY_LOADED   "°êÄy§PÂ_ ¸ü¤J"//"IP2Country ¼Æ¾Ú¤w¸ü¤J"
-    IDS_IP2COUNTRY_UNLOADED "°êÄy§PÂ_ ¨ø¸ü"//"IP2Country ¼Æ¾Ú¤w¨ø¸ü"
-    IDS_IP2COUNTRY_ERROR1   "¿ù»~¦æ¸¹: %i"//"¦b²Ä %i ¦æµo¥Í¿ù»~"
-    IDS_IP2COUNTRY_ERROR3   "¸ü¤J¥¢±Ñ"//"µLªk¸ü¤J"
-    IDS_IP2COUNTRY_ERROR4   "°êºX°±¥Î¡A¸ü¤J¥¢±Ñ"//"¦]¬°°ê®aºX¼m¥¼±Ò¥Î, µLªk¸ü¤J"
-    IDS_IP2COUNTRY_ERROR5   "¿ù»~ resID¡A©Î³\±z¸Ó§ó·s°êºX¹ÏÀÉDLL,"//"«Dªkªº¸ê·½ID, ¥i¯à§A»Ý­n§ó·s°ê®aºX¼mÀÉ(CountryFlag.dll),"
-    IDS_IP2COUNTRY_INFO     "Åª¨ú¦æ¼Æ:%u  §ä¨ì °êÄy§PÂ_ ½d³ò:%u  ­«½Æ:%u  ¦X¨Ö:%u"//"Parsed lines:%u  Found IPCountry ranges:%u  Duplicate:%u  Merged:%u"
-    IDS_IP2COUNTRY_FLAGLOAD "°êºX¤w¸ü¤J"//"°ê®aºX¼m¤w¸ü¤J"
-    IDS_IP2COUNTRY_FILELOAD "°êÄy§PÂ_ ¤w¨ø¸ü"//"IP2Country ¤å¥ó¤w¨ø¸ü"
-    IDS_IP2COUNTRY_FLAGUNLD "°êºX¤w¨ø¸ü"//"°ê®aºX¼m¤w¨ø¸ü"
+    IDS_IP2COUNTRY_MSG1     "IP2Country uses the IP-to-Country Database provided by WebHosting.Info"
+    IDS_IP2COUNTRY_MSG2     "(http://www.webhosting.info), available from http://ip-to-country.webhosting.info"
+    IDS_IP2COUNTRY_LOADED   "IP2Country ¼Æ¾Ú¤w¸ü¤J"
+    IDS_IP2COUNTRY_UNLOADED "IP2Country ¼Æ¾Ú¤w¨ø¸ü"
+    IDS_IP2COUNTRY_ERROR1   "¦b²Ä %i ¦æµo¥Í¿ù»~"
+    IDS_IP2COUNTRY_ERROR3   "µLªk¸ü¤J"
+    IDS_IP2COUNTRY_ERROR4   "¦]¬°°ê®aºX¼m¥¼±Ò¥Î, µLªk¸ü¤J"
+    IDS_IP2COUNTRY_ERROR5   "«Dªkªº¸ê·½ID, ¥i¯à§A»Ý­n§ó·s°ê®aºX¼mÀÉ(CountryFlag.dll),"
+    IDS_IP2COUNTRY_INFO     "Parsed lines:%u  Found IPCountry ranges:%u  Duplicate:%u  Merged:%u"
+    IDS_IP2COUNTRY_FLAGLOAD "°ê®aºX¼m¤w¸ü¤J"
+    IDS_IP2COUNTRY_FILELOAD "IP2Country ¤å¥ó¤w¨ø¸ü"
+    IDS_IP2COUNTRY_FLAGUNLD "°ê®aºX¼m¤w¨ø¸ü"
     IDS_IP2COUNTRY_NALONG   "¤£¾A¥Î"
     IDS_IP2COUNTRY_NASHORT  "N/A"
-    IDS_IP2COUNTRY_LOADED2  "±qÀÉ %s ¤¤¸ü¤J °êÄy§PÂ_ ¸ê®Æ, ¥Î®É %u ²@¬í"//"±qÀÉ %s ¤¤¸ü¤J IP2Country ¸ê®Æ, ¥Î®É %u ²@¬í"
+    IDS_IP2COUNTRY_LOADED2  "±qÀÉ %s ¤¤¸ü¤J IP2Country ¸ê®Æ, ¥Î®É %u ²@¬í"
     IDS_ACCURATEGRAPH       "ºë½TÅã¥Ü"
 END
 
@@ -2015,55 +2037,55 @@ BEGIN
     IDS_SMOOTHGRAPH         "¥­·ÆÅã¥Ü"
     IDS_MULTIQUEUE          "¨C­ÓÀÉ¤@­Ó¦î¦C (¦h¦î¦C)"
     IDS_RETRYCONNECTIONATTEMPTS "¹Á¸Õ­«·s½Ð¨D¥¢±ÑªºTCP³s±µ"
-    IDS_ANTIGHOST           "ÀË´ú: Ghost-Mods"//"ÀË´ú: «ÕÆF¥Î¤áºÝ"
+    IDS_ANTIGHOST           "ÀË´ú: «ÕÆF¥Î¤áºÝ"
     IDS_REMEMBERAICH        "«O¯d¥¼¨Ï¥Îªº AICH-Hashes (known2.met)"
     IDS_MARKCANCELLED       "¼Ð°O¬°""¤w¨ú®ø"""
-    IDS_DOWNHISTORY_CHECK1  "eMuleµo²{¤@­Ó¦P¤Á²Ó­Èªº¤w¤U¸üÀÉ®×:\n"//"eMuleµo²{´¿¸g¤U¸ü¹L¦P¼ËªºÀÉ ID:\n"
-    IDS_DOWNHISTORY_CHECK2  "eMuleµo²{ %i ­Ó¦PÀÉ¦Wªº¤w¤U¸üÀÉ®× (%s):\n"//"eMuleµo²{ÀÉ %i ´¿¸g¤U¸ü¹L¥BÀÉ®×¦W¬Û¦P (%s):\n"
-    IDS_DOWNHISTORY_CHECK3  "µL½×¦p¦óÁÙ¬O­n¤U¸ü³o­ÓÀÉ®×¶Ü?"//"µL½×¦p¦ó±z³£­n¤U¸ü³o­ÓÀÉ¶Ü¡H"
-    IDS_DOWNHISTORY_CHECK4  "eMuleµo²{¤@­Ó¦P¤Á²Ó­Èªº¤w¨ú®øÀÉ®×:\n"//"eMuleµo²{´¿¸g¨ú®ø¤F¦¹ÀÉªº¤U¸ü ID:\n"
-    IDS_DOWNHISTORY         "¤U¸ü¾ú¥v¬ö¿ý"//"¤U¸ü¾ú¥v"
-    IDS_DOWNHISTORY_REMOVE  "¥Ñ°O¿ý¤¤§R°£"//"²M°£¦¹°O¿ý"
+    IDS_DOWNHISTORY_CHECK1  "eMuleµo²{´¿¸g¤U¸ü¹L¦P¼ËªºÀÉ ID:\n"
+    IDS_DOWNHISTORY_CHECK2  "eMuleµo²{ÀÉ %i ´¿¸g¤U¸ü¹L¥BÀÉ®×¦W¬Û¦P (%s):\n"
+    IDS_DOWNHISTORY_CHECK3  "µL½×¦p¦ó±z³£­n¤U¸ü³o­ÓÀÉ¶Ü¡H"
+    IDS_DOWNHISTORY_CHECK4  "eMuleµo²{´¿¸g¨ú®ø¤F¦¹ÀÉªº¤U¸ü ID:\n"
+    IDS_DOWNHISTORY         "¤U¸ü¾ú¥v"
+    IDS_DOWNHISTORY_REMOVE  "²M°£¦¹°O¿ý"
     IDS_DOWNHISTORY_REMOVE_QUESTION "±z¯uªº·Q§â ""%s"" ±q¤U¸ü¾ú¥v¤¤²M°£¶Ü¡H"
     IDS_DOWNHISTORY_REMOVE_QUESTION_MULTIPLE 
                             "±z¯uªº·Q­n§â©Ò¿ïªºÀÉ±q¤U¸ü¾ú¥v¤¤²M°£¶Ü¡H"
-    IDS_DOWNHISTORY_SHARED  "¤À¨É¤¤"//"¦@¥Î"
-    IDS_DOWNHISTORY_CLEAR   "²M°£¤U¸ü¾ú¥v°O¿ý"//"²M°£©Ò¦³¤U¸ü°O¿ý"
+    IDS_DOWNHISTORY_SHARED  "¦@¥Î"
+    IDS_DOWNHISTORY_CLEAR   "²M°£©Ò¦³¤U¸ü°O¿ý"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_DOWNHISTORY_SHOWSHARED "Åã¥Ü¤À¨É¤¤ÀÉ®×"//"Åã¥Ü¦@¥Î¤¤ªºÀÉ"
-    IDS_DOWNHISTORY_ACTIONS "«ü¥O"//"¿ï¶µ"
-    IDS_DOWNHISTORY_CLEAR_QUESTION "±z½T©w­n²M°£¤U¸ü¾ú¥v°O¿ý¶Ü¡H"//"±z½T©w·Q­n²M°£©Ò¦³ªº¤U¸ü°O¿ý¶Ü¡H"
+    IDS_DOWNHISTORY_SHOWSHARED "Åã¥Ü¦@¥Î¤¤ªºÀÉ"
+    IDS_DOWNHISTORY_ACTIONS "¿ï¶µ"
+    IDS_DOWNHISTORY_CLEAR_QUESTION "±z½T©w·Q­n²M°£©Ò¦³ªº¤U¸ü°O¿ý¶Ü¡H"
     IDS_SENDBUFFER          "  µo°e½w¦s:"
-    IDS_LEERCHERLOGTITLE    "§l¦åÅ[¹LÂo°O¿ý"//"§l¦åÆj¹LÂo°O¿ý"
-    IDS_ALL_A4AF_TO_THIS    "¥ß¨è¥æ´«¥þ³¡¨Ó·½¨ì¦¹ÀÉ®×"//"¥ß¨è¥æ´«¥þ³¡¨Ó·½¨ì¦¹ÀÉ"
-    IDS_ALL_A4AF_TO_OTHER   "¥ß¨è¥æ´«¥þ³¡¨Ó·½¨ì¨ä¥LÀÉ®×"//"¥ß¨è¥æ´«¥þ³¡¨Ó·½¨ì¨ä¥LÀÉ"
-    IDS_SWAP_A4AF_TO_THIS   "¥ß¨è¥æ´«(A4AF)¨Ó·½¨ì¦¹ÀÉ®×"//"¥ß¨è¥æ´«(A4AF)¨Ó·½¨ì¦¹ÀÉ"
-    IDS_SWAP_A4AF_TO_OTHER  "¥ß¨è¥æ´«(A4AF)¨Ó·½¨ì¨ä¥LÀÉ®×"//"¥ß¨è¥æ´«(A4AF)¨Ó·½¨ì¨ä¥LÀÉ"
-    IDS_ALL_A4AF_AUTO       "¦Û°Ê¥æ´«¥þ³¡(A4AF)¨Ó·½¨ì¦¹ÀÉ®×"//"¦Û°Ê¥æ´«¥þ³¡(A4AF)¨Ó·½¨ì¦¹ÀÉ"
-    IDS_LEECHER_ACTION_BAN  "«ÊÂê"//"¾B¸n"
+    IDS_LEERCHERLOGTITLE    "§l¦åÆj¹LÂo°O¿ý"
+    IDS_ALL_A4AF_TO_THIS    "¥ß¨è¥æ´«¥þ³¡¨Ó·½¨ì¦¹ÀÉ"
+    IDS_ALL_A4AF_TO_OTHER   "¥ß¨è¥æ´«¥þ³¡¨Ó·½¨ì¨ä¥LÀÉ"
+    IDS_SWAP_A4AF_TO_THIS   "¥ß¨è¥æ´«(A4AF)¨Ó·½¨ì¦¹ÀÉ"
+    IDS_SWAP_A4AF_TO_OTHER  "¥ß¨è¥æ´«(A4AF)¨Ó·½¨ì¨ä¥LÀÉ"
+    IDS_ALL_A4AF_AUTO       "¦Û°Ê¥æ´«¥þ³¡(A4AF)¨Ó·½¨ì¦¹ÀÉ"
+    IDS_LEECHER_ACTION_BAN  "¾B¸n"
     IDS_LEECHER_ACTION_REDUCE "´î¤Ö¿n¤À"
-    IDS_ANTILEECHERBADHELLO_CHECK "ÀË´ú: wrong Hello-Tag"//"ÀË´ú: ¿ù»~ªº´¤¤â¼Ð»x"
-    IDS_ANTILEECHERSNAFU_CHECK "ÀË´ú: bad Tags"//"ÀË´ú: ¿ù»~ªºÀÉ¼Ð»x"
+    IDS_ANTILEECHERBADHELLO_CHECK "ÀË´ú: ¿ù»~ªº´¤¤â¼Ð»x"
+    IDS_ANTILEECHERSNAFU_CHECK "ÀË´ú: ¿ù»~ªºÀÉ¼Ð»x"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_ANTILEECHERMOD_CHECK "ÀË´ú: Leecher by Modstring"//"ÀË´ú: ¤£¨}ªº¥Î¤áºÝ¼Ð¥Ü"
-    IDS_ANTILEECHERTHIEF_CHECK "ÀË´ú: Nick-/ Modthiefs"//"ÀË´ú: ÎîºÙ/¥Î¤áºÝ¼Ð¥ÜÅÑ¸é"
-    IDS_ANTILEECHERSPAMMER_CHECK "ÀË´ú: Spammers"//"ÀË´ú: ©U§£¸ê°Tµo°eªÌ"
-    IDS_ANTILEECHERXSEXPLOITER_CHECK "ÀË´ú: XS-Exploiter"//"ÀË´ú: XS-Exploiter"
-    IDS_STATIC_LEECHERCOMMUNITY "Community Mods"//"ªÀ°Ï¥Î¤áºÝ"
-    IDS_STATIC_LEECHERGHOST "Ghost-Mods"//"«ÕÆF¥Î¤áºÝ"
-    IDS_STATIC_LEECHERTHIEF "Nick- / Modthiefs"//"ÎîºÙ/¥Î¤áºÝ¼Ð¥ÜÅÑ¸é"
+    IDS_ANTILEECHERMOD_CHECK "ÀË´ú: ¤£¨}ªº¥Î¤áºÝ¼Ð¥Ü"
+    IDS_ANTILEECHERTHIEF_CHECK "ÀË´ú: ÎîºÙ/¥Î¤áºÝ¼Ð¥ÜÅÑ¸é"
+    IDS_ANTILEECHERSPAMMER_CHECK "ÀË´ú: ©U§£¸ê°Tµo°eªÌ"
+    IDS_ANTILEECHERXSEXPLOITER_CHECK "ÀË´ú: XS-Exploiter"
+    IDS_STATIC_LEECHERCOMMUNITY "ªÀ°Ï¥Î¤áºÝ"
+    IDS_STATIC_LEECHERGHOST "«ÕÆF¥Î¤áºÝ"
+    IDS_STATIC_LEECHERTHIEF "ÎîºÙ/¥Î¤áºÝ¼Ð¥ÜÅÑ¸é"
     IDS_NEWXTREMEVERSION    "µo²{·sª© Xtreme ¥i¥Î"
     IDS_NEWXTREMEVERSIONDOWNLOAD "µo²{·sª© Xtreme ¥i¥Î \n ±z·Q²{¦b¤U¸ü¥¦¶Ü¡H"
     IDS_NEWDLP              "µo²{·sª© antiLeech.dll (DLP) ¥i¥Î"
     IDS_NEWDLPDOWNLOAD      "µo²{·sª© antiLeech.dll (DLP) ¥i¥Î \n ±z·Q²{¦b¤U¸ü¥¦¶Ü¡H"
-    IDS_DROPLEECHER         "½ð°£§l¦åÅ["//"­ç°£§l¦åÆj"
-    IDS_ACTIVEDOWNLOADSBOLD "¥¿¦b¤U¸ü¥ô°È¥H²ÊÅé¦rÅã¥Ü"//"¹ï¥¿¦b¤U¸üªº¥ô°È¨Ï¥Î¶ÂÅé¦rÅã¥Ü"
+    IDS_DROPLEECHER         "­ç°£§l¦åÆj"
+    IDS_ACTIVEDOWNLOADSBOLD "¹ï¥¿¦b¤U¸üªº¥ô°È¨Ï¥Î¶ÂÅé¦rÅã¥Ü"
     IDS_UPDOWNUPLOADLIST    "¤W¶Ç / ¤U¸ü"
     IDS_MAXGLOBALSOURCES    "¥þ²y¨Ó·½­­¨î:"
     IDS_ACCEPTSOURCES       "¨Ï¥Î¥þ²y¨Ó·½­­¨î"
@@ -2072,25 +2094,24 @@ END
 STRINGTABLE 
 BEGIN
     IDS_ACCEPTRATIO         "¦pªG§ä¨ìªº·½¦h©ó·½­­¨î®É¨Ï¥Î1:3ªº¤W¶Ç/¤U¸ü­­¨î"
-    IDS_SHOWADDITIONALGRAPH "Åã¥ÜÃB¥~ªº²Î­p¦±½u"//"Åã¥Üªþ¥[²Î­p¦±½u"
+    IDS_SHOWADDITIONALGRAPH "Åã¥Üªþ¥[²Î­p¦±½u"
     IDS_CHECK4UPDATEMOD     "±Ò°Ê®ÉÀË¬d Xtreme ªº·sª©¥»"
-    IDS_ANTILEECHEREMCRYPT_CHECK "ÀË´ú: emcrypt"//"ÀË´ú: ¥[±K¥Î¤áºÝ"
+    IDS_ANTILEECHEREMCRYPT_CHECK "ÀË´ú: ¥[±K¥Î¤áºÝ"
     IDS_UPLOADMANAGEMENT_FRAME "¤W¶ÇºÞ²z"
     IDS_UPLOADSLOTSPEED_LABEL "¤W¶Ç¼Ñ³t«×:"
-    IDS_USENARROWFONT       "¶Ç¿éµøµ¡¨Ï¥Î²ÓÅé¦r"//"¦b¶Ç¿éµøµ¡¨Ï¥ÎÅÖÅé¦rÅã¥Ü"
+    IDS_USENARROWFONT       "¦b¶Ç¿éµøµ¡¨Ï¥ÎÅÖÅé¦rÅã¥Ü"
     IDS_SHOWBLOCKINGRATIO   "Åã¥ÜSocketªý¶ë²v"
-    IDS_FUNNYNICK           "¼ÊºÙ¼Ð°O[FunnyNick]"//"¨Ï¥ÎÀH¾÷ÎîºÙ[FN]"
+    IDS_FUNNYNICK           "¨Ï¥ÎÀH¾÷ÎîºÙ[FN]"
     IDS_AUTOUPDATEIPFILTER  "¦Û°Ê¤É¯ÅIP¹LÂoÀÉ(IPFilter.dat)"
-    IDS_DROPBLOCKINGSOCKETS "½ð°£ÀWÁcªý¶ëªºSockets"
+    IDS_DROPBLOCKINGSOCKETS "­ç°£ÀWÁcªý¶ëªºSockets"
     IDS_LOGPARTMISMATCH     "°O¿ý¤j¤p¤£¤Ç°tªº³Q½Ð¨DÀÉ"
-    IDS_CN_UPNPNAT          "±Ò¥Î UPnP"
-    IDS_CHUNKCHOOSER        "ÀÉ®×°Ï¶ô¿ï¾Ü¤è¦¡:"//"ÀÉ¶ô¿ï¾Ü¤è¦¡:"
+    IDS_CHUNKCHOOSER        "ÀÉ¶ô¿ï¾Ü¤è¦¡:"
     IDS_UPLOADINSTABLE      "Äµ§i: §Aªº¤W¶Ç­È³]¸m¦ü¥G¤Ó°ª¤F. ½ÐÀË¬d§Aªº³]¸m!\n¬d¬Ý¤W¶Ç²Î­p¦±½u, ¨º¥Õ¦â©ÎªÌ¶À¦â(¨Ï¥ÎNAFC®É)ªº½uÀ³¸Ó¬O¤ñ¸û¥­¾ãªº.\n ¦¹®ø®§¥u´£¥Ü¤@¦¸"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_CLIENTPERCENTAGE    "Åã¥Ü¥Î¤áºÝÀÉ®×§¹¦¨¦Ê¤À²v"//"Åã¥Ü¥Î¤áºÝ¦Ê¤À¤ñ"
+    IDS_CLIENTPERCENTAGE    "Åã¥Ü¥Î¤áºÝ¦Ê¤À¤ñ"
     IDS_ONERELEASESLOT      "¹w¯d¤W¶Ç¼Ñµ¹µo§G¯ÅÀÉ"
     IDS_A_UPPRIO            "¨Ï¥Î¥þ¦Û°Ê¤W¶ÇÀu¥ý¶¶§Ç"
     IDS_SHAREFACTOR         "¦@¥Î«Y¼Æ"
@@ -2111,7 +2132,7 @@ END
 STRINGTABLE 
 BEGIN
     IDS_STATIC_DOWNINFO     "¤U¸ü 0 = µL­­¨î"
-    IDS_ANTILEECHERUSERHASH_CHECK "ÀË´ú: bad userhashes"//"ÀË´ú: ¤£¨}ªº¥Î¤áHash"
+    IDS_ANTILEECHERUSERHASH_CHECK "ÀË´ú: ¤£¨}ªº¥Î¤áHash"
 END
 
 STRINGTABLE 
@@ -2137,24 +2158,38 @@ BEGIN
                             "ÀÉ¤ñ AICH ¯à³B²zªº³Ì¤p¤À¶ôÁÙ­n¤p - ¾É¤J¤£·|¦³¥ô¦ó®ÄªG."
     IDS_SR13_IMPORTPARTS_IMPORTFINISH "¾É¤J§¹¦¨. %i ­Ó¤À¶ô³Q¾É¤J¨ì¤å¥ó %s."
     IDS_OBFUSCATION_PADDING_LENGTH "¨ó©w¥[±Kªþ¥[ªø«× [10-254]"
+//    IDS_PUSH_SMALL          "±À°e¤p¤å¥ó"
+//    IDS_SMALL               "¤p¤å¥ó"
+//    IDS_PUSH_SMALL_FILE_SIZE "¤p¤å¥ó¤j¤p¤W­­ [1-2048 kb] "
 END
 
 STRINGTABLE 
 BEGIN
-	IDS_GETFRIENDED2KLINK   "±N¦n¤Í³sµ²½Æ»s¦Ü°Å¶KÃ¯"//"±N¦n¤ÍÃìµ²½Æ»s¨ì°Å¶KªO"
-    IDS_GETHTMLFRIENDED2KLINK "±N¦n¤Í³sµ²½Æ»s¦Ü°Å¶KÃ¯ (HTML)"//"±N¦n¤ÍÃìµ²½Æ»s¨ì°Å¶KªO (HTML)"
-    IDS_ERR_FAILEDDOWNLOADEMFRIENDS "µLªk¦Û %s ¤U¸ü¦n¤Í¦Cªí"//"±q %s ¤U¸ü¦n¤Í¦CªíÀÉ¥¢±Ñ"
-    IDS_GETMYFRIENDED2KLINK "±N§Úªº³sµ²½Æ»s¦Ü°Å¶KÃ¯"//"±N§ÚªºÃìµ²½Æ»s¨ì°Å¶KªO"
-    IDS_GETMYHTMLFRIENDED2KLINK "±N§Úªº³sµ²½Æ»s¦Ü°Å¶KÃ¯ (HTML)"//"±N§ÚªºÃìµ²½Æ»s¨ì°Å¶KªO (HTML)"
-    IDS_FRIENDLINKMENUTITLE "¦n¤Í³sµ²"//"¦n¤ÍÃìµ²"
-	IDS_DOWNLOADEMFRIENDSMET "¤U¸ü emfriends.met (¦n¤Í¦Cªí)"//"¤U¸ü emfriends.met"
-    IDS_EMFRIENDSMETURL     "½Ð¿é¤J emfriends.met (¦n¤Í¦Cªí) ªº¤U¸üºô§}"//"½Ð¿é¤J emfriends.met ªº URL:"
-	IDS_USER_ALREADY_FRIEND "¨Ï¥ÎªÌ ""%s"" ¤w¦b±zªº¦n¤Í¦W³æ¤¤"//"¥Î¤á ""%s"" ¤w¸g¦s¦b¤_§Aªº¦n¤Í¦Cªí¤§¤¤"
-	IDS_TRUSTEVERYHASH      "«H¥ô¨C­Ó¤H§i¶D§Ú­ÌªºAICH¤Á²Ó­È"//"«H¥ô¨C¤@­ÓAICHHash (¥u¦b¥»¦¸¥ô°È¦³®Ä, ¤£«O¦s, ¤£±ÀÂË)"
+	IDS_GETFRIENDED2KLINK   "±N¦n¤ÍÃìµ²½Æ»s¨ì°Å¶KªO"
+    IDS_GETHTMLFRIENDED2KLINK "±N¦n¤ÍÃìµ²½Æ»s¨ì°Å¶KªO (HTML)"
+    IDS_ERR_FAILEDDOWNLOADEMFRIENDS "±q %s ¤U¸ü¦n¤Í¦CªíÀÉ¥¢±Ñ"
+    IDS_GETMYFRIENDED2KLINK "±N§ÚªºÃìµ²½Æ»s¨ì°Å¶KªO"
+    IDS_GETMYHTMLFRIENDED2KLINK "±N§ÚªºÃìµ²½Æ»s¨ì°Å¶KªO (HTML)"
+    IDS_FRIENDLINKMENUTITLE "¦n¤ÍÃìµ²"
+	IDS_DOWNLOADEMFRIENDSMET "¤U¸ü emfriends.met"
+    IDS_EMFRIENDSMETURL     "½Ð¿é¤J emfriends.met ªº URL:"
+	IDS_USER_ALREADY_FRIEND "¥Î¤á ""%s"" ¤w¸g¦s¦b¤_§Aªº¦n¤Í¦Cªí¤§¤¤"
+//	IDS_TRUSTEVERYHASH      "«H¥ô¨C¤@­ÓAICHHash (¥u¦b¥»¦¸¥ô°È¦³®Ä, ¤£«O¦s, ¤£±ÀÂË)"
 END
 
+STRINGTABLE 
+BEGIN
+	IDS_PROGRESSHASHDONE    "HashÀÉ®×§¹¦¨: %s"
+    IDS_USEACATUPNPNEXTSTART1 "¦b¤U¦¸ eMule ¹B¦æ®ÉÄ~Äò¨Ï¥Î ACAT UPnP"
+    IDS_USEACATUPNPNEXTSTART2 "¦b¤U¦¸ eMule ¹B¦æ®É¤Á´«¦Ü ACAT UPnP"
+    IDS_RETRIEVEMTUFROMSOCKET "¦Û°ÊÀò¨ú MTU"
+	IDS_ENABLEKNOWN2BUFFER	"¦b Hashing ÀÉ®×®É´î¤Ö Known2_64.met ªºÅª¼gÀW²v"
+	IDS_ANTILEECHERFINCAN_CHECK "ÀË´ú: Fincan ªÀ°Ï¥Î¤á (·|¼W¥[ CPU ¦û¥Î)"
+    IDS_ENABLEKNOWN2SPLIT   "±N¤w§R°£ÀÉ®×ªº Hashset ±q Known2_64.met ¤¤¤ÀÂ÷, ³æ¿W«O¦s"
+    IDS_EMULE_CTRL_DATA     "eMule ±±¨î«Ê¥]+¸ê®Æ¶Ç¿é"
+    IDS_NETWORK_ADAPTER     "ºô¸ô¥d"
+END
 
-//other code base on ScarAngel v3.2 zh_CN.rc(tomchen1989) & Mephisto v2.2 zh_TW.rc(DargonD) 
 STRINGTABLE 
 BEGIN
 // ==> ScarAngel Preferences window - Stulle
@@ -2270,7 +2305,7 @@ IDS_BACKUP_MESSAGE      "¦WºÙ¬°¡uBackup¡vªº¸ê®Æ§¨«Ø¥ß©ó±zªº¡uconfig¡v¸ê®Æ§¨¤º¥Î©
 IDS_BACKUP_AUTOBACKUP2  "Âù­«³Æ¥÷"
 IDS_ABORT               "¤¤Â_?"
 IDS_CONTINUE            "Ä~Äò(&C)"
-IDS_DONOTASKAGAIN       "¤£­n¦A¸ß°Ý§Ú"
+//IDS_DONOTASKAGAIN       "¤£­n¦A¸ß°Ý§Ú"
 IDS_DONOTSHOWAGAIN      "¤£­n¦A§iª¾§Ú"
 IDS_DONOTTELLAGAIN      "¤£­n¦AÅã¥Ü"
 IDS_HELP                "À°§U(&H)"
@@ -2392,6 +2427,9 @@ IDS_CAT_STARTFILESONADD "¥[¤J·sÃþ§O®É¶}©l # ÀÉ®×"
 IDS_DL_MODE_DEFAULT     "Àq»{«ì´_¼Ò¦¡"
 IDS_DL_NONE             "µL"
 IDS_SEARCH_INVALIDMINMAX "³]¸mªº³Ì¤p/³Ì¤j¤å¥ó¤j¤p¤¤¨Ï¥Î¤FµL®Äªº³æ¦ì"
+    IDS_KEEPCATINCSHARED    "·í²¾°£Ãþ§Oªº·s¶iÀÉ®×¸ê®Æ§¨®É¬O§_¸Ó±N¥L¥[¶i¤À¨É?"
+    IDS_KEEPCATINCSHARED_TITLE "²¾°£Ãþ§O"
+    IDS_ADD_REMOVED_INC     "¸ß°Ý·í²¾°£Ãþ§Oªº·s¶iÀÉ®×¸ê®Æ§¨®É¬O§_¸Ó±N¥L¥[¶i¤À¨É"
 // <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
 IDS_SHARED_PREFS        "¤w¤À¨ÉÀÉ®×ºÞ²z" // Shared Files Management [Stulle] - Stulle
 // ==> Spread bars [Slugfiller/MorphXT] - Stulle
@@ -2489,13 +2527,14 @@ IDS_PS_AMOUNT_LIMIT_WRONG   "µL®Äªº­È."
 IDS_RATIO_GROUP             "¤W¸ü¤U¸ü¤ñ²v"
 IDS_ENFORCE_RATIO           "Á`¬O¨Ï¥Î±j¨î¤ñ²v"
 IDS_RATIO_VALUE             "³Ì¤j¤ñ²v1"
-IDS_RATIO_REASON            "­ì¦]"
-IDS_RATIO_REASON2           "¥þ§½³Ì¤jµw­­¨î(¬°¤F¤½¥­)"
-IDS_RATIO_REASON3           "·í¤W¸ü³t«×§C©ó11K/s®É¡A¨Ï¥Î±j¨î1:3¤ñ²v"
-IDS_RATIO_REASON4           "NAFC°ÊºA¤U¸ü­­¨î"
-IDS_RATIO_REASON5           "¤w±j¨î¤ñ²v"
-IDS_RATIO_ACTIVATION        "¤U¸ü³t«×­­¨î¤w±Ò¥Î"
-IDS_RATIO_LIMIT             "¤W¸ü¤U¸ü¤ñ²v±N³Q­­¨î¦b³Ì¤j1:1"
+    IDS_DL_SES_RATIO            "¹F¦¹¤u§@¶¥¬q¤W¤U¶Ç¤ñ¨Òªº­­¨î"
+    IDS_DL_LIMIT_DEF            "¹F³]©wªº¤U¸ü­­¨î"
+    IDS_DL_UNL_NOUL             "¤£¨ü­­¨îªº¤U¸ü (¤£»Ý­n¤W¶Ç)"
+    IDS_DL_UNL_13RATIO          "¦]¤W¤U¶Ç¤ñ < 1:3 ¬G¤U¸ü¤£¨ü­­"
+    IDS_DL_NAFC_LIMIT           "¦] ºô¸ô¥d¦^õX±±¨î(NAFC) ¬G¤U¸ü¨ü­­"
+    IDS_DL_RATIO_SRC            "¤£±µ¨ü¦¹¥þ°ìµw©Ê¤W­­"
+    IDS_DL_RATIO_ENF            "±j¨î¤ñ¨Ò"
+    IDS_DL_RATIO_LIMIT          "¥Ø«eªº UL:DL ¤ñ¬°³Ì¤j­È 1"
 // <== Enforce Ratio [Stulle] - Stulle
 // ==> Tabbed Preferences [TPT] - Stulle
 IDS_SCARANGEL               "ScarAngel"
@@ -2640,6 +2679,18 @@ IDS_BINDADDR            "¥»¦aºÝªºIP¦ì§}"
 IDS_MEDIAINFO_MEDIADET  "¨Ï¥ÎMedia Detector(MediaDet)Àò¨ú´CÅéÀÉ®×ªº¸ê°T"
 IDS_MEDIAINFO_RM        "¨Ï¥Îmediainfo.dllÃÑ§OReal´CÅéÀÉ®×"
 IDS_MEDIAINFO_WM        "¨Ï¥Îmediainfo.dllÃÑ§OWindows MediaÀÉ®×"
+	IDS_X_DATETIMEFORMAT4LIST "®É¶¡®æ¦¡(²M³æ)"
+    IDS_UPDATEQUEUE         "¤£­n§Y®É§ó·sµ¥­Ô¤¤²M³æ"
+    IDS_REPAINTGRAPHS       "¦b§ïÅÜµøµ¡¤j¤p®É¤£­«·s«Ø¥ß²Î­p¹Ï§Î"
+    IDS_EXTRAPREVIEWWITHMENU "¦b¥kÁä®Ú¿ï³æÅã¥Ü¹wÄý"
+    IDS_SHOWUPDOWNICONINTASKBAR "¦b¤u¨ã¦C¤W¥H¹Ï¼hÅã¥Ü¤W¶Ç»P¤U¸ü"
+    IDS_FORCESPEEDSTOKB     "¥H KB/s Åã¥Ü©Ò¦³ªº³t«×¼Æ¾Ú"
+	IDS_X_FILE_BUFFER_TIME_LIMIT "¤U¸ü§Ö¨ú°±¯d®É¶¡(¬í)"
+	IDS_X_REARRANGEKADSEARCH "­«·s²Õ¦XKAD·j´MÃöÁä¦r"
+    IDS_PW_BEEP             "¿ù»~®Éµo¥XÁn­µ"
+    IDS_MSGONLYSEC          "¥u±µ¨ü¦³®Äªº«È¤áºÝ°T®§"
+    IDS_DISABLEPEERACHE     "°±¥Î±q PeerCache ¤U¸ü"
+    IDS_KEEPUNAVAILABLEFIXEDSHAREDDIRS "«O¯d©T©wºÏºÐ¤WªºµL®Ä¥Ø¿ý"
 // <== Advanced Options [Official/MorphXT] - Stulle
 // ==> Advanced Updates [MorphXT/Stulle] - Stulle
 IDS_UPDATEANTILEECHERONSTART "±Ò°Ê®É§ó·santiLeech.dll"

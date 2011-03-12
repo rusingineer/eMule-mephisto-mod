@@ -1,6 +1,17 @@
 CHANGELOG FOR EMULE Mephisto MOD
 
 
+eMule v0.50a Mephisto v3.0:
+------------------------
+- XX.XX.2011 -
+-------------------------------------------------------------------------------
+based on eMule 0.50a ScarAngel 4.0 compiled with vs2010 SP1
+
+Changed: Use minfragsize to calculate best amount to send to full slots [Stulle]
+
+Removed: Now redundant doublesendsize feature from Xtreme [Stulle]
+
+
 eMule v0.49c Mephisto v2.2:
 ------------------------
 - 06.10.2009 -

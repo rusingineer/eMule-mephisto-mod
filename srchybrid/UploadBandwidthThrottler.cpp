@@ -841,6 +841,8 @@ UINT UploadBandwidthThrottler::RunInternal() {
 
 
 		uint32 minFragSize = thePrefs.GetMTU() - (20 /*IP*/ + 20 /*TCP*/); // Maella -MTU Configuration- //Xman Bandwidthtest
+		// ==> Mephisto Upload - Mephisto
+		/*
 		uint32 doubleSendSize = thePrefs.usedoublesendsize ? minFragSize*2 : minFragSize; // send two packages at a time so they can share an ACK
 		if(allowedDataRate < 6*1024) 
 		{
@@ -851,6 +853,10 @@ UINT UploadBandwidthThrottler::RunInternal() {
 		{
 			doubleSendSize = minFragSize;
 		}
+		*/
+		if(allowedDataRate < 6*1024) 
+			minFragSize = 536;
+		// <== Mephisto Upload - Mephisto
 
 		m_currentOverallSentBytes=theApp.pBandWidthControl->GeteMuleOutOverall();
 		m_currentNetworkOut=theApp.pBandWidthControl->GetNetworkOut();
@@ -1323,11 +1329,16 @@ UINT UploadBandwidthThrottler::RunInternal() {
 				//theApp.QueueDebugLogLine(false,_T("UBT: uSlope: %I64u"),uSlope);
 				uint32 uTempSendSize = minFragSize;
 				// netfinity: Maximum Segment Size (MSS - Vista only) //added by zz_fly
-				if(thePrefs.retrieveMTUFromSocket && (socket->m_dwMSS!=0) && (allowedDataRate >= 6*1024)) //let MTU=536 at very low speed
-					uTempSendSize = socket->m_dwMSS - 40;
-				// netfinity: end
+				/*
 				if(uSlope>minFragSize)
-					uTempSendSize = (uint32)(doubleSendSize*ceil((double)(uSlope)/(double)(doubleSendSize)));
+					uTempSendSize = (uint32)(minFragSize*(uSlope/minFragSize+1);
+				*/
+				uint32 socketMSS = minFragSize;
+				if(thePrefs.retrieveMTUFromSocket && (socket->m_dwMSS!=0) && (allowedDataRate >= 6*1024)) //let MTU=536 at very low speed
+					socketMSS = socket->m_dwMSS - 40;
+				if(uSlope>minFragSize)
+					uTempSendSize = socketMSS*(uSlope/socketMSS+1);
+				// netfinity: end
 				//theApp.QueueDebugLogLine(false,_T("UBT: SlotFocus needed: %u"),uTempSendSize);
 
 				// spend bandwith

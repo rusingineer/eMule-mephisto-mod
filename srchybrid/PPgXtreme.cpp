@@ -371,6 +371,10 @@ void CPPgXtreme::Localize(void)
 		GetDlgItem(IDC_MULTIQUEUE)->SetWindowText(GetResString(IDS_MULTIQUEUE));
 
 		GetDlgItem(IDC_USEDOUBLESENDSIZE)->SetWindowText(GetResString(IDS_USEDOUBLESENDSIZE));
+		// ==> Mephisto Upload - Mephisto
+		GetDlgItem(IDC_USEDOUBLESENDSIZE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_USEDOUBLESENDSIZE)->EnableWindow(FALSE);
+		// <== Mephisto Upload - Mephisto
 		GetDlgItem(IDC_RETRIEVEMTUFROMSOCKET)->SetWindowText(GetResString(IDS_RETRIEVEMTUFROMSOCKET)); // netfinity: Maximum Segment Size (MSS - Vista only) //added by zz_fly
 		GetDlgItem(IDC_STATIC_MTU)->SetWindowText(GetResString(IDS_PPG_MAELLA_MTU_STATIC));
 		GetDlgItem(IDC_OPENMORESLOTS)->SetWindowText(GetResString(IDS_OPENMORESLOTS));

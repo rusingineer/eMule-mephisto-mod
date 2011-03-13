@@ -10,6 +10,8 @@ based on eMule 0.50a ScarAngel 4.0 compiled with vs2010 SP1
 Added: Dynamic Socket Buffering [SiRoB]
 
 Changed: Use minfragsize to calculate best amount to send to full slots [Stulle]
+Changed: Min buffer threshold for CreateNextBlockRequest based on slot speed [SiRoB]
+Changed: Allow buffering more than one additional block in CreateNextBlockRequest [Stulle]
 
 Fixed: Min UL speed to prevent slot from being dropped was improperly calculated [Stulle]
 

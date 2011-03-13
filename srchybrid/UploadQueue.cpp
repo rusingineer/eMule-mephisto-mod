@@ -73,8 +73,12 @@ static uint32 igraph, istats, i2Secs;
 */
 //Xman end
 
+// ==> Mephisto Upload - Mephisto
+/*
 #define HIGHSPEED_UPLOADRATE_START 500*1024
 #define HIGHSPEED_UPLOADRATE_END   300*1024
+*/
+// <== Mephisto Upload - Mephisto
 
 
 CUploadQueue::CUploadQueue()
@@ -138,7 +142,11 @@ CUploadQueue::CUploadQueue()
 	/*
 	m_hHighSpeedUploadTimer = NULL;
 	*/
+	// ==> Mephisto Upload - Mephisto
+	/*
 	m_bUseHighSpeedUpload = false;
+	*/
+	// <== Mephisto Upload - Mephisto
 	//Xman end
 	m_bStatisticsWaitingListDirty = true;
 
@@ -860,10 +868,14 @@ void CUploadQueue::Process() {
 	}
 	uint32 realallowedDatarate = (uint32)(theApp.pBandWidthControl->GetMaxUpload()*1024)-AvgOverhead;
 
+	// ==> Mephisto Upload - Mephisto
+	/*
 	if (realallowedDatarate > HIGHSPEED_UPLOADRATE_START)
 		m_bUseHighSpeedUpload = true;
 	else if (realallowedDatarate < HIGHSPEED_UPLOADRATE_END)
 		m_bUseHighSpeedUpload = false;
+	*/
+	// <== Mephisto Upload - Mephisto
 	//Xman end
 };
 

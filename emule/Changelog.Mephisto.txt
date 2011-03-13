@@ -13,6 +13,7 @@ Added: Send Array Packet (may reduce upload perturbation, only used for UL, yet)
 Changed: Use minfragsize to calculate best amount to send to full slots [Stulle]
 Changed: Min buffer threshold for CreateNextBlockRequest based on slot speed [SiRoB]
 Changed: Allow buffering more than one additional block in CreateNextBlockRequest [Stulle]
+Changed: (Xtreme) Check if upload should be ended frequently called twice [Stulle]
 
 Fixed: Min UL speed to prevent slot from being dropped was improperly calculated [Stulle]
 

@@ -1055,6 +1055,11 @@ void CUpDownClient::CreateNextBlockPackage(){
 
 				delete[] filedata_ReadFromDisk;
 				filedata_ReadFromDisk = NULL;
+
+				//Xman Full Chunk
+				if(upendsoon)
+					break;
+				//Xman end
 			}
 			//now process error from nextblock to read
 		}

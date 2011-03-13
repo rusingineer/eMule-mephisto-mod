@@ -1113,7 +1113,7 @@ bool CUploadQueue::AcceptNewClient(bool addOnNextConnect)
 		theApp.uploadBandwidthThrottler->GetAvgHealth() >= 100) // and we have no problem filling our bandwidth
 	{
 		m_dwNextBlockingCheck = ::GetTickCount() + SEC2MS(5); // only check every 5 seconds
-		UINT uMinUpSpeed = min(1000, (UINT)(thePrefs.GetMaxUpload()*100.0f)); //One tenth of the upload, min 1 kbyte/s
+		UINT uMinUpSpeed = max(1000, (UINT)(thePrefs.GetMaxUpload()*100.0f)); //One tenth of the upload, min 1 kbyte/s
 		//search a socket we should remove
 		for(POSITION pos=uploadinglist.GetHeadPosition();pos!=NULL;)
 		{

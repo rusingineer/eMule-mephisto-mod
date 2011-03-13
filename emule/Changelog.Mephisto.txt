@@ -9,6 +9,8 @@ based on eMule 0.50a ScarAngel 4.0 compiled with vs2010 SP1
 
 Changed: Use minfragsize to calculate best amount to send to full slots [Stulle]
 
+Fixed: Min UL speed to prevent slot from being dropped was improperly calculated [Stulle]
+
 Removed: Now redundant doublesendsize feature from Xtreme [Stulle]
 
 

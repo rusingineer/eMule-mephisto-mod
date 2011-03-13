@@ -763,7 +763,11 @@ UINT UploadBandwidthThrottler::RunInternal() {
 	// <== Mephisto Upload - Mephisto
 	//Xman count block/success send
 	uint32 last_block_process = timeGetTime() >> 10;
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 	bool bAlwaysEnableBigSocketBuffers = false;
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 
 	while(doRun) {
         pauseEvent->Lock();
@@ -1034,14 +1038,17 @@ UINT UploadBandwidthThrottler::RunInternal() {
 		}
 		*/
 		spentBytesFriends = 0;
+		// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 		// if we are uploading fast, increase the sockets sendbuffers in order to be able to archive faster
 		// speeds
 		// NOTE: Since we use slot focus we start using bigger sockets ealier
-		// TODO: CHECKEN!
 		if (allowedDataRate > 150 * 1024)
 			bAlwaysEnableBigSocketBuffers = true;
 		else
 			bAlwaysEnableBigSocketBuffers = false;
+#endif
+		// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 		// <== Mephisto Upload - Mephisto
 
 
@@ -1321,9 +1328,13 @@ UINT UploadBandwidthThrottler::RunInternal() {
 					continue; // too little data to give
 				}
 
+				// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 				// check if SendBuffer should be increased
 				if (bAlwaysEnableBigSocketBuffers)
 					socket->UseBigSendBuffer();
+#endif
+				// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 
 				// set the maximum to give
 				//theApp.QueueDebugLogLine(false,_T("UBT: uSlope: %I64u"),uSlope);
@@ -1359,7 +1370,7 @@ UINT UploadBandwidthThrottler::RunInternal() {
 					socket->m_FullTimes.AddHead(FullTimes);
 					socket->m_uFullTimesCounter++;
 
-					SocketSentBytes socketSentBytes = socket->SendFileAndControlData(uTempSendSize,uTempSendSize); 
+					SocketSentBytes socketSentBytes = socket->SendFileAndControlData(uTempSendSize,minFragSize); 
 					uint32 lastSpentBytes = socketSentBytes.sentBytesControlPackets + socketSentBytes.sentBytesStandardPackets;
 					spentBytes += lastSpentBytes;
 					spentOverhead += socketSentBytes.sentBytesControlPackets;

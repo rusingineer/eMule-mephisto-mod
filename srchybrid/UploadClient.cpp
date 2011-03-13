@@ -1245,6 +1245,12 @@ void CUpDownClient::CreateStandartPackets(byte* data,uint32 togo, Requested_Bloc
 	if (togo > 10240) 
 		nPacketSize = togo/(uint32)(togo/10240);
 	*/
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+	uint32 splittingsize = max(m_nUpDatarate10, 10240);
+	if (togo > splittingsize)
+		nPacketSize = togo/(uint32)(togo/splittingsize);
+#else
 	uint32 splittingsize = 10240;
 	if( m_nUpDatarate10 > 5120 && !IsUploadingToPeerCache() && GetDownloadState()!=DS_DOWNLOADING)
 	{
@@ -1255,6 +1261,8 @@ void CUpDownClient::CreateStandartPackets(byte* data,uint32 togo, Requested_Bloc
 	
 	if (togo > splittingsize) 
 		nPacketSize = togo/(uint32)(togo/splittingsize);
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 	//Xman end
 	else
 		nPacketSize = togo;
@@ -1402,6 +1410,12 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
     if (togo > 10240) 
         nPacketSize = togo/(uint32)(togo/10240);
 	*/
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+	uint32 splittingsize = max(m_nUpDatarate10, 10240);
+	if (togo > splittingsize)
+		nPacketSize = togo/(uint32)(togo/splittingsize);
+#else
 	uint32 splittingsize = 10240;
 	if( m_nUpDatarate10 > 5120 && GetDownloadState()!=DS_DOWNLOADING)
 	{
@@ -1412,6 +1426,8 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
 
 	if (togo > splittingsize) 
 		nPacketSize = togo/(uint32)(togo/splittingsize);
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 	//Xman end
     else
         nPacketSize = togo;

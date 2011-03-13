@@ -3940,6 +3940,19 @@ CString CUpDownClient::GetDownloadStateDisplayString() const
 		strState = _T(">>") + strState;
 	//Xman end
 
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+#ifndef _RELEASE
+	CEMSocket* s = socket;
+	if (s != NULL) {
+		if (m_pPCDownSocket)
+			s = m_pPCDownSocket;
+		strState.AppendFormat(_T(",BUF:%u"), socket->GetRecvBufferSize());
+	}
+#endif 
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
+
 	return strState;
 }
 
@@ -4025,6 +4038,22 @@ CString CUpDownClient::GetUploadStateDisplayString() const
 	if(GetDownloadState()==DS_DOWNLOADING)
 		strState = _T("<<") + strState;
 	//Xman end
+
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+#ifndef _RELEASE
+	if(GetUploadState() != US_NONE) {
+		CEMSocket* s = socket;
+		if (s != NULL) {
+			if (m_pPCUpSocket)
+				s = m_pPCUpSocket;
+			// extra info not required in release
+			strState.AppendFormat(_T(", BUF:%u"), s->GetSendBufferSize());
+		}
+	}
+#endif
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 
 	return strState;
 }

@@ -38,6 +38,19 @@ struct StandardPacketQueueEntry {
 	Packet* packet;
 };
 
+// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+struct BufferedPacket {
+		UINT	remainpacketsize;
+		UINT	packetpayloadsize;
+		bool	iscontrolpacket;
+		bool	isforpartfile;
+		bool	newdatapacket;
+		uint8	sendingdata_opcode;
+};
+#endif
+// <== Dynamic Socket Buffering [SiRoB] - Mephisto
+
 class CEMSocket : public CEncryptedStreamSocket, public ThrottledFileSocket // ZZ:UploadBandWithThrottler (UDP)
 {
 	DECLARE_DYNAMIC(CEMSocket)
@@ -54,7 +67,11 @@ public:
 	BOOL	AsyncSelect(long lEvent);
 	virtual bool IsBusy() const			{return m_bBusy;}
     virtual bool HasQueues() const		{return (sendbuffer || standartpacket_queue.GetCount() > 0 || controlpacket_queue.GetCount() > 0);} // not trustworthy threaded? but it's ok if we don't get the correct result now and then
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 	virtual bool UseBigSendBuffer();
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 
 	virtual UINT GetTimeOut() const;
 	virtual void SetTimeOut(UINT uTimeOut);
@@ -94,7 +111,13 @@ public:
 
 	//Xman Full Chunk
 	//bool StandardPacketQueueIsEmpty() const {return standartpacket_queue.IsEmpty()!=0;}
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+	bool StandardPacketQueueIsEmpty() const {return standartpacket_queue.IsEmpty()!=0 && (sendbuffer==NULL || sendblenWithoutControlPacket != sendblen - sent/*m_currentPacket_is_controlpacket == true*/);} //Xman 4.3
+#else
 	bool StandardPacketQueueIsEmpty() const {return standartpacket_queue.IsEmpty()!=0 && (sendbuffer==NULL || sendbuffer!=NULL && m_currentPacket_is_controlpacket==true);} //Xman 4.3
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 	//remark: this method isn't threadsave at uploadclient... but there is no need for
 	// this method is threadsave at uploadbandwidththrottler!
 
@@ -145,6 +168,13 @@ public:
 
 	// netfinity: Maximum Segment Size (MSS - Vista only) //added by zz_fly
 	void		SetMSSFromSocket(SOCKET socket);
+
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifndef DONT_USE_SOCKET_BUFFERING
+		uint32	GetSendBufferSize() { return m_uCurrentSendBufferSize; };
+		uint32	GetRecvBufferSize() { return m_uCurrentRecvBufferSize; };
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 
 #ifdef _DEBUG
 	// Diagnostic Support
@@ -202,7 +232,11 @@ private:
 
 	CTypedPtrList<CPtrList, Packet*> controlpacket_queue;
 	CList<StandardPacketQueueEntry> standartpacket_queue;
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 	bool m_currentPacket_is_controlpacket;
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 	CCriticalSection sendLocker;
 	uint64 m_numberOfSentBytesCompleteFile;
 	uint64 m_numberOfSentBytesPartFile;
@@ -211,7 +245,11 @@ private:
 	uint64 m_numberOfSentBytesControlPacket;
 	*/
 	//Xman end
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 	bool m_currentPackageIsFromPartFile;
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 	//Xman unused
 	/*
 	bool m_bAccelerateUpload;
@@ -224,9 +262,24 @@ private:
 	uint32 lastFinishedStandard;
 	*/
 	//Xman end
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 	uint32 m_actualPayloadSize;
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 	uint32 m_actualPayloadSizeSent;
     bool m_bBusy;
     bool m_hasSent;
+	// ==> Dynamic Socket Buffering [SiRoB] - Mephisto
+#ifdef DONT_USE_SOCKET_BUFFERING
 	bool m_bUsesBigSendBuffers;
+#else
+	CList<BufferedPacket*> m_currentPacket_in_buffer_list;
+
+	uint32	m_uCurrentRecvBufferSize;
+	uint32	m_uCurrentSendBufferSize;
+	uint32	currentBufferSize;
+	uint32 sendblenWithoutControlPacket; //Used to know if a controlpacket is already buffered
+#endif
+	// <== Dynamic Socket Buffering [SiRoB] - Mephisto
 };

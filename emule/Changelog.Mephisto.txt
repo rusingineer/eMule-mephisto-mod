@@ -8,6 +8,7 @@ eMule v0.50a Mephisto v3.0:
 based on eMule 0.50a ScarAngel 4.0 compiled with vs2010 SP1
 
 Added: Dynamic Socket Buffering [SiRoB]
+Added: Send Array Packet (may reduce upload perturbation, only used for UL, yet) [SiRoB]
 
 Changed: Use minfragsize to calculate best amount to send to full slots [Stulle]
 Changed: Min buffer threshold for CreateNextBlockRequest based on slot speed [SiRoB]

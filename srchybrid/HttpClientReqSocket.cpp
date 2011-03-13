@@ -76,6 +76,22 @@ void CHttpClientReqSocket::SendPacket(Packet* packet, bool delpacket, bool contr
 	CClientReqSocket::SendPacket(packet, delpacket, controlpacket, actualPayloadSize, bForceImmediateSend);
 }
 
+// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+void CHttpClientReqSocket::SendPacket(Packet* packet[], uint32 npacket, bool delpacket, bool controlpacket, uint32 actualPayloadSize, bool bForceImmediateSend)
+{
+	// just for safety -- never send an ed2k/emule packet via HTTP.
+	for (uint32 i = 0; i < npacket; i++) {
+		if (packet[i]->opcode != 0x00 || packet[i]->prot != 0x00){
+			ASSERT(0);
+			return;
+		}
+	}
+	CClientReqSocket::SendPacket(packet, npacket, delpacket, controlpacket, actualPayloadSize, bForceImmediateSend);
+}
+#endif
+// <== Send Array Packet [SiRoB] - Mephisto
+
 void CHttpClientReqSocket::OnConnect(int nErrorCode)
 {
 	CClientReqSocket::OnConnect(nErrorCode);

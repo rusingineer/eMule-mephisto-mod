@@ -37,6 +37,11 @@ public:
 	virtual CUpDownClient* GetClient() const { return client; }
 
 	virtual void SendPacket(Packet* packet, bool delpacket = true, bool controlpacket = true, uint32 actualPayloadSize = 0, bool bForceImmediateSend = false);
+	// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+	virtual void SendPacket(Packet* packet[], uint32 npacket, bool delpacket = true, bool controlpacket = true, uint32 actualPayloadSize = 0, bool bForceImmediateSend = false);
+#endif
+	// <== Send Array Packet [SiRoB] - Mephisto
 	virtual bool IsRawDataMode() const { return true; }
 
 	EHttpSocketState GetHttpState() const { return m_eHttpState; }

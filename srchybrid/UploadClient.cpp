@@ -1277,6 +1277,14 @@ void CUpDownClient::CreateStandartPackets(byte* data,uint32 togo, Requested_Bloc
 	//Xman end
 	else
 		nPacketSize = togo;
+	// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+	uint32 npacket = 0;
+	uint32 Size = togo;
+	//Packet* apacket[EMBLOCKSIZE*3/10240];
+	Packet** apacket = new Packet*[togo/nPacketSize];
+#endif
+	// <== Send Array Packet [SiRoB] - Mephisto
 	while (togo){
 		if (togo < nPacketSize*2)
 			nPacketSize = togo;
@@ -1324,7 +1332,13 @@ void CUpDownClient::CreateStandartPackets(byte* data,uint32 togo, Requested_Bloc
 			UINT uRawPacketSize = (UINT)dataHttp.GetLength();
 			LPBYTE pRawPacketData = dataHttp.Detach();
 			CRawPacket* packet = new CRawPacket((char*)pRawPacketData, uRawPacketSize, bFromPF);
+			// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+			apacket[npacket++] = packet;
+#else
 			m_pPCUpSocket->SendPacket(packet, true, false, nPacketSize);
+#endif
+			// <== Send Array Packet [SiRoB] - Mephisto
 			free(pRawPacketData);
 		}
 		else
@@ -1353,9 +1367,26 @@ void CUpDownClient::CreateStandartPackets(byte* data,uint32 togo, Requested_Bloc
 			}
 			// put packet directly on socket
 			
+			// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+			apacket[npacket++] = packet;
+#else
 			socket->SendPacket(packet,true,false, nPacketSize);
+#endif
+			// <== Send Array Packet [SiRoB] - Mephisto
 		}
 	}
+	// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+	if (npacket) {
+		if (IsUploadingToPeerCache())
+			m_pPCUpSocket->SendPacket(apacket, npacket, true, false, Size);
+		else
+			socket->SendPacket(apacket, npacket, true, false, Size);
+		delete[] apacket;
+	}
+#endif
+	// <== Send Array Packet [SiRoB] - Mephisto
 }
 
 void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block_Struct* currentblock, bool bFromPF){
@@ -1443,7 +1474,15 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
     else
         nPacketSize = togo;
     
+	// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+	uint32 npacket = 0;
+	//Packet* apacket[EMBLOCKSIZE*3/10240];
+	Packet** apacket = new Packet*[togo/nPacketSize];
+#else
     uint32 totalPayloadSize = 0;
+#endif
+	// <== Send Array Packet [SiRoB] - Mephisto
 
     while (togo){
 		if (togo < nPacketSize*2)
@@ -1473,6 +1512,10 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
 			DebugSend("OP__CompressedPart", this, GetUploadFileID());
 			Debug(_T("  Start=%I64u  BlockSize=%u  Size=%u\n"), statpos, newsize, nPacketSize);
 		}
+		// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+		apacket[npacket++] = packet;
+#else
         // approximate payload size
         uint32 payloadSize = nPacketSize*oldSize/newsize;
 
@@ -1488,7 +1531,17 @@ void CUpDownClient::CreatePackedPackets(byte* data, uint32 togo, Requested_Block
 		*/
 		//Xman end
         socket->SendPacket(packet,true,false, payloadSize);
+#endif
+		// <== Send Array Packet [SiRoB] - Mephisto
 	}
+	// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+	if (npacket) {
+		socket->SendPacket(apacket, npacket, true, false, oldSize);
+		delete[] apacket;
+	}
+#endif
+	// <== Send Array Packet [SiRoB] - Mephisto
 	delete[] output;
 }
 

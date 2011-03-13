@@ -806,6 +806,93 @@ void CEMSocket::SendPacket(Packet* packet, bool delpacket, bool controlpacket, u
 	}
 }
 
+// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+void CEMSocket::SendPacket(Packet* packet[], uint32 npacket, bool delpacket, bool controlpacket, uint32 actualPayloadSize, bool bForceImmediateSend){
+	//EMTrace("CEMSocket::OnSenPacked1 linked: %i, controlcount %i, standartcount %i, isbusy: %i",m_bLinkedPackets, controlpacket_queue.GetCount(), standartpacket_queue.GetCount(), IsBusy());
+
+    sendLocker.Lock();
+
+    if (byConnected == ES_DISCONNECTED) {
+        sendLocker.Unlock();
+        for (uint32 i = 0; i < npacket; i++) {
+			if(delpacket) {
+				delete packet[i];
+			}
+        }
+		return;
+    } else {
+        if (!delpacket){
+            for (uint32 i = 0; i < npacket; i++) {
+				//ASSERT ( !packet[i]->IsSplitted() );
+				Packet* copy = new Packet(packet[i]->opcode,packet[i]->size);
+				memcpy(copy->pBuffer,packet[i]->pBuffer,packet[i]->size);
+				packet[i] = copy;
+			}
+	    }
+
+        //if(m_startSendTick > 0) {
+        //    m_lastSendLatency = ::GetTickCount() - m_startSendTick;
+        //}
+
+        if (controlpacket) {
+	        for (uint32 i = 0; i < npacket; i++) {
+				controlpacket_queue.AddTail(packet[i]);
+			}
+
+            // queue up for controlpacket
+            //Xman Code Improvement
+            if(isreadyforsending)
+            {
+	        if(!IsSocketUploading()) //Xman improved socket queuing
+                        theApp.uploadBandwidthThrottler->QueueForSendingControlPacket(this, HasSent());
+            }
+        } else {
+            //Xman unused
+            /*
+            bool first = !((sendbuffer && !m_currentPacket_is_controlpacket) || !standartpacket_queue.IsEmpty());
+            */
+            //Xman end
+            uint32 payloadSize = actualPayloadSize/npacket;
+			while (payloadSize <= actualPayloadSize) {
+				actualPayloadSize -= payloadSize;
+				if(actualPayloadSize < payloadSize) {
+					payloadSize += actualPayloadSize;
+				}
+				StandardPacketQueueEntry queueEntry = { payloadSize, *packet++ };
+				standartpacket_queue.AddTail(queueEntry);
+			}
+
+            // reset timeout for the first time
+            //Xman unused
+            /*
+            if (first) {
+                lastFinishedStandard = ::GetTickCount();
+                m_bAccelerateUpload = true;	// Always accelerate first packet in a block
+            }
+            */
+            //Xman end
+        }
+    }
+
+    sendLocker.Unlock();
+	if (bForceImmediateSend){
+		ASSERT( controlpacket_queue.GetSize() == 1 );
+		//Xman // Maella -Accurate measure of bandwidth: eDonkey data + control, network adapter-
+		/*
+		Send(1024, 0, true);
+		*/
+		SocketSentBytes socketSentBytes = Send(1024, 0, true); 
+		if(socketSentBytes.sentBytesControlPackets > 0)
+		{		
+			theApp.pBandWidthControl->AddeMuleOutOverallNoHeader(socketSentBytes.sentBytesControlPackets);
+		}
+		//Xman end
+	}
+}
+#endif
+// <== Send Array Packet [SiRoB] - Mephisto
+
 uint64 CEMSocket::GetSentBytesCompleteFileSinceLastCallAndReset() {
     sendLocker.Lock();
 

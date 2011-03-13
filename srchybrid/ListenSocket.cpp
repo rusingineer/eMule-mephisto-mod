@@ -3251,6 +3251,16 @@ void CClientReqSocket::SendPacket(Packet* packet, bool delpacket, bool controlpa
 	CEMSocket::SendPacket(packet, delpacket, controlpacket, actualPayloadSize, bForceImmediateSend);
 }
 
+// ==> Send Array Packet [SiRoB] - Mephisto
+#ifndef DONT_USE_SEND_ARRAY_PACKET
+void CClientReqSocket::SendPacket(Packet* packet[], uint32 npacket, bool delpacket, bool controlpacket, uint32 actualPayloadSize, bool bForceImmediateSend)
+{
+	ResetTimeOutTimer();
+	CEMSocket::SendPacket(packet, npacket, delpacket,controlpacket, actualPayloadSize, bForceImmediateSend);
+}
+#endif
+// <== Send Array Packet [SiRoB] - Mephisto
+
 bool CListenSocket::SendPortTestReply(char result, bool disconnect)
 {
 	POSITION pos2;

@@ -685,7 +685,12 @@ void CUploadListCtrl::GetItemDisplayText(const CUpDownClient *client, int iSubIt
 			break;
 
 		case 5:
+			// ==> Display remaining upload time [Stulle] - Mephisto
+			/*
 			_tcsncpy(pszText, CastSecondsToHM(client->GetUpStartTimeDelay() / 1000), cchTextMax);
+			*/
+			_sntprintf(pszText, cchTextMax, _T("%s (+%s)"), CastSecondsToHM((client->GetUpStartTimeDelay())/1000), client->GetRemainingUploadTime());
+			// <== Display remaining upload time [Stulle] - Mephisto
 			break;
 
 		case 6:

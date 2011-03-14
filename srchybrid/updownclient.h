@@ -1224,5 +1224,9 @@ public:
 	void IncrFinishedChunks()	{m_uFinishedChunks++;}
 	UINT GetFinishedChunks() const {return m_uFinishedChunks;}
 	// <== Multiple Part Transfer [Stulle] - Mephisto
+
+	// ==> Display remaining upload time [Stulle] - Mephisto
+	CString GetRemainingUploadTime() const;
+	// <== Display remaining upload time [Stulle] - Mephisto
 };
 //#pragma pack()

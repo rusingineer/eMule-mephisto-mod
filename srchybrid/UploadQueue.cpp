@@ -1134,13 +1134,13 @@ bool CUploadQueue::AcceptNewClient(bool addOnNextConnect)
 				cur_client->GetUploadDatarate() < uMinUpSpeed && //less than a min of upload
 				cur_client->GetUpStartTimeDelay() > MIN2MS(5) && //this client is already 5 minutes uploading
 				(
-					cur_client->GetFileUploadSocket()->GetBlockRatio_overall() >= 80.0f || //80% of all sends were blocked
-					cur_client->GetFileUploadSocket()->GetBlockRatio() >= 90.0f //90% in the last 20 seconds
+					cur_client->GetFileUploadSocket()->GetBlockRatio_overall() >= 94.0f || //94% of all sends were blocked
+					cur_client->GetFileUploadSocket()->GetBlockRatio() >= 96.0f //96% in the last 20 seconds
 				)
 			  )
 			{
 				CString buffer;
-				buffer.Format(_T("client is blocking too often: avg20: %0.0f%%, all: %0.0f%%, avg-speed: %0.0f B/s"),cur_client->GetFileUploadSocket()->GetBlockRatio(),cur_client->GetFileUploadSocket()->GetBlockRatio_overall(),(float)cur_client->GetSessionUp()/cur_client->GetUpStartTimeDelay()*1000.0f );
+				buffer.Format(_T("client is blocking too often: avg20: %0.0f%%, all: %0.0f%%, cur-speed: %u B/s, avg-speed: %0.0f B/s, slot: %u/%i"),cur_client->GetFileUploadSocket()->GetBlockRatio(),cur_client->GetFileUploadSocket()->GetBlockRatio_overall(),cur_client->GetUploadDatarate(),(float)cur_client->GetSessionUp()/cur_client->GetUpStartTimeDelay()*1000.0f,cur_client->GetSlotNumber(),GetUploadQueueLength() );
 				RemoveFromUploadQueue(cur_client,buffer,CUpDownClient::USR_BLOCKING); // Maella -Upload Stop Reason-
 				break; //only one socket per loop
 			}

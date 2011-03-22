@@ -2791,7 +2791,7 @@ CString CUpDownClient::GetRemainingUploadTime() const
 				if(currentReqFile)
 				{
 					Requested_Block_Struct* lastBlock = m_DoneBlocks_list.GetHead();
-					uint32 lastDone = (uint32)(lastBlock->StartOffset / PARTSIZE);
+					const uint32 lastDone = (uint32)(lastBlock->StartOffset / PARTSIZE);
 
 					// Bytes to go for current part
 					sTogo = (lastDone+1)*PARTSIZE-1;
@@ -2802,14 +2802,16 @@ CString CUpDownClient::GetRemainingUploadTime() const
 					if(thePrefs.GetChunksMode()==CHUNK_FINISH)
 					{
 						// Bytes to go for coming up parts
-						uint32 uPartsToGo = thePrefs.GetChunksToFinish() - 1 - GetFinishedChunks();
+						const uint32 uPartsToGo = thePrefs.GetChunksToFinish() - 1 - GetFinishedChunks();
 						sTogo += ((uPartsToGo>0)?uPartsToGo:0)*PARTSIZE;
 					}
 
 					if(GetSessionUp() + sTogo < 3145728) // If the part ends too early
-						sTogo = uMaxBytesToUpload - (GetSessionUp() + sTogo); // We assume full SESSIONMAXTRANS will be sent
-					else if(GetQueueSessionPayloadUp() > uMaxBytesToUpload) // If we Uploaded too much already we don't display anything anymore
-						sTogo = -1;
+						sTogo = uMaxBytesToUpload - GetQueueSessionPayloadUp(); // we assume full uMaxBytesToUpload will be sent.
+					else if(GetQueueSessionPayloadUp() > uMaxBytesToUpload) // If we Uploaded too much already
+						sTogo = -1; // we don't display anything anymore.
+					else if(GetSessionUp() + sTogo > uMaxBytesToUpload) // If we uploaded too much to finish the current chunk
+						sTogo = uMaxBytesToUpload - GetQueueSessionPayloadUp(); // we will send uMaxBytesToUpload at the most.
 				}
 			}
 			else // Fallback when we haven't finished uploading any block

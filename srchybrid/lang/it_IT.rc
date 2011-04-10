@@ -2292,11 +2292,11 @@ BEGIN
     IDS_CLIENTQUEUEPROGRESSBAR "Mostra i Progressi della coda del client" // Client queue progress bar [Commander] - Stulle
     IDS_ACC                 "Attiva Controllo Connessione Attiva" // ACC [Max/WiZaRd] - Max
     // ==> ScarAngel Version Check - Stulle
-    IDS_VISITSVERSIONCHECK  "\n\nVuoi visitare il sito internet di ScarAngel?"
-    IDS_SVERSIONCHECK       "&Controllo versione (ScarAngel)"
-    IDS_NONEWSVERVERSION    "Nessuna nuova versione di eMule ScarAngel rilevata."
-    IDS_NEWSVERSIONAVL      "Nuova versione di eMule ScarAngel disponibile! Visti il sito per maggiori informazioni."
-    IDS_NEWSVERSIONAVLPOPUP "Nuova versione di eMule ScarAngel disponibile. Clicca qui per informazioni sulla nuova versione!"
+    //IDS_VISITSVERSIONCHECK  "\n\nVuoi visitare il sito internet di ScarAngel?"
+    //IDS_SVERSIONCHECK       "&Controllo versione (ScarAngel)"
+    //IDS_NONEWSVERVERSION    "Nessuna nuova versione di eMule ScarAngel rilevata."
+    //IDS_NEWSVERSIONAVL      "Nuova versione di eMule ScarAngel disponibile! Visti il sito per maggiori informazioni."
+    //IDS_NEWSVERSIONAVLPOPUP "Nuova versione di eMule ScarAngel disponibile. Clicca qui per informazioni sulla nuova versione!"
     // <== ScarAngel Version Check - Stulle
     // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "Avvio Veloce"
@@ -2559,7 +2559,7 @@ BEGIN
     IDS_DL_RATIO_LIMIT          "Rapporto attuale UL:DL al massimo 1"
     // <== Enforce Ratio [Stulle] - Stulle
     // ==> Tabbed Preferences [TPT] - Stulle
-    IDS_SCARANGEL               "ScarAngel"
+    //IDS_SCARANGEL               "ScarAngel"
     IDS_BACKUP                  "Backup"
     // <== Tabbed Preferences [TPT] - Stulle
     IDS_ERR_HIDDENSOURCE    "Blocchi richiesti senza la richiesta di ciò che necessita" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
@@ -2609,7 +2609,7 @@ BEGIN
     IDS_HOMEPAGE            "Sito"
     IDS_BOARD_GER           "Board Tedesca di Supporto"
     IDS_BOARD_ENG           "Board Inglese di Supporto"
-    IDS_RATE                "Vota ScarAngel"
+    //IDS_RATE                "Vota ScarAngel"
     IDS_XTREME              "Sito Mod Xtreme"
     // <== Support page in preferences [Stulle] - Stulle
     // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2726,7 +2726,7 @@ BEGIN
     IDS_AUTOUPIP2COUNTRY    "Aggiorna Ip-to-country.csv all'avvio"
     IDS_SCHED_UPDATE_IPCONFIG_LOG "Fissato IPFILTER.DAT - Aggiornamento iniziato"
     IDS_SCHED_UPDATE_ANTILEECH_LOG "Fissato antiLeech.dll - Aggiornamento iniziato"
-    IDS_SCHEDTEXT           "Aggiunto dall'Auto aggiornamento ScarAngel"
+    //IDS_SCHEDTEXT           "Aggiunto dall'Auto aggiornamento ScarAngel"
     IDS_SCHED_UPDATE_IPCONFIG "Aggiorna file IPfilter.dat"
     IDS_SCHED_UPDATE_ANTILEECH "Aggiorna file antiLeech.dll"
     IDS_SCHED_UPDATE_WARNING 
@@ -2884,6 +2884,43 @@ BEGIN
     IDS_NOMINIMIZE          "No, minimizza in tray"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "Slot Amico" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK   "\n\nVuoi visitare il sito web di Mephisto?"
+    IDS_MVERSIONCHECK        "&Controllo Versione (Mephisto)"
+    IDS_NONEWMVERVERSION     "Non è disponibile nessuna nuova versione di eMule Mephisto."
+    IDS_NEWMVERSIONAVL       "Una nuova versione di eMule Mephisto è disponibile! Controlla la homepage del progetto per ulteriori informazioni."
+    IDS_NEWMVERSIONAVLPOPUP  "Una nuova versione di eMule Mephisto è disponibile. Clicca qui per leggere le novità di questa versione!"
+    IDS_DL_RATIO_FRIEND      "Slot Amico attivo" // Multiple friendslots [ZZ] - Mephisto
+    IDS_MEPHISTO             "Mephisto"
+    IDS_RATE_MEPH            "Vota Mephisto"
+    IDS_SCHEDTEXT_MEPH       "Aggiunto da Mephisto AutoUpdate"
+    // ==> Diabolic Easteregg [Stulle] - Mephisto
+    IDS_EASTEREGG            "Non ti piace il design? Clicca!"
+    IDS_EASTEREGG_PROMPT     "Sei sicuro che non ti piace il design della mod?"
+    IDS_EASTEREGG_INSTRUCTION "Per favore chiudi la finestra Preferenze ora."
+    // <== Diabolic Easteregg [Stulle] - Mephisto
+    IDS_REMOVEALLFRIENDSLOT  "Rimuovi tutti gli Slot Amici" // Multiple friendslots [ZZ] - Mephisto
+    // ==> Mephisto Upload - Mephisto
+    IDS_NO_TRICKLE_TIMER     "Secondi necessari per apertura nuovo slot se non c'è avanzo di banda in upload (0=off)"
+    IDS_MEPHISTO_WARNING_1   "ATTENZIONE! Queste opzioni sono sensibili!"
+    IDS_MEPHISTO_WARNING_2   "Modificatele con molta cura, a vostro rischio!"
+    IDS_MEPHISTO_UPLOAD      "Settaggi Upload Mephisto"
+    IDS_MIN_SLOTS            "Numero minimo di slot"
+    IDS_NO_NEW_SLOT_TIMER    "Sec. necessari all'apertura di un nuovo slot"
+    IDS_FULL_LOOPS           "Cicli completi necessari in % per impostare Slot pieno (Full Slot)"
+    IDS_MONITOR_LOOPS        "Secondi per controllare i cicli"
+    IDS_NOT_REACHED_BW       "Sec. necessari all'apertura di uno slot se la banda in upload non è completa"
+    IDS_MOVE_DOWN_KB         "KB necessari prima di spostare in fondo i client che stanno terminando"
+    // <== Mephisto Upload - Mephisto
+    // ==> Multiple Part Transfer [Stulle] - Mephisto
+    IDS_CHUNKS_GROUP         "Modalità Trasferimento Chunk"
+    IDS_CHUNKS_NONE          "Disabilita trasferimento di chunk completi"
+    IDS_CHUNKS_XMAN          "Upload chunk completi Xtreme"
+    IDS_CHUNKS_FINISH        "Finisci X Chunk"
+    IDS_CHUNKS_TO_FINISH     "Chunk necessari al kick"
+    IDS_CHUNKS_FULL          "Upload X volte un chunk di dimensioni standard"
+    IDS_CHUNKS_TO_UPLOAD     "Moltiplicatore della dimensione del chunk necessari al kick"
+    // <== Multiple Part Transfer [Stulle] - Mephisto
+    IDS_MAX_UP_MINUTES       "Tempo massimo di upload in minuti" // Adjust max upload time [Stulle] - Mephisto
 END
 
 #endif    // Italian (Italy) resources

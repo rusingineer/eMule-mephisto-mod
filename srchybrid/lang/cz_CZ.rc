@@ -2235,11 +2235,20 @@ BEGIN
     IDS_CLIENTQUEUEPROGRESSBAR "Ukaž stav fronty klientu" // Client queue progress bar [Commander] - Stulle
     IDS_ACC                 "Povol aktivní oízení spojení" // ACC [Max/WiZaRd] - Max
     // ==> ScarAngel Version Check - Stulle
+    // ==> Mephisto mod [Stulle] - Mephisto
+    /*
     IDS_VISITSVERSIONCHECK  "\n\nChcete navštívit webovou stránku ScarAngel ?"
     IDS_SVERSIONCHECK       "Kontrola&Verze (ScarAngel)"
     IDS_NONEWSVERVERSION    "Nová verze eMule ScarAngel nebyla zjiština."
     IDS_NEWSVERSIONAVL      "Byla zjiština nová verze eMule ScarAngel! více info na stránce projectu."
     IDS_NEWSVERSIONAVLPOPUP "Byla zjiština nová verze eMule ScarAngel. Kliknite zde - info o nové verzi!"
+    */
+    IDS_VISITMVERSIONCHECK  "\n\nChcete navštívit webovou stránku Mephisto ?"
+    IDS_MVERSIONCHECK       "Kontrola&Verze (Mephisto)"
+    IDS_NONEWMVERVERSION    "Nová verze eMule Mephisto nebyla zjiština."
+    IDS_NEWMVERSIONAVL      "Byla zjiština nová verze eMule Mephisto! více info na stránce projectu."
+    IDS_NEWMVERSIONAVLPOPUP "Byla zjiština nová verze eMule Mephisto. Kliknite zde - info o nové verzi!"
+    // <== Mephisto mod [Stulle] - Mephisto
     // <== ScarAngel Version Check - Stulle
     // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "Rychlý start"

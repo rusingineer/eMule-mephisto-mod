@@ -2263,13 +2263,6 @@ BEGIN
     // <== FunnyNick [SiRoB/Stulle] - Stulle
     IDS_CLIENTQUEUEPROGRESSBAR "显示客户端排队进度" // Client queue progress bar [Commander] - Stulle
     IDS_ACC                 "允许主动连接控制" // ACC [Max/WiZaRd] - Max
-    // ==> ScarAngel Version Check - Stulle
-    IDS_VISITSVERSIONCHECK  "\n\n你想访问ScarAngel主页吗?"
-    IDS_SVERSIONCHECK       "版本检查(ScarAngel)"
-    IDS_NONEWSVERVERSION    "没有检查到新的eMule ScarAngel版本."
-    IDS_NEWSVERSIONAVL      "检查到新的ScarAngel版本!请访问ScarAngel主页."
-    IDS_NEWSVERSIONAVLPOPUP "检查到新的ScarAngel版本!点击这里阅读有关信息."
-    // <== ScarAngel Version Check - Stulle
     // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "快速启动"
     IDS_QUICK_START         "允许快速启动"
@@ -2531,7 +2524,6 @@ BEGIN
     IDS_DL_RATIO_LIMIT          "当前上传/下载比例已达到最大. 1"  //"Current UL:DL ratio is max. 1"
     // <== Enforce Ratio [Stulle] - Stulle
     // ==> Tabbed Preferences [TPT] - Stulle
-    IDS_SCARANGEL               "ScarAngel"
     IDS_BACKUP                  "备份"
     // <== Tabbed Preferences [TPT] - Stulle
     IDS_ERR_HIDDENSOURCE    "不显示对方的区块请求" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
@@ -2581,7 +2573,6 @@ BEGIN
 	IDS_HOMEPAGE            "主页"
     IDS_BOARD_GER           "德文技术论坛"
     IDS_BOARD_ENG           "英文技术论坛"
-    IDS_RATE                "评价ScarAngel"
     IDS_XTREME              "Xtreme主页"
     // <== Support page in preferences [Stulle] - Stulle
     // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2699,7 +2690,6 @@ BEGIN
     IDS_AUTOUPIP2COUNTRY    "每次启动时更新ip-to-country.csv"
     IDS_SCHED_UPDATE_IPCONFIG_LOG "开始更新ipfilter.dat"
     IDS_SCHED_UPDATE_ANTILEECH_LOG "开始更新antiLeech.dll"
-    IDS_SCHEDTEXT           "由ScarAngel自动更新添加"
     IDS_SCHED_UPDATE_IPCONFIG "更新ipfilter.dat"
     IDS_SCHED_UPDATE_ANTILEECH "更新antiLeech.dll"
     IDS_SCHED_UPDATE_WARNING 
@@ -2857,6 +2847,42 @@ BEGIN
     IDS_NOMINIMIZE          "否，缩小到系统托盘"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "好友通道" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK  "\n\n你想访问Mephisto站点吗?"
+    IDS_MVERSIONCHECK       "&V 版本检查(Mephisto)"
+    IDS_NONEWMVERVERSION    "没有检查到新的Mephisto版本"
+    IDS_NEWMVERSIONAVL      "检查到新的Mephisto版本! 请访问Mephisto站点."
+    IDS_NEWMVERSIONAVLPOPUP "检查到新的Mephisto版本! 点击这里获得更多信息."
+    IDS_MEPHISTO                "Mephisto"
+    IDS_RATE_MEPH           "评论Mephisto"
+    IDS_SCHEDTEXT_MEPH      "由Mephisto AutoUpdate添加"
+    // ==> Diabolic Easteregg [Stulle] - Mephisto
+    IDS_EASTEREGG           "不喜欢这个设计?点击!"
+    IDS_EASTEREGG_PROMPT    "你确定你不喜欢这个mod的设计?"
+    IDS_EASTEREGG_INSTRUCTION "请关闭设置窗口."
+    // <== Diabolic Easteregg [Stulle] - Mephisto
+    IDS_REMOVEALLFRIENDSLOT "删除所有好友通道" // Multiple friendslots [ZZ] - Mephisto
+    // ==> Mephisto Upload - Mephisto
+    IDS_NO_TRICKLE_TIMER    "连续X秒无流量时打开新的通道 (0=关)"
+    IDS_MEPHISTO_WARNING_1  "警告! 随便调节这些选项可能导致无法预料的问题!"
+    IDS_MEPHISTO_WARNING_2  "风险自负!"
+    IDS_MEPHISTO_UPLOAD     "Mephisto上传调整"
+    IDS_MIN_SLOTS           "最小通道数"
+    IDS_NO_NEW_SLOT_TIMER   "打开新通道前的等待时间"
+    IDS_FULL_LOOPS          "完整循环,直到设为完整通道"
+    IDS_MONITOR_LOOPS       "监视循环的秒数"
+    IDS_NOT_REACHED_BW      "没有达到BW时,打开新通道前的等待时间"
+    IDS_MOVE_DOWN_KB        "切断连接前上传的KB数(如网速很快则请稍微加大)"
+    // <== Mephisto Upload - Mephisto
+    // ==> Multiple Part Transfer [Stulle] - Mephisto
+    IDS_CHUNKS_GROUP        "区块上传模式"
+    IDS_CHUNKS_NONE         "禁止传输完整区块"
+    IDS_CHUNKS_XMAN         "Xtreme完整区块上传"
+    IDS_CHUNKS_FINISH       "完成X个区块"
+    IDS_CHUNKS_TO_FINISH    "踢掉对方前的上传区块数"
+    IDS_CHUNKS_FULL         "上传一个区块的X倍大小"
+    IDS_CHUNKS_TO_UPLOAD    "踢掉对方前的上传倍数"
+    // <== Multiple Part Transfer [Stulle] - Mephisto
+    IDS_MAX_UP_MINUTES      "全力上传持续时间" // Adjust max upload time [Stulle] - Mephisto
 END
 
 #endif    // 中文(中华人民共和国) resources

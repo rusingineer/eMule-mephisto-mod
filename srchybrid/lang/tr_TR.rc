@@ -2297,13 +2297,6 @@ BEGIN
     // <== FunnyNick [SiRoB/Stulle] - Stulle
     IDS_CLIENTQUEUEPROGRESSBAR "Sýra ilerleyiþi hakkýnda bilgi çubuðu göster" // Client queue progress bar [Commander] - Stulle
     IDS_ACC                 "Aktif Baðlantý Denetimini Etkinleþtir" // ACC [Max/WiZaRd] - Max
-    // ==> ScarAngel Version Check - Stulle
-    IDS_VISITSVERSIONCHECK  "\n\nScarAngel web sayfasýný ziyaret etmek ister misiniz?"
-    IDS_SVERSIONCHECK       "&Sürüm denetleme (ScarAngel)"
-    IDS_NONEWSVERVERSION    "Yeni bir ScarAngel sürümü saptanamadý."
-    IDS_NEWSVERSIONAVL      "Yeni bir eMule ScarAngel sürümü mevcut! Daha fazla bilgi için proje ana sayfasýný ziyaret ediniz."
-    IDS_NEWSVERSIONAVLPOPUP "Yeni bir eMule ScarAngel sürümü mevcut. Yeni sürüm hakkýnda bilgi almak için buraya týklayýnýz!"
-    // <== ScarAngel Version Check - Stulle
     // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "Quickstart"
     IDS_QUICK_START         "Enable Quickstart"
@@ -2565,7 +2558,6 @@ BEGIN
     IDS_DL_RATIO_LIMIT          "Current UL:DL ratio is max. 1"
     // <== Enforce Ratio [Stulle] - Stulle
     // ==> Tabbed Preferences [TPT] - Stulle
-    IDS_SCARANGEL               "ScarAngel"
     IDS_BACKUP                  "Yedekleme"
     // <== Tabbed Preferences [TPT] - Stulle
     IDS_ERR_HIDDENSOURCE    "Ýhtiyacý olaný söylemeden gizlenmiþ bir blok için sordu" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
@@ -2615,7 +2607,6 @@ BEGIN
 	IDS_HOMEPAGE            "Ana sayfa"
     IDS_BOARD_GER           "Almanca destek forumu"
     IDS_BOARD_ENG           "Ýngilizce destek forumu"
-    IDS_RATE                "ScarAngel'e oy ver"
     IDS_XTREME              "Xtreme Mod Ana sayfasý"
     // <== Support page in preferences [Stulle] - Stulle
     // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2733,7 +2724,6 @@ BEGIN
     IDS_AUTOUPIP2COUNTRY    "Baþlangýçta Ip-to-country.csv güncelle"
     IDS_SCHED_UPDATE_IPCONFIG_LOG "Zamanlanmýþ IPFILTER.DAT-güncelleme iþlemi baþlatýldý."
     IDS_SCHED_UPDATE_ANTILEECH_LOG "Zamanlanmýþ antiLeech.dll-güncelleme iþlemi baþlatýldý."
-    IDS_SCHEDTEXT           "ScarAngel oto-güncelleme tarafýndan eklendi"
     IDS_SCHED_UPDATE_IPCONFIG "IPFILTER.DAT-dosyasýný güncelle"
     IDS_SCHED_UPDATE_ANTILEECH "antiLeech.dll-dosyasýný güncelle"
     IDS_SCHED_UPDATE_WARNING 
@@ -2890,6 +2880,14 @@ IDS_SERVICE_NAME_CHANGED "Zaten eklenmiþ durumdaki NT Hizmetinin ismini deðiþtir
     IDS_NOMINIMIZE          "Hayýr, Tablaya at"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "Arkadaþslotu" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK  "\n\nMephisto web sayfasýný ziyaret etmek ister misiniz?"
+    IDS_MVERSIONCHECK       "&Sürüm denetleme (Mephisto)"
+    IDS_NONEWMVERVERSION    "Yeni bir Mephisto sürümü saptanamadý."
+    IDS_NEWMVERSIONAVL      "Yeni bir eMule Mephisto sürümü mevcut! Daha fazla bilgi için proje ana sayfasýný ziyaret ediniz."
+    IDS_NEWMVERSIONAVLPOPUP "Yeni bir eMule Mephisto sürümü mevcut. Yeni sürüm hakkýnda bilgi almak için buraya týklayýnýz!"
+    IDS_MEPHISTO            "Mephisto"
+    IDS_RATE_MEPH           "Mephisto'e oy ver"
+    IDS_SCHEDTEXT_MEPH      "Mephisto oto-güncelleme tarafýndan eklendi"
 END
 
 

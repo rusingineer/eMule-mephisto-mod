@@ -2267,13 +2267,6 @@ BEGIN
     IDS_CLIENTQUEUEPROGRESSBAR 
                             "Zeige Fortschrittsbalken der Client-Warteliste an"
     IDS_ACC                 "Verbindungskontrolle aktivieren" // ACC [Max/WiZaRd] - Max
-    // ==> ScarAngel Version Check - Stulle
-    IDS_VISITSVERSIONCHECK  "\n\nMöchtest du die ScarAngel Webseite besuchen?"
-    IDS_SVERSIONCHECK       "&Versioncheck (ScarAngel)"
-    IDS_NONEWSVERVERSION    "Es ist keine neuere Scarangel Version verfügbar.."
-    IDS_NEWSVERSIONAVL      "Eine neue ScarAngel Version ist verfügbar! Besuche die Projekt-Homepage um mehr Informationen zu erhalten."
-    IDS_NEWSVERSIONAVLPOPUP "Eine neuere Version von ScarAngel ist verfügbar. Klicke hier um mehr über die neue Version zu erfahren!"
-    // <== ScarAngel Version Check - Stulle
     // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "Schnellstart"
     IDS_QUICK_START         "Schalte Schnellstart ein"
@@ -2533,7 +2526,6 @@ BEGIN
     IDS_DL_RATIO_LIMIT          "Aktuelles UL:DL Verhältnis ist max. 1"
     // <== Enforce Ratio [Stulle] - Stulle
     // ==> Tabbed Preferences [TPT] - Stulle
-    IDS_SCARANGEL               "ScarAngel"
     IDS_BACKUP                  "Backup"
     // <== Tabbed Preferences [TPT] - Stulle
     IDS_ERR_HIDDENSOURCE    "Fragt nach einem Block ohne zu sagen was er braucht" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
@@ -2583,7 +2575,6 @@ BEGIN
     IDS_HOMEPAGE            "Homepage"
     IDS_BOARD_GER           "Deutsches Hilfe Forum"
     IDS_BOARD_ENG           "Englisches Hilfe Forum"
-    IDS_RATE                "Bewerte ScarAngel"
     IDS_XTREME              "Xtreme Mod Homepage"
     // <== Support page in preferences [Stulle] - Stulle
     // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2701,7 +2692,6 @@ BEGIN
     IDS_AUTOUPIP2COUNTRY    "Aktualisiere Ip-to-country.csv beim Start"
     IDS_SCHED_UPDATE_IPCONFIG_LOG "Geplante IPFILTER.DAT-aktualisierung gestartet."
     IDS_SCHED_UPDATE_ANTILEECH_LOG "Geplante antiLeech.dll-aktualisierung gestartet."
-    IDS_SCHEDTEXT           "Von ScarAngel AutoUpdate hinzugefügt"
     IDS_SCHED_UPDATE_IPCONFIG "Aktualisiere IPFILTER.DAT-Datei"
     IDS_SCHED_UPDATE_ANTILEECH "Aktualisiere antiLeech.dll-Datei"
     IDS_SCHED_UPDATE_WARNING 
@@ -2859,6 +2849,43 @@ BEGIN
     IDS_NOMINIMIZE          "Nein, minimiere zu Tray"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "Freund-Uploadplatz" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK  "\n\nMöchtest du die Mephisto Website besuchen?"
+    IDS_MVERSIONCHECK       "&Versioncheck (Mephisto)"
+    IDS_NONEWMVERVERSION    "Keine neue eMule Mephisto Version gefunden."
+    IDS_NEWMVERSIONAVL      "Eine neue Version von eMule Mephisto ist verfügbar! Besuche die project-homepage für mehr Informationen."
+    IDS_NEWMVERSIONAVLPOPUP "Eine neue Version von eMule Mephisto ist verfügbar. Klicke hier um über die neue Version nachzulesen!"
+    IDS_DL_RATIO_FRIEND     "Freund-Uploadplätze aktiviert" // Multiple friendslots [ZZ] - Mephisto
+    IDS_MEPHISTO            "Mephisto"
+    IDS_RATE_MEPH           "Rate Mephisto"
+    IDS_SCHEDTEXT_MEPH      "Hinzugefügt von Mephisto AutoUpdate"
+    // ==> Diabolic Easteregg [Stulle] - Mephisto
+    IDS_EASTEREGG           "Dir gefällt diese Optik nicht? Klick!"
+    IDS_EASTEREGG_PROMPT    "Bist du dir sicher das du diese Mod Optik nicht magst?"
+    IDS_EASTEREGG_INSTRUCTION "Bitte schließe den Präferenz Dialog jetzt."
+    // <== Diabolic Easteregg [Stulle] - Mephisto
+    IDS_REMOVEALLFRIENDSLOT "Entferne alle Friendslots" // Mehrfache Friendslots [ZZ] - Mephisto
+    // ==> Mephisto Upload - Mephisto
+    IDS_NO_TRICKLE_TIMER    "Sek. bis ein neue Slot geöffnet wird (Kein Reserve Slot) (0=off)"
+    IDS_MEPHISTO_WARNING_1  "ACHTUNG! Diese Optionen sind sehr empfindlich!"
+    IDS_MEPHISTO_WARNING_2  "Nur auf eigenes Risiko verstellen"
+    IDS_MEPHISTO_UPLOAD     "Mephisto Upload Tweaks"
+    IDS_MIN_SLOTS           "Minimale Slots"
+    IDS_NO_NEW_SLOT_TIMER   "Sek. bis ein neuer Slot geöffnet wird"
+    IDS_FULL_LOOPS          "Volle Schleifen bis zum vollen Slot in %"
+    IDS_MONITOR_LOOPS       "Sekunden für Schleifen überwachen"
+    IDS_NOT_REACHED_BW      "Sek. bis neuer Slot geöffnet wenn BW nicht erreicht"
+    IDS_MOVE_DOWN_KB        "KB bis beendender Klient nach unten bewegt wird"
+    // <== Mephisto Upload - Mephisto
+    // ==> Multiple Part Transfer [Stulle] - Mephisto
+    IDS_CHUNKS_GROUP        "Chunk Transfer Optionen"
+    IDS_CHUNKS_NONE         "Deaktiviere  vollen Chunktranfer"
+    IDS_CHUNKS_XMAN         "Xtreme voller Chunk Upload"
+    IDS_CHUNKS_FINISH       "Kick nach X Chunks"
+    IDS_CHUNKS_TO_FINISH    "Chunks bis Kick"
+    IDS_CHUNKS_FULL         "Upload X Minuten für einen Chunk"
+    IDS_CHUNKS_TO_UPLOAD    "Multiplikation für Chunks bis zum Kick"
+    // <== Multiple Part Transfer [Stulle] - Mephisto
+    IDS_MAX_UP_MINUTES      "Maximale Uploadzeit in Minuten" // Verstelle maximale Uploadzeit [Stulle] - Mephisto
 END
 
 #endif    // German (Germany) resources

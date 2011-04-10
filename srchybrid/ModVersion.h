@@ -20,7 +20,7 @@
 //START - This part should not be changed in anyway
 #define MOD_VERSION_MJR		3
 #define MOD_VERSION_MIN		0
-#define MOD_VERSION_BUILD   1
+#define MOD_VERSION_BUILD   2
 #define	MOD_VERSION			_T("Mephisto") // remark: last sign != ' ' (space) !!!
 #define	MOD_VERSION_LONG	_T("Mephisto v")
 //END - This part should not be changed in anyway

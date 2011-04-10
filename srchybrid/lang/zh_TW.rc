@@ -2273,13 +2273,6 @@ IDS_FN_TAG_AT_END       "顯示標籤在末端"//"把標籤顯示在暱稱末尾"
 // <== FunnyNick [SiRoB/Stulle] - Stulle
 IDS_CLIENTQUEUEPROGRESSBAR "顯示客戶端排隊進度"//"顯示客戶端排隊進度" // Client queue progress bar [Commander] - Stulle
 IDS_ACC                 "允許主動連線控制" // ACC [Max/WiZaRd] - Max
-// ==> ScarAngel Version Check - Stulle
-IDS_VISITSVERSIONCHECK  "\n\n你想訪問ScarAngel網站嗎?"
-IDS_SVERSIONCHECK       "&V 版本檢查(ScarAngel)"
-IDS_NONEWSVERVERSION    "沒有檢查到新的ScarAngel版本"
-IDS_NEWSVERSIONAVL      "檢查到新的ScarAngel版本! 請訪問ScarAngel網站."
-IDS_NEWSVERSIONAVLPOPUP "檢查到新的ScarAngel版本! 點擊這裡獲得更多資訊."
-// <== ScarAngel Version Check - Stulle
 // ==> Quick start [TPT] - Max
 IDS_QUICK_START_GROUP   "快速啟動"
 IDS_QUICK_START         "啟用快速啟動"//"允許快速啟動"
@@ -2537,7 +2530,6 @@ IDS_RATIO_VALUE             "最大比率1"
     IDS_DL_RATIO_LIMIT          "目前的 UL:DL 比為最大值 1"
 // <== Enforce Ratio [Stulle] - Stulle
 // ==> Tabbed Preferences [TPT] - Stulle
-IDS_SCARANGEL               "ScarAngel"
 IDS_BACKUP                  "備份"
 // <== Tabbed Preferences [TPT] - Stulle
 IDS_ERR_HIDDENSOURCE    "要求一個區塊之前未先告訴我們他需要的部分"//"Asked Block without telling us what he need" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
@@ -2587,7 +2579,6 @@ IDS_SUPPORT             "技術支援"
 IDS_HOMEPAGE            "主頁"
 IDS_BOARD_GER           "德文論壇"
 IDS_BOARD_ENG           "英文論壇"
-IDS_RATE                "評論ScarAngel"
 IDS_XTREME              "Xtreme主頁"
 // <== Support page in preferences [Stulle] - Stulle
 // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2860,6 +2851,43 @@ IDS_STATIC_ICON         "總是顯示托盤圖示" // Static Tray Icon - MyTh88
     IDS_NOMINIMIZE          "否，縮至系統列"//"No, To tray"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "好友通道"//"Friendslot" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK  "\n\n您想參觀 Mephisto 的網站嗎?"
+    IDS_MVERSIONCHECK       "&Versioncheck (Mephisto)"
+    IDS_NONEWMVERVERSION    "未偵測到新版的 eMule Mephisto"
+    IDS_NEWMVERSIONAVL      "有新版的 eMule Mephisto! 詳情請參考官網首頁."
+    IDS_NEWMVERSIONAVLPOPUP "有新版的 eMule Mephisto. 點選這裡來閱讀新版本的資料!"
+    IDS_DL_RATIO_FRIEND         "啟用好友位置" // Multiple friendslots [ZZ] - Mephisto
+    IDS_MEPHISTO                "Mephisto"
+    IDS_RATE_MEPH           "評價 Mephisto"
+    IDS_SCHEDTEXT_MEPH      "Mephisto 新增的自動更新 (AutoUpdate)"
+    // ==> Diabolic Easteregg [Stulle] - Mephisto
+    IDS_EASTEREGG           "不喜歡這個設計? 點我!"
+    IDS_EASTEREGG_PROMPT    "你確定你不喜歡這個 mod 的設計?"
+    IDS_EASTEREGG_INSTRUCTION "請現在關閉偏好設定視窗."
+    // <== Diabolic Easteregg [Stulle] - Mephisto
+    IDS_REMOVEALLFRIENDSLOT "移除所有的好友位置" // Multiple friendslots [ZZ] - Mephisto
+    // ==> Mephisto Upload - Mephisto
+    IDS_NO_TRICKLE_TIMER    "如果沒有待命上傳位置, 等待幾[秒]才開新的上傳位置 (0=關閉)"
+    IDS_MEPHISTO_WARNING_1  "警告! 這些選項很敏感!"
+    IDS_MEPHISTO_WARNING_2  "請謹慎更改, 後果自負!"
+    IDS_MEPHISTO_UPLOAD     "Mephisto 上傳微調"
+    IDS_MIN_SLOTS           "上傳位置下限"
+    IDS_NO_NEW_SLOT_TIMER   "開啟新上傳位置前等待[秒]數"
+    IDS_FULL_LOOPS          "當百分之幾[%]上傳位置滿載時設置滿載迴圈"
+    IDS_MONITOR_LOOPS       "觀測迴圈的時間[秒]"
+    IDS_NOT_REACHED_BW      "假如頻寬未滿, 再等幾[秒]才開新的上傳位置"
+    IDS_MOVE_DOWN_KB        "再幾 KB 就將完成中的用戶端下移"
+    // <== Mephisto Upload - Mephisto
+    // ==> Multiple Part Transfer [Stulle] - Mephisto
+    IDS_CHUNKS_GROUP        "區塊上傳模式"
+    IDS_CHUNKS_NONE         "停用完整區塊上傳"
+    IDS_CHUNKS_XMAN         "Xtreme 完整區塊上傳模式"
+    IDS_CHUNKS_FINISH       "完成 X 個區塊"
+    IDS_CHUNKS_TO_FINISH    "踢人前上傳幾個區塊"
+    IDS_CHUNKS_FULL         "上傳 X 倍於區塊的尺寸"
+    IDS_CHUNKS_TO_UPLOAD    "踢人前上傳幾倍於區塊的大小"
+    // <== Multiple Part Transfer [Stulle] - Mephisto
+    IDS_MAX_UP_MINUTES      "最大上傳時間 (分鐘)" // Adjust max upload time [Stulle] - Mephisto
 END
 
 /////////////////////////////////////////////////////////////////////////////

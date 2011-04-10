@@ -1989,7 +1989,7 @@ BEGIN
     IDS_POPULARITY          "Popularidad"
     IDS_SHOWWIN7TASKBARGOODIES "Activar efectos de la barra de tareas de Windows 7"
     IDS_LANMODE             "Modo LAN"
-    IDS_OPENPREFINI         "Open preferences.ini"
+    IDS_OPENPREFINI         "Abrir preferences.ini"
 END
 
 STRINGTABLE 
@@ -2129,8 +2129,8 @@ BEGIN
     IDS_SHOWADDITIONALGRAPH "Mostrar líneas de gráfico adicionales"
     IDS_CHECK4UPDATEMOD     "Comprobar si hay una nueva Xtreme versión"
     IDS_ANTILEECHEREMCRYPT_CHECK "Detectar emcrypt"
-    IDS_UPLOADMANAGEMENT_FRAME "Upload Management"
-    IDS_UPLOADSLOTSPEED_LABEL "Upload Slot Speed"
+    IDS_UPLOADMANAGEMENT_FRAME "Administración de subida"
+    IDS_UPLOADSLOTSPEED_LABEL "Velocidad de subida por slot"
     IDS_USENARROWFONT       "Caracteres estrechos en ventana de tráfico"
     IDS_SHOWBLOCKINGRATIO   "Mostrar ratio de conexiones bloquedas"
     IDS_FUNNYNICK           "Activar nicks graciosos"
@@ -2196,13 +2196,13 @@ BEGIN
     IDS_FRIENDLINKMENUTITLE "Links de amigos"
     IDS_USER_ALREADY_FRIEND "Usuario ""%s"" ya esta en tu lista de amigos"
     IDS_PROGRESSHASHDONE    "Hash finalizado: %s"
-    IDS_RETRIEVEMTUFROMSOCKET "Try to Retrieve MTU from System"
-    IDS_ENABLEKNOWN2BUFFER  "Enable AICHHashset buffer (reduce diskio while hashing tons of files)"
+    IDS_RETRIEVEMTUFROMSOCKET "Intentar recibir el MTU del sistema"
+    IDS_ENABLEKNOWN2BUFFER  "Activar el búfer AICHHashset (reduce el uso del disco al hacer hash de muchos archivos)"
     IDS_ANTILEECHERFINCAN_CHECK 
-                            "Detect Fincan Community Hash (CPU intensive!)"
-    IDS_ENABLEKNOWN2SPLIT   "Split Known2_64.met, let unshared AICHHashsets in a single file"
-    IDS_EMULE_CTRL_DATA     "eMule control + data"
-    IDS_NETWORK_ADAPTER     "Network Adapter"
+                            "Detectar el hash de comunidad Fincan (¡Uso intensivo de CPU!)"
+    IDS_ENABLEKNOWN2SPLIT   "Separar Known2_64.met, deja los AICHHashsets no compartidos en un único archivo"
+    IDS_EMULE_CTRL_DATA     "eMule control + datos"
+    IDS_NETWORK_ADAPTER     "Adaptador de Red"
 END
 
 STRINGTABLE
@@ -2290,13 +2290,6 @@ BEGIN
 // <== FunnyNick [SiRoB/Stulle] - Stulle
     IDS_CLIENTQUEUEPROGRESSBAR "Mostrar el progreso de la cola de espera del cliente" // Client queue progress bar [Commander] - Stulle
     IDS_ACC                 "Activar Control de Conexión" // ACC [Max/WiZaRd] - Max
-// ==> ScarAngel Version Check - Stulle
-    IDS_VISITSVERSIONCHECK  "\n\n¿Quieres visitar el sitio web de ScarAngel?"
-    IDS_SVERSIONCHECK       "&Comprobar versión (ScarAngel)"
-    IDS_NONEWSVERVERSION    "No se ha detectado una nueva versión de ScarAngel"
-    IDS_NEWSVERSIONAVL      "¡Hay una nueva versión de eMule ScarAngel! Comprueba la página oficial del proyecto para más información"
-    IDS_NEWSVERSIONAVLPOPUP "¡Hay una nueva versión de eMule ScarAngel! Pulsa aquí para leer sobre la nueva versión"
-// <== ScarAngel Version Check - Stulle
 // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "Inicio Rápido"
     IDS_QUICK_START         "Activar Inicio Rápido"
@@ -2447,6 +2440,7 @@ BEGIN
     IDS_KEEPCATINCSHARED    "En caso de eliminar una categoría el directorio compartido sera puesto a compartir?"
     IDS_KEEPCATINCSHARED_TITLE "Categoría Eliminada"
     IDS_ADD_REMOVED_INC     "Pregunta si el directorio compartido de una categoría eliminada es puesto a compartir."
+// <== Smart Category Control (SCC) [khaos/SiRoB/Stulle] - Stulle
     IDS_SHARED_PREFS        "Gestión de los Archivos Compartidos" // Shared Files Management [Stulle] - Stulle
 // ==> Spread bars [Slugfiller/MorphXT] - Stulle
     IDS_SPREAD_BARS         "Activar las Barras de Difusión"
@@ -2542,17 +2536,16 @@ BEGIN
     IDS_RATIO_GROUP             "SU:DE Ratio"
     IDS_ENFORCE_RATIO           "Imponer siemrpe ratio"
     IDS_RATIO_VALUE             "Máx ratio 1"
-    IDS_DL_SES_RATIO            "Session ratio based limit activated"
-    IDS_DL_LIMIT_DEF            "Configured download limit active"
-    IDS_DL_UNL_NOUL             "Download unrestricted (no upload possible)"
-    IDS_DL_UNL_13RATIO          "Download unlimited because ratio < 1:3"
-    IDS_DL_NAFC_LIMIT           "Download limited by NAFC"
-    IDS_DL_RATIO_SRC            "Global Max Hardlimit not accepted"
-    IDS_DL_RATIO_ENF            "Enforced ratio"
-    IDS_DL_RATIO_LIMIT          "Current UL:DL ratio is max. 1"
+    IDS_DL_SES_RATIO            "Limite de ratio en sesion basado en el limite activo"
+    IDS_DL_LIMIT_DEF            "Limite de descarga configurado activo"
+    IDS_DL_UNL_NOUL             "Descarga sin restricción (no es posible la subida)"
+    IDS_DL_UNL_13RATIO          "Descarga ilimitada por ratio < 1:3"
+    IDS_DL_NAFC_LIMIT           "Descarga limitada por NAFC"
+    IDS_DL_RATIO_SRC            "Límite máximo global no aceptado"
+    IDS_DL_RATIO_ENF            "Ratio forzado"
+    IDS_DL_RATIO_LIMIT          "El ratio actual UL:DL es max. 1"
 // <== Enforce Ratio [Stulle] - Stulle
 // ==> Tabbed Preferences [TPT] - Stulle
-    IDS_SCARANGEL               "ScarAngel"
     IDS_BACKUP                  "BackUp"
 // <== Tabbed Preferences [TPT] - Stulle
     IDS_ERR_HIDDENSOURCE    "Bloque Requerido sin decirnos qué necesita" // Anti Anti HideOS & SOTN [SiRoB] - Stulle
@@ -2601,7 +2594,6 @@ BEGIN
 	IDS_HOMEPAGE            "Página Web"
     IDS_BOARD_GER           "Foro de Soporte en Alemán"
     IDS_BOARD_ENG           "Foro de Soporte en Inglés"
-    IDS_RATE                "Puntuar ScarAngel"
     IDS_XTREME              "Página Web del Mod Xtreme"
 // <== Support page in preferences [Stulle] - Stulle
 // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2719,7 +2711,6 @@ BEGIN
     IDS_AUTOUPIP2COUNTRY    "Actualizar Ip-to-country.csv al inicio"
     IDS_SCHED_UPDATE_IPCONFIG_LOG "Programar el inicio de la actualización del IPFILTER.DAT."
     IDS_SCHED_UPDATE_ANTILEECH_LOG "Programar el inicio de la actualización del antiLeech.dll."
-    IDS_SCHEDTEXT           "Añadido por ScarAngel AutoUpdate"
     IDS_SCHED_UPDATE_IPCONFIG "Actualizar IPFILTER.DAT"
     IDS_SCHED_UPDATE_ANTILEECH "Actualziar antiLeech.dll-file"
     IDS_SCHED_UPDATE_WARNING  "No programar eventos de actualizaciones automáticas muy seguidas para mantener el tráfico de la red bajo\r\nUna vez a la semana suele ser suficiente"
@@ -2876,6 +2867,42 @@ BEGIN
     IDS_NOMINIMIZE          "No, a la Bandeja del Sistema"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "Slot Amigo" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK  "\n\n¿Quiere visitar el sitio web de Mephisto?"
+    IDS_MVERSIONCHECK       "&Comprobar versión (Mephisto)"
+    IDS_NONEWMVERVERSION    "No se ha detectado una versión nueva de eMule Mephisto."
+    IDS_NEWMVERSIONAVL      "Existe una nueva versión de eMule Mephisto. Comprueba la página web del proyecto para más información"
+    IDS_NEWMVERSIONAVLPOPUP "Existe una nueva versión de eMule. Pincha aquí para ver las novedades de esta versión"
+    IDS_DL_RATIO_FRIEND         "Slots de Amigos Activado" // Multiple friendslots [ZZ] - Mephisto
+    IDS_MEPHISTO            "Mephisto"
+    IDS_RATE_MEPH           "Puntuar Mephisto"
+    IDS_SCHEDTEXT_MEPH      "Añadido por Mephisto AutoUpdate"
+    // ==> Diabolic Easteregg [Stulle] - Mephisto
+    IDS_EASTEREGG           "¿No te gusta el diseño? ¡Haz Click!"
+    IDS_EASTEREGG_PROMPT    "¿Está seguro de que no le gusta el diseño del mod?"
+    IDS_EASTEREGG_INSTRUCTION "Por favor, cierre el cuadro de diálogo de las Preferencias, ahora."
+    // <== Diabolic Easteregg [Stulle] - Mephisto
+    IDS_REMOVEALLFRIENDSLOT "Eliminar todos los Slots de Amigo" // Multiple friendslots [ZZ] - Mephisto
+    IDS_NO_TRICKLE_TIMER    "Segundos hasta que se abra un nuevo slot si no hay un nuevo hilo (0=Off)" // Mephisto Upload - Mephisto
+    IDS_MEPHISTO_WARNING_1  "¡ATENCIÓN! ¡Estas opciones son muy sensibles!"
+    IDS_MEPHISTO_WARNING_2  "Cambiar con mucho cuidado, ¡bajo tu responsabilidad!"
+    IDS_MEPHISTO_UPLOAD     "Ajustes de la Subida de Mephisto"
+    IDS_MIN_SLOTS           "Mín. de Slots"
+    IDS_NO_NEW_SLOT_TIMER   "Seg. hasta abrir un nuevo Slots"
+    IDS_FULL_LOOPS          "Bucles completos hasta configurar en Slots completos en %"
+    IDS_MONITOR_LOOPS       "Segundos para monitorizar los bucles"
+    IDS_NOT_REACHED_BW      "Seg. hasta que el nuevo Slot se abra si el ancho de banda no se completa"
+    IDS_MOVE_DOWN_KB        "KB para salir antes de mover el cliente al final de la cola"
+    // <== Mephisto Upload - Mephisto
+    // ==> Multiple Part Transfer [Stulle] - Mephisto
+    IDS_CHUNKS_GROUP        "Modos de Transferencias de Partes"
+    IDS_CHUNKS_NONE         "Desactivar transferir partes completas"
+    IDS_CHUNKS_XMAN         "Subida de Partes Completas de Xtreme"
+    IDS_CHUNKS_FINISH       "Finalizar en X partes"
+    IDS_CHUNKS_TO_FINISH    "Partes antes de echar"
+    IDS_CHUNKS_FULL         "Subir X veces el tamaño de la parte"
+    IDS_CHUNKS_TO_UPLOAD    "Multiplicador del tamaño de la parte antes de echar"
+    // <== Multiple Part Transfer [Stulle] - Mephisto
+    IDS_MAX_UP_MINUTES      "Máx tiempo de subida en minutos" // Adjust max upload time [Stulle] - Mephisto
 END
 
 #endif    // Spanish (Castilian) resources

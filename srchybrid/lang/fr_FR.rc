@@ -2292,11 +2292,6 @@ BEGIN
     IDS_CLIENTQUEUEPROGRESSBAR "Afficher la progression de la file d'attente"
     IDS_ACC                 "Activer le contrôle automatique de connexion"
     // ==> ScarAngel Version Check - Stulle
-    IDS_VISITSVERSIONCHECK  "\n\nVeux-tu visiter le site WEB de ce mod ?"
-    IDS_SVERSIONCHECK       "&Vérifier la version (ScarAngel)"
-    IDS_NONEWSVERVERSION    "Pas de nouvelle version du MOD eMule trouvée."
-    IDS_NEWSVERSIONAVL      "Une nouvelle version de ce MOD eMule est disponible ! Consultez la page WEB du projet pour plus d'information."
-    IDS_NEWSVERSIONAVLPOPUP "Une nouvelle version d'eMule ScarAngel est disponible ! Cliquez ici pour lire les infos sur cette nouvelle version."
     // <== ScarAngel Version Check - Stulle
     // ==> Quick start [TPT] - Max
     IDS_QUICK_START_GROUP   "Démarrage rapide"
@@ -2556,7 +2551,6 @@ BEGIN
     IDS_DL_RATIO_LIMIT          "Le présent Ratio UL:DL est maxi. 1"
     // <== Enforce Ratio [Stulle] - Stulle
     // ==> Tabbed Preferences [TPT] - Stulle
-    IDS_SCARANGEL           "ScarAngel"
     IDS_BACKUP              "Sauvegarde de secours"
     // <== Tabbed Preferences [TPT] - Stulle
     IDS_ERR_HIDDENSOURCE    "Bloc demandé sans indiquer de ce qu'il a besoin"
@@ -2606,7 +2600,6 @@ BEGIN
     IDS_HOMEPAGE            "Page d'accueil"
     IDS_BOARD_GER           "Forum du support en allemand"
     IDS_BOARD_ENG           "Forum du support en anglais"
-    IDS_RATE                "Taux ScarAngel"
     IDS_XTREME              "Page d'accueil Mod Xtreme"
     // <== Support page in preferences [Stulle] - Stulle
     // ==> Automatic shared files updater [MoNKi] - Stulle
@@ -2712,6 +2705,7 @@ BEGIN
     IDS_MSGONLYSEC          "Autoriser seulement les clients valides"
     IDS_DISABLEPEERACHE    "Désactiver le téléchargement à partir du PeerCache"
     IDS_KEEPUNAVAILABLEFIXEDSHAREDDIRS  "Gardez les annuaires indisponibles sur les commandes fixes"
+    // <== Advanced Options [Official/MorphXT] - Stulle
     // ==> Advanced Updates [MorphXT/Stulle] - Stulle
     IDS_UPDATEANTILEECHERONSTART "Mettre à jour antiLeech.dll au démarrage"
     IDS_AUTOUPWEEK          "MAJ hebdomadaire"
@@ -2723,7 +2717,6 @@ BEGIN
     IDS_AUTOUPIP2COUNTRY    "Mise à jour des drapeaux de pays au démarrage"
     IDS_SCHED_UPDATE_IPCONFIG_LOG "Mise à jour planifiée de ipfilter.dat"
     IDS_SCHED_UPDATE_ANTILEECH_LOG "Mise à jour programmée de antiLeech.dll en cours"
-    IDS_SCHEDTEXT           "Ajouté par Morph pour la mise à jour auto"
     IDS_SCHED_UPDATE_IPCONFIG  "Mettre à jour fichier IPFILTER.DAT"
     IDS_SCHED_UPDATE_ANTILEECH "Mise à jour du fichier antiLeech.dll"
     IDS_SCHED_UPDATE_WARNING "Evitez de planifier les mises à jour trop fréquemment pour limiter le trafic réseau.\nUne mise à jour hebdomadaire devrait suffire"
@@ -2880,6 +2873,43 @@ BEGIN
     IDS_NOMINIMIZE          "No, To tray"
     // <== Extended Prompt on Exit dialog [leuk_he] - Stulle
     IDS_WS_FRIENDSLOT       "Friendslot" // Friendslot support for WebInterface [Stulle] - Stulle
+    IDS_VISITMVERSIONCHECK  "\n\nVeux-tu visiter le site internet de ce MOD eMule ?"
+    IDS_MVERSIONCHECK       "Contrôle de la &version (MOD eMule)"
+    IDS_NONEWMVERVERSION    "Pas de nouvelle version de ce MOD eMule trouvée."
+    IDS_NEWMVERSIONAVL      "Une nouvelle version de ce MOD eMule est disponible ! Voir la page d'accueil du projet pour plus d'information."
+    IDS_NEWMVERSIONAVLPOPUP "Une nouvelle version de ce MOD eMule est disponible. Cliquez ici pour plus d'information à propos de cette nouvelle version !"
+    IDS_DL_RATIO_FRIEND     "Slots amies activées" // Multiple friendslots [ZZ] - Mephisto
+    IDS_MEPHISTO                "Mephisto"
+    IDS_RATE_MEPH           "Taux Mephisto"
+    IDS_SCHEDTEXT_MEPH      "Ajouté par Mephisto pour la mise à jour auto"
+    // ==> Diabolic Easteregg [Stulle] - Mephisto
+    IDS_EASTEREGG           "Vous n'aimez pas le design ? Cliquez !"
+    IDS_EASTEREGG_PROMPT    "Etes-vous sûr que vous n'aimez pas le design de ce MOD ?"
+    IDS_EASTEREGG_INSTRUCTION "SVP, fermez maintenant la boite de dialogue Préférences."
+    // <== Diabolic Easteregg [Stulle] - Mephisto
+    IDS_REMOVEALLFRIENDSLOT "Retirer tous les slots amis" // Multiple friendslots [ZZ] - Mephisto
+    // ==> Mephisto Upload - Mephisto
+    IDS_NO_TRICKLE_TIMER    "Secondes avant l'ouverture d'un nouveau slot si aucun slot de ""réserve"" n'est actif (0=arrêt)"
+    IDS_MEPHISTO_WARNING_1  "ATTENTION: ces options sont sensibles !"
+    IDS_MEPHISTO_WARNING_2  "A modifier seulement en prenant un grand soin, c'est à vos risques !"
+    IDS_MEPHISTO_UPLOAD     "Optimisations de l'émission de Mephisto"
+    IDS_MIN_SLOTS           "Nombre minimum de slots"
+    IDS_NO_NEW_SLOT_TIMER   "Secondes avant qu'un nouveau slot soit ouvert"
+    IDS_FULL_LOOPS          "Boucles complètes nécessaires pour remplir les slots, en %"
+    IDS_MONITOR_LOOPS       "Secondes pour contrôler les boucles"
+    IDS_NOT_REACHED_BW      "Secondes nécessaires avant d'ouvrir un nouveau slot si la bande passante n'est pas pleine"
+    IDS_MOVE_DOWN_KB        "Ko avant de déplacer vers le bas un client en fin de transfert"
+    // <== Mephisto Upload - Mephisto
+    // ==> Multiple Part Transfer [Stulle] - Mephisto
+    IDS_CHUNKS_GROUP        "Mode de transfert des parties"
+    IDS_CHUNKS_NONE         "Désactiver le transfert de parties complètes"
+    IDS_CHUNKS_XMAN         "Emission de parties complètes Xtreme"
+    IDS_CHUNKS_FINISH       "Terminer X parties"
+    IDS_CHUNKS_TO_FINISH    "Parties avant d'éjecter"
+    IDS_CHUNKS_FULL         "Emettre X fois la taille d'une partie"
+    IDS_CHUNKS_TO_UPLOAD    "Multiplicateur pour la taille d'une partie avant d'éjecter"
+    // <== Multiple Part Transfer [Stulle] - Mephisto
+    IDS_MAX_UP_MINUTES      "Temps maximum d'émission en minutes" // Adjust max upload time [Stulle] - Mephisto
 END
 
 #endif    // French (France) resources
